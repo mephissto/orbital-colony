@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Colonie Orbitale</title>
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0icCIgY3g9IjM0JSIgY3k9IjI3JSIgcj0iNzglIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWRiMGQyIi8+PHN0b3Agb2Zmc2V0PSI0NSUiIHN0b3AtY29sb3I9IiM0YzVhNzIiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTUxYjI4Ii8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjEwIiBmaWxsPSIjMDcwYjE2Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMyIgcng9IjI5LjUiIHJ5PSI5LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E5N2JmZiIgc3Ryb2tlLXdpZHRoPSIzLjYiIG9wYWNpdHk9Ii42Ii8+PC9nPgo8Y2lyY2xlIGN4PSIzMiIgY3k9IjMxIiByPSIxNy41IiBmaWxsPSJ1cmwoI3ApIi8+CjxjaXJjbGUgY3g9IjI1LjUiIGN5PSIyNS41IiByPSI0LjIiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii41Ii8+CjxjaXJjbGUgY3g9IjM4LjUiIGN5PSIzNS41IiByPSIzLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40NSIvPgo8Y2lyY2xlIGN4PSIzNCIgY3k9IjIxIiByPSIyLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8cGF0aCBkPSJNMi41IDMzYTI5LjUgOS41IDAgMCAwIDU5IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRmZDhmZiIgc3Ryb2tlLXdpZHRoPSIzLjgiLz48L2c+Cjwvc3ZnPg==">
 <meta name="theme-color" content="#05070f">
@@ -27,11 +27,16 @@
   --dim:#8494b8;
 }
 *{box-sizing:border-box}
+html{touch-action:manipulation}          /* pas de zoom au double-tap ; le pincement reste possible */
 html,body{height:100%;overscroll-behavior:none}
 body{
   margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
   background:var(--bg);color:var(--txt);overflow:hidden;
+  -webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-touch-callout:none;
 }
+textarea{-webkit-user-select:text;user-select:text}
 #stars,#stars2{position:fixed;inset:0;pointer-events:none;z-index:0}
 #stars{background:
   radial-gradient(1200px 700px at 80% -10%, rgba(169,123,255,.11), transparent 60%),
@@ -43,6 +48,9 @@ body{
 /* ---------- HEADER ---------- */
 header{
   padding:9px 18px;border-bottom:1px solid var(--line);
+  padding-top:calc(9px + env(safe-area-inset-top));
+  padding-left:calc(18px + env(safe-area-inset-left));
+  padding-right:calc(18px + env(safe-area-inset-right));
   background:linear-gradient(180deg,rgba(10,16,32,.96),rgba(10,16,32,.68));
 }
 .topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -782,11 +790,12 @@ function spawnAnom(){
   el.style.display="block";
   clearTimeout(el._t); el._t=setTimeout(()=>el.style.display="none",14000);
 }
-$("#anomaly").onclick=()=>{
+bindAction($("#anomaly"),()=>{
+  if($("#anomaly").style.display==="none")return;
   $("#anomaly").style.display="none"; S.anoms++;
   ANOMS[Math.floor(Math.random()*ANOMS.length)].f();
   S.nextAnom=Date.now()+anomInterval(); render();
-};
+});
 
 /* ---------- toasts ---------- */
 function toast(msg,cls){
@@ -1150,14 +1159,14 @@ function render(){
   const n=upBadge(), badge=$("#bUp");
   txt(badge,n); cls(badge,"hidden",n===0);
 }
-$$(".tab").forEach(tab=>tab.onclick=()=>{
+$$(".tab").forEach(tab=>bindAction(tab,()=>{
   $$(".tab").forEach(x=>x.classList.remove("on")); tab.classList.add("on");
   $$(".panel").forEach(x=>x.classList.remove("on"));
   currentTab=tab.dataset.p;
   $("#p"+currentTab[0].toUpperCase()+currentTab.slice(1)).classList.add("on");
   render();
-});
-$$(".lang").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+}));
+$$(".lang").forEach(b=>bindAction(b,()=>setLang(b.dataset.lang)));
 
 /* ---------- hors-ligne ---------- */
 function offlineCap(){return (4+3*lvl("buffer"))*3600}
@@ -1219,24 +1228,24 @@ function load(){
     return true;
   }catch(e){return false}
 }
-$("#bSave").onclick=()=>{save();toast(t("t_saved"))};
-$("#bReset").onclick=()=>{
+bindAction($("#bSave"),()=>{save();toast(t("t_saved"))});
+bindAction($("#bReset"),()=>{
   if(confirm(t("confirm_reset"))){
     S=NEW(); save(); render(); toast(t("t_newgame"));
   }
-};
-$("#bExport").onclick=()=>{
+});
+bindAction($("#bExport"),()=>{
   save(); $("#mText").value=readSave()||""; $("#modal").classList.add("on"); $("#mText").select();
-};
-$("#mClose").onclick=()=>$("#modal").classList.remove("on");
-$("#mImport").onclick=()=>{
+});
+bindAction($("#mClose"),()=>$("#modal").classList.remove("on"));
+bindAction($("#mImport"),()=>{
   const v=$("#mText").value.trim(); if(!v)return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(v))));
     S=Object.assign(NEW(),d); S.lastTick=Date.now(); save(); render();
     $("#modal").classList.remove("on"); toast(t("t_imported"));
   }catch(e){alert(t("bad_code"))}
-};
+});
 window.addEventListener("beforeunload",save);
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden)save();
@@ -1258,6 +1267,30 @@ document.addEventListener("visibilitychange",()=>{
 })();
 
 /* ---------- démarrage ---------- */
+/* ---------- garde-fou anti double-tap ----------
+   iOS en mode application ignore parfois touch-action:manipulation.
+   On annule le geste natif du 2e appui rapproché — sans risque, car toutes les
+   commandes du jeu écoutent les événements Pointer, pas le clic synthétisé. */
+(function noDoubleTapZoom(){
+  let last=0, lx=0, ly=0;
+  document.addEventListener("touchend",e=>{
+    const tg=e.target;
+    if(tg&&(tg.tagName==="TEXTAREA"||tg.tagName==="INPUT"))return;   // saisie de texte : on ne touche à rien
+    if(e.changedTouches.length!==1)return;                            // pincement : on laisse faire
+    const t=e.changedTouches[0], now=Date.now();
+    if(now-last<=400&&Math.abs(t.clientX-lx)<40&&Math.abs(t.clientY-ly)<40){
+      e.preventDefault();
+      last=0;                                                         // un triple appui ne s'enchaîne pas
+    }else{
+      last=now; lx=t.clientX; ly=t.clientY;
+    }
+  },{passive:false});
+  // pincement-zoom : bloqué uniquement dans l'app installée, conservé au navigateur
+  const enApp=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  document.addEventListener("gesturestart",e=>{if(enApp())e.preventDefault()});
+  document.addEventListener("gesturechange",e=>{if(enApp())e.preventDefault()});
+})();
+
 /* ---------- service worker (jeu installable + hors connexion) ---------- */
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
   addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
