@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colonie Orbitale — Idle Game</title>
+<style>
+:root{
+  --bg:#05070f;
+  --panel:rgba(14,20,38,.78);
+  --panel-2:rgba(20,28,52,.7);
+  --line:rgba(120,180,255,.16);
+  --cyan:#4fd8ff;
+  --violet:#a97bff;
+  --gold:#ffc45c;
+  --green:#57e6a4;
+  --red:#ff6b8a;
+  --txt:#dbe6ff;
+  --dim:#8494b8;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--txt);overflow:hidden;
+}
+#stars,#stars2{position:fixed;inset:0;pointer-events:none;z-index:0}
+#stars{background:
+  radial-gradient(1200px 700px at 80% -10%, rgba(169,123,255,.11), transparent 60%),
+  radial-gradient(900px 600px at 10% 110%, rgba(79,216,255,.09), transparent 60%);
+}
+#starcanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
+#app{position:relative;z-index:2;height:100%;display:flex;flex-direction:column}
+
+/* ---------- HEADER ---------- */
+header{
+  padding:9px 18px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(10,16,32,.96),rgba(10,16,32,.68));
+}
+.topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.logo{font-weight:700;letter-spacing:.14em;font-size:13px;color:var(--cyan);text-transform:uppercase;
+  text-shadow:0 0 10px rgba(79,216,255,.3)}
+.spacer{flex:1}
+
+/* ---------- TUILES DE STATS (colonne de gauche) ---------- */
+.kpis{display:grid;grid-template-columns:1fr;gap:8px;width:100%}
+.kpi{
+  --acc:var(--cyan);
+  position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;
+  padding:9px 14px;border-radius:12px;border:1px solid var(--line);
+  background:linear-gradient(140deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc);opacity:.85}
+.kpi::after{content:"";position:absolute;right:-40px;top:-44px;width:110px;height:110px;border-radius:50%;
+  background:radial-gradient(circle,var(--acc),transparent 65%);opacity:.07;pointer-events:none}
+.kico{font-size:21px;line-height:1;opacity:.9;flex:none}
+.kbody{min-width:0;flex:1}
+.kpi .k{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
+.kpi .v{font-size:25px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums;
+  color:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .sub{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .sub b{color:var(--txt);font-weight:600}
+.kpi.ore{--acc:#e6eeff}
+.kpi.rate{--acc:var(--cyan)}
+.kpi.am{--acc:var(--violet)}
+.kpi.mult{--acc:var(--gold)}
+@media (max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:470px){
+  .kpi{padding:8px 11px;gap:9px}
+  .kico{font-size:17px}
+  .kpi .v{font-size:19px}
+  .kpi .sub{font-size:10px}
+}
+.hbtn{
+  background:var(--panel-2);border:1px solid var(--line);color:var(--dim);
+  padding:6px 11px;border-radius:8px;cursor:pointer;font-size:12px;transition:.15s;
+}
+.hbtn:hover{color:#fff;border-color:var(--cyan)}
+
+/* ---------- LAYOUT ---------- */
+main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
+#left{
+  border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;
+  align-items:center;gap:12px;background:linear-gradient(180deg,rgba(9,13,26,.6),rgba(9,13,26,.2));
+  position:relative;overflow-y:auto;overflow-x:hidden;
+}
+#left::-webkit-scrollbar{width:8px}
+#left::-webkit-scrollbar-thumb{background:rgba(79,216,255,.2);border-radius:8px}
+#right{display:flex;flex-direction:column;min-height:0}
+
+/* ---------- ASTEROID ---------- */
+#rock{
+  width:184px;height:184px;border-radius:50%;cursor:pointer;user-select:none;
+  background:
+    radial-gradient(circle at 32% 28%, #6b7ba0 0%, #3b475f 38%, #1d2536 70%, #10151f 100%);
+  box-shadow:0 0 30px rgba(79,216,255,.13), inset -16px -20px 42px rgba(0,0,0,.75),
+             inset 11px 13px 28px rgba(160,200,255,.12);
+  position:relative;transition:transform .07s;flex:none;
+}
+#rock:active{transform:scale(.94)}
+#rock::after{
+  content:"";position:absolute;inset:-6px;border-radius:50%;
+  border:1px dashed rgba(79,216,255,.35);animation:spin 24s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.crater{position:absolute;border-radius:50%;background:rgba(0,0,0,.35);
+  box-shadow:inset 2px 3px 6px rgba(0,0,0,.6), 1px 1px 0 rgba(180,210,255,.06)}
+.clicklabel{text-align:center;font-size:12px;color:var(--dim)}
+.clicklabel b{color:var(--cyan);font-size:15px}
+.float{position:absolute;pointer-events:none;font-weight:700;color:var(--cyan);
+  text-shadow:0 0 8px rgba(79,216,255,.5);animation:fly 1s ease-out forwards;font-size:15px}
+@keyframes fly{to{transform:translateY(-70px);opacity:0}}
+
+#buffs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:22px}
+.buff{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--gold);
+  color:var(--gold);background:rgba(255,196,92,.09);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 9px rgba(255,196,92,.22)}}
+
+#miniStats{width:100%;font-size:11.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:10px}
+#miniStats div{display:flex;justify-content:space-between;padding:2px 0}
+#miniStats span{color:var(--txt);font-variant-numeric:tabular-nums}
+
+/* ---------- TABS ---------- */
+nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{
+  padding:9px 16px;font-size:13px;cursor:pointer;color:var(--dim);border:1px solid transparent;
+  border-bottom:none;border-radius:9px 9px 0 0;position:relative;top:1px;white-space:nowrap;
+}
+.tab:hover{color:#fff}
+.tab.on{color:#fff;background:var(--panel);border-color:var(--line)}
+.tab .badge{display:inline-block;min-width:16px;padding:0 4px;margin-left:6px;border-radius:9px;
+  background:var(--cyan);color:#04121c;font-size:10px;font-weight:700;text-align:center}
+.tab .badge.hidden{display:none}
+#panels{flex:1;overflow-y:auto;padding:16px}
+#panels::-webkit-scrollbar{width:9px}
+#panels::-webkit-scrollbar-thumb{background:rgba(79,216,255,.25);border-radius:9px}
+.panel{display:none}
+.panel.on{display:block}
+
+/* ---------- CARDS ---------- */
+.buyrow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.buyrow .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.qty{padding:5px 13px;border-radius:7px;border:1px solid var(--line);background:var(--panel-2);
+  color:var(--dim);cursor:pointer;font-size:12px}
+.qty.on{color:#04121c;background:var(--cyan);border-color:var(--cyan);font-weight:700}
+
+.card{
+  display:grid;grid-template-columns:44px 1fr auto;gap:13px;align-items:center;
+  padding:11px 14px;margin-bottom:8px;border:1px solid var(--line);border-radius:11px;
+  background:var(--panel);cursor:pointer;
+  transition:border-color .15s, background-color .15s, box-shadow .15s;
+}
+.card:hover{border-color:rgba(79,216,255,.55);background:var(--panel-2);
+  box-shadow:0 0 0 1px rgba(79,216,255,.10)}
+.card.locked{opacity:.4;cursor:not-allowed;filter:grayscale(.6)}
+.card.locked:hover{border-color:var(--line);box-shadow:none;background:var(--panel)}
+.card.cant{cursor:not-allowed}
+.card.cant:hover{border-color:rgba(255,107,138,.45);box-shadow:none}
+.card.cant .cost{color:var(--dim)}
+.card.done{border-color:rgba(87,230,164,.35);background:rgba(87,230,164,.07);cursor:default}
+.card.done:hover{box-shadow:none;background:rgba(87,230,164,.07)}
+.ico{font-size:24px;text-align:center;filter:drop-shadow(0 0 5px rgba(79,216,255,.22))}
+.nm{font-size:14.5px;font-weight:600}
+.ds{font-size:11.5px;color:var(--dim);margin-top:2px}
+.rt{font-size:11.5px;color:var(--cyan);margin-top:3px;font-variant-numeric:tabular-nums}
+.bar{height:4px;border-radius:4px;background:rgba(255,255,255,.07);margin-top:8px;
+  max-width:430px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:4px;
+  background:linear-gradient(90deg,rgba(79,216,255,.7),var(--violet))}
+.bar.full i{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.right{text-align:right;white-space:nowrap;min-width:150px}
+.clbl{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);margin-bottom:1px}
+.cost{font-size:16px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.15}
+.miss{font-size:10.5px;color:var(--red);margin-top:3px}
+.miss.ok{color:var(--green)}
+.own{font-size:19px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;margin-top:6px}
+.owsub{font-size:10px;color:var(--dim)}
+h3.sec{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);
+  margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+h3.sec:first-child{margin-top:0}
+.hint{font-size:12px;color:var(--dim);margin:0 0 14px;line-height:1.55}
+
+/* prestige */
+.prestige-box{border:1px solid rgba(169,123,255,.4);background:rgba(169,123,255,.07);
+  border-radius:13px;padding:18px;margin-bottom:18px;text-align:center}
+.prestige-box .big{font-size:30px;font-weight:700;color:var(--violet);
+  text-shadow:0 0 12px rgba(169,123,255,.28);font-variant-numeric:tabular-nums}
+.pbtn{margin-top:12px;padding:11px 26px;border-radius:10px;border:1px solid var(--violet);
+  background:rgba(169,123,255,.16);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:.15s}
+.pbtn:hover:not(:disabled){background:var(--violet);color:#12081f;box-shadow:0 0 14px rgba(169,123,255,.3)}
+.pbtn:disabled{opacity:.35;cursor:not-allowed}
+.lvl{font-size:12px;color:var(--violet);font-weight:700}
+
+/* achievements */
+.achgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
+.ach{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);opacity:.38}
+.ach.got{opacity:1;border-color:rgba(255,196,92,.45);background:rgba(255,196,92,.07)}
+.ach .an{font-size:13px;font-weight:600}
+.ach .ad{font-size:11px;color:var(--dim);margin-top:2px}
+
+/* anomaly */
+#anomaly{position:absolute;width:62px;height:62px;border-radius:50%;cursor:pointer;z-index:20;display:none;
+  background:radial-gradient(circle at 35% 32%, #fff6d8, var(--gold) 45%, rgba(255,120,40,.15) 75%);
+  box-shadow:0 0 18px rgba(255,196,92,.75),0 0 38px rgba(255,196,92,.3);animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-14px) scale(1.08)}}
+
+/* toast */
+#toasts{position:fixed;bottom:18px;right:18px;z-index:60;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.toast{padding:10px 16px;border-radius:10px;border:1px solid var(--cyan);background:rgba(10,20,38,.95);
+  font-size:13px;box-shadow:0 6px 26px rgba(0,0,0,.6);animation:slide .3s ease-out}
+.toast.gold{border-color:var(--gold);color:var(--gold)}
+.toast.violet{border-color:var(--violet);color:var(--violet)}
+@keyframes slide{from{transform:translateX(50px);opacity:0}}
+
+/* modal */
+#modal{position:fixed;inset:0;z-index:80;background:rgba(2,4,10,.82);display:none;
+  align-items:center;justify-content:center;padding:20px}
+#modal.on{display:flex}
+.mbox{max-width:520px;width:100%;background:#0b1120;border:1px solid var(--line);border-radius:14px;padding:22px}
+.mbox h2{margin:0 0 10px;font-size:18px;color:var(--cyan)}
+.mbox textarea{width:100%;height:120px;background:#060a15;border:1px solid var(--line);border-radius:8px;
+  color:var(--txt);padding:9px;font-family:monospace;font-size:11px;resize:vertical}
+.mrow{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+
+@media (max-width:880px){
+  main{grid-template-columns:1fr;overflow-y:auto}
+  #left{border-right:none;border-bottom:1px solid var(--line);overflow:visible;height:auto}
+  #rock{width:150px;height:150px}
+  body{overflow:auto}
+  #panels{overflow:visible}
+}
+</style>
+</head>
+<body>
+<div id="stars"></div><canvas id="starcanvas"></canvas>
+
+<div id="app">
+<header>
+  <div class="topbar">
+    <div class="logo">◈ Colonie Orbitale</div>
+    <div class="spacer"></div>
+    <button class="hbtn" id="bSave">Sauvegarder</button>
+    <button class="hbtn" id="bExport">Export / Import</button>
+    <button class="hbtn" id="bReset">Reset</button>
+  </div>
+</header>
+
+<main>
+  <section id="left">
+    <div class="clicklabel">Foreuse manuelle — <b id="clickVal">+1</b> par clic</div>
+    <div id="rock"></div>
+    <div id="buffs"></div>
+    <div class="kpis">
+      <div class="kpi ore"><div class="kico">⛏️</div><div class="kbody">
+        <div class="k">Minerai</div><div class="v" id="hOre">0</div><div class="sub" id="sOre"></div></div></div>
+      <div class="kpi rate"><div class="kico">⚡</div><div class="kbody">
+        <div class="k">Production</div><div class="v" id="hRate">0 /s</div><div class="sub" id="sRate"></div></div></div>
+      <div class="kpi am"><div class="kico">🌌</div><div class="kbody">
+        <div class="k">Antimatière</div><div class="v" id="hAm">0</div><div class="sub" id="sAm"></div></div></div>
+      <div class="kpi mult"><div class="kico">✦</div><div class="kbody">
+        <div class="k">Multiplicateur</div><div class="v" id="hMult">×1</div><div class="sub" id="sMult"></div></div></div>
+    </div>
+    <div id="miniStats"></div>
+    <div id="anomaly" title="Anomalie détectée !"></div>
+  </section>
+
+  <section id="right">
+    <nav>
+      <div class="tab on" data-p="gen">Extraction</div>
+      <div class="tab" data-p="up">Améliorations<span class="badge hidden" id="bUp">0</span></div>
+      <div class="tab" data-p="pr">Recherche</div>
+      <div class="tab" data-p="ac">Succès</div>
+      <div class="tab" data-p="st">Statistiques</div>
+    </nav>
+    <div id="panels">
+      <div class="panel on" id="pGen"></div>
+      <div class="panel" id="pUp"></div>
+      <div class="panel" id="pPr"></div>
+      <div class="panel" id="pAc"></div>
+      <div class="panel" id="pSt"></div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="toasts"></div>
+<div id="modal"><div class="mbox">
+  <h2 id="mTitle">Sauvegarde</h2>
+  <p class="hint" id="mHint">Copie ce code pour sauvegarder ta partie, ou colle un code puis clique « Importer ».</p>
+  <textarea id="mText"></textarea>
+  <div class="mrow">
+    <button class="hbtn" id="mImport">Importer</button>
+    <button class="hbtn" id="mClose">Fermer</button>
+  </div>
+</div></div>
+
+<script>
+"use strict";
+/* ============================================================
+   COLONIE ORBITALE — idle game (fichier unique, hors-ligne)
+   ============================================================ */
+
+/* ---------- utils ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const UNITS=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc","Ud","Dd","Td"];
+function fmt(n){
+  if(!isFinite(n))return "∞";
+  if(n<0)return "-"+fmt(-n);
+  if(n<1000)return (n<10&&n%1!==0)?n.toFixed(1):Math.floor(n).toString();
+  let t=0; while(n>=1000&&t<UNITS.length-1){n/=1000;t++;}
+  return n.toFixed(n<10?2:n<100?1:0)+UNITS[t];
+}
+function fmtTime(s){
+  s=Math.floor(s); const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
+  if(d)return d+"j "+h+"h"; if(h)return h+"h "+m+"m"; if(m)return m+"m "+(s%60)+"s"; return s+"s";
+}
+
+/* ---------- données : générateurs ---------- */
+const GENS=[
+ {id:"drone",  ico:"🛸", nm:"Drone mineur",           ds:"Un petit drone qui gratte la surface.",        base:15,     rate:.1},
+ {id:"foreuse",ico:"⛏️", nm:"Foreuse automatique",    ds:"Perce la croûte en continu.",                  base:120,    rate:1},
+ {id:"laser",  ico:"🔦", nm:"Extracteur laser",       ds:"Découpe la roche au faisceau cohérent.",       base:1400,   rate:8},
+ {id:"raff",   ico:"🏭", nm:"Raffinerie orbitale",    ds:"Traite le minerai en orbite basse.",           base:2e4,    rate:52},
+ {id:"nano",   ico:"🦠", nm:"Essaim de nanites",      ds:"Des milliards de machines microscopiques.",    base:2.4e5,  rate:300},
+ {id:"asc",    ico:"🛗", nm:"Ascenseur spatial",      ds:"Un câble de 90 000 km. Le débit est fou.",     base:3e6,    rate:1800},
+ {id:"broy",   ico:"☄️", nm:"Broyeur d'astéroïdes",   ds:"Capture et pulvérise des cailloux entiers.",   base:4.5e7,  rate:11000},
+ {id:"forge",  ico:"🌟", nm:"Forge stellaire",        ds:"Fabrique la matière au cœur d'une étoile.",    base:8e8,    rate:75000},
+ {id:"rift",   ico:"🌀", nm:"Déchireur dimensionnel", ds:"Vole le minerai d'univers voisins.",           base:1.5e10, rate:5.4e5},
+ {id:"dyson",  ico:"🪐", nm:"Sphère de Dyson",        ds:"Toute une étoile au service de la colonie.",   base:3e11,   rate:4.2e6},
+];
+const GROWTH=1.15;
+
+/* ---------- données : améliorations ---------- */
+const UPS=[];
+// paliers par générateur
+const TIERS=[
+  {need:10, mult:2, txt:"Production ×2"},
+  {need:25, mult:2, txt:"Production ×2"},
+  {need:50, mult:3, txt:"Production ×3"},
+  {need:100,mult:4, txt:"Production ×4"},
+  {need:175,mult:5, txt:"Production ×5"},
+];
+GENS.forEach(g=>{
+  TIERS.forEach((t,i)=>{
+    UPS.push({
+      id:g.id+"_t"+i, ico:g.ico, nm:g.nm+" — Palier "+(i+1),
+      ds:t.txt+" (nécessite "+t.need+" × "+g.nm+")",
+      cost:g.base*18*Math.pow(11,i), kind:"gen", target:g.id, mult:t.mult,
+      req:S=>(S.gens[g.id]||0)>=t.need
+    });
+  });
+});
+// clic
+UPS.push(
+ {id:"c1",ico:"🔨",nm:"Marteau ionique",   ds:"Puissance de clic ×3",            cost:400,   kind:"click",mult:3},
+ {id:"c2",ico:"🦾",nm:"Exosquelette",      ds:"Puissance de clic ×4",            cost:3.5e4, kind:"click",mult:4,req:S=>S.clicks>=50},
+ {id:"c3",ico:"⚡",nm:"Condensateur",      ds:"Puissance de clic ×5",            cost:5e6,   kind:"click",mult:5,req:S=>S.clicks>=250},
+ {id:"c4",ico:"🧲",nm:"Champ magnétique",  ds:"Puissance de clic ×8",            cost:2e9,   kind:"click",mult:8,req:S=>S.clicks>=600},
+ {id:"r1",ico:"📡",nm:"Résonateur v1",     ds:"Le clic gagne +3 % de ta production/s", cost:2e5, kind:"reso",val:.03},
+ {id:"r2",ico:"📡",nm:"Résonateur v2",     ds:"Le clic gagne +12 % de ta production/s",cost:4e8, kind:"reso",val:.12,req:S=>S.ups.r1},
+ {id:"r3",ico:"📡",nm:"Résonateur v3",     ds:"Le clic gagne +40 % de ta production/s",cost:6e11,kind:"reso",val:.40,req:S=>S.ups.r2}
+);
+// globales
+UPS.push(
+ {id:"g1",ico:"🔗",nm:"Réseau logistique",    ds:"Production globale ×1,25", cost:5e4,  kind:"glob",mult:1.25},
+ {id:"g2",ico:"🧠",nm:"IA de coordination",   ds:"Production globale ×1,5",  cost:8e6,  kind:"glob",mult:1.5},
+ {id:"g3",ico:"🛰️",nm:"Relais quantique",     ds:"Production globale ×2",    cost:1.2e9,kind:"glob",mult:2},
+ {id:"g4",ico:"🧬",nm:"Bio-ingénierie",       ds:"Production globale ×2,5",  cost:3e11, kind:"glob",mult:2.5},
+ {id:"g5",ico:"🕳️",nm:"Moteur à singularité", ds:"Production globale ×4",    cost:9e13, kind:"glob",mult:4},
+ {id:"a1",ico:"🔮",nm:"Balise d'anomalie",    ds:"Les anomalies apparaissent 30 % plus souvent", cost:1e7, kind:"anom"}
+);
+
+/* ---------- données : recherche (antimatière) ---------- */
+const RES=[
+ {id:"mining", ico:"⚙️", nm:"Optimisation minière", ds:"+30 % de production par niveau", max:15, c0:4,  cg:1.55},
+ {id:"servo",  ico:"🤖", nm:"Bras servo-assistés",  ds:"×2 puissance de clic par niveau", max:12, c0:3,  cg:1.5},
+ {id:"buffer", ico:"💾", nm:"Mémoire tampon",       ds:"+3 h de gains hors-ligne par niveau", max:8, c0:6, cg:1.8},
+ {id:"auto",   ico:"🔁", nm:"Automatisation",       ds:"+10 % d'efficacité hors-ligne par niveau", max:6, c0:8, cg:2},
+ {id:"nego",   ico:"💠", nm:"Négociation",          ds:"−4 % sur le coût des générateurs par niveau", max:10, c0:10, cg:1.9},
+ {id:"detec",  ico:"📶", nm:"Détecteur d'anomalies",ds:"Anomalies +25 % fréquentes et +30 % longues", max:5, c0:14, cg:2.2},
+ {id:"reso",   ico:"✨", nm:"Résonance d'antimatière",ds:"Chaque antimatière donne +1,5 % de bonus en plus", max:10, c0:20, cg:2.4},
+ {id:"capsule",ico:"📦", nm:"Capsule de départ",    ds:"Démarre chaque cycle avec du minerai", max:6, c0:15, cg:2.1},
+];
+const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
+
+/* ---------- données : succès ---------- */
+const ACHS=[
+ {id:"a_click1",nm:"Premier caillou",   ds:"Cliquer une fois",              f:S=>S.clicks>=1},
+ {id:"a_click100",nm:"Main d'œuvre",    ds:"100 clics",                     f:S=>S.clicks>=100},
+ {id:"a_click1k",nm:"Tendinite",        ds:"1 000 clics",                   f:S=>S.clicks>=1000},
+ {id:"a_drone10",nm:"Petit essaim",     ds:"10 drones mineurs",             f:S=>(S.gens.drone||0)>=10},
+ {id:"a_drone100",nm:"Nuée",            ds:"100 drones mineurs",            f:S=>(S.gens.drone||0)>=100},
+ {id:"a_all1",nm:"Panoplie complète",   ds:"1 de chaque générateur",        f:S=>GENS.every(g=>(S.gens[g.id]||0)>=1)},
+ {id:"a_all25",nm:"Industriel",         ds:"25 de chaque générateur",       f:S=>GENS.every(g=>(S.gens[g.id]||0)>=25)},
+ {id:"a_e6",nm:"Million",               ds:"1 M de minerai extrait",        f:S=>S.totalOre>=1e6},
+ {id:"a_e9",nm:"Milliard",              ds:"1 B de minerai extrait",        f:S=>S.totalOre>=1e9},
+ {id:"a_e12",nm:"Billion",              ds:"1 T de minerai extrait",        f:S=>S.totalOre>=1e12},
+ {id:"a_e15",nm:"Échelle planétaire",   ds:"1 Qa de minerai extrait",       f:S=>S.totalOre>=1e15},
+ {id:"a_e18",nm:"Échelle stellaire",    ds:"1 Qi de minerai extrait",       f:S=>S.totalOre>=1e18},
+ {id:"a_rate1k",nm:"Cadence",           ds:"1 K/s de production",           f:S=>perSec()>=1e3},
+ {id:"a_rate1m",nm:"Chaîne complète",   ds:"1 M/s de production",           f:S=>perSec()>=1e6},
+ {id:"a_rate1g",nm:"Débit galactique",  ds:"1 B/s de production",           f:S=>perSec()>=1e9},
+ {id:"a_up10",nm:"Bricoleur",           ds:"10 améliorations achetées",     f:S=>Object.keys(S.ups).length>=10},
+ {id:"a_up30",nm:"Ingénieur en chef",   ds:"30 améliorations achetées",     f:S=>Object.keys(S.ups).length>=30},
+ {id:"a_anom1",nm:"Curieux",            ds:"Attraper une anomalie",         f:S=>S.anoms>=1},
+ {id:"a_anom25",nm:"Chasseur d'anomalies",ds:"Attraper 25 anomalies",       f:S=>S.anoms>=25},
+ {id:"a_pr1",nm:"Renaissance",          ds:"Premier cycle d'antimatière",   f:S=>S.prestiges>=1},
+ {id:"a_pr5",nm:"Boucle temporelle",    ds:"5 cycles",                      f:S=>S.prestiges>=5},
+ {id:"a_am100",nm:"Physicien",          ds:"100 antimatière possédée",      f:S=>S.am>=100},
+ {id:"a_am1k",nm:"Maître de l'antimatière",ds:"1 000 antimatière possédée", f:S=>S.am>=1000},
+ {id:"a_dyson",nm:"Ingénierie ultime",  ds:"Construire une sphère de Dyson",f:S=>(S.gens.dyson||0)>=1},
+];
+
+/* ---------- état ---------- */
+const NEW=()=>({
+  ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
+  gens:{},ups:{},res:{},achs:{},seen:1,
+  clicks:0,anoms:0,buffs:[],buy:1,
+  started:Date.now(),lastTick:Date.now(),lastSave:Date.now(),
+  nextAnom:Date.now()+45000
+});
+let S=NEW();
+
+/* ---------- stockage (avec repli mémoire si indisponible) ---------- */
+const KEY="colonie_orbitale_v1";
+let memSave=null, storageOK=(()=>{
+  try{const t="__t";localStorage.setItem(t,"1");localStorage.removeItem(t);return true}catch(e){return false}
+})();
+function writeSave(str){ if(storageOK){try{localStorage.setItem(KEY,str);return}catch(e){}} memSave=str; }
+function readSave(){ if(storageOK){try{const v=localStorage.getItem(KEY);if(v)return v}catch(e){}} return memSave; }
+
+/* ---------- calculs ---------- */
+function lvl(id){return S.res[id]||0}
+function amBonus(){return 0.02+0.015*lvl("reso")}            // par antimatière
+function achMult(){return 1+Object.keys(S.achs).length*0.01}
+function globalMult(){
+  let m=1;
+  m*=1+S.am*amBonus();
+  m*=achMult();
+  m*=Math.pow(1.3,lvl("mining"));
+  UPS.forEach(u=>{if(u.kind==="glob"&&S.ups[u.id])m*=u.mult});
+  S.buffs.forEach(b=>{if(b.k==="prod")m*=b.m});
+  return m;
+}
+function genMult(id){
+  let m=1;
+  UPS.forEach(u=>{if(u.kind==="gen"&&u.target===id&&S.ups[u.id])m*=u.mult});
+  return m;
+}
+function perSec(){
+  let t=0;
+  GENS.forEach(g=>{t+=(S.gens[g.id]||0)*g.rate*genMult(g.id)});
+  return t*globalMult();
+}
+function clickVal(){
+  let base=1, m=1;
+  UPS.forEach(u=>{if(u.kind==="click"&&S.ups[u.id])m*=u.mult});
+  m*=Math.pow(2,lvl("servo"));
+  let reso=0; UPS.forEach(u=>{if(u.kind==="reso"&&S.ups[u.id])reso=Math.max(reso,u.val)});
+  S.buffs.forEach(b=>{if(b.k==="click")m*=b.m});
+  return base*m*globalMult()+perSec()*reso;
+}
+function costMult(){return Math.pow(0.96,lvl("nego"))}
+function genCost(g,n){
+  const o=S.gens[g.id]||0, b=g.base*costMult();
+  return b*Math.pow(GROWTH,o)*(Math.pow(GROWTH,n)-1)/(GROWTH-1);
+}
+function maxAffordable(g){
+  const o=S.gens[g.id]||0, b=g.base*costMult()*Math.pow(GROWTH,o);
+  const n=Math.floor(Math.log(1+S.ore*(GROWTH-1)/b)/Math.log(GROWTH));
+  return Math.max(0,n);
+}
+function amGain(){
+  const raw=Math.floor(12*Math.sqrt(S.runOre/1e12));
+  return Math.max(0,raw);
+}
+
+/* ---------- actions ---------- */
+function gain(n){S.ore+=n;S.totalOre+=n;S.runOre+=n}
+
+function buyGen(g){
+  let n = S.buy==="max" ? maxAffordable(g) : S.buy;
+  if(S.buy!=="max"){ // achat "tout ou rien" pour x1/x10, sinon on ajuste
+    if(genCost(g,n)>S.ore) n=Math.min(n,maxAffordable(g));
+  }
+  if(n<1)return;
+  const c=genCost(g,n);
+  if(c>S.ore)return;
+  S.ore-=c; S.gens[g.id]=(S.gens[g.id]||0)+n;
+  render();
+}
+function buyUp(u){
+  if(S.ups[u.id]||S.ore<u.cost)return;
+  if(u.req&&!u.req(S))return;
+  S.ore-=u.cost; S.ups[u.id]=1; toast("Amélioration : "+u.nm); render();
+}
+function buyRes(r){
+  const l=lvl(r.id); if(l>=r.max)return;
+  const c=resCost(r,l); if(S.am<c)return;
+  S.am-=c; S.res[r.id]=l+1; toast("Recherche : "+r.nm+" niv."+(l+1),"violet"); render();
+}
+function doPrestige(){
+  const g=amGain(); if(g<1)return;
+  if(!confirm("Lancer un nouveau cycle ?\n\nTu perds minerai, générateurs et améliorations,\nmais tu gagnes "+fmt(g)+" antimatière (bonus permanent)."))return;
+  S.am+=g; S.amTotal+=g; S.prestiges++;
+  S.ore=0;S.runOre=0;S.gens={};S.ups={};S.buffs=[];
+  const cap=lvl("capsule"); if(cap)gain(1e4*Math.pow(25,cap));
+  toast("+"+fmt(g)+" antimatière !","violet"); save(); render();
+}
+
+/* ---------- buffs & anomalies ---------- */
+function addBuff(k,m,sec,nm){
+  S.buffs.push({k,m,nm,until:Date.now()+sec*1000});
+}
+const ANOMS=[
+ {nm:"Surtension",   f:()=>{const d=45*(1+.3*lvl("detec"));addBuff("prod",7,d,"Production ×7");toast("⚡ Surtension : production ×7 pendant "+Math.round(d)+"s","gold")}},
+ {nm:"Écho quantique",f:()=>{const d=60*(1+.3*lvl("detec"));addBuff("click",12,d,"Clic ×12");toast("✨ Écho quantique : clic ×12 pendant "+Math.round(d)+"s","gold")}},
+ {nm:"Filon riche",  f:()=>{const v=Math.max(50,perSec()*180);gain(v);toast("💎 Filon riche : +"+fmt(v)+" minerai","gold")}},
+ {nm:"Cache abandonnée",f:()=>{const v=Math.max(100,S.ore*0.18);gain(v);toast("📦 Cache abandonnée : +"+fmt(v)+" minerai","gold")}},
+];
+function anomInterval(){
+  let base=110000+Math.random()*130000;
+  if(S.ups.a1)base*=0.7;
+  base*=Math.pow(0.8,lvl("detec"));
+  return base;
+}
+function spawnAnom(){
+  const el=$("#anomaly"), box=$("#left").getBoundingClientRect();
+  el.style.left=(20+Math.random()*Math.max(20,box.width-100))+"px";
+  el.style.top=(60+Math.random()*Math.max(20,box.height-160))+"px";
+  el.style.display="block";
+  clearTimeout(el._t); el._t=setTimeout(()=>el.style.display="none",14000);
+}
+$("#anomaly").onclick=()=>{
+  $("#anomaly").style.display="none"; S.anoms++;
+  ANOMS[Math.floor(Math.random()*ANOMS.length)].f();
+  S.nextAnom=Date.now()+anomInterval(); render();
+};
+
+/* ---------- toasts ---------- */
+function toast(msg,cls){
+  const box=$("#toasts");
+  while(box.children.length>=4)box.firstChild.remove();   // pas plus de 4 à l'écran
+  const d=document.createElement("div");
+  d.className="toast"+(cls?" "+cls:""); d.textContent=msg;
+  box.appendChild(d);
+  setTimeout(()=>{d.style.transition=".4s";d.style.opacity="0";setTimeout(()=>d.remove(),400)},3600);
+}
+
+/* ---------- succès ---------- */
+function checkAchs(){
+  ACHS.forEach(a=>{
+    if(!S.achs[a.id]&&a.f(S)){S.achs[a.id]=1;toast("🏆 Succès : "+a.nm+"  (+1 % production)","gold")}
+  });
+}
+
+/* ---------- clic ---------- */
+$("#rock").addEventListener("pointerdown",e=>{
+  const v=clickVal(); gain(v); S.clicks++;
+  const f=document.createElement("div"); f.className="float"; f.textContent="+"+fmt(v);
+  const r=$("#left").getBoundingClientRect();
+  f.style.left=(e.clientX-r.left-14)+"px"; f.style.top=(e.clientY-r.top-14)+"px";
+  $("#left").appendChild(f); setTimeout(()=>f.remove(),1000);
+});
+// cratères décoratifs
+(function craters(){
+  const r=$("#rock");
+  [[28,32,26],[62,22,15],[48,58,30],[22,66,18],[70,62,22],[40,14,11],[76,42,12]].forEach(([x,y,s])=>{
+    const d=document.createElement("div"); d.className="crater";
+    d.style.cssText=`left:${x}%;top:${y}%;width:${s}px;height:${s}px`;
+    r.appendChild(d);
+  });
+})();
+
+/* ---------- rendu : primitives (mise à jour EN PLACE, pas de reconstruction) ---------- */
+function txt(el,v){v=(v==null)?"":String(v);if(el._v!==v){el._v=v;el.textContent=v}}
+function html(el,v){v=(v==null)?"":String(v);if(el._v!==v){el._v=v;el.innerHTML=v}}
+function cls(el,c,on){if(el.classList.contains(c)!==!!on)el.classList.toggle(c,!!on)}
+function show(el,on){const d=on?"":"none";if(el.style.display!==d)el.style.display=d}
+function syncList(box,items){
+  const cur=box.children;
+  let same=cur.length===items.length;
+  if(same)for(let i=0;i<items.length;i++)if(cur[i]!==items[i]){same=false;break}
+  if(same)return;                       // aucune modif du DOM : le survol n'est jamais interrompu
+  const f=document.createDocumentFragment();
+  items.forEach(e=>f.appendChild(e));
+  box.textContent=""; box.appendChild(f);
+}
+
+const CARDS=new Map();
+function getCard(key,act){
+  let c=CARDS.get(key); if(c)return c;
+  c=document.createElement("div"); c.className="card";
+  c.innerHTML='<div class="ico"></div>'+
+    '<div class="mid"><div class="nm"></div><div class="ds"></div><div class="rt"></div>'+
+    '<div class="bar"><i></i></div></div>'+
+    '<div class="right"><div class="clbl"></div><div class="cost"></div><div class="miss"></div>'+
+    '<div class="own"></div><div class="owsub"></div></div>';
+  c.q={ico:c.querySelector(".ico"),nm:c.querySelector(".nm"),ds:c.querySelector(".ds"),
+       rt:c.querySelector(".rt"),bar:c.querySelector(".bar"),fill:c.querySelector(".bar i"),
+       clbl:c.querySelector(".clbl"),cost:c.querySelector(".cost"),miss:c.querySelector(".miss"),
+       own:c.querySelector(".own"),owsub:c.querySelector(".owsub")};
+  if(act)c.onpointerdown=e=>{if(e.button===0||e.pointerType!=="mouse")act()};
+  CARDS.set(key,c); return c;
+}
+function upd(c,o){
+  const q=c.q;
+  txt(q.ico,o.ico); html(q.nm,o.nm); txt(q.ds,o.ds);
+  txt(q.rt,o.rt);       show(q.rt,!!o.rt);
+  txt(q.clbl,o.clbl);   show(q.clbl,!!o.clbl);
+  txt(q.cost,o.cost);   show(q.cost,o.cost!=null);
+  txt(q.miss,o.miss);   show(q.miss,!!o.miss); cls(q.miss,"ok",!!o.ok);
+  txt(q.own,o.own);     show(q.own,o.own!=null);
+  txt(q.owsub,o.owsub); show(q.owsub,!!o.owsub);
+  cls(c,"cant",!!o.cant); cls(c,"done",!!o.done); cls(c,"locked",!!o.locked);
+  if(o.prog!=null){
+    show(q.bar,true);
+    const w=Math.max(0,Math.min(100,o.prog*100)).toFixed(1)+"%";
+    if(q.fill._w!==w){q.fill._w=w;q.fill.style.width=w}
+    cls(q.bar,"full",o.prog>=1);
+  }else show(q.bar,false);
+}
+/* ligne de prix lisible : ce qu'il manque + temps estimé */
+function priceInfo(cost,cur,rate,unit){
+  if(cur>=cost)return {ok:1,cant:0,miss:"✓ tu peux l'acheter"};
+  const d=cost-cur;
+  let s="il manque "+fmt(d)+(unit?" "+unit:"");
+  if(rate>0)s+=(d/rate>86400*60)?"  •  encore très loin":"  •  ≈ "+fmtTime(d/rate);
+  return {ok:0,cant:1,miss:s};
+}
+
+/* ---------- squelette statique des onglets (construit une seule fois) ---------- */
+let QBTN=[], ACHNODES=[], STROWS=[];
+(function skeleton(){
+  /* --- Extraction --- */
+  $("#pGen").innerHTML=
+    '<p class="hint">Chaque structure produit du minerai en continu. Le prix monte de 15 % à chaque exemplaire acheté.</p>'+
+    '<div class="buyrow"><span class="lbl">Acheter par</span></div><div id="genList"></div>';
+  const row=$("#pGen .buyrow");
+  QBTN=[1,10,100,"max"].map(q=>{
+    const b=document.createElement("button");
+    b.className="qty"; b.textContent=(q==="max")?"MAX":"×"+q; b._q=q;
+    b.onpointerdown=()=>{S.buy=q;render()};
+    row.appendChild(b); return b;
+  });
+
+  /* --- Améliorations --- */
+  $("#pUp").innerHTML=
+    '<p class="hint">Achats <b>uniques et permanents</b>, payés en minerai. À droite : le prix, puis ce qu\'il te manque et le temps qu\'il faut pour l\'obtenir à ta production actuelle. La barre montre ta progression vers le prix.</p>'+
+    '<h3 class="sec" id="upT1">À acheter</h3><div id="upList"></div>'+
+    '<h3 class="sec" id="upT2">Déjà acquises</h3><div id="upOwn"></div>';
+
+  /* --- Recherche --- */
+  $("#pPr").innerHTML=
+    '<div class="prestige-box">'+
+      '<div class="hint" style="margin:0 0 6px">Cycle d\'antimatière — tu repars de zéro, tu gardes un bonus permanent</div>'+
+      '<div class="big" id="prGain">+0</div>'+
+      '<div class="hint" style="margin:6px 0 0" id="prInfo"></div>'+
+      '<div class="hint" id="prNote" style="margin:8px 0 0"></div>'+
+      '<button class="pbtn" id="prBtn">Lancer un nouveau cycle</button>'+
+    '</div>'+
+    '<h3 class="sec" id="resTitle"></h3>'+
+    '<p class="hint">Les recherches se paient en <b style="color:var(--violet)">antimatière</b> et ne sont jamais perdues.</p>'+
+    '<div id="resList"></div>';
+  $("#prBtn").onpointerdown=doPrestige;
+
+  /* --- Succès --- */
+  $("#pAc").innerHTML='<p class="hint" id="acHint"></p><div class="achgrid" id="acGrid"></div>';
+  const grid=$("#acGrid");
+  ACHNODES=ACHS.map(a=>{
+    const d=document.createElement("div"); d.className="ach";
+    d.innerHTML='<div class="an"></div><div class="ad"></div>';
+    d.q={n:d.querySelector(".an"),d:d.querySelector(".ad")};
+    grid.appendChild(d); return d;
+  });
+
+  /* --- Statistiques --- */
+  $("#pSt").innerHTML='<h3 class="sec">Statistiques</h3><div id="stList"></div>';
+  const labels=["Minerai possédé","Minerai extrait (total)","Minerai extrait (ce cycle)","Production",
+    "Puissance de clic","Clics effectués","Anomalies attrapées","Antimatière possédée",
+    "Antimatière gagnée (total)","Cycles effectués","Multiplicateur global","Améliorations acquises",
+    "Succès","Temps de jeu","Gains hors-ligne","Sauvegarde"];
+  const sl=$("#stList");
+  STROWS=labels.map(l=>{
+    const d=document.createElement("div");
+    d.style.cssText="display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px solid var(--line);font-size:13px";
+    d.innerHTML='<span style="color:var(--dim)">'+l+'</span><b style="font-variant-numeric:tabular-nums"></b>';
+    d.q=d.querySelector("b"); sl.appendChild(d); return d;
+  });
+})();
+
+/* ---------- rendu des onglets ---------- */
+function renderGens(){
+  QBTN.forEach(b=>cls(b,"on",S.buy===b._q));
+  const rate=perSec(), list=[];
+  let locked=0;
+  GENS.forEach((g,i)=>{
+    const owned=S.gens[g.id]||0;
+    if(owned>0||S.ore>=g.base*0.35)S.seen=Math.max(S.seen,i+2);
+    if(i>=S.seen){
+      if(++locked>2)return;                       // on n'annonce que les 2 prochaines
+      const c=getCard("lock:"+i);
+      upd(c,{ico:"🔒",nm:"???",ds:"Continue de progresser pour débloquer cette structure.",locked:1});
+      list.push(c); return;
+    }
+    let n=(S.buy==="max")?maxAffordable(g):S.buy;
+    const isMax=(S.buy==="max"&&n>=1);
+    if(n<1)n=1;
+    const cost=genCost(g,n);
+    const each=g.rate*genMult(g.id)*globalMult();
+    const p=priceInfo(cost,S.ore,rate);
+    const c=getCard("gen:"+g.id,()=>buyGen(g));
+    upd(c,{
+      ico:g.ico,nm:g.nm,ds:g.ds,
+      rt:fmt(each)+" /s par unité"+(owned?"   •   ces "+owned+" rapportent "+fmt(each*owned)+" /s":""),
+      clbl:(isMax?"Prix pour MAX (×"+n+")":"Prix pour ×"+n),
+      cost:fmt(cost)+" minerai",
+      miss:p.miss,ok:p.ok,cant:p.cant,prog:S.ore/cost,
+      own:owned,owsub:"possédés"
+    });
+    list.push(c);
+  });
+  syncList($("#genList"),list);
+}
+
+/* visible dès qu'on a déjà extrait 8 % du prix (critère monotone => aucune liste qui saute) */
+function upVisible(u){return (!u.req||u.req(S))&&S.totalOre>=u.cost*0.08}
+function upBadge(){return UPS.filter(u=>!S.ups[u.id]&&(!u.req||u.req(S))&&S.ore>=u.cost).length}
+
+function renderUps(){
+  const rate=perSec();
+  const avail=UPS.filter(u=>!S.ups[u.id]&&upVisible(u)).sort((a,b)=>a.cost-b.cost);
+  const own=UPS.filter(u=>S.ups[u.id]);
+  txt($("#upT1"),"À acheter ("+avail.length+")");
+  txt($("#upT2"),"Déjà acquises ("+own.length+")");
+  show($("#upT2"),own.length>0);
+
+  const l1=avail.map(u=>{
+    const p=priceInfo(u.cost,S.ore,rate);
+    const c=getCard("up:"+u.id,()=>buyUp(u));
+    upd(c,{ico:u.ico,nm:u.nm,ds:u.ds,clbl:"Prix",cost:fmt(u.cost)+" minerai",
+           miss:p.miss,ok:p.ok,cant:p.cant,prog:S.ore/u.cost});
+    return c;
+  });
+  if(!avail.length){
+    const c=getCard("up:none");
+    upd(c,{ico:"🔎",nm:"Rien de neuf pour l'instant",
+           ds:"Achète des structures et accumule du minerai : de nouvelles améliorations apparaîtront ici.",locked:1});
+    l1.push(c);
+  }
+  syncList($("#upList"),l1);
+
+  syncList($("#upOwn"),own.map(u=>{
+    const c=getCard("upo:"+u.id);
+    upd(c,{ico:u.ico,nm:u.nm,ds:u.ds,clbl:"Acquise",cost:"✔",done:1});
+    return c;
+  }));
+}
+
+function renderPrestige(){
+  const g=amGain();
+  txt($("#prGain"),"+"+fmt(g));
+  html($("#prInfo"),"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne "+
+    '<b style="color:var(--violet)">+'+(amBonus()*100).toFixed(1)+" %</b> de production<br>"+
+    'Bonus actuel : <b style="color:var(--violet)">×'+fmt(1+S.am*amBonus())+"</b> — cycles effectués : "+S.prestiges);
+  const note=$("#prNote");
+  show(note,g<1);
+  if(g<1){
+    const need=1e12/144, r=perSec();
+    txt(note,"Il faut extraire "+fmt(need)+" de minerai sur ce cycle pour gagner 1 antimatière — il t'en manque "+
+      fmt(Math.max(0,need-S.runOre))+(r>0?"  •  ≈ "+fmtTime(Math.max(0,need-S.runOre)/r):""));
+  }
+  const b=$("#prBtn"); if(b.disabled!==(g<1))b.disabled=(g<1);
+
+  txt($("#resTitle"),"Laboratoire — "+fmt(S.am)+" antimatière disponible");
+  syncList($("#resList"),RES.map(r=>{
+    const l=lvl(r.id), maxed=l>=r.max, cost=resCost(r,l);
+    const c=getCard("res:"+r.id,()=>buyRes(r));
+    const p=maxed?{}:priceInfo(cost,S.am,0,"antimatière");
+    upd(c,{ico:r.ico,nm:r.nm+'  <span class="lvl">niv. '+l+"/"+r.max+"</span>",ds:r.ds,
+      clbl:maxed?"":"Prix du niveau "+(l+1),
+      cost:maxed?"MAX":fmt(cost)+" AM",
+      miss:maxed?"niveau maximum atteint":p.miss, ok:maxed?1:p.ok,
+      done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost});
+    return c;
+  }));
+}
+
+function renderAchs(){
+  const got=Object.keys(S.achs).length;
+  html($("#acHint"),"<b>"+got+"/"+ACHS.length+"</b> succès — bonus de production actuel : "+
+    '<b style="color:var(--gold)">×'+achMult().toFixed(2)+"</b> (+1 % par succès)");
+  ACHS.forEach((a,i)=>{
+    const n=ACHNODES[i], has=!!S.achs[a.id];
+    cls(n,"got",has);
+    txt(n.q.n,(has?"🏆 ":"🔒 ")+(has?a.nm:"???"));
+    txt(n.q.d,a.ds);
+  });
+}
+
+function renderStats(){
+  const v=[fmt(S.ore),fmt(S.totalOre),fmt(S.runOre),fmt(perSec())+" /s",fmt(clickVal()),
+    fmt(S.clicks),fmt(S.anoms),fmt(S.am),fmt(S.amTotal),S.prestiges,"×"+fmt(globalMult()),
+    Object.keys(S.ups).length+"/"+UPS.length,Object.keys(S.achs).length+"/"+ACHS.length,
+    fmtTime((Date.now()-S.started)/1000),
+    "max "+fmtTime(offlineCap())+" à "+Math.round(offlineRate()*100)+" %",
+    storageOK?"navigateur (auto toutes les 20 s)":"mémoire seule — utilise Export !"];
+  STROWS.forEach((r,i)=>txt(r.q,v[i]));
+}
+
+/* détail du multiplicateur, pour la ligne sous le chiffre */
+function multParts(){
+  let up=1; UPS.forEach(u=>{if(u.kind==="glob"&&S.ups[u.id])up*=u.mult});
+  let bf=1; S.buffs.forEach(b=>{if(b.k==="prod")bf*=b.m});
+  return {am:1+S.am*amBonus(), ach:achMult(), tech:up*Math.pow(1.3,lvl("mining")), buff:bf};
+}
+function renderHeader(){
+  const rate=perSec(), g=amGain(), m=multParts();
+  txt($("#hOre"),fmt(S.ore));
+  txt($("#hRate"),fmt(rate)+" /s");
+  txt($("#hAm"),fmt(S.am));
+  txt($("#hMult"),"×"+fmt(globalMult()));
+  html($("#sOre"),"total extrait : <b>"+fmt(S.totalOre)+"</b>");
+  html($("#sRate"),"clic : <b>+"+fmt(clickVal())+"</b>");
+  html($("#sAm"),g>=1?"<b>+"+fmt(g)+"</b> au prochain cycle"
+                    :"cycle n°"+(S.prestiges+1)+" en cours");
+  const parts=[],full=[];
+  if(m.am>1.0001){parts.push("AM ×"+fmt(m.am));full.push("antimatière ×"+fmt(m.am))}
+  if(m.ach>1.0001){parts.push("succès ×"+m.ach.toFixed(2));full.push("succès ×"+m.ach.toFixed(2))}
+  if(m.tech>1.0001){parts.push("tech ×"+fmt(m.tech));full.push("améliorations et recherches ×"+fmt(m.tech))}
+  if(m.buff>1.0001){parts.push("<b style='color:var(--gold)'>bonus ×"+fmt(m.buff)+"</b>");
+                    full.push("bonus temporaire ×"+fmt(m.buff))}
+  html($("#sMult"),parts.length?parts.join(" · "):"aucun bonus pour l'instant");
+  const tile=$(".kpi.mult"), tip=full.join("\n");
+  if(tile._tip!==tip){tile._tip=tip;tile.title=tip?"Détail du multiplicateur :\n"+tip:""}
+  txt($("#clickVal"),"+"+fmt(clickVal()));
+  const b=$("#buffs");
+  const want=S.buffs.map(x=>x.nm+" — "+Math.ceil((x.until-Date.now())/1000)+"s");
+  if(b._n!==S.buffs.length){b._n=S.buffs.length;b.textContent="";
+    want.forEach(()=>{const d=document.createElement("div");d.className="buff";b.appendChild(d)})}
+  want.forEach((t,i)=>txt(b.children[i],t));
+  const owned=GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0);
+  const ms=$("#miniStats");
+  if(!ms._built){ms._built=1;
+    ms.innerHTML=["Structures","Succès","Cycles","Prochaine anomalie"]
+      .map(l=>"<div>"+l+" <span></span></div>").join("");
+    ms.q=[...ms.querySelectorAll("span")]}
+  txt(ms.q[0],fmt(owned));
+  txt(ms.q[1],Object.keys(S.achs).length+"/"+ACHS.length);
+  txt(ms.q[2],S.prestiges);
+  txt(ms.q[3],S.nextAnom>Date.now()?fmtTime((S.nextAnom-Date.now())/1000):"imminente");
+}
+
+let currentTab="gen";
+function render(){
+  renderHeader();
+  if(currentTab==="gen")renderGens();
+  else if(currentTab==="up")renderUps();
+  else if(currentTab==="pr")renderPrestige();
+  else if(currentTab==="ac")renderAchs();
+  else renderStats();
+  const n=upBadge(), badge=$("#bUp");
+  txt(badge,n); cls(badge,"hidden",n===0);
+}
+$$(".tab").forEach(t=>t.onclick=()=>{
+  $$(".tab").forEach(x=>x.classList.remove("on")); t.classList.add("on");
+  $$(".panel").forEach(x=>x.classList.remove("on"));
+  currentTab=t.dataset.p;
+  $("#p"+currentTab[0].toUpperCase()+currentTab.slice(1)).classList.add("on");
+  render();
+});
+
+/* ---------- hors-ligne ---------- */
+function offlineCap(){return (4+3*lvl("buffer"))*3600}
+function offlineRate(){return Math.min(1,0.35+0.10*lvl("auto"))}
+
+/* ---------- boucle ---------- */
+/* Crédite le temps écoulé. Les navigateurs gèlent requestAnimationFrame quand
+   l'onglet passe en arrière-plan : au retour, dt peut valoir plusieurs heures.
+   Sous 90 s (throttling normal) on paie plein tarif ; au-delà, c'est une absence
+   et on applique les règles hors-ligne (plafond + rendement). */
+const GRACE=90;
+function creditElapsed(sec,quiet){
+  if(!(sec>0))return 0;
+  if(sec<=GRACE){gain(perSec()*sec);return 0}
+  const eff=Math.min(sec,offlineCap());
+  const g=perSec()*eff*offlineRate();
+  if(g>0){
+    gain(g);
+    if(!quiet)toast("Absence de "+fmtTime(sec)+" → +"+fmt(g)+" minerai","gold");
+  }
+  return g;
+}
+
+let acc=0, uiAcc=0;
+function step(){
+  const now=Date.now();
+  let dt=(now-S.lastTick)/1000; S.lastTick=now;
+  if(dt<0)dt=0;                                   // horloge système reculée
+  S.buffs=S.buffs.filter(b=>b.until>now);         // avant le crédit : pas de bonus expiré payé
+  creditElapsed(dt);
+  if(now>=S.nextAnom&&$("#anomaly").style.display!=="block"){
+    spawnAnom(); S.nextAnom=now+anomInterval();
+  }
+  acc+=dt; if(acc>=1){acc=0;checkAchs()}
+  uiAcc+=dt; if(uiAcc>=0.2){uiAcc=0;render()}
+  if(now-S.lastSave>20000)save();
+}
+function loop(){ step(); requestAnimationFrame(loop) }
+/* filet de sécurité : même si rAF est gelé, ce timer finit par passer
+   (les navigateurs le limitent à ~1 fois par minute en arrière-plan) */
+setInterval(step,5000);
+
+/* ---------- sauvegarde ---------- */
+function save(){
+  S.lastSave=Date.now();
+  try{writeSave(btoa(unescape(encodeURIComponent(JSON.stringify(S)))))}catch(e){}
+}
+function load(){
+  const raw=readSave(); if(!raw)return false;
+  try{
+    const d=JSON.parse(decodeURIComponent(escape(atob(raw))));
+    S=Object.assign(NEW(),d);
+    S.buffs=(S.buffs||[]).filter(b=>b.until>Date.now());
+    // gains hors-ligne (même règle que le retour d'arrière-plan)
+    const away=(Date.now()-(d.lastSave||Date.now()))/1000;
+    const g=creditElapsed(away,true);
+    if(g>0)setTimeout(()=>toast("Absence de "+fmtTime(away)+" → +"+fmt(g)+" minerai","gold"),600);
+    S.lastTick=Date.now();
+    return true;
+  }catch(e){return false}
+}
+$("#bSave").onclick=()=>{save();toast("Partie sauvegardée")};
+$("#bReset").onclick=()=>{
+  if(confirm("Effacer TOUTE la progression (y compris l'antimatière) ?")){
+    S=NEW(); save(); render(); toast("Nouvelle partie");
+  }
+};
+$("#bExport").onclick=()=>{
+  save(); $("#mText").value=readSave()||""; $("#modal").classList.add("on"); $("#mText").select();
+};
+$("#mClose").onclick=()=>$("#modal").classList.remove("on");
+$("#mImport").onclick=()=>{
+  const v=$("#mText").value.trim(); if(!v)return;
+  try{
+    const d=JSON.parse(decodeURIComponent(escape(atob(v))));
+    S=Object.assign(NEW(),d); S.lastTick=Date.now(); save(); render();
+    $("#modal").classList.remove("on"); toast("Sauvegarde importée");
+  }catch(e){alert("Code de sauvegarde invalide.")}
+};
+window.addEventListener("beforeunload",save);
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden)save();
+  else{step();render()}          // au retour : on rattrape tout de suite le temps passé
+});
+
+/* ---------- fond étoilé ---------- */
+(function starfield(){
+  const c=$("#starcanvas"),x=c.getContext("2d");let st=[];
+  function rs(){c.width=innerWidth;c.height=innerHeight;st=[];
+    for(let i=0;i<140;i++)st.push({x:Math.random()*c.width,y:Math.random()*c.height,
+      r:Math.random()*1.3+.2,s:Math.random()*.16+.03,a:Math.random()});}
+  rs();addEventListener("resize",rs);
+  (function d(){x.clearRect(0,0,c.width,c.height);
+    st.forEach(p=>{p.y-=p.s;if(p.y<0){p.y=c.height;p.x=Math.random()*c.width}
+      p.a+=(Math.random()-.5)*.05;p.a=Math.max(.15,Math.min(1,p.a));
+      x.fillStyle=`rgba(190,220,255,${p.a*.7})`;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()});
+    requestAnimationFrame(d)})();
+})();
+
+/* ---------- démarrage ---------- */
+const loaded=load();
+if(!loaded)setTimeout(()=>toast("Bienvenue, commandant. Clique sur l'astéroïde."),700);
+if(!storageOK)setTimeout(()=>toast("Stockage indisponible ici : utilise « Export » pour garder ta partie.","gold"),1800);
+render();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
