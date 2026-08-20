@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Colonie Orbitale — Idle Game</title>
+<title>Colonie Orbitale</title>
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0icCIgY3g9IjM0JSIgY3k9IjI3JSIgcj0iNzglIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWRiMGQyIi8+PHN0b3Agb2Zmc2V0PSI0NSUiIHN0b3AtY29sb3I9IiM0YzVhNzIiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTUxYjI4Ii8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjEwIiBmaWxsPSIjMDcwYjE2Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMyIgcng9IjI5LjUiIHJ5PSI5LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E5N2JmZiIgc3Ryb2tlLXdpZHRoPSIzLjYiIG9wYWNpdHk9Ii42Ii8+PC9nPgo8Y2lyY2xlIGN4PSIzMiIgY3k9IjMxIiByPSIxNy41IiBmaWxsPSJ1cmwoI3ApIi8+CjxjaXJjbGUgY3g9IjI1LjUiIGN5PSIyNS41IiByPSI0LjIiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii41Ii8+CjxjaXJjbGUgY3g9IjM4LjUiIGN5PSIzNS41IiByPSIzLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40NSIvPgo8Y2lyY2xlIGN4PSIzNCIgY3k9IjIxIiByPSIyLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8cGF0aCBkPSJNMi41IDMzYTI5LjUgOS41IDAgMCAwIDU5IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRmZDhmZiIgc3Ryb2tlLXdpZHRoPSIzLjgiLz48L2c+Cjwvc3ZnPg==">
+<meta name="theme-color" content="#05070f">
 <style>
 :root{
   --bg:#05070f;
@@ -60,6 +62,7 @@ header{
   color:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .sub{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .sub b{color:var(--txt);font-weight:600}
+.kpi.mult .sub{white-space:normal;line-height:1.35}   /* le détail du multiplicateur peut passer à la ligne */
 .kpi.ore{--acc:#e6eeff}
 .kpi.rate{--acc:var(--cyan)}
 .kpi.am{--acc:var(--violet)}
@@ -71,11 +74,30 @@ header{
   .kpi .v{font-size:19px}
   .kpi .sub{font-size:10px}
 }
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
 .hbtn{
   background:var(--panel-2);border:1px solid var(--line);color:var(--dim);
   padding:6px 11px;border-radius:8px;cursor:pointer;font-size:12px;transition:.15s;
+  display:inline-flex;align-items:center;gap:7px;line-height:1;white-space:nowrap;
 }
 .hbtn:hover{color:#fff;border-color:var(--cyan)}
+.ic{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round}
+/* sur petit écran : icônes seules, boutons carrés et alignés */
+@media (max-width:720px){
+  .hbtn span{display:none}
+  .hbtn{padding:8px;justify-content:center;width:34px;height:34px}
+  .ic{width:17px;height:17px}
+  .lang{padding:8px 9px}
+  .tools{gap:6px}
+  .topbar{flex-wrap:nowrap}
+  .logo{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+.langsw{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.lang{background:var(--panel-2);border:none;color:var(--dim);padding:6px 10px;cursor:pointer;
+  font-size:11px;font-weight:700;letter-spacing:.06em;transition:.15s}
+.lang:hover{color:#fff}
+.lang.on{background:var(--cyan);color:#04121c}
 
 /* ---------- LAYOUT ---------- */
 main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
@@ -90,6 +112,7 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
 
 /* ---------- ASTEROID ---------- */
 #rock{
+  touch-action:manipulation;
   width:184px;height:184px;border-radius:50%;cursor:pointer;user-select:none;
   background:
     radial-gradient(circle at 32% 28%, #6b7ba0 0%, #3b475f 38%, #1d2536 70%, #10151f 100%);
@@ -152,6 +175,7 @@ nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line)
 }
 .card:hover{border-color:rgba(79,216,255,.55);background:var(--panel-2);
   box-shadow:0 0 0 1px rgba(79,216,255,.10)}
+.card:active{border-color:rgba(79,216,255,.7)}
 .card.locked{opacity:.4;cursor:not-allowed;filter:grayscale(.6)}
 .card.locked:hover{border-color:var(--line);box-shadow:none;background:var(--panel)}
 .card.cant{cursor:not-allowed}
@@ -237,40 +261,49 @@ h3.sec:first-child{margin-top:0}
 <div id="app">
 <header>
   <div class="topbar">
-    <div class="logo">◈ Colonie Orbitale</div>
+    <div class="logo" data-i18n="logo">◈ Colonie Orbitale</div>
     <div class="spacer"></div>
-    <button class="hbtn" id="bSave">Sauvegarder</button>
-    <button class="hbtn" id="bExport">Export / Import</button>
-    <button class="hbtn" id="bReset">Reset</button>
+    <div class="tools">
+      <div class="langsw"><button class="lang" data-lang="fr">FR</button><button class="lang" data-lang="en">EN</button></div>
+      <button class="hbtn" id="bSave" data-i18n-title="save">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+        <span data-i18n="save">Sauvegarder</span></button>
+      <button class="hbtn" id="bExport" data-i18n-title="export">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M8 17V4m0 0L4 8m4-4 4 4"/><path d="M16 7v13m0 0 4-4m-4 4-4-4"/></svg>
+        <span data-i18n="export">Export / Import</span></button>
+      <button class="hbtn" id="bReset" data-i18n-title="reset">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        <span data-i18n="reset">Reset</span></button>
+    </div>
   </div>
 </header>
 
 <main>
   <section id="left">
-    <div class="clicklabel">Foreuse manuelle — <b id="clickVal">+1</b> par clic</div>
+    <div class="clicklabel" id="clickLabel"></div>
     <div id="rock"></div>
     <div id="buffs"></div>
     <div class="kpis">
       <div class="kpi ore"><div class="kico">⛏️</div><div class="kbody">
-        <div class="k">Minerai</div><div class="v" id="hOre">0</div><div class="sub" id="sOre"></div></div></div>
+        <div class="k" data-i18n="kpi_ore">Minerai</div><div class="v" id="hOre">0</div><div class="sub" id="sOre"></div></div></div>
       <div class="kpi rate"><div class="kico">⚡</div><div class="kbody">
-        <div class="k">Production</div><div class="v" id="hRate">0 /s</div><div class="sub" id="sRate"></div></div></div>
+        <div class="k" data-i18n="kpi_rate">Production</div><div class="v" id="hRate">0 /s</div><div class="sub" id="sRate"></div></div></div>
       <div class="kpi am"><div class="kico">🌌</div><div class="kbody">
-        <div class="k">Antimatière</div><div class="v" id="hAm">0</div><div class="sub" id="sAm"></div></div></div>
+        <div class="k" data-i18n="kpi_am">Antimatière</div><div class="v" id="hAm">0</div><div class="sub" id="sAm"></div></div></div>
       <div class="kpi mult"><div class="kico">✦</div><div class="kbody">
-        <div class="k">Multiplicateur</div><div class="v" id="hMult">×1</div><div class="sub" id="sMult"></div></div></div>
+        <div class="k" data-i18n="kpi_mult">Multiplicateur</div><div class="v" id="hMult">×1</div><div class="sub" id="sMult"></div></div></div>
     </div>
     <div id="miniStats"></div>
-    <div id="anomaly" title="Anomalie détectée !"></div>
+    <div id="anomaly" data-i18n-title="anom_title"></div>
   </section>
 
   <section id="right">
     <nav>
-      <div class="tab on" data-p="gen">Extraction</div>
-      <div class="tab" data-p="up">Améliorations<span class="badge hidden" id="bUp">0</span></div>
-      <div class="tab" data-p="pr">Recherche</div>
-      <div class="tab" data-p="ac">Succès</div>
-      <div class="tab" data-p="st">Statistiques</div>
+      <div class="tab on" data-p="gen"><span data-i18n="tab_gen">Extraction</span></div>
+      <div class="tab" data-p="up"><span data-i18n="tab_up">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
+      <div class="tab" data-p="pr"><span data-i18n="tab_pr">Recherche</span></div>
+      <div class="tab" data-p="ac"><span data-i18n="tab_ac">Succès</span></div>
+      <div class="tab" data-p="st"><span data-i18n="tab_st">Statistiques</span></div>
     </nav>
     <div id="panels">
       <div class="panel on" id="pGen"></div>
@@ -285,12 +318,12 @@ h3.sec:first-child{margin-top:0}
 
 <div id="toasts"></div>
 <div id="modal"><div class="mbox">
-  <h2 id="mTitle">Sauvegarde</h2>
-  <p class="hint" id="mHint">Copie ce code pour sauvegarder ta partie, ou colle un code puis clique « Importer ».</p>
+  <h2 id="mTitle" data-i18n="m_title">Sauvegarde</h2>
+  <p class="hint" id="mHint" data-i18n="m_hint"></p>
   <textarea id="mText"></textarea>
   <div class="mrow">
-    <button class="hbtn" id="mImport">Importer</button>
-    <button class="hbtn" id="mClose">Fermer</button>
+    <button class="hbtn" id="mImport" data-i18n="m_import">Importer</button>
+    <button class="hbtn" id="mClose" data-i18n="m_close">Fermer</button>
   </div>
 </div></div>
 
@@ -312,103 +345,315 @@ function fmt(n){
 }
 function fmtTime(s){
   s=Math.floor(s); const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
-  if(d)return d+"j "+h+"h"; if(h)return h+"h "+m+"m"; if(m)return m+"m "+(s%60)+"s"; return s+"s";
+  if(d)return d+t("u_d")+" "+h+t("u_h");
+  if(h)return h+t("u_h")+" "+m+t("u_m");
+  if(m)return m+t("u_m")+" "+(s%60)+t("u_s");
+  return s+t("u_s");
 }
+
+/* ============================================================
+   LANGUES — tout le texte visible passe par T / t() / tr()
+   ============================================================ */
+const T={
+fr:{
+  logo:"◈ Colonie Orbitale", doc_title:"Colonie Orbitale — idle game spatial",
+  save:"Sauvegarder", export:"Export / Import", reset:"Reset",
+  tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_ac:"Succès", tab_st:"Statistiques",
+  manual:"Foreuse manuelle", per_click:"par clic",
+  kpi_ore:"Minerai", kpi_rate:"Production", kpi_am:"Antimatière", kpi_mult:"Multiplicateur",
+  sub_total:"total extrait : <b>{0}</b>",
+  sub_click:"clic : <b>+{0}</b>",
+  sub_next:"<b>+{0}</b> au prochain cycle",
+  sub_cycle:"cycle n°{0} en cours",
+  p_am:"AM ×{0}", p_ach:"succès ×{0}", p_tech:"tech ×{0}", p_buff:"bonus ×{0}",
+  f_am:"antimatière ×{0}", f_ach:"succès ×{0}", f_tech:"améliorations et recherches ×{0}",
+  f_buff:"bonus temporaire ×{0}",
+  mult_none:"aucun bonus pour l'instant", mult_tip:"Détail du multiplicateur :",
+  ms_struct:"Structures", ms_ach:"Succès", ms_cycles:"Cycles", ms_anom:"Prochaine anomalie",
+  imminent:"imminente", anom_title:"Anomalie détectée !",
+  m_title:"Sauvegarde",
+  m_hint:"Copie ce code pour sauvegarder ta partie, ou colle un code puis clique « Importer ».",
+  m_import:"Importer", m_close:"Fermer", bad_code:"Code de sauvegarde invalide.",
+  gen_hint:"Chaque structure produit du minerai en continu. Le prix monte de 15 % à chaque exemplaire acheté.",
+  buy_by:"Acheter par",
+  up_hint:"Achats <b>uniques et permanents</b>, payés en minerai. À droite : le prix, puis ce qu'il te manque et le temps qu'il faut pour l'obtenir à ta production actuelle. La barre montre ta progression vers le prix.",
+  up_avail:"À acheter ({0})", up_owned:"Déjà acquises ({0})", acquired:"Acquise",
+  up_none_nm:"Rien de neuf pour l'instant",
+  up_none_ds:"Achète des structures et accumule du minerai : de nouvelles améliorations apparaîtront ici.",
+  price:"Prix", price_for:"Prix pour ×{0}", price_for_max:"Prix pour MAX (×{0})", price_lvl:"Prix du niveau {0}",
+  cost_ore:"{0} minerai", cost_am:"{0} AM", unit_am:"antimatière",
+  can_buy:"✓ tu peux l'acheter", missing:"il manque {0}", eta:"  •  ≈ {0}", far:"  •  encore très loin",
+  each_rate:"{0} /s par unité", total_rate:"   •   ces {0} rapportent {1} /s", owned_sub:"possédés",
+  locked_ds:"Continue de progresser pour débloquer cette structure.",
+  pr_head:"Cycle d'antimatière — tu repars de zéro, tu gardes un bonus permanent",
+  pr_btn:"Lancer un nouveau cycle",
+  pr_info:"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne <b style=\"color:var(--violet)\">+{0} %</b> de production<br>Bonus actuel : <b style=\"color:var(--violet)\">×{1}</b> — cycles effectués : {2}",
+  pr_note:"Il faut extraire {0} de minerai sur ce cycle pour gagner 1 antimatière — il t'en manque {1}{2}",
+  pr_confirm:"Lancer un nouveau cycle ?\n\nTu perds minerai, générateurs et améliorations,\nmais tu gagnes {0} antimatière (bonus permanent).",
+  res_title:"Laboratoire — {0} antimatière disponible",
+  res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
+  lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
+  ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--gold)\">×{2}</b> (+1 % par succès)",
+  st_title:"Statistiques",
+  st:["Minerai possédé","Minerai extrait (total)","Minerai extrait (ce cycle)","Production",
+      "Puissance de clic","Clics effectués","Anomalies attrapées","Antimatière possédée",
+      "Antimatière gagnée (total)","Cycles effectués","Multiplicateur global","Améliorations acquises",
+      "Succès","Temps de jeu","Gains hors-ligne","Sauvegarde"],
+  st_off:"max {0} à {1} %",
+  st_save_ok:"navigateur (auto toutes les 20 s)", st_save_mem:"mémoire seule — utilise Export !",
+  t_up:"Amélioration : {0}", t_res:"Recherche : {0} niv.{1}", t_ach:"🏆 Succès : {0}  (+1 % production)",
+  t_saved:"Partie sauvegardée", t_newgame:"Nouvelle partie", t_imported:"Sauvegarde importée",
+  t_welcome:"Bienvenue, commandant. Clique sur l'astéroïde.",
+  t_nostorage:"Stockage indisponible ici : utilise « Export » pour garder ta partie.",
+  t_away:"Absence de {0} → +{1} minerai", t_am:"+{0} antimatière !",
+  confirm_reset:"Effacer TOUTE la progression (y compris l'antimatière) ?",
+  an_surge:"⚡ Surtension : production ×7 pendant {0} s",
+  an_echo:"✨ Écho quantique : clic ×12 pendant {0} s",
+  an_vein:"💎 Filon riche : +{0} minerai",
+  an_cache:"📦 Cache abandonnée : +{0} minerai",
+  buff_prod:"Production ×7", buff_click:"Clic ×12",
+  u_d:"j", u_h:"h", u_m:"m", u_s:"s"
+},
+en:{
+  logo:"◈ Orbital Colony", doc_title:"Orbital Colony — space idle game",
+  save:"Save", export:"Export / Import", reset:"Reset",
+  tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_ac:"Achievements", tab_st:"Statistics",
+  manual:"Manual drill", per_click:"per click",
+  kpi_ore:"Ore", kpi_rate:"Output", kpi_am:"Antimatter", kpi_mult:"Multiplier",
+  sub_total:"total mined: <b>{0}</b>",
+  sub_click:"click: <b>+{0}</b>",
+  sub_next:"<b>+{0}</b> on next cycle",
+  sub_cycle:"cycle #{0} in progress",
+  p_am:"AM ×{0}", p_ach:"achiev. ×{0}", p_tech:"tech ×{0}", p_buff:"boost ×{0}",
+  f_am:"antimatter ×{0}", f_ach:"achievements ×{0}", f_tech:"upgrades and research ×{0}",
+  f_buff:"temporary boost ×{0}",
+  mult_none:"no bonus yet", mult_tip:"Multiplier breakdown:",
+  ms_struct:"Structures", ms_ach:"Achievements", ms_cycles:"Cycles", ms_anom:"Next anomaly",
+  imminent:"imminent", anom_title:"Anomaly detected!",
+  m_title:"Save file",
+  m_hint:"Copy this code to back up your game, or paste a code and click “Import”.",
+  m_import:"Import", m_close:"Close", bad_code:"Invalid save code.",
+  gen_hint:"Each structure produces ore continuously. The price rises 15 % with every unit bought.",
+  buy_by:"Buy in lots of",
+  up_hint:"<b>One-off, permanent</b> purchases paid in ore. On the right: the price, then what you are still missing and how long it takes at your current output. The bar shows your progress towards the price.",
+  up_avail:"Available ({0})", up_owned:"Already owned ({0})", acquired:"Owned",
+  up_none_nm:"Nothing new right now",
+  up_none_ds:"Buy structures and pile up ore — new upgrades will show up here.",
+  price:"Price", price_for:"Price for ×{0}", price_for_max:"Price for MAX (×{0})", price_lvl:"Price of level {0}",
+  cost_ore:"{0} ore", cost_am:"{0} AM", unit_am:"antimatter",
+  can_buy:"✓ you can afford it", missing:"{0} short", eta:"  •  ≈ {0}", far:"  •  still a long way off",
+  each_rate:"{0} /s each", total_rate:"   •   these {0} produce {1} /s", owned_sub:"owned",
+  locked_ds:"Keep progressing to unlock this structure.",
+  pr_head:"Antimatter cycle — you start over, you keep a permanent bonus",
+  pr_btn:"Start a new cycle",
+  pr_info:"antimatter on the next cycle &nbsp;•&nbsp; each unit grants <b style=\"color:var(--violet)\">+{0} %</b> output<br>Current bonus: <b style=\"color:var(--violet)\">×{1}</b> — cycles completed: {2}",
+  pr_note:"You need to mine {0} ore this cycle to earn 1 antimatter — {1} to go{2}",
+  pr_confirm:"Start a new cycle?\n\nYou lose ore, structures and upgrades,\nbut you gain {0} antimatter (permanent bonus).",
+  res_title:"Laboratory — {0} antimatter available",
+  res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
+  lvl:"lvl {0}/{1}", maxed:"maximum level reached",
+  ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--gold)\">×{2}</b> (+1 % each)",
+  st_title:"Statistics",
+  st:["Ore held","Ore mined (total)","Ore mined (this cycle)","Output",
+      "Click power","Clicks made","Anomalies caught","Antimatter held",
+      "Antimatter earned (total)","Cycles completed","Global multiplier","Upgrades owned",
+      "Achievements","Play time","Offline gains","Save"],
+  st_off:"max {0} at {1} %",
+  st_save_ok:"browser (auto every 20 s)", st_save_mem:"memory only — use Export!",
+  t_up:"Upgrade: {0}", t_res:"Research: {0} lvl {1}", t_ach:"🏆 Achievement: {0}  (+1 % output)",
+  t_saved:"Game saved", t_newgame:"New game", t_imported:"Save imported",
+  t_welcome:"Welcome, commander. Click the asteroid.",
+  t_nostorage:"Storage unavailable here: use “Export” to keep your game.",
+  t_away:"Away for {0} → +{1} ore", t_am:"+{0} antimatter!",
+  confirm_reset:"Erase ALL progress (including antimatter)?",
+  an_surge:"⚡ Power surge: output ×7 for {0} s",
+  an_echo:"✨ Quantum echo: clicks ×12 for {0} s",
+  an_vein:"💎 Rich vein: +{0} ore",
+  an_cache:"📦 Abandoned cache: +{0} ore",
+  buff_prod:"Output ×7", buff_click:"Clicks ×12",
+  u_d:"d", u_h:"h", u_m:"m", u_s:"s"
+}};
+
+const LKEY="colonie_orbitale_lang";
+function readLang(){try{return localStorage.getItem(LKEY)}catch(e){return null}}
+function writeLang(l){try{localStorage.setItem(LKEY,l)}catch(e){}}
+let LANG=readLang();
+if(!T[LANG])LANG=((navigator.language||"en").toLowerCase().indexOf("fr")===0)?"fr":"en";
+
+/* t("clé", param0, param1…) → chaîne d'interface ; tr({fr,en}) → texte de données */
+function t(k){
+  let s=T[LANG][k]; if(s==null)s=T.fr[k]; if(s==null)return k;
+  for(let i=1;i<arguments.length;i++)s=s.split("{"+(i-1)+"}").join(arguments[i]);
+  return s;
+}
+function tr(o){return (o&&typeof o==="object")?(o[LANG]!=null?o[LANG]:o.fr):o}
 
 /* ---------- données : générateurs ---------- */
 const GENS=[
- {id:"drone",  ico:"🛸", nm:"Drone mineur",           ds:"Un petit drone qui gratte la surface.",        base:15,     rate:.1},
- {id:"foreuse",ico:"⛏️", nm:"Foreuse automatique",    ds:"Perce la croûte en continu.",                  base:120,    rate:1},
- {id:"laser",  ico:"🔦", nm:"Extracteur laser",       ds:"Découpe la roche au faisceau cohérent.",       base:1400,   rate:8},
- {id:"raff",   ico:"🏭", nm:"Raffinerie orbitale",    ds:"Traite le minerai en orbite basse.",           base:2e4,    rate:52},
- {id:"nano",   ico:"🦠", nm:"Essaim de nanites",      ds:"Des milliards de machines microscopiques.",    base:2.4e5,  rate:300},
- {id:"asc",    ico:"🛗", nm:"Ascenseur spatial",      ds:"Un câble de 90 000 km. Le débit est fou.",     base:3e6,    rate:1800},
- {id:"broy",   ico:"☄️", nm:"Broyeur d'astéroïdes",   ds:"Capture et pulvérise des cailloux entiers.",   base:4.5e7,  rate:11000},
- {id:"forge",  ico:"🌟", nm:"Forge stellaire",        ds:"Fabrique la matière au cœur d'une étoile.",    base:8e8,    rate:75000},
- {id:"rift",   ico:"🌀", nm:"Déchireur dimensionnel", ds:"Vole le minerai d'univers voisins.",           base:1.5e10, rate:5.4e5},
- {id:"dyson",  ico:"🪐", nm:"Sphère de Dyson",        ds:"Toute une étoile au service de la colonie.",   base:3e11,   rate:4.2e6},
+ {id:"drone",  ico:"🛸", base:15,     rate:.1,
+  nm:{fr:"Drone mineur",en:"Mining drone"},
+  ds:{fr:"Un petit drone qui gratte la surface.",en:"A small drone scraping the surface."}},
+ {id:"foreuse",ico:"⛏️", base:120,    rate:1,
+  nm:{fr:"Foreuse automatique",en:"Automated drill"},
+  ds:{fr:"Perce la croûte en continu.",en:"Bores through the crust non-stop."}},
+ {id:"laser",  ico:"🔦", base:1400,   rate:8,
+  nm:{fr:"Extracteur laser",en:"Laser extractor"},
+  ds:{fr:"Découpe la roche au faisceau cohérent.",en:"Cuts rock with a coherent beam."}},
+ {id:"raff",   ico:"🏭", base:2e4,    rate:52,
+  nm:{fr:"Raffinerie orbitale",en:"Orbital refinery"},
+  ds:{fr:"Traite le minerai en orbite basse.",en:"Processes ore in low orbit."}},
+ {id:"nano",   ico:"🦠", base:2.4e5,  rate:300,
+  nm:{fr:"Essaim de nanites",en:"Nanite swarm"},
+  ds:{fr:"Des milliards de machines microscopiques.",en:"Billions of microscopic machines."}},
+ {id:"asc",    ico:"🛗", base:3e6,    rate:1800,
+  nm:{fr:"Ascenseur spatial",en:"Space elevator"},
+  ds:{fr:"Un câble de 90 000 km. Le débit est fou.",en:"A 90,000 km cable. The throughput is insane."}},
+ {id:"broy",   ico:"☄️", base:4.5e7,  rate:11000,
+  nm:{fr:"Broyeur d'astéroïdes",en:"Asteroid crusher"},
+  ds:{fr:"Capture et pulvérise des cailloux entiers.",en:"Captures and pulverises whole rocks."}},
+ {id:"forge",  ico:"🌟", base:8e8,    rate:75000,
+  nm:{fr:"Forge stellaire",en:"Stellar forge"},
+  ds:{fr:"Fabrique la matière au cœur d'une étoile.",en:"Makes matter in the heart of a star."}},
+ {id:"rift",   ico:"🌀", base:1.5e10, rate:5.4e5,
+  nm:{fr:"Déchireur dimensionnel",en:"Dimensional ripper"},
+  ds:{fr:"Vole le minerai d'univers voisins.",en:"Steals ore from neighbouring universes."}},
+ {id:"dyson",  ico:"🪐", base:3e11,   rate:4.2e6,
+  nm:{fr:"Sphère de Dyson",en:"Dyson sphere"},
+  ds:{fr:"Toute une étoile au service de la colonie.",en:"A whole star serving the colony."}},
 ];
 const GROWTH=1.15;
 
 /* ---------- données : améliorations ---------- */
 const UPS=[];
-// paliers par générateur
-const TIERS=[
-  {need:10, mult:2, txt:"Production ×2"},
-  {need:25, mult:2, txt:"Production ×2"},
-  {need:50, mult:3, txt:"Production ×3"},
-  {need:100,mult:4, txt:"Production ×4"},
-  {need:175,mult:5, txt:"Production ×5"},
-];
+const TIERS=[{need:10,mult:2},{need:25,mult:2},{need:50,mult:3},{need:100,mult:4},{need:175,mult:5}];
 GENS.forEach(g=>{
-  TIERS.forEach((t,i)=>{
+  TIERS.forEach((tier,i)=>{
     UPS.push({
-      id:g.id+"_t"+i, ico:g.ico, nm:g.nm+" — Palier "+(i+1),
-      ds:t.txt+" (nécessite "+t.need+" × "+g.nm+")",
-      cost:g.base*18*Math.pow(11,i), kind:"gen", target:g.id, mult:t.mult,
-      req:S=>(S.gens[g.id]||0)>=t.need
+      id:g.id+"_t"+i, ico:g.ico,
+      nm:{fr:g.nm.fr+" — Palier "+(i+1), en:g.nm.en+" — Tier "+(i+1)},
+      ds:{fr:"Production ×"+tier.mult+" (nécessite "+tier.need+" × "+g.nm.fr+")",
+          en:"Output ×"+tier.mult+" (requires "+tier.need+" × "+g.nm.en+")"},
+      cost:g.base*18*Math.pow(11,i), kind:"gen", target:g.id, mult:tier.mult,
+      req:S=>(S.gens[g.id]||0)>=tier.need
     });
   });
 });
 // clic
 UPS.push(
- {id:"c1",ico:"🔨",nm:"Marteau ionique",   ds:"Puissance de clic ×3",            cost:400,   kind:"click",mult:3},
- {id:"c2",ico:"🦾",nm:"Exosquelette",      ds:"Puissance de clic ×4",            cost:3.5e4, kind:"click",mult:4,req:S=>S.clicks>=50},
- {id:"c3",ico:"⚡",nm:"Condensateur",      ds:"Puissance de clic ×5",            cost:5e6,   kind:"click",mult:5,req:S=>S.clicks>=250},
- {id:"c4",ico:"🧲",nm:"Champ magnétique",  ds:"Puissance de clic ×8",            cost:2e9,   kind:"click",mult:8,req:S=>S.clicks>=600},
- {id:"r1",ico:"📡",nm:"Résonateur v1",     ds:"Le clic gagne +3 % de ta production/s", cost:2e5, kind:"reso",val:.03},
- {id:"r2",ico:"📡",nm:"Résonateur v2",     ds:"Le clic gagne +12 % de ta production/s",cost:4e8, kind:"reso",val:.12,req:S=>S.ups.r1},
- {id:"r3",ico:"📡",nm:"Résonateur v3",     ds:"Le clic gagne +40 % de ta production/s",cost:6e11,kind:"reso",val:.40,req:S=>S.ups.r2}
+ {id:"c1",ico:"🔨",cost:400,  kind:"click",mult:3,
+  nm:{fr:"Marteau ionique",en:"Ion hammer"},ds:{fr:"Puissance de clic ×3",en:"Click power ×3"}},
+ {id:"c2",ico:"🦾",cost:3.5e4,kind:"click",mult:4,req:S=>S.clicks>=50,
+  nm:{fr:"Exosquelette",en:"Exoskeleton"},ds:{fr:"Puissance de clic ×4",en:"Click power ×4"}},
+ {id:"c3",ico:"⚡",cost:5e6,  kind:"click",mult:5,req:S=>S.clicks>=250,
+  nm:{fr:"Condensateur",en:"Capacitor"},ds:{fr:"Puissance de clic ×5",en:"Click power ×5"}},
+ {id:"c4",ico:"🧲",cost:2e9,  kind:"click",mult:8,req:S=>S.clicks>=600,
+  nm:{fr:"Champ magnétique",en:"Magnetic field"},ds:{fr:"Puissance de clic ×8",en:"Click power ×8"}},
+ {id:"r1",ico:"📡",cost:2e5,  kind:"reso",val:.03,
+  nm:{fr:"Résonateur v1",en:"Resonator v1"},
+  ds:{fr:"Le clic gagne +3 % de ta production/s",en:"Clicks gain +3 % of your output/s"}},
+ {id:"r2",ico:"📡",cost:4e8,  kind:"reso",val:.12,req:S=>S.ups.r1,
+  nm:{fr:"Résonateur v2",en:"Resonator v2"},
+  ds:{fr:"Le clic gagne +12 % de ta production/s",en:"Clicks gain +12 % of your output/s"}},
+ {id:"r3",ico:"📡",cost:6e11, kind:"reso",val:.40,req:S=>S.ups.r2,
+  nm:{fr:"Résonateur v3",en:"Resonator v3"},
+  ds:{fr:"Le clic gagne +40 % de ta production/s",en:"Clicks gain +40 % of your output/s"}}
 );
 // globales
 UPS.push(
- {id:"g1",ico:"🔗",nm:"Réseau logistique",    ds:"Production globale ×1,25", cost:5e4,  kind:"glob",mult:1.25},
- {id:"g2",ico:"🧠",nm:"IA de coordination",   ds:"Production globale ×1,5",  cost:8e6,  kind:"glob",mult:1.5},
- {id:"g3",ico:"🛰️",nm:"Relais quantique",     ds:"Production globale ×2",    cost:1.2e9,kind:"glob",mult:2},
- {id:"g4",ico:"🧬",nm:"Bio-ingénierie",       ds:"Production globale ×2,5",  cost:3e11, kind:"glob",mult:2.5},
- {id:"g5",ico:"🕳️",nm:"Moteur à singularité", ds:"Production globale ×4",    cost:9e13, kind:"glob",mult:4},
- {id:"a1",ico:"🔮",nm:"Balise d'anomalie",    ds:"Les anomalies apparaissent 30 % plus souvent", cost:1e7, kind:"anom"}
+ {id:"g1",ico:"🔗",cost:5e4,  kind:"glob",mult:1.25,
+  nm:{fr:"Réseau logistique",en:"Logistics network"},ds:{fr:"Production globale ×1,25",en:"Global output ×1.25"}},
+ {id:"g2",ico:"🧠",cost:8e6,  kind:"glob",mult:1.5,
+  nm:{fr:"IA de coordination",en:"Coordination AI"},ds:{fr:"Production globale ×1,5",en:"Global output ×1.5"}},
+ {id:"g3",ico:"🛰️",cost:1.2e9,kind:"glob",mult:2,
+  nm:{fr:"Relais quantique",en:"Quantum relay"},ds:{fr:"Production globale ×2",en:"Global output ×2"}},
+ {id:"g4",ico:"🧬",cost:3e11, kind:"glob",mult:2.5,
+  nm:{fr:"Bio-ingénierie",en:"Bio-engineering"},ds:{fr:"Production globale ×2,5",en:"Global output ×2.5"}},
+ {id:"g5",ico:"🕳️",cost:9e13, kind:"glob",mult:4,
+  nm:{fr:"Moteur à singularité",en:"Singularity engine"},ds:{fr:"Production globale ×4",en:"Global output ×4"}},
+ {id:"a1",ico:"🔮",cost:1e7,  kind:"anom",
+  nm:{fr:"Balise d'anomalie",en:"Anomaly beacon"},
+  ds:{fr:"Les anomalies apparaissent 30 % plus souvent",en:"Anomalies appear 30 % more often"}}
 );
 
 /* ---------- données : recherche (antimatière) ---------- */
 const RES=[
- {id:"mining", ico:"⚙️", nm:"Optimisation minière", ds:"+30 % de production par niveau", max:15, c0:4,  cg:1.55},
- {id:"servo",  ico:"🤖", nm:"Bras servo-assistés",  ds:"×2 puissance de clic par niveau", max:12, c0:3,  cg:1.5},
- {id:"buffer", ico:"💾", nm:"Mémoire tampon",       ds:"+3 h de gains hors-ligne par niveau", max:8, c0:6, cg:1.8},
- {id:"auto",   ico:"🔁", nm:"Automatisation",       ds:"+10 % d'efficacité hors-ligne par niveau", max:6, c0:8, cg:2},
- {id:"nego",   ico:"💠", nm:"Négociation",          ds:"−4 % sur le coût des générateurs par niveau", max:10, c0:10, cg:1.9},
- {id:"detec",  ico:"📶", nm:"Détecteur d'anomalies",ds:"Anomalies +25 % fréquentes et +30 % longues", max:5, c0:14, cg:2.2},
- {id:"reso",   ico:"✨", nm:"Résonance d'antimatière",ds:"Chaque antimatière donne +1,5 % de bonus en plus", max:10, c0:20, cg:2.4},
- {id:"capsule",ico:"📦", nm:"Capsule de départ",    ds:"Démarre chaque cycle avec du minerai", max:6, c0:15, cg:2.1},
+ {id:"mining", ico:"⚙️", max:15, c0:4,  cg:1.55,
+  nm:{fr:"Optimisation minière",en:"Mining optimisation"},
+  ds:{fr:"+30 % de production par niveau",en:"+30 % output per level"}},
+ {id:"servo",  ico:"🤖", max:12, c0:3,  cg:1.5,
+  nm:{fr:"Bras servo-assistés",en:"Servo-assisted arms"},
+  ds:{fr:"×2 puissance de clic par niveau",en:"×2 click power per level"}},
+ {id:"buffer", ico:"💾", max:8,  c0:6,  cg:1.8,
+  nm:{fr:"Mémoire tampon",en:"Buffer memory"},
+  ds:{fr:"+3 h de gains hors-ligne par niveau",en:"+3 h of offline gains per level"}},
+ {id:"auto",   ico:"🔁", max:6,  c0:8,  cg:2,
+  nm:{fr:"Automatisation",en:"Automation"},
+  ds:{fr:"+10 % d'efficacité hors-ligne par niveau",en:"+10 % offline efficiency per level"}},
+ {id:"nego",   ico:"💠", max:10, c0:10, cg:1.9,
+  nm:{fr:"Négociation",en:"Negotiation"},
+  ds:{fr:"−4 % sur le coût des générateurs par niveau",en:"−4 % on structure costs per level"}},
+ {id:"detec",  ico:"📶", max:5,  c0:14, cg:2.2,
+  nm:{fr:"Détecteur d'anomalies",en:"Anomaly detector"},
+  ds:{fr:"Anomalies +25 % fréquentes et +30 % longues",en:"Anomalies +25 % more frequent, +30 % longer"}},
+ {id:"reso",   ico:"✨", max:10, c0:20, cg:2.4,
+  nm:{fr:"Résonance d'antimatière",en:"Antimatter resonance"},
+  ds:{fr:"Chaque antimatière donne +1,5 % de bonus en plus",en:"Each antimatter grants +1.5 % extra bonus"}},
+ {id:"capsule",ico:"📦", max:6,  c0:15, cg:2.1,
+  nm:{fr:"Capsule de départ",en:"Starter capsule"},
+  ds:{fr:"Démarre chaque cycle avec du minerai",en:"Begin each cycle with some ore"}},
 ];
 const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
 
 /* ---------- données : succès ---------- */
 const ACHS=[
- {id:"a_click1",nm:"Premier caillou",   ds:"Cliquer une fois",              f:S=>S.clicks>=1},
- {id:"a_click100",nm:"Main d'œuvre",    ds:"100 clics",                     f:S=>S.clicks>=100},
- {id:"a_click1k",nm:"Tendinite",        ds:"1 000 clics",                   f:S=>S.clicks>=1000},
- {id:"a_drone10",nm:"Petit essaim",     ds:"10 drones mineurs",             f:S=>(S.gens.drone||0)>=10},
- {id:"a_drone100",nm:"Nuée",            ds:"100 drones mineurs",            f:S=>(S.gens.drone||0)>=100},
- {id:"a_all1",nm:"Panoplie complète",   ds:"1 de chaque générateur",        f:S=>GENS.every(g=>(S.gens[g.id]||0)>=1)},
- {id:"a_all25",nm:"Industriel",         ds:"25 de chaque générateur",       f:S=>GENS.every(g=>(S.gens[g.id]||0)>=25)},
- {id:"a_e6",nm:"Million",               ds:"1 M de minerai extrait",        f:S=>S.totalOre>=1e6},
- {id:"a_e9",nm:"Milliard",              ds:"1 B de minerai extrait",        f:S=>S.totalOre>=1e9},
- {id:"a_e12",nm:"Billion",              ds:"1 T de minerai extrait",        f:S=>S.totalOre>=1e12},
- {id:"a_e15",nm:"Échelle planétaire",   ds:"1 Qa de minerai extrait",       f:S=>S.totalOre>=1e15},
- {id:"a_e18",nm:"Échelle stellaire",    ds:"1 Qi de minerai extrait",       f:S=>S.totalOre>=1e18},
- {id:"a_rate1k",nm:"Cadence",           ds:"1 K/s de production",           f:S=>perSec()>=1e3},
- {id:"a_rate1m",nm:"Chaîne complète",   ds:"1 M/s de production",           f:S=>perSec()>=1e6},
- {id:"a_rate1g",nm:"Débit galactique",  ds:"1 B/s de production",           f:S=>perSec()>=1e9},
- {id:"a_up10",nm:"Bricoleur",           ds:"10 améliorations achetées",     f:S=>Object.keys(S.ups).length>=10},
- {id:"a_up30",nm:"Ingénieur en chef",   ds:"30 améliorations achetées",     f:S=>Object.keys(S.ups).length>=30},
- {id:"a_anom1",nm:"Curieux",            ds:"Attraper une anomalie",         f:S=>S.anoms>=1},
- {id:"a_anom25",nm:"Chasseur d'anomalies",ds:"Attraper 25 anomalies",       f:S=>S.anoms>=25},
- {id:"a_pr1",nm:"Renaissance",          ds:"Premier cycle d'antimatière",   f:S=>S.prestiges>=1},
- {id:"a_pr5",nm:"Boucle temporelle",    ds:"5 cycles",                      f:S=>S.prestiges>=5},
- {id:"a_am100",nm:"Physicien",          ds:"100 antimatière possédée",      f:S=>S.am>=100},
- {id:"a_am1k",nm:"Maître de l'antimatière",ds:"1 000 antimatière possédée", f:S=>S.am>=1000},
- {id:"a_dyson",nm:"Ingénierie ultime",  ds:"Construire une sphère de Dyson",f:S=>(S.gens.dyson||0)>=1},
+ {id:"a_click1",f:S=>S.clicks>=1,
+  nm:{fr:"Premier caillou",en:"First pebble"},ds:{fr:"Cliquer une fois",en:"Click once"}},
+ {id:"a_click100",f:S=>S.clicks>=100,
+  nm:{fr:"Main d'œuvre",en:"Manual labour"},ds:{fr:"100 clics",en:"100 clicks"}},
+ {id:"a_click1k",f:S=>S.clicks>=1000,
+  nm:{fr:"Tendinite",en:"Tendinitis"},ds:{fr:"1 000 clics",en:"1,000 clicks"}},
+ {id:"a_drone10",f:S=>(S.gens.drone||0)>=10,
+  nm:{fr:"Petit essaim",en:"Small swarm"},ds:{fr:"10 drones mineurs",en:"10 mining drones"}},
+ {id:"a_drone100",f:S=>(S.gens.drone||0)>=100,
+  nm:{fr:"Nuée",en:"Cloud"},ds:{fr:"100 drones mineurs",en:"100 mining drones"}},
+ {id:"a_all1",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=1),
+  nm:{fr:"Panoplie complète",en:"Full set"},ds:{fr:"1 de chaque générateur",en:"1 of every structure"}},
+ {id:"a_all25",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=25),
+  nm:{fr:"Industriel",en:"Industrialist"},ds:{fr:"25 de chaque générateur",en:"25 of every structure"}},
+ {id:"a_e6",f:S=>S.totalOre>=1e6,
+  nm:{fr:"Million",en:"Million"},ds:{fr:"1 M de minerai extrait",en:"1 M ore mined"}},
+ {id:"a_e9",f:S=>S.totalOre>=1e9,
+  nm:{fr:"Milliard",en:"Billion"},ds:{fr:"1 B de minerai extrait",en:"1 B ore mined"}},
+ {id:"a_e12",f:S=>S.totalOre>=1e12,
+  nm:{fr:"Billion",en:"Trillion"},ds:{fr:"1 T de minerai extrait",en:"1 T ore mined"}},
+ {id:"a_e15",f:S=>S.totalOre>=1e15,
+  nm:{fr:"Échelle planétaire",en:"Planetary scale"},ds:{fr:"1 Qa de minerai extrait",en:"1 Qa ore mined"}},
+ {id:"a_e18",f:S=>S.totalOre>=1e18,
+  nm:{fr:"Échelle stellaire",en:"Stellar scale"},ds:{fr:"1 Qi de minerai extrait",en:"1 Qi ore mined"}},
+ {id:"a_rate1k",f:S=>perSec()>=1e3,
+  nm:{fr:"Cadence",en:"Cadence"},ds:{fr:"1 K/s de production",en:"1 K/s output"}},
+ {id:"a_rate1m",f:S=>perSec()>=1e6,
+  nm:{fr:"Chaîne complète",en:"Full chain"},ds:{fr:"1 M/s de production",en:"1 M/s output"}},
+ {id:"a_rate1g",f:S=>perSec()>=1e9,
+  nm:{fr:"Débit galactique",en:"Galactic throughput"},ds:{fr:"1 B/s de production",en:"1 B/s output"}},
+ {id:"a_up10",f:S=>Object.keys(S.ups).length>=10,
+  nm:{fr:"Bricoleur",en:"Tinkerer"},ds:{fr:"10 améliorations achetées",en:"10 upgrades bought"}},
+ {id:"a_up30",f:S=>Object.keys(S.ups).length>=30,
+  nm:{fr:"Ingénieur en chef",en:"Chief engineer"},ds:{fr:"30 améliorations achetées",en:"30 upgrades bought"}},
+ {id:"a_anom1",f:S=>S.anoms>=1,
+  nm:{fr:"Curieux",en:"Curious"},ds:{fr:"Attraper une anomalie",en:"Catch an anomaly"}},
+ {id:"a_anom25",f:S=>S.anoms>=25,
+  nm:{fr:"Chasseur d'anomalies",en:"Anomaly hunter"},ds:{fr:"Attraper 25 anomalies",en:"Catch 25 anomalies"}},
+ {id:"a_pr1",f:S=>S.prestiges>=1,
+  nm:{fr:"Renaissance",en:"Rebirth"},ds:{fr:"Premier cycle d'antimatière",en:"First antimatter cycle"}},
+ {id:"a_pr5",f:S=>S.prestiges>=5,
+  nm:{fr:"Boucle temporelle",en:"Time loop"},ds:{fr:"5 cycles",en:"5 cycles"}},
+ {id:"a_am100",f:S=>S.am>=100,
+  nm:{fr:"Physicien",en:"Physicist"},ds:{fr:"100 antimatière possédée",en:"100 antimatter held"}},
+ {id:"a_am1k",f:S=>S.am>=1000,
+  nm:{fr:"Maître de l'antimatière",en:"Antimatter master"},ds:{fr:"1 000 antimatière possédée",en:"1,000 antimatter held"}},
+ {id:"a_dyson",f:S=>(S.gens.dyson||0)>=1,
+  nm:{fr:"Ingénierie ultime",en:"Ultimate engineering"},ds:{fr:"Construire une sphère de Dyson",en:"Build a Dyson sphere"}},
 ];
 
 /* ---------- état ---------- */
@@ -492,31 +737,31 @@ function buyGen(g){
 function buyUp(u){
   if(S.ups[u.id]||S.ore<u.cost)return;
   if(u.req&&!u.req(S))return;
-  S.ore-=u.cost; S.ups[u.id]=1; toast("Amélioration : "+u.nm); render();
+  S.ore-=u.cost; S.ups[u.id]=1; toast(t("t_up",tr(u.nm))); render();
 }
 function buyRes(r){
   const l=lvl(r.id); if(l>=r.max)return;
   const c=resCost(r,l); if(S.am<c)return;
-  S.am-=c; S.res[r.id]=l+1; toast("Recherche : "+r.nm+" niv."+(l+1),"violet"); render();
+  S.am-=c; S.res[r.id]=l+1; toast(t("t_res",tr(r.nm),l+1),"violet"); render();
 }
 function doPrestige(){
   const g=amGain(); if(g<1)return;
-  if(!confirm("Lancer un nouveau cycle ?\n\nTu perds minerai, générateurs et améliorations,\nmais tu gagnes "+fmt(g)+" antimatière (bonus permanent)."))return;
+  if(!confirm(t("pr_confirm",fmt(g))))return;
   S.am+=g; S.amTotal+=g; S.prestiges++;
   S.ore=0;S.runOre=0;S.gens={};S.ups={};S.buffs=[];
   const cap=lvl("capsule"); if(cap)gain(1e4*Math.pow(25,cap));
-  toast("+"+fmt(g)+" antimatière !","violet"); save(); render();
+  toast(t("t_am",fmt(g)),"violet"); save(); render();
 }
 
 /* ---------- buffs & anomalies ---------- */
-function addBuff(k,m,sec,nm){
-  S.buffs.push({k,m,nm,until:Date.now()+sec*1000});
+function addBuff(k,m,sec,key){
+  S.buffs.push({k,m,key,until:Date.now()+sec*1000});
 }
 const ANOMS=[
- {nm:"Surtension",   f:()=>{const d=45*(1+.3*lvl("detec"));addBuff("prod",7,d,"Production ×7");toast("⚡ Surtension : production ×7 pendant "+Math.round(d)+"s","gold")}},
- {nm:"Écho quantique",f:()=>{const d=60*(1+.3*lvl("detec"));addBuff("click",12,d,"Clic ×12");toast("✨ Écho quantique : clic ×12 pendant "+Math.round(d)+"s","gold")}},
- {nm:"Filon riche",  f:()=>{const v=Math.max(50,perSec()*180);gain(v);toast("💎 Filon riche : +"+fmt(v)+" minerai","gold")}},
- {nm:"Cache abandonnée",f:()=>{const v=Math.max(100,S.ore*0.18);gain(v);toast("📦 Cache abandonnée : +"+fmt(v)+" minerai","gold")}},
+ {f:()=>{const d=45*(1+.3*lvl("detec"));addBuff("prod",7,d,"buff_prod");toast(t("an_surge",Math.round(d)),"gold")}},
+ {f:()=>{const d=60*(1+.3*lvl("detec"));addBuff("click",12,d,"buff_click");toast(t("an_echo",Math.round(d)),"gold")}},
+ {f:()=>{const v=Math.max(50,perSec()*180);gain(v);toast(t("an_vein",fmt(v)),"gold")}},
+ {f:()=>{const v=Math.max(100,S.ore*0.18);gain(v);toast(t("an_cache",fmt(v)),"gold")}},
 ];
 function anomInterval(){
   let base=110000+Math.random()*130000;
@@ -550,7 +795,7 @@ function toast(msg,cls){
 /* ---------- succès ---------- */
 function checkAchs(){
   ACHS.forEach(a=>{
-    if(!S.achs[a.id]&&a.f(S)){S.achs[a.id]=1;toast("🏆 Succès : "+a.nm+"  (+1 % production)","gold")}
+    if(!S.achs[a.id]&&a.f(S)){S.achs[a.id]=1;toast(t("t_ach",tr(a.nm)),"gold")}
   });
 }
 
@@ -587,6 +832,31 @@ function syncList(box,items){
   box.textContent=""; box.appendChild(f);
 }
 
+/* Souris : on agit dès l'appui (réactif pour enchaîner les achats).
+   Doigt / stylet : on n'agit qu'au relâchement, et seulement si le doigt n'a pas
+   bougé — sinon un simple défilement validerait des achats. */
+const TAP_SLOP=12, TAP_MAX_MS=900;
+function bindAction(el,act){
+  el.style.touchAction="manipulation";
+  let id=null,sx=0,sy=0,st=0,moved=false;
+  el.addEventListener("pointerdown",e=>{
+    if(e.pointerType==="mouse"){ if(e.button===0)act(); return; }
+    id=e.pointerId; sx=e.clientX; sy=e.clientY; st=Date.now(); moved=false;
+  });
+  el.addEventListener("pointermove",e=>{
+    if(e.pointerId!==id||moved)return;
+    if(Math.abs(e.clientX-sx)>TAP_SLOP||Math.abs(e.clientY-sy)>TAP_SLOP)moved=true;
+  },{passive:true});
+  el.addEventListener("pointerup",e=>{
+    if(e.pointerId!==id)return;
+    id=null;
+    if(!moved&&Date.now()-st<=TAP_MAX_MS)act();
+  });
+  // le navigateur annule le pointeur dès qu'il décide que c'est un défilement
+  el.addEventListener("pointercancel",()=>{id=null});
+  el.addEventListener("pointerleave",e=>{if(e.pointerType!=="mouse"&&e.pointerId===id)moved=true});
+}
+
 const CARDS=new Map();
 function getCard(key,act){
   let c=CARDS.get(key); if(c)return c;
@@ -600,7 +870,7 @@ function getCard(key,act){
        rt:c.querySelector(".rt"),bar:c.querySelector(".bar"),fill:c.querySelector(".bar i"),
        clbl:c.querySelector(".clbl"),cost:c.querySelector(".cost"),miss:c.querySelector(".miss"),
        own:c.querySelector(".own"),owsub:c.querySelector(".owsub")};
-  if(act)c.onpointerdown=e=>{if(e.button===0||e.pointerType!=="mouse")act()};
+  if(act)bindAction(c,act);
   CARDS.set(key,c); return c;
 }
 function upd(c,o){
@@ -622,52 +892,52 @@ function upd(c,o){
 }
 /* ligne de prix lisible : ce qu'il manque + temps estimé */
 function priceInfo(cost,cur,rate,unit){
-  if(cur>=cost)return {ok:1,cant:0,miss:"✓ tu peux l'acheter"};
+  if(cur>=cost)return {ok:1,cant:0,miss:t("can_buy")};
   const d=cost-cur;
-  let s="il manque "+fmt(d)+(unit?" "+unit:"");
-  if(rate>0)s+=(d/rate>86400*60)?"  •  encore très loin":"  •  ≈ "+fmtTime(d/rate);
+  let s=t("missing",fmt(d)+(unit?" "+unit:""));
+  if(rate>0)s+=(d/rate>86400*60)?t("far"):t("eta",fmtTime(d/rate));
   return {ok:0,cant:1,miss:s};
 }
 
-/* ---------- squelette statique des onglets (construit une seule fois) ---------- */
-let QBTN=[], ACHNODES=[], STROWS=[];
-(function skeleton(){
+/* ---------- squelette statique des onglets (reconstruit au changement de langue) ---------- */
+let QBTN=[], ACHNODES=[], STROWS=[], MSQ=[];
+function buildSkeleton(){
   /* --- Extraction --- */
   $("#pGen").innerHTML=
-    '<p class="hint">Chaque structure produit du minerai en continu. Le prix monte de 15 % à chaque exemplaire acheté.</p>'+
-    '<div class="buyrow"><span class="lbl">Acheter par</span></div><div id="genList"></div>';
+    '<p class="hint">'+t("gen_hint")+'</p>'+
+    '<div class="buyrow"><span class="lbl">'+t("buy_by")+'</span></div><div id="genList"></div>';
   const row=$("#pGen .buyrow");
   QBTN=[1,10,100,"max"].map(q=>{
     const b=document.createElement("button");
     b.className="qty"; b.textContent=(q==="max")?"MAX":"×"+q; b._q=q;
-    b.onpointerdown=()=>{S.buy=q;render()};
+    bindAction(b,()=>{S.buy=q;render()});
     row.appendChild(b); return b;
   });
 
   /* --- Améliorations --- */
   $("#pUp").innerHTML=
-    '<p class="hint">Achats <b>uniques et permanents</b>, payés en minerai. À droite : le prix, puis ce qu\'il te manque et le temps qu\'il faut pour l\'obtenir à ta production actuelle. La barre montre ta progression vers le prix.</p>'+
-    '<h3 class="sec" id="upT1">À acheter</h3><div id="upList"></div>'+
-    '<h3 class="sec" id="upT2">Déjà acquises</h3><div id="upOwn"></div>';
+    '<p class="hint">'+t("up_hint")+'</p>'+
+    '<h3 class="sec" id="upT1"></h3><div id="upList"></div>'+
+    '<h3 class="sec" id="upT2"></h3><div id="upOwn"></div>';
 
   /* --- Recherche --- */
   $("#pPr").innerHTML=
     '<div class="prestige-box">'+
-      '<div class="hint" style="margin:0 0 6px">Cycle d\'antimatière — tu repars de zéro, tu gardes un bonus permanent</div>'+
+      '<div class="hint" style="margin:0 0 6px">'+t("pr_head")+'</div>'+
       '<div class="big" id="prGain">+0</div>'+
       '<div class="hint" style="margin:6px 0 0" id="prInfo"></div>'+
       '<div class="hint" id="prNote" style="margin:8px 0 0"></div>'+
-      '<button class="pbtn" id="prBtn">Lancer un nouveau cycle</button>'+
+      '<button class="pbtn" id="prBtn">'+t("pr_btn")+'</button>'+
     '</div>'+
     '<h3 class="sec" id="resTitle"></h3>'+
-    '<p class="hint">Les recherches se paient en <b style="color:var(--violet)">antimatière</b> et ne sont jamais perdues.</p>'+
+    '<p class="hint">'+t("res_hint")+'</p>'+
     '<div id="resList"></div>';
-  $("#prBtn").onpointerdown=doPrestige;
+  bindAction($("#prBtn"),()=>{if(!$("#prBtn").disabled)doPrestige()});
 
   /* --- Succès --- */
   $("#pAc").innerHTML='<p class="hint" id="acHint"></p><div class="achgrid" id="acGrid"></div>';
   const grid=$("#acGrid");
-  ACHNODES=ACHS.map(a=>{
+  ACHNODES=ACHS.map(()=>{
     const d=document.createElement("div"); d.className="ach";
     d.innerHTML='<div class="an"></div><div class="ad"></div>';
     d.q={n:d.querySelector(".an"),d:d.querySelector(".ad")};
@@ -675,19 +945,40 @@ let QBTN=[], ACHNODES=[], STROWS=[];
   });
 
   /* --- Statistiques --- */
-  $("#pSt").innerHTML='<h3 class="sec">Statistiques</h3><div id="stList"></div>';
-  const labels=["Minerai possédé","Minerai extrait (total)","Minerai extrait (ce cycle)","Production",
-    "Puissance de clic","Clics effectués","Anomalies attrapées","Antimatière possédée",
-    "Antimatière gagnée (total)","Cycles effectués","Multiplicateur global","Améliorations acquises",
-    "Succès","Temps de jeu","Gains hors-ligne","Sauvegarde"];
+  $("#pSt").innerHTML='<h3 class="sec">'+t("st_title")+'</h3><div id="stList"></div>';
   const sl=$("#stList");
-  STROWS=labels.map(l=>{
+  STROWS=T[LANG].st.map(l=>{
     const d=document.createElement("div");
     d.style.cssText="display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px solid var(--line);font-size:13px";
-    d.innerHTML='<span style="color:var(--dim)">'+l+'</span><b style="font-variant-numeric:tabular-nums"></b>';
+    d.innerHTML='<span style="color:var(--dim)"></span><b style="font-variant-numeric:tabular-nums"></b>';
+    d.querySelector("span").textContent=l;
     d.q=d.querySelector("b"); sl.appendChild(d); return d;
   });
-})();
+
+  /* --- mini-récap de la colonne de gauche --- */
+  const ms=$("#miniStats");
+  ms.innerHTML=[t("ms_struct"),t("ms_ach"),t("ms_cycles"),t("ms_anom")]
+    .map(l=>"<div><span></span> <span></span></div>").join("");
+  [...ms.querySelectorAll("div")].forEach((d,i)=>{
+    d.children[0].textContent=[t("ms_struct"),t("ms_ach"),t("ms_cycles"),t("ms_anom")][i];
+  });
+  MSQ=[...ms.querySelectorAll("div")].map(d=>d.children[1]);
+}
+
+/* ---------- changement de langue ---------- */
+function applyI18n(){
+  document.title=t("doc_title");
+  document.documentElement.lang=LANG;
+  $$("[data-i18n]").forEach(e=>txt(e,t(e.dataset.i18n)));
+  $$("[data-i18n-title]").forEach(e=>{const v=t(e.dataset.i18nTitle);if(e.title!==v)e.title=v});
+  $$(".lang").forEach(b=>cls(b,"on",b.dataset.lang===LANG));
+}
+function setLang(l){
+  if(!T[l]||l===LANG)return;
+  LANG=l; writeLang(l);
+  CARDS.clear();                 // les cartes portent du texte : on les refait
+  applyI18n(); buildSkeleton(); render();
+}
 
 /* ---------- rendu des onglets ---------- */
 function renderGens(){
@@ -700,7 +991,7 @@ function renderGens(){
     if(i>=S.seen){
       if(++locked>2)return;                       // on n'annonce que les 2 prochaines
       const c=getCard("lock:"+i);
-      upd(c,{ico:"🔒",nm:"???",ds:"Continue de progresser pour débloquer cette structure.",locked:1});
+      upd(c,{ico:"🔒",nm:"???",ds:t("locked_ds"),locked:1});
       list.push(c); return;
     }
     let n=(S.buy==="max")?maxAffordable(g):S.buy;
@@ -711,12 +1002,12 @@ function renderGens(){
     const p=priceInfo(cost,S.ore,rate);
     const c=getCard("gen:"+g.id,()=>buyGen(g));
     upd(c,{
-      ico:g.ico,nm:g.nm,ds:g.ds,
-      rt:fmt(each)+" /s par unité"+(owned?"   •   ces "+owned+" rapportent "+fmt(each*owned)+" /s":""),
-      clbl:(isMax?"Prix pour MAX (×"+n+")":"Prix pour ×"+n),
-      cost:fmt(cost)+" minerai",
+      ico:g.ico,nm:tr(g.nm),ds:tr(g.ds),
+      rt:t("each_rate",fmt(each))+(owned?t("total_rate",owned,fmt(each*owned)):""),
+      clbl:isMax?t("price_for_max",n):t("price_for",n),
+      cost:t("cost_ore",fmt(cost)),
       miss:p.miss,ok:p.ok,cant:p.cant,prog:S.ore/cost,
-      own:owned,owsub:"possédés"
+      own:owned,owsub:t("owned_sub")
     });
     list.push(c);
   });
@@ -731,28 +1022,27 @@ function renderUps(){
   const rate=perSec();
   const avail=UPS.filter(u=>!S.ups[u.id]&&upVisible(u)).sort((a,b)=>a.cost-b.cost);
   const own=UPS.filter(u=>S.ups[u.id]);
-  txt($("#upT1"),"À acheter ("+avail.length+")");
-  txt($("#upT2"),"Déjà acquises ("+own.length+")");
+  txt($("#upT1"),t("up_avail",avail.length));
+  txt($("#upT2"),t("up_owned",own.length));
   show($("#upT2"),own.length>0);
 
   const l1=avail.map(u=>{
     const p=priceInfo(u.cost,S.ore,rate);
     const c=getCard("up:"+u.id,()=>buyUp(u));
-    upd(c,{ico:u.ico,nm:u.nm,ds:u.ds,clbl:"Prix",cost:fmt(u.cost)+" minerai",
+    upd(c,{ico:u.ico,nm:tr(u.nm),ds:tr(u.ds),clbl:t("price"),cost:t("cost_ore",fmt(u.cost)),
            miss:p.miss,ok:p.ok,cant:p.cant,prog:S.ore/u.cost});
     return c;
   });
   if(!avail.length){
     const c=getCard("up:none");
-    upd(c,{ico:"🔎",nm:"Rien de neuf pour l'instant",
-           ds:"Achète des structures et accumule du minerai : de nouvelles améliorations apparaîtront ici.",locked:1});
+    upd(c,{ico:"🔎",nm:t("up_none_nm"),ds:t("up_none_ds"),locked:1});
     l1.push(c);
   }
   syncList($("#upList"),l1);
 
   syncList($("#upOwn"),own.map(u=>{
     const c=getCard("upo:"+u.id);
-    upd(c,{ico:u.ico,nm:u.nm,ds:u.ds,clbl:"Acquise",cost:"✔",done:1});
+    upd(c,{ico:u.ico,nm:tr(u.nm),ds:tr(u.ds),clbl:t("acquired"),cost:"✔",done:1});
     return c;
   }));
 }
@@ -760,27 +1050,24 @@ function renderUps(){
 function renderPrestige(){
   const g=amGain();
   txt($("#prGain"),"+"+fmt(g));
-  html($("#prInfo"),"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne "+
-    '<b style="color:var(--violet)">+'+(amBonus()*100).toFixed(1)+" %</b> de production<br>"+
-    'Bonus actuel : <b style="color:var(--violet)">×'+fmt(1+S.am*amBonus())+"</b> — cycles effectués : "+S.prestiges);
+  html($("#prInfo"),t("pr_info",(amBonus()*100).toFixed(1),fmt(1+S.am*amBonus()),S.prestiges));
   const note=$("#prNote");
   show(note,g<1);
   if(g<1){
-    const need=1e12/144, r=perSec();
-    txt(note,"Il faut extraire "+fmt(need)+" de minerai sur ce cycle pour gagner 1 antimatière — il t'en manque "+
-      fmt(Math.max(0,need-S.runOre))+(r>0?"  •  ≈ "+fmtTime(Math.max(0,need-S.runOre)/r):""));
+    const need=1e12/144, r=perSec(), left=Math.max(0,need-S.runOre);
+    txt(note,t("pr_note",fmt(need),fmt(left),r>0?t("eta",fmtTime(left/r)):""));
   }
   const b=$("#prBtn"); if(b.disabled!==(g<1))b.disabled=(g<1);
 
-  txt($("#resTitle"),"Laboratoire — "+fmt(S.am)+" antimatière disponible");
+  txt($("#resTitle"),t("res_title",fmt(S.am)));
   syncList($("#resList"),RES.map(r=>{
     const l=lvl(r.id), maxed=l>=r.max, cost=resCost(r,l);
     const c=getCard("res:"+r.id,()=>buyRes(r));
-    const p=maxed?{}:priceInfo(cost,S.am,0,"antimatière");
-    upd(c,{ico:r.ico,nm:r.nm+'  <span class="lvl">niv. '+l+"/"+r.max+"</span>",ds:r.ds,
-      clbl:maxed?"":"Prix du niveau "+(l+1),
-      cost:maxed?"MAX":fmt(cost)+" AM",
-      miss:maxed?"niveau maximum atteint":p.miss, ok:maxed?1:p.ok,
+    const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
+    upd(c,{ico:r.ico,nm:tr(r.nm)+'  <span class="lvl">'+t("lvl",l,r.max)+"</span>",ds:tr(r.ds),
+      clbl:maxed?"":t("price_lvl",l+1),
+      cost:maxed?"MAX":t("cost_am",fmt(cost)),
+      miss:maxed?t("maxed"):p.miss, ok:maxed?1:p.ok,
       done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost});
     return c;
   }));
@@ -788,13 +1075,12 @@ function renderPrestige(){
 
 function renderAchs(){
   const got=Object.keys(S.achs).length;
-  html($("#acHint"),"<b>"+got+"/"+ACHS.length+"</b> succès — bonus de production actuel : "+
-    '<b style="color:var(--gold)">×'+achMult().toFixed(2)+"</b> (+1 % par succès)");
+  html($("#acHint"),t("ac_hint",got,ACHS.length,achMult().toFixed(2)));
   ACHS.forEach((a,i)=>{
     const n=ACHNODES[i], has=!!S.achs[a.id];
     cls(n,"got",has);
-    txt(n.q.n,(has?"🏆 ":"🔒 ")+(has?a.nm:"???"));
-    txt(n.q.d,a.ds);
+    txt(n.q.n,(has?"🏆 ":"🔒 ")+(has?tr(a.nm):"???"));
+    txt(n.q.d,tr(a.ds));
   });
 }
 
@@ -803,8 +1089,8 @@ function renderStats(){
     fmt(S.clicks),fmt(S.anoms),fmt(S.am),fmt(S.amTotal),S.prestiges,"×"+fmt(globalMult()),
     Object.keys(S.ups).length+"/"+UPS.length,Object.keys(S.achs).length+"/"+ACHS.length,
     fmtTime((Date.now()-S.started)/1000),
-    "max "+fmtTime(offlineCap())+" à "+Math.round(offlineRate()*100)+" %",
-    storageOK?"navigateur (auto toutes les 20 s)":"mémoire seule — utilise Export !"];
+    t("st_off",fmtTime(offlineCap()),Math.round(offlineRate()*100)),
+    storageOK?t("st_save_ok"):t("st_save_mem")];
   STROWS.forEach((r,i)=>txt(r.q,v[i]));
 }
 
@@ -815,40 +1101,36 @@ function multParts(){
   return {am:1+S.am*amBonus(), ach:achMult(), tech:up*Math.pow(1.3,lvl("mining")), buff:bf};
 }
 function renderHeader(){
-  const rate=perSec(), g=amGain(), m=multParts();
+  const rate=perSec(), g=amGain(), m=multParts(), cv=clickVal();
   txt($("#hOre"),fmt(S.ore));
   txt($("#hRate"),fmt(rate)+" /s");
   txt($("#hAm"),fmt(S.am));
   txt($("#hMult"),"×"+fmt(globalMult()));
-  html($("#sOre"),"total extrait : <b>"+fmt(S.totalOre)+"</b>");
-  html($("#sRate"),"clic : <b>+"+fmt(clickVal())+"</b>");
-  html($("#sAm"),g>=1?"<b>+"+fmt(g)+"</b> au prochain cycle"
-                    :"cycle n°"+(S.prestiges+1)+" en cours");
+  html($("#sOre"),t("sub_total",fmt(S.totalOre)));
+  html($("#sRate"),t("sub_click",fmt(cv)));
+  html($("#sAm"),g>=1?t("sub_next",fmt(g)):t("sub_cycle",S.prestiges+1));
   const parts=[],full=[];
-  if(m.am>1.0001){parts.push("AM ×"+fmt(m.am));full.push("antimatière ×"+fmt(m.am))}
-  if(m.ach>1.0001){parts.push("succès ×"+m.ach.toFixed(2));full.push("succès ×"+m.ach.toFixed(2))}
-  if(m.tech>1.0001){parts.push("tech ×"+fmt(m.tech));full.push("améliorations et recherches ×"+fmt(m.tech))}
-  if(m.buff>1.0001){parts.push("<b style='color:var(--gold)'>bonus ×"+fmt(m.buff)+"</b>");
-                    full.push("bonus temporaire ×"+fmt(m.buff))}
-  html($("#sMult"),parts.length?parts.join(" · "):"aucun bonus pour l'instant");
+  if(m.am>1.0001){parts.push(t("p_am",fmt(m.am)));full.push(t("f_am",fmt(m.am)))}
+  if(m.ach>1.0001){parts.push(t("p_ach",m.ach.toFixed(2)));full.push(t("f_ach",m.ach.toFixed(2)))}
+  if(m.tech>1.0001){parts.push(t("p_tech",fmt(m.tech)));full.push(t("f_tech",fmt(m.tech)))}
+  if(m.buff>1.0001){parts.push("<b style='color:var(--gold)'>"+t("p_buff",fmt(m.buff))+"</b>");
+                    full.push(t("f_buff",fmt(m.buff)))}
+  html($("#sMult"),parts.length?parts.join(" · "):t("mult_none"));
   const tile=$(".kpi.mult"), tip=full.join("\n");
-  if(tile._tip!==tip){tile._tip=tip;tile.title=tip?"Détail du multiplicateur :\n"+tip:""}
-  txt($("#clickVal"),"+"+fmt(clickVal()));
+  if(tile._tip!==tip){tile._tip=tip;tile.title=tip?t("mult_tip")+"\n"+tip:""}
+  html($("#clickLabel"),t("manual")+" — <b>+"+fmt(cv)+"</b> "+t("per_click"));
   const b=$("#buffs");
-  const want=S.buffs.map(x=>x.nm+" — "+Math.ceil((x.until-Date.now())/1000)+"s");
+  const want=S.buffs.map(x=>t(x.key||"buff_prod")+" — "+Math.ceil((x.until-Date.now())/1000)+t("u_s"));
   if(b._n!==S.buffs.length){b._n=S.buffs.length;b.textContent="";
     want.forEach(()=>{const d=document.createElement("div");d.className="buff";b.appendChild(d)})}
-  want.forEach((t,i)=>txt(b.children[i],t));
+  want.forEach((v,i)=>txt(b.children[i],v));
   const owned=GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0);
-  const ms=$("#miniStats");
-  if(!ms._built){ms._built=1;
-    ms.innerHTML=["Structures","Succès","Cycles","Prochaine anomalie"]
-      .map(l=>"<div>"+l+" <span></span></div>").join("");
-    ms.q=[...ms.querySelectorAll("span")]}
-  txt(ms.q[0],fmt(owned));
-  txt(ms.q[1],Object.keys(S.achs).length+"/"+ACHS.length);
-  txt(ms.q[2],S.prestiges);
-  txt(ms.q[3],S.nextAnom>Date.now()?fmtTime((S.nextAnom-Date.now())/1000):"imminente");
+  if(MSQ.length){
+    txt(MSQ[0],fmt(owned));
+    txt(MSQ[1],Object.keys(S.achs).length+"/"+ACHS.length);
+    txt(MSQ[2],S.prestiges);
+    txt(MSQ[3],S.nextAnom>Date.now()?fmtTime((S.nextAnom-Date.now())/1000):t("imminent"));
+  }
 }
 
 let currentTab="gen";
@@ -862,13 +1144,14 @@ function render(){
   const n=upBadge(), badge=$("#bUp");
   txt(badge,n); cls(badge,"hidden",n===0);
 }
-$$(".tab").forEach(t=>t.onclick=()=>{
-  $$(".tab").forEach(x=>x.classList.remove("on")); t.classList.add("on");
+$$(".tab").forEach(tab=>tab.onclick=()=>{
+  $$(".tab").forEach(x=>x.classList.remove("on")); tab.classList.add("on");
   $$(".panel").forEach(x=>x.classList.remove("on"));
-  currentTab=t.dataset.p;
+  currentTab=tab.dataset.p;
   $("#p"+currentTab[0].toUpperCase()+currentTab.slice(1)).classList.add("on");
   render();
 });
+$$(".lang").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 
 /* ---------- hors-ligne ---------- */
 function offlineCap(){return (4+3*lvl("buffer"))*3600}
@@ -887,7 +1170,7 @@ function creditElapsed(sec,quiet){
   const g=perSec()*eff*offlineRate();
   if(g>0){
     gain(g);
-    if(!quiet)toast("Absence de "+fmtTime(sec)+" → +"+fmt(g)+" minerai","gold");
+    if(!quiet)toast(t("t_away",fmtTime(sec),fmt(g)),"gold");
   }
   return g;
 }
@@ -925,15 +1208,15 @@ function load(){
     // gains hors-ligne (même règle que le retour d'arrière-plan)
     const away=(Date.now()-(d.lastSave||Date.now()))/1000;
     const g=creditElapsed(away,true);
-    if(g>0)setTimeout(()=>toast("Absence de "+fmtTime(away)+" → +"+fmt(g)+" minerai","gold"),600);
+    if(g>0)setTimeout(()=>toast(t("t_away",fmtTime(away),fmt(g)),"gold"),600);
     S.lastTick=Date.now();
     return true;
   }catch(e){return false}
 }
-$("#bSave").onclick=()=>{save();toast("Partie sauvegardée")};
+$("#bSave").onclick=()=>{save();toast(t("t_saved"))};
 $("#bReset").onclick=()=>{
-  if(confirm("Effacer TOUTE la progression (y compris l'antimatière) ?")){
-    S=NEW(); save(); render(); toast("Nouvelle partie");
+  if(confirm(t("confirm_reset"))){
+    S=NEW(); save(); render(); toast(t("t_newgame"));
   }
 };
 $("#bExport").onclick=()=>{
@@ -945,8 +1228,8 @@ $("#mImport").onclick=()=>{
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(v))));
     S=Object.assign(NEW(),d); S.lastTick=Date.now(); save(); render();
-    $("#modal").classList.remove("on"); toast("Sauvegarde importée");
-  }catch(e){alert("Code de sauvegarde invalide.")}
+    $("#modal").classList.remove("on"); toast(t("t_imported"));
+  }catch(e){alert(t("bad_code"))}
 };
 window.addEventListener("beforeunload",save);
 document.addEventListener("visibilitychange",()=>{
@@ -969,9 +1252,10 @@ document.addEventListener("visibilitychange",()=>{
 })();
 
 /* ---------- démarrage ---------- */
+applyI18n(); buildSkeleton();
 const loaded=load();
-if(!loaded)setTimeout(()=>toast("Bienvenue, commandant. Clique sur l'astéroïde."),700);
-if(!storageOK)setTimeout(()=>toast("Stockage indisponible ici : utilise « Export » pour garder ta partie.","gold"),1800);
+if(!loaded)setTimeout(()=>toast(t("t_welcome")),700);
+if(!storageOK)setTimeout(()=>toast(t("t_nostorage"),"gold"),1800);
 render();
 requestAnimationFrame(loop);
 </script>
