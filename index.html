@@ -6,6 +6,12 @@
 <title>Colonie Orbitale</title>
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0icCIgY3g9IjM0JSIgY3k9IjI3JSIgcj0iNzglIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWRiMGQyIi8+PHN0b3Agb2Zmc2V0PSI0NSUiIHN0b3AtY29sb3I9IiM0YzVhNzIiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTUxYjI4Ii8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjEwIiBmaWxsPSIjMDcwYjE2Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMyIgcng9IjI5LjUiIHJ5PSI5LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E5N2JmZiIgc3Ryb2tlLXdpZHRoPSIzLjYiIG9wYWNpdHk9Ii42Ii8+PC9nPgo8Y2lyY2xlIGN4PSIzMiIgY3k9IjMxIiByPSIxNy41IiBmaWxsPSJ1cmwoI3ApIi8+CjxjaXJjbGUgY3g9IjI1LjUiIGN5PSIyNS41IiByPSI0LjIiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii41Ii8+CjxjaXJjbGUgY3g9IjM4LjUiIGN5PSIzNS41IiByPSIzLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40NSIvPgo8Y2lyY2xlIGN4PSIzNCIgY3k9IjIxIiByPSIyLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8cGF0aCBkPSJNMi41IDMzYTI5LjUgOS41IDAgMCAwIDU5IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRmZDhmZiIgc3Ryb2tlLXdpZHRoPSIzLjgiLz48L2c+Cjwvc3ZnPg==">
 <meta name="theme-color" content="#05070f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Colonie">
 <style>
 :root{
   --bg:#05070f;
@@ -21,7 +27,7 @@
   --dim:#8494b8;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none}
 body{
   margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
   background:var(--bg);color:var(--txt);overflow:hidden;
@@ -1252,6 +1258,11 @@ document.addEventListener("visibilitychange",()=>{
 })();
 
 /* ---------- démarrage ---------- */
+/* ---------- service worker (jeu installable + hors connexion) ---------- */
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+  addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
+}
+
 applyI18n(); buildSkeleton();
 const loaded=load();
 if(!loaded)setTimeout(()=>toast(t("t_welcome")),700);
