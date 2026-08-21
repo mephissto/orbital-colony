@@ -175,8 +175,16 @@ body.anomsoon #rock::after{border-color:var(--anom);
 
 #buffs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
 #buffs:empty{display:none}
-#anomChip{font-size:11px;color:var(--dim);text-align:center;margin-top:7px;
-  font-variant-numeric:tabular-nums;letter-spacing:.03em;white-space:nowrap}
+/* largeur FIXE : le texte change de longueur (1m 34s → 43s → En vue !) mais le
+   bloc garde la même taille, donc plus rien ne bouge autour de la planète */
+#anomChip{width:188px;font-size:12.5px;color:var(--dim);text-align:center;margin-bottom:9px;
+  font-variant-numeric:tabular-nums;letter-spacing:.03em;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+  display:flex;align-items:center;justify-content:center;gap:.3em}
+/* l'icône reprend la couleur du texte : grise au repos, magenta à l'approche */
+#anomChip .aci{flex:none;display:inline-flex;width:1.05em;height:1.05em}
+#anomChip .aci svg{width:100%;height:100%;fill:currentColor;display:block}
+#anomChip .acw{margin-right:-.06em}
 body.anomsoon #anomChip{color:var(--anom);animation:anompulse 1.2s ease-in-out infinite}
 @keyframes anompulse{50%{opacity:.45}}
 .buff{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--gold);
@@ -209,8 +217,6 @@ nav::-webkit-scrollbar{display:none}
 .qty{padding:5px 13px;border-radius:7px;border:1px solid var(--line);background:var(--panel-2);
   color:var(--dim);cursor:pointer;font-size:12px}
 .qty.on{color:#04121c;background:var(--cyan);border-color:var(--cyan);font-weight:700}
-.structright{margin-left:auto;order:99;display:flex;align-items:baseline;gap:7px}
-.structright b{font-size:15px;font-variant-numeric:tabular-nums;color:var(--txt)}
 
 .card{
   display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:13px;align-items:center;
@@ -328,6 +334,8 @@ h3.sec:first-child{margin-top:0}
   #rockwrap{order:2;gap:0;flex:none}
   #buffs{order:3;width:100%;justify-content:center;margin:0}
   #clickLabel{display:none}
+  #anomChip{width:112px;font-size:11.5px;margin-bottom:7px}
+  #anomChip .acw{display:none}
   #rock{width:90px;height:90px;box-shadow:0 0 18px rgba(79,216,255,.13),
     inset -9px -11px 24px rgba(0,0,0,.75), inset 6px 7px 16px rgba(160,200,255,.12)}
   #rock::after{inset:-4px}
@@ -371,6 +379,7 @@ h3.sec:first-child{margin-top:0}
 /* très petits écrans (iPhone SE) : les 5 onglets doivent tenir sans défilement */
 @media (max-width:365px){
   #rock{width:74px;height:74px}
+  #anomChip{width:96px;font-size:10.5px}
   .crater{transform:scale(.4)}
   #hero .kpi{padding:6px 8px}
   #hero .kpi .v{font-size:15px}
@@ -410,8 +419,10 @@ h3.sec:first-child{margin-top:0}
   <div id="hero">
     <div id="rockwrap">
       <div class="clicklabel" id="clickLabel"></div>
+      <div id="anomChip" data-i18n-title="anom_title"><span class="aci"><svg viewBox="0 0 64 64" aria-hidden="true"><path
+        d="M32 10 L38 26 L54 32 L38 38 L32 54 L26 38 L10 32 L26 26 Z"/></svg></span><span
+        class="acw" data-i18n="anom_word">Anomalie ·</span><span class="acv"></span></div>
       <div id="rock"></div>
-      <div id="anomChip" data-i18n-title="anom_title"></div>
     </div>
     <div id="buffs"></div>
     <div id="heroside">
@@ -530,7 +541,7 @@ fr:{
   mult_tip:"Détail du multiplicateur :",
   ms_struct:"Structures", ms_ach:"Succès", ms_cycles:"Cycles", ms_anom:"Prochaine anomalie",
   imminent:"imminente", anom_title:"Anomalie détectée !",
-  chip_next:"📡 Anomalie · {0}", chip_now:"📡 En vue !", chip_soon:"📡 Imminente…",
+  anom_word:"Anomalie ·", chip_now:"En vue !", chip_soon:"Imminente…",
   m_title:"Sauvegarde",
   m_hint:"Copie ce code pour sauvegarder ta partie, ou colle un code puis clique « Importer ».",
   m_import:"Importer", m_close:"Fermer", bad_code:"Code de sauvegarde invalide.",
@@ -591,7 +602,7 @@ en:{
   mult_tip:"Multiplier breakdown:",
   ms_struct:"Structures", ms_ach:"Achievements", ms_cycles:"Cycles", ms_anom:"Next anomaly",
   imminent:"imminent", anom_title:"Anomaly detected!",
-  chip_next:"📡 Anomaly · {0}", chip_now:"📡 Sighted!", chip_soon:"📡 Imminent…",
+  anom_word:"Anomaly ·", chip_now:"Sighted!", chip_soon:"Imminent…",
   m_title:"Save file",
   m_hint:"Copy this code to back up your game, or paste a code and click “Import”.",
   m_import:"Import", m_close:"Close", bad_code:"Invalid save code.",
@@ -1145,9 +1156,7 @@ function buildSkeleton(){
   $("#pGen").innerHTML=
     '<p class="hint">'+t("gen_hint")+'</p>'+
     '<div class="buyrow"><span class="lbl">'+t("buy_by")+'</span></div><div id="genList"></div>';
-  const sr=document.createElement("span"); sr.className="structright";
-  sr.innerHTML='<span class="lbl">'+t("ms_struct")+'</span><b id="structTotal">0</b>';
-  $("#pGen .buyrow").appendChild(sr);
+
   const row=$("#pGen .buyrow");
   QBTN=[1,10,100,"max"].map(q=>{
     const b=document.createElement("button");
@@ -1221,7 +1230,6 @@ function setLang(l){
 /* ---------- rendu des onglets ---------- */
 function renderGens(){
   QBTN.forEach(b=>cls(b,"on",S.buy===b._q));
-  txt($("#structTotal"),fmt(GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)));
   const rate=perSec(), list=[];
   let locked=0;
   GENS.forEach((g,i)=>{
@@ -1365,11 +1373,11 @@ function renderHeader(){
     want.forEach(()=>{const d=document.createElement("div");d.className="buff";b.appendChild(d)})}
   want.forEach((v,i)=>txt(b.children[i],v));
   const resteAnom=(S.nextAnom-Date.now())/1000;
-  txt($("#anomChip"), $("#anomaly").style.display==="block" ? t("chip_now")
-    : resteAnom<1 ? t("chip_soon") : t("chip_next",fmtTime(resteAnom)));
+  txt($("#anomChip .acv"), $("#anomaly").style.display==="block" ? t("chip_now")
+    : resteAnom<1 ? t("chip_soon") : fmtTime(resteAnom));
   // signal discret : l'anneau de la planète passe au doré quand une anomalie approche
   cls(document.body,"anomsoon",
-      S.nextAnom-Date.now()<15000 || $("#anomaly").style.display==="block");
+      S.nextAnom-Date.now()<10000 || $("#anomaly").style.display==="block");
 }
 
 let currentTab="gen";
