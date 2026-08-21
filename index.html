@@ -1377,7 +1377,10 @@ $$(".tab").forEach(tab=>bindAction(tab,()=>{
     // profond que son début, on remonte juste sous les onglets collés
     const m=$("main");
     const depasse=$("nav").getBoundingClientRect().bottom-$("#panels").getBoundingClientRect().top;
-    if(depasse>0)m.scrollTop=Math.max(0,m.scrollTop-depasse);
+    // si l'en-tête est compacté, on le laisse compacté : le recalage ne descend
+    // jamais sous le seuil de redéploiement (l'utilisateur n'a pas demandé à remonter)
+    const plancher=document.body.classList.contains("compact")?31:0;
+    if(depasse>0)m.scrollTop=Math.max(plancher,m.scrollTop-depasse);
     syncHero();
   }
 }));
