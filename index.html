@@ -114,17 +114,27 @@ header{
 .lang.on{background:var(--cyan);color:#04121c}
 
 /* ---------- LAYOUT ---------- */
-main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
-#left{
-  border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;
-  align-items:center;gap:12px;background:linear-gradient(180deg,rgba(9,13,26,.6),rgba(9,13,26,.2));
-  position:relative;overflow-y:auto;overflow-x:hidden;
+main{flex:1;display:grid;min-height:0;position:relative;
+  grid-template-columns:352px 1fr;grid-template-rows:auto minmax(0,1fr);
+  grid-template-areas:"hero right" "left right"}
+#hero{grid-area:hero}
+#left{grid-area:left}
+#right{grid-area:right}
+
+/* --- bloc d'en-tête --- */
+#hero{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:14px 16px 12px;border-right:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(9,13,26,.72),rgba(9,13,26,.35));
 }
-#rockslot{
-  position:sticky;top:0;z-index:5;width:100%;
-  display:flex;flex-direction:column;align-items:center;gap:12px;padding-bottom:10px;
-  background:linear-gradient(180deg,rgba(9,13,26,.97) 82%,rgba(9,13,26,0));
-  backdrop-filter:blur(3px);
+#rockwrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+#heroside{width:100%;display:flex;flex-direction:column;gap:10px}
+#herospacer{display:none}
+
+#left{
+  border-right:1px solid var(--line);padding:0 16px 16px;display:flex;flex-direction:column;
+  align-items:center;gap:12px;background:linear-gradient(180deg,rgba(9,13,26,.35),rgba(9,13,26,.2));
+  position:relative;overflow-y:auto;overflow-x:hidden;
 }
 #left::-webkit-scrollbar{width:8px}
 #left::-webkit-scrollbar-thumb{background:rgba(79,216,255,.2);border-radius:8px}
@@ -153,33 +163,10 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
 /* Planète compacte : elle reste toujours au même endroit — en haut, au centre —
    dans la barre collante qui porte les onglets. Aucun déplacement, donc aucun
    risque de toucher une amélioration par erreur. */
-/* Planète compacte : hors du flux (position fixe), donc son apparition ne décale
-   jamais rien. Elle se place juste sous les onglets, toujours au même endroit, et
-   ne s'affiche que lorsque la grande planète est sortie de l'écran. */
-#miniwrap{display:none;position:fixed;left:0;right:0;top:96px;z-index:35;
-  align-items:center;justify-content:center;pointer-events:none;
-  opacity:0;transform:scale(.75);transition:opacity .18s, transform .18s}
-body.minion #miniwrap{opacity:1;transform:scale(1)}
-body.minion #minipill{pointer-events:auto}
-#minipill{display:flex;align-items:center;gap:9px;padding:5px 15px 5px 5px;border-radius:40px;
-  cursor:pointer;background:rgba(10,16,32,.95);border:1px solid rgba(79,216,255,.32);
-  box-shadow:0 7px 20px rgba(0,0,0,.6);backdrop-filter:blur(7px);
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .07s}
-#minipill:active{transform:scale(.94)}
-#minirock{
-  position:relative;width:40px;height:40px;border-radius:50%;flex:none;
-  border:1px solid rgba(79,216,255,.35);
-  background:radial-gradient(circle at 32% 28%, #6b7ba0 0%, #3b475f 38%, #1d2536 70%, #10151f 100%);
-  box-shadow:inset -5px -6px 12px rgba(0,0,0,.7), 0 0 14px rgba(79,216,255,.14);
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .07s;
-}
-#minirock:active{transform:scale(.9)}
-#minirock .mrring{position:absolute;inset:-4px;border-radius:50%;
-  border:1px dashed rgba(79,216,255,.4);animation:spin 18s linear infinite}
-#minival{font-size:14px;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;
-  white-space:nowrap}
 
-.float{position:fixed;pointer-events:none;font-weight:700;color:var(--cyan);
+/* z-index obligatoire : .float est posé sur <body>, or #app est en z-index:2.
+   Sans ça, les "+N" se dessinent DERRIÈRE le jeu et restent invisibles. */
+.float{position:fixed;z-index:70;pointer-events:none;font-weight:700;color:var(--cyan);
   text-shadow:0 0 8px rgba(79,216,255,.5);animation:fly 1s ease-out forwards;font-size:15px}
 @keyframes fly{to{transform:translateY(-70px);opacity:0}}
 
@@ -275,7 +262,7 @@ h3.sec:first-child{margin-top:0}
 .ach .ad{font-size:11px;color:var(--dim);margin-top:2px}
 
 /* anomaly */
-#anomaly{position:absolute;width:62px;height:62px;border-radius:50%;cursor:pointer;z-index:20;display:none;
+#anomaly{position:fixed;width:62px;height:62px;border-radius:50%;cursor:pointer;z-index:42;display:none;
   background:radial-gradient(circle at 35% 32%, #fff6d8, var(--gold) 45%, rgba(255,120,40,.15) 75%);
   box-shadow:0 0 18px rgba(255,196,92,.75),0 0 38px rgba(255,196,92,.3);animation:bob 2s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-14px) scale(1.08)}}
@@ -305,11 +292,39 @@ h3.sec:first-child{margin-top:0}
 .mrow{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
 
 @media (max-width:880px){
-  main{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start;overflow-y:auto}
-  #left{border-right:none;border-bottom:1px solid var(--line);overflow:visible;height:auto;min-width:0}
+  main{display:block;overflow-y:auto}
+  /* l'en-tête sort du flux : sa réduction ne décale donc jamais le contenu */
+  #hero{
+    position:fixed;left:0;right:0;z-index:26;
+    top:calc(53px + env(safe-area-inset-top));
+    border-right:none;border-bottom:1px solid var(--line);
+    background:rgba(8,12,24,.96);backdrop-filter:blur(10px);
+    padding:10px 12px;gap:10px;
+    transition:padding .2s;
+  }
+  #herospacer{display:block}
+  /* état compact : la planète rapetisse et passe à gauche de la grille 2×2 */
+  body.compact #hero{flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;padding:7px 10px}
+  body.compact #buffs{order:3;width:100%;justify-content:center;margin-top:-2px}
+  body.compact #rockwrap{gap:0;flex:none}
+  body.compact #clickLabel{display:none}
+  body.compact #rock{width:64px;height:64px;box-shadow:0 0 14px rgba(79,216,255,.12),
+    inset -6px -7px 15px rgba(0,0,0,.75), inset 4px 5px 10px rgba(160,200,255,.12)}
+  body.compact #rock::after{inset:-3px}
+  body.compact .crater{transform:scale(.35);transform-origin:top left}
+  body.compact #heroside{gap:5px;min-width:0}
+  body.compact #hero .kpis{gap:5px}
+  body.compact #hero .kpi{padding:4px 8px;gap:6px;border-radius:9px}
+  body.compact #hero .kpi .k{font-size:8.5px;letter-spacing:.1em}
+  body.compact #hero .kpi .v{font-size:15px}
+  body.compact #hero .kpi .sub{display:none}
+  body.compact #hero .kico{display:none}
+  body.compact #buffs{min-height:0}
+  body.compact .buff{font-size:10px;padding:2px 8px}
+  #rock{transition:width .2s, height .2s}
+  #left{border-right:none;border-bottom:1px solid var(--line);overflow:visible;height:auto;min-width:0;
+    padding:12px 12px 14px}
   #right{min-height:auto;height:auto}
-  #rockslot{position:static;background:none;backdrop-filter:none;padding-bottom:0}
-  #miniwrap{display:flex}
   main{overflow-x:hidden}
   #stickyhead{position:sticky;top:0;z-index:30;
     background:rgba(8,12,24,.94);backdrop-filter:blur(8px);
@@ -368,25 +383,33 @@ h3.sec:first-child{margin-top:0}
 </header>
 
 <main>
-  <section id="left">
-    <div id="rockslot">
+  <!-- Bloc d'en-tête : planète + les deux chiffres clés + les bonus.
+       Sur mobile il reste collé en haut et se compacte au défilement. -->
+  <div id="hero">
+    <div id="rockwrap">
       <div class="clicklabel" id="clickLabel"></div>
       <div id="rock"></div>
     </div>
     <div id="buffs"></div>
-    <div class="kpis">
-      <div class="kpi ore"><div class="kico">⛏️</div><div class="kbody">
-        <div class="k" data-i18n="kpi_ore">Minerai</div><div class="v" id="hOre">0</div><div class="sub" id="sOre"></div></div></div>
-      <div class="kpi rate"><div class="kico">⚡</div><div class="kbody">
-        <div class="k" data-i18n="kpi_rate">Production</div><div class="v" id="hRate">0 /s</div><div class="sub" id="sRate"></div></div></div>
-      <div class="kpi am"><div class="kico">🌌</div><div class="kbody">
-        <div class="k" data-i18n="kpi_am">Antimatière</div><div class="v" id="hAm">0</div><div class="sub" id="sAm"></div></div></div>
-      <div class="kpi mult"><div class="kico">✦</div><div class="kbody">
-        <div class="k" data-i18n="kpi_mult">Multiplicateur</div><div class="v" id="hMult">×1</div><div class="sub" id="sMult"></div></div></div>
+    <div id="heroside">
+      <div class="kpis">
+        <div class="kpi ore"><div class="kico">⛏️</div><div class="kbody">
+          <div class="k" data-i18n="kpi_ore">Minerai</div><div class="v" id="hOre">0</div><div class="sub" id="sOre"></div></div></div>
+        <div class="kpi rate"><div class="kico">⚡</div><div class="kbody">
+          <div class="k" data-i18n="kpi_rate">Production</div><div class="v" id="hRate">0 /s</div><div class="sub" id="sRate"></div></div></div>
+        <div class="kpi am"><div class="kico">🌌</div><div class="kbody">
+          <div class="k" data-i18n="kpi_am">Antimatière</div><div class="v" id="hAm">0</div><div class="sub" id="sAm"></div></div></div>
+        <div class="kpi mult"><div class="kico">✦</div><div class="kbody">
+          <div class="k" data-i18n="kpi_mult">Multiplicateur</div><div class="v" id="hMult">×1</div><div class="sub" id="sMult"></div></div></div>
+      </div>
     </div>
+  </div>
+  <div id="herospacer"></div>
+
+  <section id="left">
     <div id="miniStats"></div>
-    <div id="anomaly" data-i18n-title="anom_title"></div>
   </section>
+  <div id="anomaly" data-i18n-title="anom_title"></div>
 
   <section id="right">
    <div id="stickyhead">
@@ -409,12 +432,6 @@ h3.sec:first-child{margin-top:0}
 </main>
 </div>
 
-<div id="miniwrap">
-  <div id="minipill" data-i18n-title="manual">
-    <div id="minirock"><span class="mrring"></span></div>
-    <div id="minival">+1</div>
-  </div>
-</div>
 <div id="toasts"></div>
 <div id="modal"><div class="mbox">
   <h2 id="mTitle" data-i18n="m_title">Sauvegarde</h2>
@@ -912,10 +929,17 @@ function anomInterval(){
   base*=Math.pow(0.8,lvl("detec"));
   return base;
 }
+/* L'anomalie apparaît toujours DANS la zone visible, jamais en haut d'une page
+   qu'on a déjà fait défiler. On évite l'en-tête et le bas de l'écran. */
 function spawnAnom(){
-  const el=$("#anomaly"), box=$("#left").getBoundingClientRect();
-  el.style.left=(20+Math.random()*Math.max(20,box.width-100))+"px";
-  el.style.top=(60+Math.random()*Math.max(20,box.height-160))+"px";
+  const el=$("#anomaly");
+  const hero=$("#hero").getBoundingClientRect();
+  const haut=Math.max(hero.bottom, $("header").getBoundingClientRect().bottom)+14;
+  const bas=innerHeight-90;
+  const x=16+Math.random()*Math.max(20,innerWidth-16-78);
+  const y=haut+Math.random()*Math.max(30,bas-haut);
+  el.style.left=Math.round(x)+"px";
+  el.style.top=Math.round(Math.min(y,bas))+"px";
   el.style.display="block";
   clearTimeout(el._t); el._t=setTimeout(()=>el.style.display="none",14000);
 }
@@ -952,26 +976,32 @@ function doTap(x,y){
 }
 $("#rock").addEventListener("pointerdown",e=>doTap(e.clientX,e.clientY));
 /* Planète compacte de la barre collante : même action, position fixe en haut au centre. */
-$("#minipill").addEventListener("pointerdown",e=>{
-  if(!document.body.classList.contains("minion"))return;
-  e.preventDefault(); doTap(e.clientX,e.clientY);
-});
-/* Position verticale de la planète compacte : juste sous la barre d'onglets. */
-function placeMini(){
-  const h=$("header").getBoundingClientRect().height;
-  const n=$("nav").getBoundingClientRect().height;
-  $("#miniwrap").style.top=Math.round(h+n+8)+"px";
-}
-addEventListener("resize",placeMini);
-placeMini();
 
-/* On n'affiche la planète compacte que lorsque la grande est sortie de l'écran. */
-(function miniWatcher(){
-  if(!("IntersectionObserver" in window)){document.body.classList.add("minion");return}
-  new IntersectionObserver(es=>{
-    document.body.classList.toggle("minion",!es[0].isIntersecting);
-  },{threshold:0.2}).observe($("#rock"));
-})();
+/* ---------- en-tête collant qui se compacte (mobile) ----------
+   #hero est en position fixe : on réserve sa hauteur avec #herospacer pour que
+   le contenu ne saute jamais, et on bascule en mode compact après un peu de défilement. */
+let heroH=0;
+function syncHero(){
+  const mobile=matchMedia("(max-width:880px)").matches;
+  const sp=$("#herospacer");
+  if(!mobile){sp.style.height="";document.body.classList.remove("compact");return}
+  if(!document.body.classList.contains("compact")){
+    heroH=$("#hero").getBoundingClientRect().height;
+    sp.style.height=Math.round(heroH)+"px";
+  }
+  const sc=$("main").scrollTop, avant=document.body.classList.contains("compact");
+  const apres=sc>60;
+  document.body.classList.toggle("compact",apres);
+  // les onglets se collent juste sous l'en-tête compacté
+  const h=$("#hero").getBoundingClientRect();
+  $("#stickyhead").style.top=Math.round(Math.max(0,h.bottom-$("main").getBoundingClientRect().top))+"px";
+  // la réduction est animée : on recalcule une fois l'animation terminée,
+  // sinon la position des onglets reste figée sur la hauteur intermédiaire
+  if(avant!==apres){clearTimeout(syncHero._t);syncHero._t=setTimeout(syncHero,240)}
+}
+addEventListener("resize",()=>{document.body.classList.remove("compact");syncHero()});
+$("main").addEventListener("scroll",syncHero,{passive:true});
+setTimeout(syncHero,60);
 // cratères décoratifs
 (function craters(){
   const specs=[[28,32,26],[62,22,15],[48,58,30],[22,66,18],[70,62,22],[40,14,11],[76,42,12]];
@@ -981,7 +1011,6 @@ placeMini();
     host.appendChild(d);
   });
   put($("#rock"),1);
-  put($("#minirock"),0.22);
 })();
 
 /* ---------- rendu : primitives (mise à jour EN PLACE, pas de reconstruction) ---------- */
@@ -1148,7 +1177,7 @@ function setLang(l){
   if(!T[l]||l===LANG)return;
   LANG=l; writeLang(l);
   CARDS.clear();                 // les cartes portent du texte : on les refait
-  applyI18n(); buildSkeleton(); render(); placeMini();
+  applyI18n(); buildSkeleton(); render(); syncHero();
 }
 
 /* ---------- rendu des onglets ---------- */
@@ -1290,7 +1319,6 @@ function renderHeader(){
   const tile=$(".kpi.mult"), tip=full.join("\n");
   if(tile._tip!==tip){tile._tip=tip;tile.title=tip?t("mult_tip")+"\n"+tip:""}
   html($("#clickLabel"),t("manual")+" — <b>+"+fmt(cv)+"</b> "+t("per_click"));
-  txt($("#minival"),"+"+fmt(cv));
   const b=$("#buffs");
   const want=S.buffs.map(x=>t(x.key||"buff_prod")+" — "+Math.ceil((x.until-Date.now())/1000)+t("u_s"));
   if(b._n!==S.buffs.length){b._n=S.buffs.length;b.textContent="";
