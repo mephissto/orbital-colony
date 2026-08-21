@@ -929,8 +929,11 @@ function clickVal(){
   UPS.forEach(u=>{if(u.kind==="click"&&S.ups[u.id])m*=u.mult});
   m*=Math.pow(2,lvl("servo"));
   let reso=0; UPS.forEach(u=>{if(u.kind==="reso"&&S.ups[u.id])reso=Math.max(reso,u.val)});
-  S.buffs.forEach(b=>{if(b.k==="click")m*=b.m});
-  return base*m*globalMult()+perSec()*reso;
+  // Le bonus de clic multiplie la valeur TOTALE, résonateur compris.
+  // Sinon il ne portait que sur la puissance brute — devenue négligeable en fin
+  // de partie face au résonateur (99 % du clic), et le ×12 ne donnait plus que ×1,09.
+  let bf=1; S.buffs.forEach(b=>{if(b.k==="click")bf*=b.m});
+  return (base*m*globalMult()+perSec()*reso)*bf;
 }
 function costMult(){return Math.pow(0.96,lvl("nego"))}
 function genCost(g,n){
