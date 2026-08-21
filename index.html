@@ -11,7 +11,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Colonie">
+<meta name="apple-mobile-web-app-title" content="Colony">
 <style>
 :root{
   --bg:#05070f;
@@ -553,8 +553,10 @@ fr:{
   up_none_ds:"Achète des structures et accumule du minerai : de nouvelles améliorations apparaîtront ici.",
   price:"Prix", price_for:"Prix pour ×{0}", price_for_max:"Prix pour MAX (×{0})", price_lvl:"Prix du niveau {0}",
   cost_ore:"{0} minerai", cost_am:"{0} AM", unit_am:"antimatière",
-  can_buy:"✓ tu peux l'acheter", missing:"il manque {0}", eta:"  •  ≈ {0}", far:"  •  encore très loin",
-  each_rate:"{0} /s par unité", total_rate:"   •   ces {0} rapportent {1} /s", owned_sub:"possédés",
+  can_buy:"✓ tu peux l'acheter", missing:"il manque {0}", missing_s:"manque {0}",
+  eta:"  •  ≈ {0}", far:"  •  encore très loin", far_s:"  •  très loin",
+  each_rate:"{0} /s par unité", total_rate:"   •   ces {0} rapportent {1} /s",
+  total_rate_s:"  •  {0} → {1}/s", owned_sub:"possédés",
   locked_ds:"Continue de progresser pour débloquer cette structure.",
   pr_head:"Cycle d'antimatière — tu repars de zéro, tu gardes un bonus permanent",
   pr_btn:"Lancer un nouveau cycle",
@@ -614,8 +616,10 @@ en:{
   up_none_ds:"Buy structures and pile up ore — new upgrades will show up here.",
   price:"Price", price_for:"Price for ×{0}", price_for_max:"Price for MAX (×{0})", price_lvl:"Price of level {0}",
   cost_ore:"{0} ore", cost_am:"{0} AM", unit_am:"antimatter",
-  can_buy:"✓ you can afford it", missing:"{0} short", eta:"  •  ≈ {0}", far:"  •  still a long way off",
-  each_rate:"{0} /s each", total_rate:"   •   these {0} produce {1} /s", owned_sub:"owned",
+  can_buy:"✓ you can afford it", missing:"{0} short",
+  eta:"  •  ≈ {0}", far:"  •  still a long way off", far_s:"  •  far off",
+  each_rate:"{0} /s each", total_rate:"   •   these {0} produce {1} /s",
+  total_rate_s:"  •  {0} → {1}/s", owned_sub:"owned",
   locked_ds:"Keep progressing to unlock this structure.",
   pr_head:"Antimatter cycle — you start over, you keep a permanent bonus",
   pr_btn:"Start a new cycle",
@@ -660,6 +664,14 @@ function t(k){
   return s;
 }
 function tr(o){return (o&&typeof o==="object")?(o[LANG]!=null?o[LANG]:o.fr):o}
+/* tm() = t(), mais bascule sur la variante courte "clé_s" quand l'écran est étroit */
+let ETROIT=matchMedia("(max-width:880px)").matches;
+addEventListener("resize",()=>{ETROIT=matchMedia("(max-width:880px)").matches});
+function tm(k){
+  const a=[].slice.call(arguments);
+  if(ETROIT&&T[LANG][k+"_s"]!=null)a[0]=k+"_s";
+  return t.apply(null,a);
+}
 
 /* ---------- données : générateurs ---------- */
 const GENS=[
@@ -1144,8 +1156,8 @@ function upd(c,o){
 function priceInfo(cost,cur,rate,unit){
   if(cur>=cost)return {ok:1,cant:0,miss:t("can_buy")};
   const d=cost-cur;
-  let s=t("missing",fmt(d)+(unit?" "+unit:""));
-  if(rate>0)s+=(d/rate>86400*60)?t("far"):t("eta",fmtTime(d/rate));
+  let s=tm("missing",fmt(d)+(unit?" "+unit:""));
+  if(rate>0)s+=(d/rate>86400*60)?tm("far"):t("eta",fmtTime(d/rate));
   return {ok:0,cant:1,miss:s};
 }
 
@@ -1250,7 +1262,7 @@ function renderGens(){
     const c=getCard("gen:"+g.id,()=>buyGen(g));
     upd(c,{
       ico:g.ico,nm:tr(g.nm),ds:tr(g.ds),
-      rt:t("each_rate",fmt(each))+(owned?t("total_rate",owned,fmt(each*owned)):""),
+      rt:t("each_rate",fmt(each))+(owned?tm("total_rate",owned,fmt(each*owned)):""),
       clbl:isMax?t("price_for_max",n):t("price_for",n),
       cost:t("cost_ore",fmt(cost)),
       miss:p.miss,ok:p.ok,cant:p.cant,prog:S.ore/cost,

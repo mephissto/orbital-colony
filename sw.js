@@ -4,7 +4,7 @@
      dernière version publiée), avec repli sur le cache si tu es hors connexion ;
    - le reste (icônes, manifeste) est servi depuis le cache en priorité.
    Après une mise à jour du jeu, incrémente CACHE ci-dessous. */
-const CACHE = "colonie-orbitale-v1";
+const CACHE = "colonie-orbitale-v2";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"

@@ -1,7 +1,7 @@
 {
-  "name": "Colonie Orbitale",
-  "short_name": "Colonie",
-  "description": "Idle game spatial : extrais du minerai, bâtis une colonie, plie l'espace-temps.",
+  "name": "Orbital Colony",
+  "short_name": "Colony",
+  "description": "Space idle game: mine ore, build a colony, bend space-time.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
