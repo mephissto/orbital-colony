@@ -122,7 +122,7 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
 }
 #left::-webkit-scrollbar{width:8px}
 #left::-webkit-scrollbar-thumb{background:rgba(79,216,255,.2);border-radius:8px}
-#right{display:flex;flex-direction:column;min-height:0}
+#right{display:flex;flex-direction:column;min-height:0;min-width:0}
 
 /* ---------- ASTEROID ---------- */
 #rock{
@@ -144,7 +144,25 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
   box-shadow:inset 2px 3px 6px rgba(0,0,0,.6), 1px 1px 0 rgba(180,210,255,.06)}
 .clicklabel{text-align:center;font-size:12px;color:var(--dim)}
 .clicklabel b{color:var(--cyan);font-size:15px}
-.float{position:absolute;pointer-events:none;font-weight:700;color:var(--cyan);
+/* Planète compacte : elle reste toujours au même endroit — en haut, au centre —
+   dans la barre collante qui porte les onglets. Aucun déplacement, donc aucun
+   risque de toucher une amélioration par erreur. */
+#miniwrap{display:none;position:relative;align-items:center;justify-content:center;padding:8px 0 2px}
+#minirock{
+  position:relative;width:46px;height:46px;border-radius:50%;flex:none;cursor:pointer;
+  border:1px solid rgba(79,216,255,.35);
+  background:radial-gradient(circle at 32% 28%, #6b7ba0 0%, #3b475f 38%, #1d2536 70%, #10151f 100%);
+  box-shadow:inset -5px -6px 12px rgba(0,0,0,.7), 0 0 14px rgba(79,216,255,.14);
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .07s;
+}
+#minirock:active{transform:scale(.9)}
+#minirock .mrring{position:absolute;inset:-4px;border-radius:50%;
+  border:1px dashed rgba(79,216,255,.4);animation:spin 18s linear infinite}
+#minival{position:absolute;left:50%;margin-left:33px;font-size:14px;font-weight:700;
+  color:var(--cyan);font-variant-numeric:tabular-nums;text-shadow:0 0 10px rgba(79,216,255,.35);
+  white-space:nowrap}
+
+.float{position:fixed;pointer-events:none;font-weight:700;color:var(--cyan);
   text-shadow:0 0 8px rgba(79,216,255,.5);animation:fly 1s ease-out forwards;font-size:15px}
 @keyframes fly{to{transform:translateY(-70px);opacity:0}}
 
@@ -158,7 +176,9 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
 #miniStats span{color:var(--txt);font-variant-numeric:tabular-nums}
 
 /* ---------- TABS ---------- */
-nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);
+  flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+nav::-webkit-scrollbar{display:none}
 .tab{
   padding:9px 16px;font-size:13px;cursor:pointer;color:var(--dim);border:1px solid transparent;
   border-bottom:none;border-radius:9px 9px 0 0;position:relative;top:1px;white-space:nowrap;
@@ -182,7 +202,7 @@ nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line)
 .qty.on{color:#04121c;background:var(--cyan);border-color:var(--cyan);font-weight:700}
 
 .card{
-  display:grid;grid-template-columns:44px 1fr auto;gap:13px;align-items:center;
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:13px;align-items:center;
   padding:11px 14px;margin-bottom:8px;border:1px solid var(--line);border-radius:11px;
   background:var(--panel);cursor:pointer;
   transition:border-color .15s, background-color .15s, box-shadow .15s;
@@ -206,6 +226,7 @@ nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line)
 .bar i{display:block;height:100%;width:0;border-radius:4px;
   background:linear-gradient(90deg,rgba(79,216,255,.7),var(--violet))}
 .bar.full i{background:linear-gradient(90deg,var(--green),var(--cyan))}
+.mid{min-width:0}                 /* sans ça, un nom long fait déborder la carte */
 .right{text-align:right;white-space:nowrap;min-width:150px}
 .clbl{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);margin-bottom:1px}
 .cost{font-size:16px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.15}
@@ -244,6 +265,12 @@ h3.sec:first-child{margin-top:0}
 
 /* toast */
 #toasts{position:fixed;bottom:18px;right:18px;z-index:60;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+@media (max-width:880px){
+  /* au-dessus du bouton flottant, et sans couvrir tout l'écran */
+  #toasts{left:10px;right:10px;align-items:stretch;
+    bottom:calc(14px + env(safe-area-inset-bottom));gap:6px}
+  .toast{font-size:12px;padding:8px 12px;text-align:center}
+}
 .toast{padding:10px 16px;border-radius:10px;border:1px solid var(--cyan);background:rgba(10,20,38,.95);
   font-size:13px;box-shadow:0 6px 26px rgba(0,0,0,.6);animation:slide .3s ease-out}
 .toast.gold{border-color:var(--gold);color:var(--gold)}
@@ -261,11 +288,41 @@ h3.sec:first-child{margin-top:0}
 .mrow{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
 
 @media (max-width:880px){
-  main{grid-template-columns:1fr;overflow-y:auto}
-  #left{border-right:none;border-bottom:1px solid var(--line);overflow:visible;height:auto}
+  main{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start;overflow-y:auto}
+  #left{border-right:none;border-bottom:1px solid var(--line);overflow:visible;height:auto;min-width:0}
+  #right{min-height:auto;height:auto}
+  main{overflow-x:hidden}
+  #miniwrap{display:flex}
+  #stickyhead{position:sticky;top:0;z-index:30;
+    background:rgba(8,12,24,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line)}
+  #stickyhead nav{border-bottom:none}
+  nav{padding:6px 10px 0;gap:1px}
+  #panels{padding:12px 10px}
+  .card{grid-template-columns:32px minmax(0,1fr) auto;gap:9px;padding:10px 11px}
+  .ico{font-size:20px}
+  .nm{font-size:13.5px}
+  .ds{font-size:11px}
+  .rt{font-size:11px}
+  .right{min-width:104px}
+  .clbl{font-size:9px;letter-spacing:.06em}
+  .cost{font-size:14px}
+  .miss{font-size:10px;white-space:normal}
+  .own{font-size:17px;margin-top:4px}
+  .bar{margin-top:6px}
+  h3.sec{margin:18px 0 8px}
+  .tab{padding:8px 9px;font-size:12px}
+  .tab .badge{margin-left:4px;min-width:14px;font-size:9.5px;padding:0 3px}
   #rock{width:150px;height:150px}
   body{overflow:auto}
   #panels{overflow:visible}
+}
+
+/* très petits écrans (iPhone SE) : les 5 onglets doivent tenir sans défilement */
+@media (max-width:365px){
+  nav{padding:6px 5px 0}
+  .tab{padding:7px 4px;font-size:11.5px}
+  .tab .badge{margin-left:3px;min-width:13px;font-size:9px}
 }
 </style>
 </head>
@@ -312,13 +369,19 @@ h3.sec:first-child{margin-top:0}
   </section>
 
   <section id="right">
+   <div id="stickyhead">
+    <div id="miniwrap">
+      <div id="minirock" data-i18n-title="manual"><span class="mrring"></span></div>
+      <div id="minival">+1</div>
+    </div>
     <nav>
-      <div class="tab on" data-p="gen"><span data-i18n="tab_gen">Extraction</span></div>
-      <div class="tab" data-p="up"><span data-i18n="tab_up">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
-      <div class="tab" data-p="pr"><span data-i18n="tab_pr">Recherche</span></div>
-      <div class="tab" data-p="ac"><span data-i18n="tab_ac">Succès</span></div>
-      <div class="tab" data-p="st"><span data-i18n="tab_st">Statistiques</span></div>
+      <div class="tab on" data-p="gen"><span data-i18n="tab_gen" data-i18n-s="tab_gen_s">Extraction</span></div>
+      <div class="tab" data-p="up"><span data-i18n="tab_up" data-i18n-s="tab_up_s">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
+      <div class="tab" data-p="pr"><span data-i18n="tab_pr" data-i18n-s="tab_pr_s">Recherche</span></div>
+      <div class="tab" data-p="ac"><span data-i18n="tab_ac" data-i18n-s="tab_ac_s">Succès</span></div>
+      <div class="tab" data-p="st"><span data-i18n="tab_st" data-i18n-s="tab_st_s">Statistiques</span></div>
     </nav>
+   </div>
     <div id="panels">
       <div class="panel on" id="pGen"></div>
       <div class="panel" id="pUp"></div>
@@ -373,6 +436,7 @@ fr:{
   logo:"◈ Colonie Orbitale", doc_title:"Colonie Orbitale — idle game spatial",
   save:"Sauvegarder", export:"Export / Import", reset:"Reset",
   tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_ac:"Succès", tab_st:"Statistiques",
+  tab_gen_s:"Extraction", tab_up_s:"Amélio.", tab_pr_s:"Recherche", tab_ac_s:"Succès", tab_st_s:"Stats",
   manual:"Foreuse manuelle", per_click:"par clic",
   kpi_ore:"Minerai", kpi_rate:"Production", kpi_am:"Antimatière", kpi_mult:"Multiplicateur",
   sub_total:"total extrait : <b>{0}</b>",
@@ -432,6 +496,7 @@ en:{
   logo:"◈ Orbital Colony", doc_title:"Orbital Colony — space idle game",
   save:"Save", export:"Export / Import", reset:"Reset",
   tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_ac:"Achievements", tab_st:"Statistics",
+  tab_gen_s:"Mining", tab_up_s:"Upgrades", tab_pr_s:"Research", tab_ac_s:"Trophies", tab_st_s:"Stats",
   manual:"Manual drill", per_click:"per click",
   kpi_ore:"Ore", kpi_rate:"Output", kpi_am:"Antimatter", kpi_mult:"Multiplier",
   sub_total:"total mined: <b>{0}</b>",
@@ -539,7 +604,7 @@ const GROWTH=1.15;
 
 /* ---------- données : améliorations ---------- */
 const UPS=[];
-const TIERS=[{need:10,mult:2},{need:25,mult:2},{need:50,mult:3},{need:100,mult:4},{need:175,mult:5}];
+const TIERS=[{need:10,mult:2},{need:25,mult:2},{need:50,mult:3},{need:100,mult:4},{need:175,mult:5},{need:250,mult:6}];
 GENS.forEach(g=>{
   TIERS.forEach((tier,i)=>{
     UPS.push({
@@ -668,6 +733,48 @@ const ACHS=[
   nm:{fr:"Maître de l'antimatière",en:"Antimatter master"},ds:{fr:"1 000 antimatière possédée",en:"1,000 antimatter held"}},
  {id:"a_dyson",f:S=>(S.gens.dyson||0)>=1,
   nm:{fr:"Ingénierie ultime",en:"Ultimate engineering"},ds:{fr:"Construire une sphère de Dyson",en:"Build a Dyson sphere"}},
+
+ /* ---- haut niveau ---- */
+ {id:"a_drone500",f:S=>(S.gens.drone||0)>=500,
+  nm:{fr:"Marée de drones",en:"Drone tide"},ds:{fr:"500 drones mineurs",en:"500 mining drones"}},
+ {id:"a_all100",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=100),
+  nm:{fr:"Conglomérat",en:"Conglomerate"},ds:{fr:"100 de chaque structure",en:"100 of every structure"}},
+ {id:"a_all200",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=200),
+  nm:{fr:"Empire industriel",en:"Industrial empire"},ds:{fr:"200 de chaque structure",en:"200 of every structure"}},
+ {id:"a_all250",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=250),
+  nm:{fr:"Machine parfaite",en:"Perfect machine"},ds:{fr:"250 de chaque structure",en:"250 of every structure"}},
+ {id:"a_struct1k",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=1000,
+  nm:{fr:"Mille pièces",en:"A thousand parts"},ds:{fr:"1 000 structures au total",en:"1,000 structures in total"}},
+ {id:"a_struct2k5",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=2500,
+  nm:{fr:"Mégastructure",en:"Megastructure"},ds:{fr:"2 500 structures au total",en:"2,500 structures in total"}},
+ {id:"a_dyson50",f:S=>(S.gens.dyson||0)>=50,
+  nm:{fr:"Constellation captive",en:"Captive constellation"},ds:{fr:"50 sphères de Dyson",en:"50 Dyson spheres"}},
+ {id:"a_e21",f:S=>S.totalOre>=1e21,
+  nm:{fr:"Échelle galactique",en:"Galactic scale"},ds:{fr:"1 Sx de minerai extrait",en:"1 Sx ore mined"}},
+ {id:"a_e24",f:S=>S.totalOre>=1e24,
+  nm:{fr:"Échelle universelle",en:"Universal scale"},ds:{fr:"1 Sp de minerai extrait",en:"1 Sp ore mined"}},
+ {id:"a_e27",f:S=>S.totalOre>=1e27,
+  nm:{fr:"Au-delà des nombres",en:"Beyond numbers"},ds:{fr:"1 Oc de minerai extrait",en:"1 Oc ore mined"}},
+ {id:"a_rate1t",f:S=>perSec()>=1e12,
+  nm:{fr:"Torrent",en:"Torrent"},ds:{fr:"1 T/s de production",en:"1 T/s output"}},
+ {id:"a_rate1qa",f:S=>perSec()>=1e15,
+  nm:{fr:"Singularité productive",en:"Productive singularity"},ds:{fr:"1 Qa/s de production",en:"1 Qa/s output"}},
+ {id:"a_click1g",f:S=>clickVal()>=1e9,
+  nm:{fr:"Doigt de fer",en:"Iron finger"},ds:{fr:"1 B de puissance de clic",en:"1 B click power"}},
+ {id:"a_anom100",f:S=>S.anoms>=100,
+  nm:{fr:"Radar vivant",en:"Living radar"},ds:{fr:"Attraper 100 anomalies",en:"Catch 100 anomalies"}},
+ {id:"a_pr10",f:S=>S.prestiges>=10,
+  nm:{fr:"Éternel retour",en:"Eternal return"},ds:{fr:"10 cycles",en:"10 cycles"}},
+ {id:"a_pr25",f:S=>S.prestiges>=25,
+  nm:{fr:"Sisyphe heureux",en:"Happy Sisyphus"},ds:{fr:"25 cycles",en:"25 cycles"}},
+ {id:"a_am10k",f:S=>S.am>=1e4,
+  nm:{fr:"Réacteur à antimatière",en:"Antimatter reactor"},ds:{fr:"10 000 antimatière possédée",en:"10,000 antimatter held"}},
+ {id:"a_am100k",f:S=>S.am>=1e5,
+  nm:{fr:"Banque d'antimatière",en:"Antimatter bank"},ds:{fr:"100 000 antimatière possédée",en:"100,000 antimatter held"}},
+ {id:"a_res_all",f:S=>RES.every(r=>(S.res[r.id]||0)>=r.max),
+  nm:{fr:"Savoir absolu",en:"Absolute knowledge"},ds:{fr:"Toutes les recherches au maximum",en:"Every research maxed out"}},
+ {id:"a_ups_all",f:S=>UPS.every(u=>S.ups[u.id]),
+  nm:{fr:"Collectionneur",en:"Completionist"},ds:{fr:"Toutes les améliorations achetées",en:"Every upgrade bought"}},
 ];
 
 /* ---------- état ---------- */
@@ -815,21 +922,25 @@ function checkAchs(){
 }
 
 /* ---------- clic ---------- */
-$("#rock").addEventListener("pointerdown",e=>{
+function doTap(x,y){
   const v=clickVal(); gain(v); S.clicks++;
   const f=document.createElement("div"); f.className="float"; f.textContent="+"+fmt(v);
-  const r=$("#left").getBoundingClientRect();
-  f.style.left=(e.clientX-r.left-14)+"px"; f.style.top=(e.clientY-r.top-14)+"px";
-  $("#left").appendChild(f); setTimeout(()=>f.remove(),1000);
-});
+  f.style.left=(x-16)+"px"; f.style.top=(y-16)+"px";   // .float est en position fixed
+  document.body.appendChild(f); setTimeout(()=>f.remove(),1000);
+}
+$("#rock").addEventListener("pointerdown",e=>doTap(e.clientX,e.clientY));
+/* Planète compacte de la barre collante : même action, position fixe en haut au centre. */
+$("#minirock").addEventListener("pointerdown",e=>{e.preventDefault();doTap(e.clientX,e.clientY)});
 // cratères décoratifs
 (function craters(){
-  const r=$("#rock");
-  [[28,32,26],[62,22,15],[48,58,30],[22,66,18],[70,62,22],[40,14,11],[76,42,12]].forEach(([x,y,s])=>{
+  const specs=[[28,32,26],[62,22,15],[48,58,30],[22,66,18],[70,62,22],[40,14,11],[76,42,12]];
+  const put=(host,k)=>specs.forEach(([x,y,s])=>{
     const d=document.createElement("div"); d.className="crater";
-    d.style.cssText=`left:${x}%;top:${y}%;width:${s}px;height:${s}px`;
-    r.appendChild(d);
+    d.style.cssText=`left:${x}%;top:${y}%;width:${s*k}px;height:${s*k}px`;
+    host.appendChild(d);
   });
+  put($("#rock"),1);
+  put($("#minirock"),0.25);
 })();
 
 /* ---------- rendu : primitives (mise à jour EN PLACE, pas de reconstruction) ---------- */
@@ -984,7 +1095,11 @@ function buildSkeleton(){
 function applyI18n(){
   document.title=t("doc_title");
   document.documentElement.lang=LANG;
-  $$("[data-i18n]").forEach(e=>txt(e,t(e.dataset.i18n)));
+  const court=matchMedia("(max-width:560px)").matches;
+  $$("[data-i18n]").forEach(e=>{
+    const k=(court&&e.dataset.i18nS)?e.dataset.i18nS:e.dataset.i18n;
+    txt(e,t(k));
+  });
   $$("[data-i18n-title]").forEach(e=>{const v=t(e.dataset.i18nTitle);if(e.title!==v)e.title=v});
   $$(".lang").forEach(b=>cls(b,"on",b.dataset.lang===LANG));
 }
@@ -1134,6 +1249,7 @@ function renderHeader(){
   const tile=$(".kpi.mult"), tip=full.join("\n");
   if(tile._tip!==tip){tile._tip=tip;tile.title=tip?t("mult_tip")+"\n"+tip:""}
   html($("#clickLabel"),t("manual")+" — <b>+"+fmt(cv)+"</b> "+t("per_click"));
+  txt($("#minival"),"+"+fmt(cv));
   const b=$("#buffs");
   const want=S.buffs.map(x=>t(x.key||"buff_prod")+" — "+Math.ceil((x.until-Date.now())/1000)+t("u_s"));
   if(b._n!==S.buffs.length){b._n=S.buffs.length;b.textContent="";
@@ -1167,6 +1283,10 @@ $$(".tab").forEach(tab=>bindAction(tab,()=>{
   render();
 }));
 $$(".lang").forEach(b=>bindAction(b,()=>setLang(b.dataset.lang)));
+
+/* libellés d'onglets courts/longs selon la largeur */
+let rzT=null;
+addEventListener("resize",()=>{clearTimeout(rzT);rzT=setTimeout(applyI18n,150)});
 
 /* ---------- hors-ligne ---------- */
 function offlineCap(){return (4+3*lvl("buffer"))*3600}
