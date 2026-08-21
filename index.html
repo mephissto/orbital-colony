@@ -292,7 +292,8 @@ h3.sec:first-child{margin-top:0}
 .mrow{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
 
 @media (max-width:880px){
-  main{display:block;overflow-y:auto}
+  main{display:block;overflow-y:auto;overflow-anchor:none}
+  #herospacer{transition:height .2s}
   /* l'en-tête sort du flux : sa réduction ne décale donc jamais le contenu */
   #hero{
     position:fixed;left:0;right:0;z-index:26;
@@ -304,8 +305,11 @@ h3.sec:first-child{margin-top:0}
   }
   #herospacer{display:block}
   /* état compact : la planète rapetisse et passe à gauche de la grille 2×2 */
-  body.compact #hero{flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;padding:7px 10px}
-  body.compact #buffs{order:3;width:100%;justify-content:center;margin-top:-2px}
+  body.compact #hero{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:7px 10px}
+  body.compact #buffs{order:-1;width:100%;justify-content:center;min-height:0;margin:0}
+  body.compact #buffs:empty{display:none}
+  /* sans ces règles, #heroside (width:100%) passe à la ligne et la planète se retrouve seule */
+  body.compact #heroside{flex:1 1 0;width:auto;min-width:0}
   body.compact #rockwrap{gap:0;flex:none}
   body.compact #clickLabel{display:none}
   body.compact #rock{width:64px;height:64px;box-shadow:0 0 14px rgba(79,216,255,.12),
@@ -985,19 +989,26 @@ function syncHero(){
   const mobile=matchMedia("(max-width:880px)").matches;
   const sp=$("#herospacer");
   if(!mobile){sp.style.height="";document.body.classList.remove("compact");return}
-  if(!document.body.classList.contains("compact")){
-    heroH=$("#hero").getBoundingClientRect().height;
-    sp.style.height=Math.round(heroH)+"px";
-  }
   const sc=$("main").scrollTop, avant=document.body.classList.contains("compact");
-  const apres=sc>60;
+  // hystérésis : on compacte après 90 px, on redéploie sous 30 px — pas de clignotement
+  const apres = avant ? sc>30 : sc>90;
   document.body.classList.toggle("compact",apres);
-  // les onglets se collent juste sous l'en-tête compacté
+  // la cale suit la hauteur RÉELLE de l'en-tête (animée en CSS) :
+  // le contenu se referme en douceur, aucun vide pendant la transition
   const h=$("#hero").getBoundingClientRect();
+  sp.style.height=Math.round(h.height)+"px";
   $("#stickyhead").style.top=Math.round(Math.max(0,h.bottom-$("main").getBoundingClientRect().top))+"px";
-  // la réduction est animée : on recalcule une fois l'animation terminée,
-  // sinon la position des onglets reste figée sur la hauteur intermédiaire
-  if(avant!==apres){clearTimeout(syncHero._t);syncHero._t=setTimeout(syncHero,240)}
+  // pendant l'animation (~200 ms), on suit la hauteur image par image
+  if(avant!==apres){
+    cancelAnimationFrame(syncHero._raf); clearTimeout(syncHero._t);
+    const t0=performance.now();
+    const suivre=()=>{ if(performance.now()-t0<260){syncHero._raf=requestAnimationFrame(suivre)}
+      const r=$("#hero").getBoundingClientRect();
+      sp.style.height=Math.round(r.height)+"px";
+      $("#stickyhead").style.top=Math.round(Math.max(0,r.bottom-$("main").getBoundingClientRect().top))+"px";
+    };
+    suivre();
+  }
 }
 addEventListener("resize",()=>{document.body.classList.remove("compact");syncHero()});
 $("main").addEventListener("scroll",syncHero,{passive:true});
