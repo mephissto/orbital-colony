@@ -495,7 +495,7 @@ fr:{
   mult_none:"aucun bonus pour l'instant", mult_tip:"Détail du multiplicateur :",
   ms_struct:"Structures", ms_ach:"Succès", ms_cycles:"Cycles", ms_anom:"Prochaine anomalie",
   imminent:"imminente", anom_title:"Anomalie détectée !",
-  chip_next:"📡 Anomalie dans {0}", chip_now:"📡 Anomalie en vue !",
+  chip_next:"📡 Anomalie dans {0}", chip_now:"📡 Anomalie en vue !", chip_soon:"📡 Anomalie imminente…",
   m_title:"Sauvegarde",
   m_hint:"Copie ce code pour sauvegarder ta partie, ou colle un code puis clique « Importer ».",
   m_import:"Importer", m_close:"Fermer", bad_code:"Code de sauvegarde invalide.",
@@ -556,7 +556,7 @@ en:{
   mult_none:"no bonus yet", mult_tip:"Multiplier breakdown:",
   ms_struct:"Structures", ms_ach:"Achievements", ms_cycles:"Cycles", ms_anom:"Next anomaly",
   imminent:"imminent", anom_title:"Anomaly detected!",
-  chip_next:"📡 Anomaly in {0}", chip_now:"📡 Anomaly sighted!",
+  chip_next:"📡 Anomaly in {0}", chip_now:"📡 Anomaly sighted!", chip_soon:"📡 Anomaly imminent…",
   m_title:"Save file",
   m_hint:"Copy this code to back up your game, or paste a code and click “Import”.",
   m_import:"Import", m_close:"Close", bad_code:"Invalid save code.",
@@ -1347,9 +1347,9 @@ function renderHeader(){
   if(b._n!==S.buffs.length){b._n=S.buffs.length;b.textContent="";
     want.forEach(()=>{const d=document.createElement("div");d.className="buff";b.appendChild(d)})}
   want.forEach((v,i)=>txt(b.children[i],v));
-  txt($("#anomChip"), $("#anomaly").style.display==="block"
-    ? t("chip_now")
-    : t("chip_next",fmtTime(Math.max(0,(S.nextAnom-Date.now())/1000))));
+  const resteAnom=(S.nextAnom-Date.now())/1000;
+  txt($("#anomChip"), $("#anomaly").style.display==="block" ? t("chip_now")
+    : resteAnom<1 ? t("chip_soon") : t("chip_next",fmtTime(resteAnom)));
   // signal discret : l'anneau de la planète passe au doré quand une anomalie approche
   cls(document.body,"anomsoon",
       S.nextAnom-Date.now()<15000 && $("#anomaly").style.display!=="block");
