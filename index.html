@@ -988,7 +988,11 @@ let heroH=0;
 function syncHero(){
   const mobile=matchMedia("(max-width:880px)").matches;
   const sp=$("#herospacer");
-  if(!mobile){sp.style.height="";document.body.classList.remove("compact");return}
+  if(!mobile){sp.style.height="";$("#panels").style.minHeight="";document.body.classList.remove("compact");return}
+  // hauteur minimale du panneau : l'état compacté doit rester stable même si
+  // l'onglet affiché est presque vide (sinon changer d'onglet fait tout sauter)
+  const minH=Math.max(0,$("main").clientHeight-$("#stickyhead").getBoundingClientRect().height)+"px";
+  if($("#panels").style.minHeight!==minH)$("#panels").style.minHeight=minH;
   const sc=$("main").scrollTop, avant=document.body.classList.contains("compact");
   // hystérésis : on compacte après 90 px, on redéploie sous 30 px — pas de clignotement
   const apres = avant ? sc>30 : sc>90;
@@ -1010,7 +1014,12 @@ function syncHero(){
     suivre();
   }
 }
-addEventListener("resize",()=>{document.body.classList.remove("compact");syncHero()});
+addEventListener("resize",syncHero);
+// la hauteur de l'en-tête peut changer SANS défilement (bonus qui expire,
+// changement de langue…) : on suit sa taille directement
+if("ResizeObserver" in window){
+  new ResizeObserver(()=>syncHero()).observe($("#hero"));
+}
 $("main").addEventListener("scroll",syncHero,{passive:true});
 setTimeout(syncHero,60);
 // cratères décoratifs
@@ -1361,6 +1370,14 @@ $$(".tab").forEach(tab=>bindAction(tab,()=>{
   currentTab=tab.dataset.p;
   $("#p"+currentTab[0].toUpperCase()+currentTab.slice(1)).classList.add("on");
   render();
+  if(matchMedia("(max-width:880px)").matches){
+    // le haut du nouveau panneau doit être visible : si on avait défilé plus
+    // profond que son début, on remonte juste sous les onglets collés
+    const m=$("main");
+    const depasse=$("nav").getBoundingClientRect().bottom-$("#panels").getBoundingClientRect().top;
+    if(depasse>0)m.scrollTop=Math.max(0,m.scrollTop-depasse);
+    syncHero();
+  }
 }));
 $$(".lang").forEach(b=>bindAction(b,()=>setLang(b.dataset.lang)));
 
