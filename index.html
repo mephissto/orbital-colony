@@ -120,6 +120,12 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
   align-items:center;gap:12px;background:linear-gradient(180deg,rgba(9,13,26,.6),rgba(9,13,26,.2));
   position:relative;overflow-y:auto;overflow-x:hidden;
 }
+#rockslot{
+  position:sticky;top:0;z-index:5;width:100%;
+  display:flex;flex-direction:column;align-items:center;gap:12px;padding-bottom:10px;
+  background:linear-gradient(180deg,rgba(9,13,26,.97) 82%,rgba(9,13,26,0));
+  backdrop-filter:blur(3px);
+}
 #left::-webkit-scrollbar{width:8px}
 #left::-webkit-scrollbar-thumb{background:rgba(79,216,255,.2);border-radius:8px}
 #right{display:flex;flex-direction:column;min-height:0;min-width:0}
@@ -147,9 +153,21 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
 /* Planète compacte : elle reste toujours au même endroit — en haut, au centre —
    dans la barre collante qui porte les onglets. Aucun déplacement, donc aucun
    risque de toucher une amélioration par erreur. */
-#miniwrap{display:none;position:relative;align-items:center;justify-content:center;padding:8px 0 2px}
+/* Planète compacte : hors du flux (position fixe), donc son apparition ne décale
+   jamais rien. Elle se place juste sous les onglets, toujours au même endroit, et
+   ne s'affiche que lorsque la grande planète est sortie de l'écran. */
+#miniwrap{display:none;position:fixed;left:0;right:0;top:96px;z-index:35;
+  align-items:center;justify-content:center;pointer-events:none;
+  opacity:0;transform:scale(.75);transition:opacity .18s, transform .18s}
+body.minion #miniwrap{opacity:1;transform:scale(1)}
+body.minion #minipill{pointer-events:auto}
+#minipill{display:flex;align-items:center;gap:9px;padding:5px 15px 5px 5px;border-radius:40px;
+  cursor:pointer;background:rgba(10,16,32,.95);border:1px solid rgba(79,216,255,.32);
+  box-shadow:0 7px 20px rgba(0,0,0,.6);backdrop-filter:blur(7px);
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .07s}
+#minipill:active{transform:scale(.94)}
 #minirock{
-  position:relative;width:46px;height:46px;border-radius:50%;flex:none;cursor:pointer;
+  position:relative;width:40px;height:40px;border-radius:50%;flex:none;
   border:1px solid rgba(79,216,255,.35);
   background:radial-gradient(circle at 32% 28%, #6b7ba0 0%, #3b475f 38%, #1d2536 70%, #10151f 100%);
   box-shadow:inset -5px -6px 12px rgba(0,0,0,.7), 0 0 14px rgba(79,216,255,.14);
@@ -158,8 +176,7 @@ main{flex:1;display:grid;grid-template-columns:352px 1fr;gap:0;min-height:0}
 #minirock:active{transform:scale(.9)}
 #minirock .mrring{position:absolute;inset:-4px;border-radius:50%;
   border:1px dashed rgba(79,216,255,.4);animation:spin 18s linear infinite}
-#minival{position:absolute;left:50%;margin-left:33px;font-size:14px;font-weight:700;
-  color:var(--cyan);font-variant-numeric:tabular-nums;text-shadow:0 0 10px rgba(79,216,255,.35);
+#minival{font-size:14px;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums;
   white-space:nowrap}
 
 .float{position:fixed;pointer-events:none;font-weight:700;color:var(--cyan);
@@ -291,8 +308,9 @@ h3.sec:first-child{margin-top:0}
   main{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start;overflow-y:auto}
   #left{border-right:none;border-bottom:1px solid var(--line);overflow:visible;height:auto;min-width:0}
   #right{min-height:auto;height:auto}
-  main{overflow-x:hidden}
+  #rockslot{position:static;background:none;backdrop-filter:none;padding-bottom:0}
   #miniwrap{display:flex}
+  main{overflow-x:hidden}
   #stickyhead{position:sticky;top:0;z-index:30;
     background:rgba(8,12,24,.94);backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line)}
@@ -351,8 +369,10 @@ h3.sec:first-child{margin-top:0}
 
 <main>
   <section id="left">
-    <div class="clicklabel" id="clickLabel"></div>
-    <div id="rock"></div>
+    <div id="rockslot">
+      <div class="clicklabel" id="clickLabel"></div>
+      <div id="rock"></div>
+    </div>
     <div id="buffs"></div>
     <div class="kpis">
       <div class="kpi ore"><div class="kico">⛏️</div><div class="kbody">
@@ -370,10 +390,6 @@ h3.sec:first-child{margin-top:0}
 
   <section id="right">
    <div id="stickyhead">
-    <div id="miniwrap">
-      <div id="minirock" data-i18n-title="manual"><span class="mrring"></span></div>
-      <div id="minival">+1</div>
-    </div>
     <nav>
       <div class="tab on" data-p="gen"><span data-i18n="tab_gen" data-i18n-s="tab_gen_s">Extraction</span></div>
       <div class="tab" data-p="up"><span data-i18n="tab_up" data-i18n-s="tab_up_s">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
@@ -393,6 +409,12 @@ h3.sec:first-child{margin-top:0}
 </main>
 </div>
 
+<div id="miniwrap">
+  <div id="minipill" data-i18n-title="manual">
+    <div id="minirock"><span class="mrring"></span></div>
+    <div id="minival">+1</div>
+  </div>
+</div>
 <div id="toasts"></div>
 <div id="modal"><div class="mbox">
   <h2 id="mTitle" data-i18n="m_title">Sauvegarde</h2>
@@ -930,7 +952,26 @@ function doTap(x,y){
 }
 $("#rock").addEventListener("pointerdown",e=>doTap(e.clientX,e.clientY));
 /* Planète compacte de la barre collante : même action, position fixe en haut au centre. */
-$("#minirock").addEventListener("pointerdown",e=>{e.preventDefault();doTap(e.clientX,e.clientY)});
+$("#minipill").addEventListener("pointerdown",e=>{
+  if(!document.body.classList.contains("minion"))return;
+  e.preventDefault(); doTap(e.clientX,e.clientY);
+});
+/* Position verticale de la planète compacte : juste sous la barre d'onglets. */
+function placeMini(){
+  const h=$("header").getBoundingClientRect().height;
+  const n=$("nav").getBoundingClientRect().height;
+  $("#miniwrap").style.top=Math.round(h+n+8)+"px";
+}
+addEventListener("resize",placeMini);
+placeMini();
+
+/* On n'affiche la planète compacte que lorsque la grande est sortie de l'écran. */
+(function miniWatcher(){
+  if(!("IntersectionObserver" in window)){document.body.classList.add("minion");return}
+  new IntersectionObserver(es=>{
+    document.body.classList.toggle("minion",!es[0].isIntersecting);
+  },{threshold:0.2}).observe($("#rock"));
+})();
 // cratères décoratifs
 (function craters(){
   const specs=[[28,32,26],[62,22,15],[48,58,30],[22,66,18],[70,62,22],[40,14,11],[76,42,12]];
@@ -940,7 +981,7 @@ $("#minirock").addEventListener("pointerdown",e=>{e.preventDefault();doTap(e.cli
     host.appendChild(d);
   });
   put($("#rock"),1);
-  put($("#minirock"),0.25);
+  put($("#minirock"),0.22);
 })();
 
 /* ---------- rendu : primitives (mise à jour EN PLACE, pas de reconstruction) ---------- */
@@ -1107,7 +1148,7 @@ function setLang(l){
   if(!T[l]||l===LANG)return;
   LANG=l; writeLang(l);
   CARDS.clear();                 // les cartes portent du texte : on les refait
-  applyI18n(); buildSkeleton(); render();
+  applyI18n(); buildSkeleton(); render(); placeMini();
 }
 
 /* ---------- rendu des onglets ---------- */
