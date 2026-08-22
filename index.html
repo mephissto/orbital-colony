@@ -58,6 +58,9 @@ header{
 .logo{font-weight:700;letter-spacing:.14em;font-size:13px;color:var(--cyan);text-transform:uppercase;
   text-shadow:0 0 10px rgba(79,216,255,.3)}
 .spacer{flex:1}
+.ver{font-size:10px;color:var(--dim);letter-spacing:.06em;opacity:.75;
+  font-variant-numeric:tabular-nums;align-self:center}
+@media (max-width:880px){.ver{display:none}}   /* trop étroit : la version reste dans les Stats */
 
 /* ---------- TUILES DE STATS (colonne de gauche) ---------- */
 .kpis{display:grid;grid-template-columns:1fr;gap:8px;width:100%}
@@ -420,6 +423,7 @@ h3.sec:first-child{margin-top:0}
 <header>
   <div class="topbar">
     <div class="logo" data-i18n="logo">◈ Colonie Orbitale</div>
+    <span class="ver" id="verTag"></span>
     <div class="spacer"></div>
     <div class="tools">
       <div class="langsw"><button class="lang" data-lang="fr">FR</button><button class="lang" data-lang="en">EN</button></div>
@@ -531,6 +535,13 @@ h3.sec:first-child{margin-top:0}
    COLONIE ORBITALE — idle game (fichier unique, hors-ligne)
    ============================================================ */
 
+/* Version du jeu — affichée dans la barre du haut (ordinateur) et en dernière
+   ligne de l'onglet Statistiques (partout). Incrémentée à chaque livraison :
+     MAJEUR  refonte visible ou changement de règles du jeu
+     MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
+     CORRECT correction de bug, retouche de texte ou de mise en page */
+const VERSION="2.0.0", BUILD="2026-08-22";
+
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const UNITS=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc","Ud","Dd","Td"];
@@ -582,7 +593,7 @@ fr:{
   up_none_ds:"Achète des structures et accumule du minerai : de nouvelles améliorations apparaîtront ici.",
   price:"Prix", price_for:"Prix pour ×{0}", price_for_max:"Prix pour MAX (×{0})", price_lvl:"Prix du niveau {0}",
   cost_ore:"{0} minerai", cost_am:"{0} AM", unit_am:"antimatière",
-  can_buy:"✓ tu peux l'acheter", missing:"il manque {0}", missing_s:"manque {0}",
+  can_buy:"✓ tu peux l'acheter", missing:"il manque {0}", missing_s:"−{0}",
   eta:"  •  ≈ {0}", far:"  •  encore très loin", far_s:"  •  très loin",
   each_rate:"{0} /s par unité", total_rate:"   •   ces {0} rapportent {1} /s",
   total_rate_s:"  •  {0} → {1}/s", owned_sub:"possédés",
@@ -600,7 +611,7 @@ fr:{
   st:["Minerai possédé","Minerai extrait (total)","Minerai extrait (ce cycle)","Production",
       "Puissance de clic","Clics effectués","Anomalies attrapées","Prochaine anomalie","Antimatière possédée",
       "Antimatière gagnée (total)","Cycles effectués","Multiplicateur global","Améliorations acquises",
-      "Succès","Temps de jeu","Gains hors-ligne","Sauvegarde"],
+      "Succès","Temps de jeu","Gains hors-ligne","Sauvegarde","Version"],
   st_off:"max {0} à {1} %",
   st_save_ok:"navigateur (auto toutes les 20 s)", st_save_mem:"mémoire seule — utilise Export !",
   t_up:"Amélioration : {0}", t_res:"Recherche : {0} niv.{1}", t_ach:"🏆 Succès : {0}  (+1 % production)",
@@ -611,8 +622,8 @@ fr:{
   confirm_reset:"Effacer TOUTE la progression (y compris l'antimatière) ?",
   an_surge:"⚡ Surtension : production ×7 pendant {0} s",
   an_echo:"✨ Écho quantique : clic ×12 pendant {0} s",
-  an_vein:"💎 Filon riche : +{0} minerai",
-  an_cache:"📦 Cache abandonnée : +{0} minerai",
+  an_vein:"💎 Filon riche : +{0} minerai ({1} s de production)",
+  an_cache:"📦 Cache abandonnée : +{0} minerai ({1} % de ta réserve)",
   an_leap:"🌟 BOND TEMPOREL : 30 minutes d'avance, +{0} minerai !",
   buff_prod:"Production ×7", buff_click:"Clic ×12",
   u_d:"j", u_h:"h", u_m:"m", u_s:"s"
@@ -646,7 +657,7 @@ en:{
   up_none_ds:"Buy structures and pile up ore — new upgrades will show up here.",
   price:"Price", price_for:"Price for ×{0}", price_for_max:"Price for MAX (×{0})", price_lvl:"Price of level {0}",
   cost_ore:"{0} ore", cost_am:"{0} AM", unit_am:"antimatter",
-  can_buy:"✓ you can afford it", missing:"{0} short",
+  can_buy:"✓ you can afford it", missing:"{0} short", missing_s:"−{0}",
   eta:"  •  ≈ {0}", far:"  •  still a long way off", far_s:"  •  far off",
   each_rate:"{0} /s each", total_rate:"   •   these {0} produce {1} /s",
   total_rate_s:"  •  {0} → {1}/s", owned_sub:"owned",
@@ -664,7 +675,7 @@ en:{
   st:["Ore held","Ore mined (total)","Ore mined (this cycle)","Output",
       "Click power","Clicks made","Anomalies caught","Next anomaly","Antimatter held",
       "Antimatter earned (total)","Cycles completed","Global multiplier","Upgrades owned",
-      "Achievements","Play time","Offline gains","Save"],
+      "Achievements","Play time","Offline gains","Save","Version"],
   st_off:"max {0} at {1} %",
   st_save_ok:"browser (auto every 20 s)", st_save_mem:"memory only — use Export!",
   t_up:"Upgrade: {0}", t_res:"Research: {0} lvl {1}", t_ach:"🏆 Achievement: {0}  (+1 % output)",
@@ -675,8 +686,8 @@ en:{
   confirm_reset:"Erase ALL progress (including antimatter)?",
   an_surge:"⚡ Power surge: output ×7 for {0} s",
   an_echo:"✨ Quantum echo: clicks ×12 for {0} s",
-  an_vein:"💎 Rich vein: +{0} ore",
-  an_cache:"📦 Abandoned cache: +{0} ore",
+  an_vein:"💎 Rich vein: +{0} ore ({1} s of output)",
+  an_cache:"📦 Abandoned cache: +{0} ore ({1} % of your reserve)",
   an_leap:"🌟 TIME LEAP: 30 minutes ahead, +{0} ore!",
   buff_prod:"Output ×7", buff_click:"Clicks ×12",
   u_d:"d", u_h:"h", u_m:"m", u_s:"s"
@@ -1028,8 +1039,16 @@ const ANOMS=[
     const v=Math.max(2000,perSec()*1800);
     gain(v); toast(t("an_leap",fmt(v)),"violet");
   }},
- {w:89, f:()=>{const v=Math.max(50,perSec()*180);gain(v);toast(t("an_vein",fmt(v)),"gold")}},
- {w:89, f:()=>{const v=Math.max(100,S.ore*0.18);gain(v);toast(t("an_cache",fmt(v)),"gold")}},
+ {w:89, f:()=>{                                 // 120 à 300 s de production
+    const sec=120+Math.random()*180;
+    const v=Math.max(50,perSec()*sec);
+    gain(v); toast(t("an_vein",fmt(v),Math.round(sec)),"gold");
+  }},
+ {w:89, f:()=>{                                 // 15 à 20 % de la réserve
+    const pct=15+Math.random()*5;
+    const v=Math.max(100,S.ore*pct/100);
+    gain(v); toast(t("an_cache",fmt(v),pct.toFixed(1)),"gold");
+  }},
 ];
 function tirerAnom(){
   const total=ANOMS.reduce((a,x)=>a+x.w,0);
@@ -1273,6 +1292,7 @@ function buildSkeleton(){
 /* ---------- changement de langue ---------- */
 function applyI18n(){
   document.title=t("doc_title");
+  txt($("#verTag"),"v"+VERSION);
   document.documentElement.lang=LANG;
   const court=matchMedia("(max-width:560px)").matches;
   $$("[data-i18n]").forEach(e=>{
@@ -1401,7 +1421,8 @@ function renderStats(){
     Object.keys(S.ups).length+"/"+UPS.length,Object.keys(S.achs).length+"/"+ACHS.length,
     fmtTime((Date.now()-S.started)/1000),
     t("st_off",fmtTime(offlineCap()),Math.round(offlineRate()*100)),
-    storageOK?t("st_save_ok"):t("st_save_mem")];
+    storageOK?t("st_save_ok"):t("st_save_mem"),
+    VERSION+" ("+BUILD+")"];
   STROWS.forEach((r,i)=>txt(r.q,v[i]));
 }
 

@@ -21,6 +21,7 @@ serveur, aucune donnée qui sort de ton navigateur.
 - [Les gains hors-ligne](#les-gains-hors-ligne)
 - [Sauvegarde](#sauvegarde)
 - [Interface](#interface)
+- [Version](#version)
 - [Modifier l'équilibrage](#modifier-léquilibrage)
 
 ---
@@ -180,8 +181,11 @@ Au maximum des deux : entre 25 et 55 secondes.
 | 🌟 **Bond temporel** | **1 %** | **30 minutes** de production, d'un coup |
 | ⚡ Surtension | 5 % | production ×7 pendant 45 s |
 | ✨ Écho quantique | 5 % | clic ×12 pendant 60 s |
-| 💎 Filon riche | 44,5 % | 180 secondes de production, d'un coup |
-| 📦 Cache abandonnée | 44,5 % | +18 % de ton minerai en réserve |
+| 💎 Filon riche | 44,5 % | **120 à 300 s** de production, d'un coup |
+| 📦 Cache abandonnée | 44,5 % | **+15 à 20 %** de ton minerai en réserve |
+
+Le filon et la cache tirent leur valeur au hasard dans la fourchette indiquée,
+à chaque apparition — le message annonce le montant exact obtenu.
 
 Les multiplicateurs sont volontairement rares : ils se cumulent avec tout le
 reste et deviennent démesurés en fin de partie, alors que le filon et la cache
@@ -191,7 +195,7 @@ niveau de Détecteur.
 ### Le bond temporel
 
 C'est le gros lot : un saut de **30 minutes en avant**, crédité instantanément
-(`production/s × 1800`). Soit **dix fois** un Filon riche, tout en restant
+(`production/s × 1800`). Soit **six à quinze fois** un Filon riche, tout en restant
 proportionné à ta progression — il ne donne jamais un pouvoir que tu n'as pas
 déjà, seulement du temps d'avance. C'est volontaire : il accélère la partie sans
 raccourcir la courbe de progression.
@@ -332,6 +336,40 @@ partie en cours.
 
 ---
 
+## Version
+
+Le numéro de version est défini en haut du `<script>` :
+
+```js
+const VERSION="2.0.0", BUILD="2026-08-22";
+```
+
+Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
+l'onglet **Statistiques** sur toutes les tailles d'écran. C'est le moyen le plus
+simple de vérifier quelle version est réellement servie, le service worker
+pouvant garder une page en cache.
+
+**Règle d'incrémentation** (`MAJEUR.MINEUR.CORRECTIF`) :
+
+| Partie | Quand l'incrémenter | Exemples |
+|---|---|---|
+| **MAJEUR** | refonte visible ou changement des règles du jeu | passage à l'en-tête collant, nouvelle monnaie |
+| **MINEUR** | nouvelle fonctionnalité, nouveau contenu, équilibrage | nouvelle anomalie, nouveaux succès, probabilités modifiées |
+| **CORRECTIF** | correction de bug, retouche de texte ou de mise en page | libellé raccourci, débordement corrigé |
+
+Une même livraison ne fait avancer qu'un seul niveau — le plus élevé concerné —
+et remet à zéro ceux de droite : après `2.0.0`, une correction donne `2.0.1`,
+un nouveau contenu `2.1.0`.
+
+### Historique
+
+| Version | Contenu |
+|---|---|
+| **2.0.0** | version publique consolidée : PWA installable, bilingue FR/EN, en-tête mobile fixe, 44 succès, anomalies pondérées avec bond temporel |
+| 1.0.0 | première numérotation, introduite en même temps que l'affichage de version |
+
+---
+
 ## Modifier l'équilibrage
 
 Tout est regroupé en haut du `<script>` dans `index.html` :
@@ -350,6 +388,7 @@ Tout est regroupé en haut du `<script>` dans `index.html` :
 | Bonus par antimatière | `amBonus()` |
 | Hors-ligne | `offlineCap()`, `offlineRate()`, `GRACE` |
 | Textes des deux langues | objet `T` |
+| Numéro de version | constantes `VERSION` et `BUILD` |
 
 Les poids `w` du tableau `ANOMS` totalisent 200 : un point vaut 0,5 %.
 
