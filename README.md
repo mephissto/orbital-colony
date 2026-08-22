@@ -178,14 +178,16 @@ Au maximum des deux : entre 25 et 55 secondes.
 
 | Anomalie | Chance | Effet |
 |---|---|---|
-| 🌟 **Bond temporel** | **1 %** | **30 minutes** de production, d'un coup |
-| ⚡ Surtension | 5 % | production ×7 pendant 45 s |
-| ✨ Écho quantique | 5 % | clic ×12 pendant 60 s |
+| 🌟 **Bond temporel** | **1 %** | **20 à 30 minutes** de production, d'un coup |
+| ⚡ Surtension | 5 % | production **×5 à ×10** pendant 45 s |
+| ✨ Écho quantique | 5 % | clic **×6 à ×12** pendant 60 s |
 | 💎 Filon riche | 44,5 % | **120 à 300 s** de production, d'un coup |
 | 📦 Cache abandonnée | 44,5 % | **+15 à 20 %** de ton minerai en réserve |
 
-Le filon et la cache tirent leur valeur au hasard dans la fourchette indiquée,
-à chaque apparition — le message annonce le montant exact obtenu.
+**Chaque anomalie tire sa valeur au hasard** dans la fourchette indiquée, à
+chaque apparition — le message et le badge affichent le montant exact obtenu
+(« Production ×6,4 », « +813K minerai (21 minutes d'avance) »). Les
+multiplicateurs sont arrondis au dixième.
 
 Les multiplicateurs sont volontairement rares : ils se cumulent avec tout le
 reste et deviennent démesurés en fin de partie, alors que le filon et la cache
@@ -194,8 +196,8 @@ niveau de Détecteur.
 
 ### Le bond temporel
 
-C'est le gros lot : un saut de **30 minutes en avant**, crédité instantanément
-(`production/s × 1800`). Soit **six à quinze fois** un Filon riche, tout en restant
+C'est le gros lot : un saut de **20 à 30 minutes en avant**, crédité
+instantanément. Soit **quatre à quinze fois** un Filon riche, tout en restant
 proportionné à ta progression — il ne donne jamais un pouvoir que tu n'as pas
 déjà, seulement du temps d'avance. C'est volontaire : il accélère la partie sans
 raccourcir la courbe de progression.
@@ -341,7 +343,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.0.0", BUILD="2026-08-22";
+const VERSION="2.1.0", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -365,7 +367,8 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.0.0** | version publique consolidée : PWA installable, bilingue FR/EN, en-tête mobile fixe, 44 succès, anomalies pondérées avec bond temporel |
+| **2.1.0** | toutes les anomalies tirent leur valeur au hasard ; le badge et le message affichent le montant obtenu |
+| 2.0.0 | version publique consolidée : PWA installable, bilingue FR/EN, en-tête mobile fixe, 44 succès, anomalies pondérées avec bond temporel |
 | 1.0.0 | première numérotation, introduite en même temps que l'affichage de version |
 
 ---
