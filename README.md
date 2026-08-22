@@ -367,11 +367,51 @@ hors-ligne habituels s'appliquent.
 
 ## Les succès
 
-**44 succès**, chacun donnant **+1 % de production** — soit **+44 %** au
-complet. Ils portent sur les clics, le nombre de structures, le minerai extrait,
-la production par seconde, les anomalies attrapées, les cycles, l'antimatière,
-et la complétion des recherches et améliorations. Ils ne sont **jamais perdus**
-au prestige.
+**71 succès**, chacun donnant **+1 % de production** — soit **+71 %** au
+complet. Ils ne sont **jamais perdus** au prestige.
+
+L'onglet les range en **huit catégories** (tableau `ACHCATS`, dont l'ordre est
+celui de l'affichage ; le champ `c` de chaque succès dit à quelle section il
+appartient). Chaque intitulé de section affiche sa progression, et passe en doré
+une fois la catégorie complète.
+
+| Catégorie | Nombre | Ce qu'elle mesure |
+|---|---|---|
+| 🖱️ Clics | 12 | nombre de clics jusqu'à 1 000 000, puissance de clic de 1 M à 1 Sx |
+| 🏗️ Structures | 12 | drones, sphères de Dyson, paliers « X de chaque », totaux |
+| ⛏️ Extraction | 8 | minerai extrait, de 1 M à 1 Oc |
+| ⚡ Production | 5 | production par seconde, de 1 K/s à 1 Qa/s |
+| 🔬 Améliorations et recherches | 4 | achats d'améliorations, complétion des deux arbres |
+| ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
+| ♻️ Cycles et antimatière | 8 | nombre de cycles, antimatière possédée |
+| ⚙️ Automatisation | 8 | achat et usage des automates |
+
+Les deux échelles de la catégorie Clics sont volontairement séparées : le
+**nombre** de clics (que le Bras automatique fait grimper de 10/s, soit
+1 000 000 en une trentaine d'heures) et la **puissance** d'un clic. Le plafond
+de puissance est monté jusqu'à 1 Sx parce que 1 Qa se franchit vers « 100 de
+chaque structure + toutes les améliorations + 100 antimatière », donc bien avant
+la fin de partie ; à 250 de chaque et 100 000 antimatière on dépasse 1 Sx.
+
+Deux succès de la catégorie Anomalies ne se comptent pas : **Résonance
+parfaite** demande deux bonus actifs en même temps, et **Réflexe éclair** une
+anomalie ramassée **à la main** en moins de 2 s. Comme la Sonde attend
+justement 2 s, celui-là ne peut se décrocher qu'en étant réellement devant
+l'écran — c'est le seul succès du jeu qui demande de l'adresse.
+
+Les seuils par **type** d'anomalie sont calés sur les probabilités de tirage :
+à 500 anomalies attrapées on a en moyenne 223 filons, 223 caches, 25
+surtensions, 25 échos et 5 bonds temporels. Les cinq seuils (200 / 200 / 25 /
+25 / 5) se débloquent donc à peu près au même moment que « Œil du vide », qui
+demande 500 anomalies. Le comptage par type utilise la clé `k` de chaque entrée
+de `ANOMS` et le compteur `S.anomK`.
+
+Les huit succès d'automatisation vont du premier achat (Délégation) au Bras
+automatique niveau 10 et à tous les automates au maximum (Colonie autonome).
+Deux d'entre eux portent sur l'**usage** et non sur l'achat : 50 anomalies
+ramassées par la Sonde (`S.asonde`) et 10 puis 100 cycles relancés par le Cycle
+automatique (`S.acyc`) — deux compteurs ajoutés à la sauvegarde, sans effet sur
+les sauvegardes antérieures qui repartent simplement de zéro.
 
 ---
 
@@ -423,6 +463,16 @@ tu n'as pas bougé de plus de 12 px en moins de 0,9 s : faire défiler ne décle
 jamais d'achat par erreur. Le clic sur la planète reste instantané. Le zoom par
 double-tap est neutralisé.
 
+**Statistiques** — l'onglet est découpé en six sections (`STATCATS`), chacune
+affichant ses valeurs sous forme de **tuiles** : intitulé en petit au-dessus,
+valeur en gros en dessous, et une barre de couleur à gauche propre à la section.
+L'ancienne présentation en lignes étiquette-à-gauche / valeur-à-droite devenait
+illisible sur un écran large, où les deux se retrouvaient séparées de près de
+900 px. Le contenu est déclaré dans le tableau `STATS` : chaque entrée porte sa
+catégorie, son intitulé bilingue et la fonction qui calcule sa valeur. On y
+trouve notamment le **détail des anomalies par type**, invisible ailleurs dans
+le jeu.
+
 **Langue** — sélecteur FR / EN en haut à droite ; la langue par défaut suit celle
 du navigateur et ton choix est mémorisé. Changer de langue ne touche pas à la
 partie en cours.
@@ -434,7 +484,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.8.0", BUILD="2026-08-22";
+const VERSION="2.12.0", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -458,7 +508,11 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.8.0** | les réglages d'automatisation deviennent deux cadres autonomes sous une section « Réglages », et le plafond de dépense passe en menu déroulant |
+| **2.12.0** | écran des statistiques refait en tuiles groupées par thème, avec le détail des anomalies par type ; succès « Réflexe éclair » (71 au total) |
+| 2.11.0 | 5 succès de plus (70 au total) : 100 000 et 1 000 000 de clics, puissance de clic jusqu'à 1 Sx, et 1 000 anomalies |
+| 2.10.0 | 13 succès de plus (65 au total) : quatre paliers de clic, dont deux au-delà de 1 B, et neuf sur les anomalies dont un par type, calés sur leurs probabilités |
+| 2.9.0 | les succès sont rangés en huit catégories avec leur progression, et huit succès d'automatisation s'ajoutent (52 au total, +52 % au complet) |
+| 2.8.0 | les réglages d'automatisation deviennent deux cadres autonomes sous une section « Réglages », et le plafond de dépense passe en menu déroulant |
 | 2.7.0 | plafond de dépense par paliers de 10 % ; seuil de relance du cycle saisi à la main, en antimatière |
 | 2.6.0 | les deux réglages d'automatisation passent de pourcentages à trois modes nommés, doublés d'une ligne qui affiche le chiffre concret du moment |
 | 2.5.0 | Bras automatique jusqu'au niveau 10 (jusqu'à 10 clics/s) ; Contremaître à 300 et Ingénieur à 450 antimatière |
@@ -483,6 +537,8 @@ Tout est regroupé en haut du `<script>` dans `index.html` :
 | Améliorations de clic / globales | appels `UPS.push(...)` |
 | Recherches | tableau `RES` |
 | Succès | tableau `ACHS` |
+| Catégories de succès | tableau `ACHCATS` |
+| Contenu des statistiques | tableaux `STATS` et `STATCATS` |
 | Anomalies, effets et **probabilités** (`w`) | tableau `ANOMS` |
 | Fréquence des anomalies | `anomInterval()` |
 | Gain de prestige | `amGain()` |

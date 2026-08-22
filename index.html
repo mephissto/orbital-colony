@@ -299,6 +299,22 @@ h3.sec:first-child{margin-top:0}
 .lvl{font-size:12px;color:var(--violet);font-weight:700}
 
 /* achievements */
+/* tuiles de statistiques */
+.stgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:9px;margin-bottom:4px}
+.stt{padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--acc,var(--line));
+  border-radius:10px;background:var(--panel);min-width:0}
+.stt .k{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);line-height:1.35}
+.stt .v{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:4px;
+  color:var(--txt);overflow-wrap:anywhere;line-height:1.25}
+.stt.small .v{font-size:12.5px;font-weight:600;line-height:1.45}
+@media(max-width:880px){
+  .stgrid{grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:8px}
+  .stt{padding:9px 10px}
+  .stt .v{font-size:16px}
+}
+h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.secn{font-size:11px;letter-spacing:.08em;color:var(--dim);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.secn.full{color:var(--gold)}
 .achgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
 .ach{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);opacity:.38}
 .ach.got{opacity:1;border-color:rgba(255,196,92,.45);background:rgba(255,196,92,.07)}
@@ -578,7 +594,7 @@ h3.sec:first-child{margin-top:0}
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.8.0", BUILD="2026-08-22";
+const VERSION="2.12.0", BUILD="2026-08-22";
 
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -665,11 +681,6 @@ fr:{
   res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
   lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
   ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--gold)\">×{2}</b> (+1 % par succès)",
-  st_title:"Statistiques",
-  st:["Minerai possédé","Minerai extrait (total)","Minerai extrait (ce cycle)","Production",
-      "Puissance de clic","Clics effectués","Anomalies attrapées","Prochaine anomalie","Antimatière possédée",
-      "Antimatière gagnée (total)","Cycles effectués","Multiplicateur global","Améliorations acquises",
-      "Succès","Temps de jeu","Gains hors-ligne","Sauvegarde","Version"],
   st_off:"max {0} à {1} %",
   st_save_ok:"navigateur (auto toutes les 20 s)", st_save_mem:"mémoire seule — utilise Export !",
   t_up:"Amélioration : {0}", t_res:"Recherche : {0} niv.{1}", t_ach:"🏆 Succès : {0}  (+1 % production)",
@@ -746,11 +757,6 @@ en:{
   res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
   lvl:"lvl {0}/{1}", maxed:"maximum level reached",
   ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--gold)\">×{2}</b> (+1 % each)",
-  st_title:"Statistics",
-  st:["Ore held","Ore mined (total)","Ore mined (this cycle)","Output",
-      "Click power","Clicks made","Anomalies caught","Next anomaly","Antimatter held",
-      "Antimatter earned (total)","Cycles completed","Global multiplier","Upgrades owned",
-      "Achievements","Play time","Offline gains","Save","Version"],
   st_off:"max {0} at {1} %",
   st_save_ok:"browser (auto every 20 s)", st_save_mem:"memory only — use Export!",
   t_up:"Upgrade: {0}", t_res:"Research: {0} lvl {1}", t_ach:"🏆 Achievement: {0}  (+1 % output)",
@@ -948,104 +954,230 @@ function normPart(){return S.autoPart=proche(S.autoPart,PARTS,30)}
 const cycSeuil=()=>Math.max(1,Math.floor(S.autoCyc)||1);
 
 /* ---------- données : succès ---------- */
+/* Les succès sont rangés par catégorie : la liste avait dépassé la quarantaine
+   et devenait illisible d'un bloc. L'ordre du tableau ACHCATS est celui de
+   l'affichage ; le champ `c` de chaque succès dit à quelle section il appartient. */
+const ank=k=>(S.anomK&&S.anomK[k])||0;
+
+/* ---------- statistiques ----------
+   Un tableau déclaratif : chaque tuile porte son intitulé bilingue et la
+   fonction qui calcule sa valeur. L'ancien écran était une longue liste de
+   lignes étiquette/valeur, illisible sur un écran large où l'étiquette et sa
+   valeur se retrouvaient à 900 px l'une de l'autre. */
+const STATCATS=[
+ {id:"ext", ico:"⛏️", acc:"var(--cyan)",   nm:{fr:"Extraction",en:"Mining"}},
+ {id:"anom",ico:"✦",  acc:"var(--anom)",   nm:{fr:"Anomalies",en:"Anomalies"}},
+ {id:"cyc", ico:"♻️", acc:"var(--violet)", nm:{fr:"Cycles et antimatière",en:"Cycles and antimatter"}},
+ {id:"auto",ico:"⚙️", acc:"var(--green)",  nm:{fr:"Automatisation",en:"Automation"}},
+ {id:"prog",ico:"🏆", acc:"var(--gold)",   nm:{fr:"Progression",en:"Progress"}},
+ {id:"game",ico:"💾", acc:"var(--dim)",    nm:{fr:"Partie",en:"Game"}},
+];
+const STATS=[
+ {c:"ext", nm:{fr:"Minerai possédé",en:"Ore held"},                  v:()=>fmt(S.ore)},
+ {c:"ext", nm:{fr:"Minerai extrait (total)",en:"Ore mined (total)"},  v:()=>fmt(S.totalOre)},
+ {c:"ext", nm:{fr:"Minerai extrait (ce cycle)",en:"Ore mined (this cycle)"}, v:()=>fmt(S.runOre)},
+ {c:"ext", nm:{fr:"Production",en:"Output"},                         v:()=>fmt(perSec())+" /s"},
+ {c:"ext", nm:{fr:"Puissance de clic",en:"Click power"},             v:()=>fmt(clickVal())},
+ {c:"ext", nm:{fr:"Clics effectués",en:"Clicks made"},               v:()=>fmt(S.clicks)},
+
+ {c:"anom",nm:{fr:"Anomalies attrapées",en:"Anomalies caught"},      v:()=>fmt(S.anoms)},
+ {c:"anom",nm:{fr:"Prochaine anomalie",en:"Next anomaly"},           v:()=>S.nextAnom>Date.now()?fmtTime((S.nextAnom-Date.now())/1000):t("imminent")},
+ {c:"anom",nm:{fr:"Surtensions",en:"Power surges"},                  v:()=>fmt(ank("surge"))},
+ {c:"anom",nm:{fr:"Échos quantiques",en:"Quantum echoes"},           v:()=>fmt(ank("echo"))},
+ {c:"anom",nm:{fr:"Bonds temporels",en:"Time leaps"},                v:()=>fmt(ank("bond"))},
+ {c:"anom",nm:{fr:"Filons riches",en:"Rich veins"},                  v:()=>fmt(ank("filon"))},
+ {c:"anom",nm:{fr:"Caches abandonnées",en:"Abandoned caches"},       v:()=>fmt(ank("cache"))},
+ {c:"anom",nm:{fr:"Ramassées par la sonde",en:"Collected by the probe"}, v:()=>fmt(S.asonde||0)},
+
+ {c:"cyc", nm:{fr:"Antimatière possédée",en:"Antimatter held"},      v:()=>fmt(S.am)},
+ {c:"cyc", nm:{fr:"Antimatière gagnée (total)",en:"Antimatter earned (total)"}, v:()=>fmt(S.amTotal)},
+ {c:"cyc", nm:{fr:"Cycles effectués",en:"Cycles completed"},         v:()=>fmt(S.prestiges)},
+ {c:"cyc", nm:{fr:"Gain au prochain cycle",en:"Gain on next cycle"}, v:()=>"+"+fmt(amGain())},
+ {c:"cyc", nm:{fr:"Multiplicateur global",en:"Global multiplier"},   v:()=>"×"+fmt(globalMult())},
+
+ {c:"auto",nm:{fr:"Automates achetés",en:"Automations owned"},       v:()=>AUTOS.filter(a=>alvl(a.id)>0).length+"/"+AUTOS.length},
+ {c:"auto",nm:{fr:"Clics automatiques",en:"Automatic clicks"},       v:()=>aOn("clic")?alvl("clic")+" /s":"—"},
+ {c:"auto",nm:{fr:"Seuil de relance",en:"Restart threshold"},        v:()=>alvl("cycle")?"+"+fmt(cycSeuil()):"—"},
+ {c:"auto",nm:{fr:"Cycles relancés seuls",en:"Cycles restarted alone"}, v:()=>fmt(S.acyc||0)},
+
+ {c:"prog",nm:{fr:"Améliorations",en:"Upgrades"},                    v:()=>Object.keys(S.ups).length+"/"+UPS.length},
+ {c:"prog",nm:{fr:"Recherches",en:"Research"},                       v:()=>RES.reduce((a,r)=>a+lvl(r.id),0)+"/"+RES.reduce((a,r)=>a+r.max,0)},
+ {c:"prog",nm:{fr:"Succès",en:"Achievements"},                       v:()=>Object.keys(S.achs).length+"/"+ACHS.length},
+ {c:"prog",nm:{fr:"Structures bâties",en:"Structures built"},        v:()=>fmt(GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0))},
+
+ {c:"game",nm:{fr:"Temps de jeu",en:"Play time"},                    v:()=>fmtTime((Date.now()-S.started)/1000)},
+ {c:"game",nm:{fr:"Gains hors-ligne",en:"Offline gains"},            txt:1, v:()=>t("st_off",fmtTime(offlineCap()),Math.round(offlineRate()*100))},
+ {c:"game",nm:{fr:"Sauvegarde",en:"Save"},                           txt:1, v:()=>storageOK?t("st_save_ok"):t("st_save_mem")},
+ {c:"game",nm:{fr:"Version",en:"Version"},                           txt:1, v:()=>VERSION+" ("+BUILD+")"},
+];
+const ACHCATS=[
+ {id:"clic",  ico:"🖱️", nm:{fr:"Clics",en:"Clicking"}},
+ {id:"struct",ico:"🏗️", nm:{fr:"Structures",en:"Structures"}},
+ {id:"ore",   ico:"⛏️", nm:{fr:"Extraction",en:"Mining"}},
+ {id:"rate",  ico:"⚡", nm:{fr:"Production",en:"Output"}},
+ {id:"tech",  ico:"🔬", nm:{fr:"Améliorations et recherches",en:"Upgrades and research"}},
+ {id:"anom",  ico:"✦",  nm:{fr:"Anomalies",en:"Anomalies"}},
+ {id:"cycle", ico:"♻️", nm:{fr:"Cycles et antimatière",en:"Cycles and antimatter"}},
+ {id:"auto",  ico:"⚙️", nm:{fr:"Automatisation",en:"Automation"}},
+];
 const ACHS=[
- {id:"a_click1",f:S=>S.clicks>=1,
+ {id:"a_click1",c:"clic",f:S=>S.clicks>=1,
   nm:{fr:"Premier caillou",en:"First pebble"},ds:{fr:"Cliquer une fois",en:"Click once"}},
- {id:"a_click100",f:S=>S.clicks>=100,
+ {id:"a_click100",c:"clic",f:S=>S.clicks>=100,
   nm:{fr:"Main d'œuvre",en:"Manual labour"},ds:{fr:"100 clics",en:"100 clicks"}},
- {id:"a_click1k",f:S=>S.clicks>=1000,
+ {id:"a_click1k",c:"clic",f:S=>S.clicks>=1000,
   nm:{fr:"Tendinite",en:"Tendinitis"},ds:{fr:"1 000 clics",en:"1,000 clicks"}},
- {id:"a_drone10",f:S=>(S.gens.drone||0)>=10,
+ {id:"a_click10k",c:"clic",f:S=>S.clicks>=1e4,
+  nm:{fr:"Métronome",en:"Metronome"},ds:{fr:"10 000 clics",en:"10,000 clicks"}},
+ {id:"a_click100k",c:"clic",f:S=>S.clicks>=1e5,
+  nm:{fr:"Marteau-piqueur",en:"Jackhammer"},ds:{fr:"100 000 clics",en:"100,000 clicks"}},
+ {id:"a_click1M",c:"clic",f:S=>S.clicks>=1e6,
+  nm:{fr:"Mémoire musculaire",en:"Muscle memory"},ds:{fr:"1 000 000 de clics",en:"1,000,000 clicks"}},
+ {id:"a_click1m",c:"clic",f:S=>clickVal()>=1e6,
+  nm:{fr:"Doigt de fer",en:"Iron finger"},ds:{fr:"1 M de puissance de clic",en:"1 M click power"}},
+ {id:"a_drone10",c:"struct",f:S=>(S.gens.drone||0)>=10,
   nm:{fr:"Petit essaim",en:"Small swarm"},ds:{fr:"10 drones mineurs",en:"10 mining drones"}},
- {id:"a_drone100",f:S=>(S.gens.drone||0)>=100,
+ {id:"a_drone100",c:"struct",f:S=>(S.gens.drone||0)>=100,
   nm:{fr:"Nuée",en:"Cloud"},ds:{fr:"100 drones mineurs",en:"100 mining drones"}},
- {id:"a_all1",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=1),
+ {id:"a_all1",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=1),
   nm:{fr:"Panoplie complète",en:"Full set"},ds:{fr:"1 de chaque générateur",en:"1 of every structure"}},
- {id:"a_all25",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=25),
+ {id:"a_all25",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=25),
   nm:{fr:"Industriel",en:"Industrialist"},ds:{fr:"25 de chaque générateur",en:"25 of every structure"}},
- {id:"a_e6",f:S=>S.totalOre>=1e6,
+ {id:"a_e6",c:"ore",f:S=>S.totalOre>=1e6,
   nm:{fr:"Million",en:"Million"},ds:{fr:"1 M de minerai extrait",en:"1 M ore mined"}},
- {id:"a_e9",f:S=>S.totalOre>=1e9,
+ {id:"a_e9",c:"ore",f:S=>S.totalOre>=1e9,
   nm:{fr:"Milliard",en:"Billion"},ds:{fr:"1 B de minerai extrait",en:"1 B ore mined"}},
- {id:"a_e12",f:S=>S.totalOre>=1e12,
+ {id:"a_e12",c:"ore",f:S=>S.totalOre>=1e12,
   nm:{fr:"Billion",en:"Trillion"},ds:{fr:"1 T de minerai extrait",en:"1 T ore mined"}},
- {id:"a_e15",f:S=>S.totalOre>=1e15,
+ {id:"a_e15",c:"ore",f:S=>S.totalOre>=1e15,
   nm:{fr:"Échelle planétaire",en:"Planetary scale"},ds:{fr:"1 Qa de minerai extrait",en:"1 Qa ore mined"}},
- {id:"a_e18",f:S=>S.totalOre>=1e18,
+ {id:"a_e18",c:"ore",f:S=>S.totalOre>=1e18,
   nm:{fr:"Échelle stellaire",en:"Stellar scale"},ds:{fr:"1 Qi de minerai extrait",en:"1 Qi ore mined"}},
- {id:"a_rate1k",f:S=>perSec()>=1e3,
+ {id:"a_rate1k",c:"rate",f:S=>perSec()>=1e3,
   nm:{fr:"Cadence",en:"Cadence"},ds:{fr:"1 K/s de production",en:"1 K/s output"}},
- {id:"a_rate1m",f:S=>perSec()>=1e6,
+ {id:"a_rate1m",c:"rate",f:S=>perSec()>=1e6,
   nm:{fr:"Chaîne complète",en:"Full chain"},ds:{fr:"1 M/s de production",en:"1 M/s output"}},
- {id:"a_rate1g",f:S=>perSec()>=1e9,
+ {id:"a_rate1g",c:"rate",f:S=>perSec()>=1e9,
   nm:{fr:"Débit galactique",en:"Galactic throughput"},ds:{fr:"1 B/s de production",en:"1 B/s output"}},
- {id:"a_up10",f:S=>Object.keys(S.ups).length>=10,
+ {id:"a_up10",c:"tech",f:S=>Object.keys(S.ups).length>=10,
   nm:{fr:"Bricoleur",en:"Tinkerer"},ds:{fr:"10 améliorations achetées",en:"10 upgrades bought"}},
- {id:"a_up30",f:S=>Object.keys(S.ups).length>=30,
+ {id:"a_up30",c:"tech",f:S=>Object.keys(S.ups).length>=30,
   nm:{fr:"Ingénieur en chef",en:"Chief engineer"},ds:{fr:"30 améliorations achetées",en:"30 upgrades bought"}},
- {id:"a_anom1",f:S=>S.anoms>=1,
+ {id:"a_anom1",c:"anom",f:S=>S.anoms>=1,
   nm:{fr:"Curieux",en:"Curious"},ds:{fr:"Attraper une anomalie",en:"Catch an anomaly"}},
- {id:"a_anom25",f:S=>S.anoms>=25,
+ {id:"a_anom25",c:"anom",f:S=>S.anoms>=25,
   nm:{fr:"Chasseur d'anomalies",en:"Anomaly hunter"},ds:{fr:"Attraper 25 anomalies",en:"Catch 25 anomalies"}},
- {id:"a_pr1",f:S=>S.prestiges>=1,
+ {id:"a_pr1",c:"cycle",f:S=>S.prestiges>=1,
   nm:{fr:"Renaissance",en:"Rebirth"},ds:{fr:"Premier cycle d'antimatière",en:"First antimatter cycle"}},
- {id:"a_pr5",f:S=>S.prestiges>=5,
+ {id:"a_pr5",c:"cycle",f:S=>S.prestiges>=5,
   nm:{fr:"Boucle temporelle",en:"Time loop"},ds:{fr:"5 cycles",en:"5 cycles"}},
- {id:"a_am100",f:S=>S.am>=100,
+ {id:"a_am100",c:"cycle",f:S=>S.am>=100,
   nm:{fr:"Physicien",en:"Physicist"},ds:{fr:"100 antimatière possédée",en:"100 antimatter held"}},
- {id:"a_am1k",f:S=>S.am>=1000,
+ {id:"a_am1k",c:"cycle",f:S=>S.am>=1000,
   nm:{fr:"Maître de l'antimatière",en:"Antimatter master"},ds:{fr:"1 000 antimatière possédée",en:"1,000 antimatter held"}},
- {id:"a_dyson",f:S=>(S.gens.dyson||0)>=1,
+ {id:"a_dyson",c:"struct",f:S=>(S.gens.dyson||0)>=1,
   nm:{fr:"Ingénierie ultime",en:"Ultimate engineering"},ds:{fr:"Construire une sphère de Dyson",en:"Build a Dyson sphere"}},
 
  /* ---- haut niveau ---- */
- {id:"a_drone500",f:S=>(S.gens.drone||0)>=500,
+ {id:"a_drone500",c:"struct",f:S=>(S.gens.drone||0)>=500,
   nm:{fr:"Marée de drones",en:"Drone tide"},ds:{fr:"500 drones mineurs",en:"500 mining drones"}},
- {id:"a_all100",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=100),
+ {id:"a_all100",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=100),
   nm:{fr:"Conglomérat",en:"Conglomerate"},ds:{fr:"100 de chaque structure",en:"100 of every structure"}},
- {id:"a_all200",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=200),
+ {id:"a_all200",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=200),
   nm:{fr:"Empire industriel",en:"Industrial empire"},ds:{fr:"200 de chaque structure",en:"200 of every structure"}},
- {id:"a_all250",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=250),
+ {id:"a_all250",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=250),
   nm:{fr:"Machine parfaite",en:"Perfect machine"},ds:{fr:"250 de chaque structure",en:"250 of every structure"}},
- {id:"a_struct1k",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=1000,
+ {id:"a_struct1k",c:"struct",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=1000,
   nm:{fr:"Mille pièces",en:"A thousand parts"},ds:{fr:"1 000 structures au total",en:"1,000 structures in total"}},
- {id:"a_struct2k5",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=2500,
+ {id:"a_struct2k5",c:"struct",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=2500,
   nm:{fr:"Mégastructure",en:"Megastructure"},ds:{fr:"2 500 structures au total",en:"2,500 structures in total"}},
- {id:"a_dyson50",f:S=>(S.gens.dyson||0)>=50,
+ {id:"a_dyson50",c:"struct",f:S=>(S.gens.dyson||0)>=50,
   nm:{fr:"Constellation captive",en:"Captive constellation"},ds:{fr:"50 sphères de Dyson",en:"50 Dyson spheres"}},
- {id:"a_e21",f:S=>S.totalOre>=1e21,
+ {id:"a_e21",c:"ore",f:S=>S.totalOre>=1e21,
   nm:{fr:"Échelle galactique",en:"Galactic scale"},ds:{fr:"1 Sx de minerai extrait",en:"1 Sx ore mined"}},
- {id:"a_e24",f:S=>S.totalOre>=1e24,
+ {id:"a_e24",c:"ore",f:S=>S.totalOre>=1e24,
   nm:{fr:"Échelle universelle",en:"Universal scale"},ds:{fr:"1 Sp de minerai extrait",en:"1 Sp ore mined"}},
- {id:"a_e27",f:S=>S.totalOre>=1e27,
+ {id:"a_e27",c:"ore",f:S=>S.totalOre>=1e27,
   nm:{fr:"Au-delà des nombres",en:"Beyond numbers"},ds:{fr:"1 Oc de minerai extrait",en:"1 Oc ore mined"}},
- {id:"a_rate1t",f:S=>perSec()>=1e12,
+ {id:"a_rate1t",c:"rate",f:S=>perSec()>=1e12,
   nm:{fr:"Torrent",en:"Torrent"},ds:{fr:"1 T/s de production",en:"1 T/s output"}},
- {id:"a_rate1qa",f:S=>perSec()>=1e15,
+ {id:"a_rate1qa",c:"rate",f:S=>perSec()>=1e15,
   nm:{fr:"Singularité productive",en:"Productive singularity"},ds:{fr:"1 Qa/s de production",en:"1 Qa/s output"}},
- {id:"a_click1g",f:S=>clickVal()>=1e9,
-  nm:{fr:"Doigt de fer",en:"Iron finger"},ds:{fr:"1 B de puissance de clic",en:"1 B click power"}},
- {id:"a_anom100",f:S=>S.anoms>=100,
+ {id:"a_click1g",c:"clic",f:S=>clickVal()>=1e9,
+  nm:{fr:"Doigt d'or",en:"Golden finger"},ds:{fr:"1 B de puissance de clic",en:"1 B click power"}},
+ {id:"a_click1t",c:"clic",f:S=>clickVal()>=1e12,
+  nm:{fr:"Doigt de diamant",en:"Diamond finger"},ds:{fr:"1 T de puissance de clic",en:"1 T click power"}},
+ {id:"a_click1qa",c:"clic",f:S=>clickVal()>=1e15,
+  nm:{fr:"Doigt de neutronium",en:"Neutronium finger"},ds:{fr:"1 Qa de puissance de clic",en:"1 Qa click power"}},
+ {id:"a_click1qi",c:"clic",f:S=>clickVal()>=1e18,
+  nm:{fr:"Doigt d'antimatière",en:"Antimatter finger"},ds:{fr:"1 Qi de puissance de clic",en:"1 Qi click power"}},
+ {id:"a_click1sx",c:"clic",f:S=>clickVal()>=1e21,
+  nm:{fr:"Doigt-singularité",en:"Singularity finger"},ds:{fr:"1 Sx de puissance de clic",en:"1 Sx click power"}},
+ {id:"a_anom100",c:"anom",f:S=>S.anoms>=100,
   nm:{fr:"Radar vivant",en:"Living radar"},ds:{fr:"Attraper 100 anomalies",en:"Catch 100 anomalies"}},
- {id:"a_pr10",f:S=>S.prestiges>=10,
+ {id:"a_anom250",c:"anom",f:S=>S.anoms>=250,
+  nm:{fr:"Traqueur",en:"Tracker"},ds:{fr:"Attraper 250 anomalies",en:"Catch 250 anomalies"}},
+ {id:"a_anom500",c:"anom",f:S=>S.anoms>=500,
+  nm:{fr:"Œil du vide",en:"Eye of the void"},ds:{fr:"Attraper 500 anomalies",en:"Catch 500 anomalies"}},
+ {id:"a_anom1k",c:"anom",f:S=>S.anoms>=1000,
+  nm:{fr:"Aimant à anomalies",en:"Anomaly magnet"},ds:{fr:"Attraper 1 000 anomalies",en:"Catch 1,000 anomalies"}},
+ /* Seuils calés sur les probabilités : à ~500 anomalies attrapées on a en
+    moyenne 222 filons, 222 caches, 25 surtensions, 25 échos et 5 bonds. Les
+    cinq se débloquent donc à peu près au même moment. */
+ {id:"a_k_bond1",c:"anom",f:S=>ank("bond")>=1,
+  nm:{fr:"Instant suspendu",en:"Suspended moment"},ds:{fr:"Attraper un bond temporel (1 %)",en:"Catch a time leap (1 %)"}},
+ {id:"a_k_bond5",c:"anom",f:S=>ank("bond")>=5,
+  nm:{fr:"Contre toute attente",en:"Against all odds"},ds:{fr:"5 bonds temporels",en:"5 time leaps"}},
+ {id:"a_k_surge",c:"anom",f:S=>ank("surge")>=25,
+  nm:{fr:"Surtension maîtrisée",en:"Surge tamed"},ds:{fr:"25 surtensions (5 %)",en:"25 power surges (5 %)"}},
+ {id:"a_k_echo",c:"anom",f:S=>ank("echo")>=25,
+  nm:{fr:"Écho persistant",en:"Lingering echo"},ds:{fr:"25 échos quantiques (5 %)",en:"25 quantum echoes (5 %)"}},
+ {id:"a_k_filon",c:"anom",f:S=>ank("filon")>=200,
+  nm:{fr:"Prospecteur",en:"Prospector"},ds:{fr:"200 filons riches",en:"200 rich veins"}},
+ {id:"a_k_cache",c:"anom",f:S=>ank("cache")>=200,
+  nm:{fr:"Pilleur d'épaves",en:"Wreck looter"},ds:{fr:"200 caches abandonnées",en:"200 abandoned caches"}},
+ {id:"a_fast",c:"anom",f:S=>!!S.fastAnom,
+  nm:{fr:"Réflexe éclair",en:"Lightning reflex"},
+  ds:{fr:"Attraper une anomalie à la main en moins de 2 s",en:"Catch an anomaly by hand in under 2 s"}},
+ {id:"a_2buffs",c:"anom",f:S=>S.buffs.length>=2,
+  nm:{fr:"Résonance parfaite",en:"Perfect resonance"},ds:{fr:"Deux bonus actifs en même temps",en:"Two buffs active at once"}},
+ {id:"a_pr10",c:"cycle",f:S=>S.prestiges>=10,
   nm:{fr:"Éternel retour",en:"Eternal return"},ds:{fr:"10 cycles",en:"10 cycles"}},
- {id:"a_pr25",f:S=>S.prestiges>=25,
+ {id:"a_pr25",c:"cycle",f:S=>S.prestiges>=25,
   nm:{fr:"Sisyphe heureux",en:"Happy Sisyphus"},ds:{fr:"25 cycles",en:"25 cycles"}},
- {id:"a_am10k",f:S=>S.am>=1e4,
+ {id:"a_am10k",c:"cycle",f:S=>S.am>=1e4,
   nm:{fr:"Réacteur à antimatière",en:"Antimatter reactor"},ds:{fr:"10 000 antimatière possédée",en:"10,000 antimatter held"}},
- {id:"a_am100k",f:S=>S.am>=1e5,
+ {id:"a_am100k",c:"cycle",f:S=>S.am>=1e5,
   nm:{fr:"Banque d'antimatière",en:"Antimatter bank"},ds:{fr:"100 000 antimatière possédée",en:"100,000 antimatter held"}},
- {id:"a_res_all",f:S=>RES.every(r=>(S.res[r.id]||0)>=r.max),
+ {id:"a_res_all",c:"tech",f:S=>RES.every(r=>(S.res[r.id]||0)>=r.max),
   nm:{fr:"Savoir absolu",en:"Absolute knowledge"},ds:{fr:"Toutes les recherches au maximum",en:"Every research maxed out"}},
- {id:"a_ups_all",f:S=>UPS.every(u=>S.ups[u.id]),
+ {id:"a_ups_all",c:"tech",f:S=>UPS.every(u=>S.ups[u.id]),
   nm:{fr:"Collectionneur",en:"Completionist"},ds:{fr:"Toutes les améliorations achetées",en:"Every upgrade bought"}},
+
+ /* ---- automatisation ---- */
+ {id:"a_auto1",c:"auto",f:S=>Object.keys(S.auto).length>=1,
+  nm:{fr:"Délégation",en:"Delegation"},ds:{fr:"Acheter une première automatisation",en:"Buy a first automation"}},
+ {id:"a_autoclic5",c:"auto",f:S=>alvl("clic")>=5,
+  nm:{fr:"Cinq doigts",en:"Five fingers"},ds:{fr:"Bras automatique niveau 5",en:"Robotic arm level 5"}},
+ {id:"a_autoclic10",c:"auto",f:S=>alvl("clic")>=10,
+  nm:{fr:"Dix doigts d'acier",en:"Ten steel fingers"},ds:{fr:"Bras automatique niveau 10",en:"Robotic arm level 10"}},
+ {id:"a_autofull",c:"auto",f:S=>AUTOS.every(a=>alvl(a.id)>=1),
+  nm:{fr:"Équipe au complet",en:"Full crew"},ds:{fr:"Posséder les cinq automates",en:"Own all five automations"}},
+ {id:"a_automax",c:"auto",f:S=>AUTOS.every(a=>alvl(a.id)>=a.max),
+  nm:{fr:"Colonie autonome",en:"Self-running colony"},ds:{fr:"Tous les automates au maximum",en:"Every automation maxed out"}},
+ {id:"a_asonde50",c:"auto",f:S=>(S.asonde||0)>=50,
+  nm:{fr:"Filet dérivant",en:"Drift net"},ds:{fr:"50 anomalies ramassées par la sonde",en:"50 anomalies collected by the probe"}},
+ {id:"a_acyc10",c:"auto",f:S=>(S.acyc||0)>=10,
+  nm:{fr:"Pilote automatique",en:"Autopilot"},ds:{fr:"10 cycles relancés tout seuls",en:"10 cycles restarted on their own"}},
+ {id:"a_acyc100",c:"auto",f:S=>(S.acyc||0)>=100,
+  nm:{fr:"Roue libre",en:"Freewheel"},ds:{fr:"100 cycles relancés tout seuls",en:"100 cycles restarted on their own"}},
 ];
 
 /* ---------- état ---------- */
 const NEW=()=>({
   ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
   gens:{},ups:{},res:{},achs:{},seen:1,
-  auto:{},autoOff:{},autoPart:30,autoCyc:50,
+  auto:{},autoOff:{},autoPart:30,autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,
   clicks:0,anoms:0,buffs:[],buy:1,
   started:Date.now(),lastTick:Date.now(),lastSave:Date.now(),
   nextAnom:Date.now()+45000
@@ -1166,25 +1298,25 @@ function addBuff(k,m,sec,key){
    rares : ils se cumulent avec tout le reste et deviennent démesurés en fin de
    partie, alors qu'un filon ou une cache restent proportionnés. */
 const ANOMS=[
- {w:10, f:()=>{                                 // production ×5 à ×10
+ {k:"surge", w:10, f:()=>{                      // production ×5 à ×10
     const m=Math.round((5+Math.random()*5)*10)/10, d=45*(1+.3*lvl("detec"));
     addBuff("prod",m,d,"buff_prod"); toast(t("an_surge",mfmt(m),Math.round(d)),"gold");
   }},
- {w:10, f:()=>{                                 // clic ×6 à ×12
+ {k:"echo",  w:10, f:()=>{                      // clic ×6 à ×12
     const m=Math.round((6+Math.random()*6)*10)/10, d=60*(1+.3*lvl("detec"));
     addBuff("click",m,d,"buff_click"); toast(t("an_echo",mfmt(m),Math.round(d)),"gold");
   }},
- {w:2, super:1, f:()=>{                       // 1 % : un bond de 20 à 30 minutes
+ {k:"bond", w:2, super:1, f:()=>{                       // 1 % : un bond de 20 à 30 minutes
     const min=20+Math.random()*10;
     const v=Math.max(2000,perSec()*min*60);
     gain(v); toast(t("an_leap",fmt(v),Math.round(min)),"violet");
   }},
- {w:89, f:()=>{                                 // 120 à 300 s de production
+ {k:"filon", w:89, f:()=>{                                 // 120 à 300 s de production
     const sec=120+Math.random()*180;
     const v=Math.max(50,perSec()*sec);
     gain(v); toast(t("an_vein",fmt(v),Math.round(sec)),"gold");
   }},
- {w:89, f:()=>{                                 // 15 à 20 % de la réserve
+ {k:"cache", w:89, f:()=>{                                 // 15 à 20 % de la réserve
     const pct=15+Math.random()*5;
     const v=Math.max(100,S.ore*pct/100);
     gain(v); toast(t("an_cache",fmt(v),pct.toFixed(1)),"gold");
@@ -1220,11 +1352,17 @@ function spawnAnom(){
   el.style.display="block"; anomNee=Date.now();
   clearTimeout(el._t); el._t=setTimeout(()=>el.style.display="none",14000);
 }
-function collectAnom(){
+function collectAnom(auto){
   const el=$("#anomaly");
   if(el.style.display!=="block")return;
   el.style.display="none"; S.anoms++;
-  (anomCourante||ANOMS[ANOMS.length-1]).f(); anomCourante=null;
+  // ramassée à la main en moins de 2 s : la sonde attend 2 s, donc ce succès
+  // ne peut se décrocher qu'en étant réellement devant l'écran.
+  if(!auto&&Date.now()-anomNee<2000)S.fastAnom=1;
+  const a=anomCourante||ANOMS[ANOMS.length-1];
+  if(!S.anomK)S.anomK={};
+  S.anomK[a.k]=(S.anomK[a.k]||0)+1;
+  a.f(); anomCourante=null;
   S.nextAnom=Date.now()+anomInterval(); render();
 }
 bindAction($("#anomaly"),collectAnom);
@@ -1398,7 +1536,7 @@ function priceInfo(cost,cur,rate,unit){
 }
 
 /* ---------- squelette statique des onglets (reconstruit au changement de langue) ---------- */
-let QBTN=[], ACHNODES=[], STROWS=[], RESSEL=null, CYCIN=null;
+let QBTN=[], ACHNODES=[], ACHSECS=[], STROWS=[], RESSEL=null, CYCIN=null;
 function buildSkeleton(){
   /* --- Extraction --- */
   $("#pGen").innerHTML=
@@ -1471,24 +1609,42 @@ function buildSkeleton(){
   $("#auCycCtl").appendChild(CYCIN); $("#auCycCtl").appendChild(uni);
 
   /* --- Succès --- */
-  $("#pAc").innerHTML='<p class="hint" id="acHint"></p><div class="achgrid" id="acGrid"></div>';
-  const grid=$("#acGrid");
-  ACHNODES=ACHS.map(()=>{
-    const d=document.createElement("div"); d.className="ach";
-    d.innerHTML='<div class="an"></div><div class="ad"></div>';
-    d.q={n:d.querySelector(".an"),d:d.querySelector(".ad")};
-    grid.appendChild(d); return d;
+  $("#pAc").innerHTML='<p class="hint" id="acHint"></p><div id="acSecs"></div>';
+  const box=$("#acSecs"); ACHNODES=[]; ACHSECS=[];
+  ACHCATS.forEach(cat=>{
+    const idx=[]; ACHS.forEach((a,i)=>{if(a.c===cat.id)idx.push(i)});
+    if(!idx.length)return;
+    const h=document.createElement("h3"); h.className="sec achsec";
+    const g=document.createElement("div"); g.className="achgrid";
+    box.appendChild(h); box.appendChild(g);
+    idx.forEach(i=>{
+      const d=document.createElement("div"); d.className="ach";
+      d.innerHTML='<div class="an"></div><div class="ad"></div>';
+      d.q={n:d.querySelector(".an"),d:d.querySelector(".ad")};
+      g.appendChild(d); ACHNODES[i]=d;
+    });
+    ACHSECS.push({cat,h,idx});
   });
 
   /* --- Statistiques --- */
-  $("#pSt").innerHTML='<h3 class="sec">'+t("st_title")+'</h3><div id="stList"></div>';
-  const sl=$("#stList");
-  STROWS=T[LANG].st.map(l=>{
-    const d=document.createElement("div");
-    d.style.cssText="display:flex;justify-content:space-between;padding:7px 2px;border-bottom:1px solid var(--line);font-size:13px";
-    d.innerHTML='<span style="color:var(--dim)"></span><b style="font-variant-numeric:tabular-nums"></b>';
-    d.querySelector("span").textContent=l;
-    d.q=d.querySelector("b"); sl.appendChild(d); return d;
+  $("#pSt").innerHTML='<div id="stSecs"></div>';
+  const sb=$("#stSecs"); STROWS=[];
+  STATCATS.forEach(cat=>{
+    const list=STATS.filter(x=>x.c===cat.id);
+    if(!list.length)return;
+    const h=document.createElement("h3"); h.className="sec";
+    h.textContent=cat.ico+" "+tr(cat.nm);
+    const g=document.createElement("div"); g.className="stgrid";
+    sb.appendChild(h); sb.appendChild(g);
+    list.forEach(x=>{
+      const d=document.createElement("div");
+      d.className="stt"+(x.txt?" small":"");
+      d.style.setProperty("--acc",cat.acc);
+      d.innerHTML='<div class="k"></div><div class="v"></div>';
+      d.querySelector(".k").textContent=tr(x.nm);
+      STROWS.push({q:d.querySelector(".v"),f:x.v});
+      g.appendChild(d);
+    });
   });
 
 }
@@ -1647,6 +1803,11 @@ function renderAuto(){
 function renderAchs(){
   const got=Object.keys(S.achs).length;
   html($("#acHint"),t("ac_hint",got,ACHS.length,achMult().toFixed(2)));
+  ACHSECS.forEach(sec=>{
+    const n=sec.idx.filter(i=>S.achs[ACHS[i].id]).length;
+    html(sec.h,'<span>'+sec.cat.ico+" "+tr(sec.cat.nm)+'</span>'+
+               '<span class="secn'+(n===sec.idx.length?" full":"")+'">'+n+"/"+sec.idx.length+"</span>");
+  });
   ACHS.forEach((a,i)=>{
     const n=ACHNODES[i], has=!!S.achs[a.id];
     cls(n,"got",has);
@@ -1656,16 +1817,7 @@ function renderAchs(){
 }
 
 function renderStats(){
-  const v=[fmt(S.ore),fmt(S.totalOre),fmt(S.runOre),fmt(perSec())+" /s",fmt(clickVal()),
-    fmt(S.clicks),fmt(S.anoms),
-    S.nextAnom>Date.now()?fmtTime((S.nextAnom-Date.now())/1000):t("imminent"),
-    fmt(S.am),fmt(S.amTotal),S.prestiges,"×"+fmt(globalMult()),
-    Object.keys(S.ups).length+"/"+UPS.length,Object.keys(S.achs).length+"/"+ACHS.length,
-    fmtTime((Date.now()-S.started)/1000),
-    t("st_off",fmtTime(offlineCap()),Math.round(offlineRate()*100)),
-    storageOK?t("st_save_ok"):t("st_save_mem"),
-    VERSION+" ("+BUILD+")"];
-  STROWS.forEach((r,i)=>txt(r.q,v[i]));
+  STROWS.forEach(r=>txt(r.q,r.f()));
 }
 
 /* détail du multiplicateur, pour la ligne sous le chiffre */
@@ -1834,10 +1986,10 @@ function runAutos(dt){
   }
 
   if(aOn("sonde")&&$("#anomaly").style.display==="block"
-     &&Date.now()-anomNee>=SONDE_S*1000) collectAnom();
+     &&Date.now()-anomNee>=SONDE_S*1000){ S.asonde=(S.asonde||0)+1; collectAnom(true); }
 
   if(aOn("cycle")){
-    if(amGain()>=cycSeuil()) doPrestige(true);
+    if(amGain()>=cycSeuil()){ S.acyc=(S.acyc||0)+1; doPrestige(true); }
   }
 }
 
