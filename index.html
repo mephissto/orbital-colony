@@ -613,7 +613,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.13.0", BUILD="2026-08-22";
+const VERSION="2.13.1", BUILD="2026-08-22";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1794,7 +1794,7 @@ function renderAuto(){
       nm:tr(a.nm)+(a.max>1?'  <span class="lvl">'+t("lvl",l,a.max)+"</span>":""),
       ds:tr(a.ds),
       rt:l>0?(coupe?autoEtat(a)+" — "+t("au_off"):autoEtat(a)):"",
-      clbl:maxed?"":tm("price_lvl",l+1),
+      clbl:maxed?"":(a.max>1?tm("price_lvl",l+1):t("price")),
       cost:maxed?"MAX":t("cost_am",fmt(cost)),
       miss:maxed?t("maxed"):p.miss, ok:maxed?1:p.ok,
       done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost});
