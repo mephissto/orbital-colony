@@ -1,4 +1,7 @@
 /* Colonie Orbitale — service worker
+   Copyright (C) 2026 Guilhem — SPDX-License-Identifier: GPL-3.0-or-later
+   Voir le fichier LICENSE.
+
    Stratégie :
    - le document HTML est cherché sur le réseau en priorité (tu vois toujours la
      dernière version publiée), avec repli sur le cache si tu es hors connexion ;

@@ -4,6 +4,8 @@ Idle game spatial, bilingue FR / EN, installable en application (PWA) et jouable
 hors connexion. Tout le jeu tient dans `index.html` : aucune dépendance, aucun
 serveur, aucune donnée qui sort de ton navigateur.
 
+Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
+
 ---
 
 ## Sommaire
@@ -24,6 +26,7 @@ serveur, aucune donnée qui sort de ton navigateur.
 - [Interface](#interface)
 - [Version](#version)
 - [Modifier l'équilibrage](#modifier-léquilibrage)
+- [Licence](#licence)
 
 ---
 
@@ -37,6 +40,8 @@ serveur, aucune donnée qui sort de ton navigateur.
 | `icon-192.png`, `icon-512.png` | icônes d'application |
 | `icon-maskable-512.png` | icône adaptative Android (recadrable en rond) |
 | `apple-touch-icon.png` | icône iOS |
+| `LICENSE` | texte complet de la GPL 3.0 |
+| `README.md` | ce document |
 
 Tous les fichiers vont **à la racine du dépôt**, à plat. L'installation exige
 HTTPS — GitHub Pages et Netlify le fournissent automatiquement.
@@ -484,7 +489,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.12.0", BUILD="2026-08-22";
+const VERSION="2.12.1", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -508,7 +513,8 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.12.0** | écran des statistiques refait en tuiles groupées par thème, avec le détail des anomalies par type ; succès « Réflexe éclair » (71 au total) |
+| **2.12.1** | le projet passe sous licence GPL 3.0 ou ultérieure : fichier `LICENSE`, en-têtes dans `index.html` et `sw.js`, tuile « Licence » dans les statistiques |
+| 2.12.0 | écran des statistiques refait en tuiles groupées par thème, avec le détail des anomalies par type ; succès « Réflexe éclair » (71 au total) |
 | 2.11.0 | 5 succès de plus (70 au total) : 100 000 et 1 000 000 de clics, puissance de clic jusqu'à 1 Sx, et 1 000 anomalies |
 | 2.10.0 | 13 succès de plus (65 au total) : quatre paliers de clic, dont deux au-delà de 1 B, et neuf sur les anomalies dont un par type, calés sur leurs probabilités |
 | 2.9.0 | les succès sont rangés en huit catégories avec leur progression, et huit succès d'automatisation s'ajoutent (52 au total, +52 % au complet) |
@@ -548,6 +554,7 @@ Tout est regroupé en haut du `<script>` dans `index.html` :
 | Hors-ligne | `offlineCap()`, `offlineRate()`, `GRACE` |
 | Textes des deux langues | objet `T` |
 | Numéro de version | constantes `VERSION` et `BUILD` |
+| Licence affichée dans le jeu | constante `LICENCE` |
 
 Les poids `w` du tableau `ANOMS` totalisent 200 : un point vaut 0,5 %.
 
@@ -555,4 +562,28 @@ Les poids `w` du tableau `ANOMS` totalisent 200 : un point vaut 0,5 %.
 
 ## Licence
 
-Fais-en ce que tu veux.
+**GNU General Public License v3.0 ou ultérieure** (`GPL-3.0-or-later`).
+Le texte complet est dans le fichier [`LICENSE`](LICENSE).
+
+Ce que ça veut dire, en clair :
+
+- Tu peux **utiliser, copier, modifier et redistribuer** le jeu, y compris
+  commercialement.
+- Toute version modifiée que tu **distribues** doit l'être elle aussi sous
+  GPL 3, avec son code source et la mention des changements.
+- Il est donc impossible d'en faire une version fermée ou de l'intégrer à un
+  logiciel propriétaire.
+- Le jeu est fourni **sans aucune garantie** ; l'auteur n'est responsable
+  d'aucun dommage lié à son utilisation.
+
+Point pratique propre à ce projet : le jeu est un fichier HTML lisible servi tel
+quel au navigateur. Le code source *est* ce que reçoit le visiteur — un simple
+« afficher la source » suffit à vérifier qu'une version dérivée respecte bien la
+licence.
+
+La licence couvre le **code**. Elle ne couvre ni le nom « Colonie Orbitale »
+(droit des marques, distinct) ni l'idée du jeu : quelqu'un qui réécrit un jeu
+équivalent depuis zéro ne lui est pas soumis.
+
+Pour l'appliquer à ton nom complet, remplace `Guilhem` dans l'en-tête de
+`index.html`, celui de `sw.js` et la section ci-dessus.

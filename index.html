@@ -1,4 +1,23 @@
 <!DOCTYPE html>
+<!--
+  Colonie Orbitale — un jeu incrémental de colonie spatiale.
+  Copyright (C) 2026 Guilhem
+
+  Ce programme est un logiciel libre : vous pouvez le redistribuer ou le
+  modifier selon les termes de la GNU General Public License telle que publiée
+  par la Free Software Foundation, soit la version 3 de la Licence, soit (à
+  votre choix) toute version ultérieure.
+
+  Ce programme est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE
+  GARANTIE, sans même la garantie implicite de QUALITÉ MARCHANDE ou
+  d'ADÉQUATION À UN USAGE PARTICULIER. Voir la GNU General Public License pour
+  plus de détails.
+
+  Vous devriez avoir reçu une copie de la GNU General Public License avec ce
+  programme (fichier LICENSE). Sinon, voir <https://www.gnu.org/licenses/>.
+
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -594,7 +613,8 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.12.0", BUILD="2026-08-22";
+const VERSION="2.12.1", BUILD="2026-08-22";
+const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -1009,6 +1029,7 @@ const STATS=[
  {c:"game",nm:{fr:"Gains hors-ligne",en:"Offline gains"},            txt:1, v:()=>t("st_off",fmtTime(offlineCap()),Math.round(offlineRate()*100))},
  {c:"game",nm:{fr:"Sauvegarde",en:"Save"},                           txt:1, v:()=>storageOK?t("st_save_ok"):t("st_save_mem")},
  {c:"game",nm:{fr:"Version",en:"Version"},                           txt:1, v:()=>VERSION+" ("+BUILD+")"},
+ {c:"game",nm:{fr:"Licence",en:"Licence"},                           txt:1, v:()=>LICENCE},
 ];
 const ACHCATS=[
  {id:"clic",  ico:"🖱️", nm:{fr:"Clics",en:"Clicking"}},
