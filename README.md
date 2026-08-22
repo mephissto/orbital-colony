@@ -17,6 +17,7 @@ serveur, aucune donnée qui sort de ton navigateur.
 - [Le multiplicateur global](#le-multiplicateur-global)
 - [Le prestige et l'antimatière](#le-prestige-et-lantimatière)
 - [Les recherches](#les-recherches)
+- [L'automatisation](#lautomatisation)
 - [Les succès](#les-succès)
 - [Les gains hors-ligne](#les-gains-hors-ligne)
 - [Sauvegarde](#sauvegarde)
@@ -251,6 +252,28 @@ régulièrement que s'acharner.
 La recherche Résonance ajoute +1,5 point par niveau, soit **+17 % par unité** au
 niveau 10 — c'est de très loin le plus gros levier du jeu.
 
+Le total est ensuite **élevé à la puissance 1,5** :
+
+```
+multiplicateur = ( 1 + antimatière × bonus ) ^ 1.5
+```
+
+Sans cet exposant le multiplicateur montait *linéairement* avec l'antimatière
+alors que le prix des structures monte *exponentiellement* (×1,15 par achat) :
+chaque cycle rapportait donc mécaniquement moins que le précédent. Avec la
+puissance 1,5, le multiplicateur croît assez vite pour compenser le minerai
+demandé, et un cycle garde une durée à peu près stable très loin dans la partie.
+L'exposant est la constante `AM_EXP`.
+
+| Antimatière | Ancien bonus | Bonus actuel |
+|---|---|---|
+| 10 | ×2,7 | ×4,4 |
+| 100 | ×18 | ×76 |
+| 1 000 | ×171 | ×2 236 |
+| 10 000 | ×1 701 | ×70 155 |
+
+*(valeurs à Résonance niveau 10)*
+
 ---
 
 ## Les recherches
@@ -271,6 +294,74 @@ Payées en **antimatière**, jamais perdues. Le prix du niveau `n` vaut
 
 La Capsule donne `10 000 × 25^niveau` de minerai au début de chaque cycle, soit
 2 441 milliards (2,44e12) au niveau 6.
+
+---
+
+## L'automatisation
+
+Onglet **Auto**, révélé au premier cycle de prestige. Comme les recherches, les
+automates se paient en **antimatière** et ne sont jamais perdus. Ils font gagner
+du confort, pas de la puissance : le Bras automatique ne fait rien qu'un joueur
+présent ne puisse faire à la main.
+
+**Chaque automate possède un interrupteur** (à droite de sa carte). Le couper ne
+rembourse rien et ne fait pas perdre les niveaux : il suffit de le rallumer.
+
+| Automate | Effet | Max | Coût | Coût cumulé |
+|---|---|---|---|---|
+| 🖱️ Bras automatique | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
+| 🏗️ Contremaître | rachète chaque seconde la structure la moins chère | 1 | 300 | 300 |
+| ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 450 | 450 |
+| 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 600 | 600 |
+| ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 1 000 | 1 000 |
+
+Tout automatiser coûte **33 040 antimatière**, à mettre en balance avec les
+106 434 nécessaires pour terminer les recherches : acheter un automate, c'est
+retarder un niveau de Résonance. Le Bras automatique en représente à lui seul
+30 690, ses derniers niveaux (3 840, 7 680, 15 360) restant un objectif bien
+après que le reste soit acheté.
+
+Seul le Bras automatique a plusieurs niveaux, parce que sa cadence est son
+effet. Les autres n'ont qu'un seul palier : ils font une chose, ils la font
+bien, et un découpage en niveaux n'aurait fait qu'étaler artificiellement une
+dépense. Contremaître : un achat par seconde (`CONTRE_S`). Sonde : ramassage
+2 s après l'apparition (`SONDE_S`), largement sous les 14 s de durée de vie
+d'une anomalie.
+
+Sous la liste, une section **Réglages** regroupe deux boîtes. Chacune contient,
+dans cet ordre : l'intitulé et sa commande sur la même ligne, puis un trait, puis
+le **chiffre concret** du moment, puis l'explication en petit. Tout ce qui
+concerne un réglage est ainsi enfermé dans son propre cadre — aucune ambiguïté
+sur l'explication qui va avec quoi — et le joueur n'a jamais de calcul mental à
+faire pour savoir ce que son réglage donne réellement.
+
+**Les automates ne dépensent pas plus de** — menu déroulant, paliers de 10 % à
+100 % (`PARTS`, `S.autoPart`, 30 % par défaut). Le Contremaître et l'Ingénieur
+n'achètent que si le prix ne dépasse pas cette part du minerai possédé. Sous
+100 %, chaque achat laisse forcément un reste : la réserve ne tombe donc jamais
+à zéro. Plus le plafond est bas, plus le stock grossit et plus il reste de quoi
+acheter soi-même — au prix de quelques structures en moins. La ligne affichée
+donne le prix plafond du moment (`oreDispo()`).
+
+**Relancer le cycle à partir de** — un **seuil saisi à la main**, en antimatière
+(`S.autoCyc`, 50 par défaut, `cycSeuil()` en garantit au moins 1). Le Cycle
+automatique repart dès que `amGain()` atteint ce nombre. Un seuil absolu se
+comprend sans explication, mais ne suit pas la progression : c'est au joueur de
+le relever, et la ligne sous le champ lui donne son gain courant, ce qu'il reste
+à atteindre et une estimation de temps pour l'aider à choisir. La carte du Cycle
+automatique reprend le même seuil.
+
+Le champ n'est jamais réécrit pendant la frappe (`document.activeElement`), et
+une valeur vide ou nulle est ignorée : le dernier seuil valide est restauré à la
+sortie du champ.
+
+Les sauvegardes antérieures peuvent contenir un plafond disparu (25 %) :
+`normPart()` le ramène silencieusement au palier le plus proche.
+
+**Garde-fou** — `runAutos()` plafonne le temps traité à 1 seconde. Un retour
+d'arrière-plan ou de hors-ligne ne déclenche donc jamais des milliers de clics
+d'un coup : l'automatisation ne joue pas pendant l'absence, seuls les gains
+hors-ligne habituels s'appliquent.
 
 ---
 
@@ -343,7 +434,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.1.0", BUILD="2026-08-22";
+const VERSION="2.8.0", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -367,7 +458,14 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.1.0** | toutes les anomalies tirent leur valeur au hasard ; le badge et le message affichent le montant obtenu |
+| **2.8.0** | les réglages d'automatisation deviennent deux cadres autonomes sous une section « Réglages », et le plafond de dépense passe en menu déroulant |
+| 2.7.0 | plafond de dépense par paliers de 10 % ; seuil de relance du cycle saisi à la main, en antimatière |
+| 2.6.0 | les deux réglages d'automatisation passent de pourcentages à trois modes nommés, doublés d'une ligne qui affiche le chiffre concret du moment |
+| 2.5.0 | Bras automatique jusqu'au niveau 10 (jusqu'à 10 clics/s) ; Contremaître à 300 et Ingénieur à 450 antimatière |
+| 2.4.0 | Contremaître, Sonde et Cycle automatique passent à un palier unique (200 / 600 / 1 000 antimatière) au lieu de niveaux successifs |
+| 2.3.0 | onglet **Automatisation** : bras automatique, contremaître, ingénieur, sonde de récupération et cycle automatique, achetés en antimatière et coupables à volonté |
+| 2.2.0 | le bonus d'antimatière n'est plus linéaire : le total est élevé à la puissance 1,5 (`AM_EXP`), pour que les cycles tardifs restent rentables |
+| 2.1.0 | toutes les anomalies tirent leur valeur au hasard ; le badge et le message affichent le montant obtenu |
 | 2.0.0 | version publique consolidée : PWA installable, bilingue FR/EN, en-tête mobile fixe, 44 succès, anomalies pondérées avec bond temporel |
 | 1.0.0 | première numérotation, introduite en même temps que l'affichage de version |
 
@@ -388,7 +486,9 @@ Tout est regroupé en haut du `<script>` dans `index.html` :
 | Anomalies, effets et **probabilités** (`w`) | tableau `ANOMS` |
 | Fréquence des anomalies | `anomInterval()` |
 | Gain de prestige | `amGain()` |
-| Bonus par antimatière | `amBonus()` |
+| Automatisations, prix, cadences | tableau `AUTOS`, `CONTRE_S`, `SONDE_S` |
+| Paliers du plafond de dépense | tableau `PARTS` |
+| Bonus par antimatière | `amBonus()`, `amMult()`, `AM_EXP` |
 | Hors-ligne | `offlineCap()`, `offlineRate()`, `GRACE` |
 | Textes des deux langues | objet `T` |
 | Numéro de version | constantes `VERSION` et `BUILD` |

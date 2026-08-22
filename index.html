@@ -216,6 +216,27 @@ nav::-webkit-scrollbar{display:none}
 .qty{padding:5px 13px;border-radius:7px;border:1px solid var(--line);background:var(--panel-2);
   color:var(--dim);cursor:pointer;font-size:12px}
 .qty.on{color:#04121c;background:var(--cyan);border-color:var(--cyan);font-weight:700}
+/* ---- boîte de réglage : intitulé + commande, puis la valeur du moment,
+        puis l'explication. Chaque explication est enfermée avec son réglage. ---- */
+.setbox{border:1px solid var(--line);border-radius:11px;background:var(--panel);
+  padding:12px 14px;margin-bottom:9px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap}
+.setlbl{font-size:13.5px;font-weight:600;color:var(--txt);flex:1 1 200px;min-width:0}
+.setctl{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.setctl .unit{font-size:12px;color:var(--dim)}
+.setnow{font-size:12.5px;color:var(--dim);margin-top:10px;padding-top:9px;
+  border-top:1px solid var(--line);line-height:1.5}
+.sethint{font-size:11.5px;color:var(--dim);opacity:.75;margin-top:6px;line-height:1.5}
+.sel{appearance:none;-webkit-appearance:none;padding:6px 32px 6px 13px;border-radius:7px;
+  border:1px solid var(--line);color:var(--txt);font:inherit;font-size:14px;font-weight:700;
+  font-variant-numeric:tabular-nums;cursor:pointer;
+  background:var(--panel-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238494b8' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 11px center}
+.sel:hover,.sel:focus{outline:none;border-color:rgba(79,216,255,.55)}
+.sel option{background:#0e1426;color:var(--txt)}
+.numin{width:118px;padding:5px 10px;border-radius:7px;border:1px solid var(--line);
+  background:var(--panel-2);color:var(--txt);font:inherit;font-size:14px;font-weight:700;
+  font-variant-numeric:tabular-nums;text-align:right}
+.numin:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 1px rgba(79,216,255,.25)}
 
 .card{
   display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:13px;align-items:center;
@@ -233,6 +254,17 @@ nav::-webkit-scrollbar{display:none}
 .card.cant .cost{color:var(--dim)}
 .card.done{border-color:rgba(87,230,164,.35);background:rgba(87,230,164,.07);cursor:default}
 .card.done:hover{box-shadow:none;background:rgba(87,230,164,.07)}
+/* carte d'automatisation : une 4e colonne pour l'interrupteur */
+.acard{grid-template-columns:44px minmax(0,1fr) auto auto}
+.card.off{opacity:.5;filter:grayscale(.55)}
+.sw{width:46px;height:26px;border-radius:13px;border:1px solid var(--line);
+  background:var(--panel-2);position:relative;transition:background-color .18s,border-color .18s;
+  flex:0 0 auto;align-self:center}
+.sw i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:var(--dim);transition:left .18s, background-color .18s}
+.sw.on{background:rgba(79,216,255,.18);border-color:var(--cyan)}
+.sw.on i{left:23px;background:var(--cyan)}
+
 .ico{font-size:24px;text-align:center;filter:drop-shadow(0 0 5px rgba(79,216,255,.22))}
 .nm{font-size:14.5px;font-weight:600}
 .ds{font-size:11.5px;color:var(--dim);margin-top:2px}
@@ -372,6 +404,10 @@ h3.sec:first-child{margin-top:0}
   nav{padding:6px 10px 0;gap:1px}
   #panels{padding:12px 10px}
   .card{grid-template-columns:32px minmax(0,1fr) auto;gap:9px;padding:10px 11px}
+  .acard{grid-template-columns:32px minmax(0,1fr) auto auto;gap:8px}
+  .acard .right{min-width:86px}
+  .sw{width:40px;height:23px}.sw i{width:16px;height:16px;top:2.5px}
+  .sw.on i{left:20px}
   .ico{font-size:20px}
   .nm{font-size:13.5px}
   .ds{font-size:11px}
@@ -503,6 +539,7 @@ h3.sec:first-child{margin-top:0}
       <div class="tab on" data-p="gen"><span data-i18n="tab_gen" data-i18n-s="tab_gen_s">Extraction</span></div>
       <div class="tab" data-p="up"><span data-i18n="tab_up" data-i18n-s="tab_up_s">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
       <div class="tab" data-p="pr"><span data-i18n="tab_pr" data-i18n-s="tab_pr_s">Recherche</span></div>
+      <div class="tab" data-p="au" id="tabAu" style="display:none"><span data-i18n="tab_au" data-i18n-s="tab_au_s">Automatisation</span></div>
       <div class="tab" data-p="ac"><span data-i18n="tab_ac" data-i18n-s="tab_ac_s">Succès</span></div>
       <div class="tab" data-p="st"><span data-i18n="tab_st" data-i18n-s="tab_st_s">Statistiques</span></div>
     </nav>
@@ -511,6 +548,7 @@ h3.sec:first-child{margin-top:0}
       <div class="panel on" id="pGen"></div>
       <div class="panel" id="pUp"></div>
       <div class="panel" id="pPr"></div>
+      <div class="panel" id="pAu"></div>
       <div class="panel" id="pAc"></div>
       <div class="panel" id="pSt"></div>
     </div>
@@ -540,7 +578,7 @@ h3.sec:first-child{margin-top:0}
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.1.0", BUILD="2026-08-22";
+const VERSION="2.8.0", BUILD="2026-08-22";
 
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -570,8 +608,8 @@ const T={
 fr:{
   logo:"◈ Colonie Orbitale", doc_title:"Colonie Orbitale — idle game spatial",
   save:"Sauvegarder", export:"Export / Import", reset:"Reset",
-  tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_ac:"Succès", tab_st:"Statistiques",
-  tab_gen_s:"Extraction", tab_up_s:"Amélio.", tab_pr_s:"Recherche", tab_ac_s:"Succès", tab_st_s:"Stats",
+  tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_au:"Automatisation", tab_ac:"Succès", tab_st:"Statistiques",
+  tab_gen_s:"Extraction", tab_up_s:"Amélio.", tab_pr_s:"Recherche", tab_au_s:"Auto", tab_ac_s:"Succès", tab_st_s:"Stats",
   manual:"Foreuse manuelle", per_click:"par clic",
   kpi_ore:"Minerai", kpi_rate:"Production", kpi_am:"Antimatière", kpi_mult:"Multiplicateur",
   sub_total:"total extrait : <b>{0}</b>",
@@ -594,7 +632,7 @@ fr:{
   up_avail:"À acheter ({0})", up_owned:"Déjà acquises ({0})", acquired:"Acquise",
   up_none_nm:"Rien de neuf pour l'instant",
   up_none_ds:"Achète des structures et accumule du minerai : de nouvelles améliorations apparaîtront ici.",
-  price:"Prix", price_for:"Prix pour ×{0}", price_for_max:"Prix pour MAX (×{0})", price_lvl:"Prix du niveau {0}",
+  price:"Prix", price_for:"Prix pour ×{0}", price_for_max:"Prix pour MAX (×{0})", price_lvl:"Prix du niveau {0}", price_lvl_s:"Niveau {0}",
   cost_ore:"{0} minerai", cost_am:"{0} AM", unit_am:"antimatière",
   can_buy:"✓ tu peux l'acheter", missing:"il manque {0}", missing_s:"−{0}",
   eta:"  •  ≈ {0}", far:"  •  encore très loin", far_s:"  •  très loin",
@@ -603,10 +641,27 @@ fr:{
   locked_ds:"Continue de progresser pour débloquer cette structure.",
   pr_head:"Cycle d'antimatière — tu repars de zéro, tu gardes un bonus permanent",
   pr_btn:"Lancer un nouveau cycle",
-  pr_info:"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne <b style=\"color:var(--violet)\">+{0} %</b> de production<br>Bonus actuel : <b style=\"color:var(--violet)\">×{1}</b> — cycles effectués : {2}",
+  pr_info:"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne <b style=\"color:var(--violet)\">+{0} %</b> de production, le total étant amplifié à la <b style=\"color:var(--violet)\">puissance {3}</b><br>Bonus actuel : <b style=\"color:var(--violet)\">×{1}</b> — cycles effectués : {2}",
   pr_note:"Il faut extraire {0} de minerai sur ce cycle pour gagner 1 antimatière — il t'en manque {1}{2}",
   pr_confirm:"Lancer un nouveau cycle ?\n\nTu perds minerai, générateurs et améliorations,\nmais tu gagnes {0} antimatière (bonus permanent).",
   res_title:"Laboratoire — {0} antimatière disponible",
+  au_title:"Automatisation — {0} antimatière disponible",
+  au_hint:"Les automates se paient en <b style=\"color:var(--violet)\">antimatière</b>, se gardent d'un cycle à l'autre, et chacun peut être <b>coupé</b> avec son interrupteur sans être remboursé.",
+  au_set:"Réglages",
+  au_res:"Les automates ne dépensent pas plus de", au_cyc:"Relancer le cycle à partir de",
+  au_res_hint:"Part de ton minerai qu'un seul achat peut coûter au maximum. Il en reste donc toujours : plus le plafond est bas, plus ta réserve grossit et plus il te reste pour les gros achats que tu veux faire toi-même.",
+  au_res_now:"En ce moment, ils n'achètent rien au-dessus de <b style=\"color:var(--cyan)\">{0} minerai</b>.",
+  au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. À toi de le relever quand tu progresses.",
+  au_cyc_now:"Gain actuel : <b>+{0}</b> — {1}",
+  au_cyc_ready:"le seuil est atteint, le cycle repart.",
+  au_cyc_wait:"il manque <b style=\"color:var(--violet)\">{0}</b>{1}.",
+  au_unit_am:"antimatière",
+  au_off:"coupé",
+  au_e_clic:"{0} clic/s automatiques", au_e_contre:"un achat par seconde",
+  au_e_ing:"achète l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
+  au_e_cycle:"relance à +{0} antimatière",
+  t_auto:"{0} — niveau {1}", t_auto_on:"{0} : remis en marche", t_auto_off:"{0} : coupé",
+  t_autocyc:"Cycle automatique : +{0} antimatière",
   res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
   lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
   ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--gold)\">×{2}</b> (+1 % par succès)",
@@ -634,8 +689,8 @@ fr:{
 en:{
   logo:"◈ Orbital Colony", doc_title:"Orbital Colony — space idle game",
   save:"Save", export:"Export / Import", reset:"Reset",
-  tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_ac:"Achievements", tab_st:"Statistics",
-  tab_gen_s:"Mining", tab_up_s:"Upgrades", tab_pr_s:"Research", tab_ac_s:"Trophies", tab_st_s:"Stats",
+  tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_au:"Automation", tab_ac:"Achievements", tab_st:"Statistics",
+  tab_gen_s:"Mining", tab_up_s:"Upgrades", tab_pr_s:"Research", tab_au_s:"Auto", tab_ac_s:"Trophies", tab_st_s:"Stats",
   manual:"Manual drill", per_click:"per click",
   kpi_ore:"Ore", kpi_rate:"Output", kpi_am:"Antimatter", kpi_mult:"Multiplier",
   sub_total:"total mined: <b>{0}</b>",
@@ -658,7 +713,7 @@ en:{
   up_avail:"Available ({0})", up_owned:"Already owned ({0})", acquired:"Owned",
   up_none_nm:"Nothing new right now",
   up_none_ds:"Buy structures and pile up ore — new upgrades will show up here.",
-  price:"Price", price_for:"Price for ×{0}", price_for_max:"Price for MAX (×{0})", price_lvl:"Price of level {0}",
+  price:"Price", price_for:"Price for ×{0}", price_for_max:"Price for MAX (×{0})", price_lvl:"Price of level {0}", price_lvl_s:"Level {0}",
   cost_ore:"{0} ore", cost_am:"{0} AM", unit_am:"antimatter",
   can_buy:"✓ you can afford it", missing:"{0} short", missing_s:"−{0}",
   eta:"  •  ≈ {0}", far:"  •  still a long way off", far_s:"  •  far off",
@@ -667,10 +722,27 @@ en:{
   locked_ds:"Keep progressing to unlock this structure.",
   pr_head:"Antimatter cycle — you start over, you keep a permanent bonus",
   pr_btn:"Start a new cycle",
-  pr_info:"antimatter on the next cycle &nbsp;•&nbsp; each unit grants <b style=\"color:var(--violet)\">+{0} %</b> output<br>Current bonus: <b style=\"color:var(--violet)\">×{1}</b> — cycles completed: {2}",
+  pr_info:"antimatter on the next cycle &nbsp;•&nbsp; each unit grants <b style=\"color:var(--violet)\">+{0} %</b> output, the total raised to the <b style=\"color:var(--violet)\">power {3}</b><br>Current bonus: <b style=\"color:var(--violet)\">×{1}</b> — cycles completed: {2}",
   pr_note:"You need to mine {0} ore this cycle to earn 1 antimatter — {1} to go{2}",
   pr_confirm:"Start a new cycle?\n\nYou lose ore, structures and upgrades,\nbut you gain {0} antimatter (permanent bonus).",
   res_title:"Laboratory — {0} antimatter available",
+  au_title:"Automation — {0} antimatter available",
+  au_hint:"Automations are paid in <b style=\"color:var(--violet)\">antimatter</b>, kept from one cycle to the next, and each one can be <b>switched off</b> without being refunded.",
+  au_set:"Settings",
+  au_res:"Automations never spend more than", au_cyc:"Restart the cycle from",
+  au_res_hint:"The largest share of your ore a single purchase may cost. Some is always left over: the lower the cap, the more your stock grows and the more you keep for the big purchases you want to make yourself.",
+  au_res_now:"Right now they buy nothing above <b style=\"color:var(--cyan)\">{0} ore</b>.",
+  au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. Raise it as you progress.",
+  au_cyc_now:"Current gain: <b>+{0}</b> — {1}",
+  au_cyc_ready:"the threshold is reached, the cycle restarts.",
+  au_cyc_wait:"<b style=\"color:var(--violet)\">{0}</b> to go{1}.",
+  au_unit_am:"antimatter",
+  au_off:"off",
+  au_e_clic:"{0} automatic click/s", au_e_contre:"one purchase per second",
+  au_e_ing:"buys the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
+  au_e_cycle:"restarts at +{0} antimatter",
+  t_auto:"{0} — level {1}", t_auto_on:"{0}: switched back on", t_auto_off:"{0}: switched off",
+  t_autocyc:"Auto cycle: +{0} antimatter",
   res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
   lvl:"lvl {0}/{1}", maxed:"maximum level reached",
   ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--gold)\">×{2}</b> (+1 % each)",
@@ -834,6 +906,47 @@ const RES=[
 ];
 const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
 
+/* ---------- automatisations ----------
+   Payées en antimatière comme les recherches, conservées d'un cycle à l'autre.
+   Elles font gagner du confort, pas de la puissance : le Bras automatique ne
+   fait rien qu'un joueur présent ne puisse faire à la main. Chacune possède un
+   interrupteur, pour la couper sans la revendre. */
+const AUTOS=[
+ {id:"clic",  ico:"🖱️", max:10, c0:30,  cg:2,
+  nm:{fr:"Bras automatique",en:"Robotic arm"},
+  ds:{fr:"Clique tout seul, +1 clic/s par niveau",en:"Clicks on its own, +1 click/s per level"}},
+ {id:"contre",ico:"🏗️", max:1, c0:300, cg:1,
+  nm:{fr:"Contremaître",en:"Foreman"},
+  ds:{fr:"Rachète chaque seconde la structure la moins chère",en:"Rebuys the cheapest structure every second"}},
+ {id:"ing",   ico:"⬆️", max:1, c0:450, cg:1,
+  nm:{fr:"Ingénieur",en:"Engineer"},
+  ds:{fr:"Achète les améliorations dès qu'elles sont payables",en:"Buys upgrades as soon as they are affordable"}},
+ {id:"sonde", ico:"📡", max:1, c0:600, cg:1,
+  nm:{fr:"Sonde de récupération",en:"Recovery probe"},
+  ds:{fr:"Ramasse les anomalies à ta place",en:"Collects anomalies for you"}},
+ {id:"cycle", ico:"♻️", max:1, c0:1000, cg:1,
+  nm:{fr:"Cycle automatique",en:"Auto cycle"},
+  ds:{fr:"Relance un cycle dès que le gain atteint le seuil",en:"Starts a new cycle once the gain hits the threshold"}},
+];
+const autoCost=(a,l)=>Math.ceil(a.c0*Math.pow(a.cg,l));
+const alvl=id=>S.auto[id]||0;
+const aOn=id=>alvl(id)>0&&!S.autoOff[id];
+const CONTRE_S=1;                   // délai entre deux achats du Contremaître
+const SONDE_S =2;                   // délai avant ramassage de la Sonde
+/* Plafond de dépense d'un automate pour un seul achat, en part du minerai
+   possédé. Sous 100 %, chaque achat laisse forcément un reste : la réserve ne
+   tombe jamais à zéro et il te reste toujours de quoi acheter toi-même. */
+const oreDispo=()=>S.ore*normPart()/100;
+/* Trois réglages nommés plutôt que des pourcentages : le joueur choisit un
+   comportement, le panneau lui montre ensuite le chiffre que ça donne. */
+const PARTS=[10,20,30,40,50,60,70,80,90,100];   // plafond de dépense, en %
+const proche=(v,l,d)=>l.includes(v)?v:(v==null?d:l.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a));
+function normPart(){return S.autoPart=proche(S.autoPart,PARTS,30)}
+/* Seuil de relance : saisi à la main, en antimatière. Un chiffre qu'on tape
+   soi-même se comprend sans explication — contrairement à un pourcentage
+   d'une réserve qui bouge. */
+const cycSeuil=()=>Math.max(1,Math.floor(S.autoCyc)||1);
+
 /* ---------- données : succès ---------- */
 const ACHS=[
  {id:"a_click1",f:S=>S.clicks>=1,
@@ -932,6 +1045,7 @@ const ACHS=[
 const NEW=()=>({
   ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
   gens:{},ups:{},res:{},achs:{},seen:1,
+  auto:{},autoOff:{},autoPart:30,autoCyc:50,
   clicks:0,anoms:0,buffs:[],buy:1,
   started:Date.now(),lastTick:Date.now(),lastSave:Date.now(),
   nextAnom:Date.now()+45000
@@ -949,10 +1063,15 @@ function readSave(){ if(storageOK){try{const v=localStorage.getItem(KEY);if(v)re
 /* ---------- calculs ---------- */
 function lvl(id){return S.res[id]||0}
 function amBonus(){return 0.02+0.015*lvl("reso")}            // par antimatière
+// Le bonus d'antimatière était linéaire (×(1+am·b)) alors que le coût des
+// structures est exponentiel : chaque cycle rapportait donc de moins en moins.
+// On élève le total à une puissance > 1 pour que le multiplicateur suive.
+const AM_EXP=1.5;
+function amMult(){return Math.pow(1+S.am*amBonus(),AM_EXP)}
 function achMult(){return 1+Object.keys(S.achs).length*0.01}
 function globalMult(){
   let m=1;
-  m*=1+S.am*amBonus();
+  m*=amMult();
   m*=achMult();
   m*=Math.pow(1.3,lvl("mining"));
   UPS.forEach(u=>{if(u.kind==="glob"&&S.ups[u.id])m*=u.mult});
@@ -1009,23 +1128,34 @@ function buyGen(g){
   S.ore-=c; S.gens[g.id]=(S.gens[g.id]||0)+n;
   render();
 }
-function buyUp(u){
+function buyUp(u,muet){
   if(S.ups[u.id]||S.ore<u.cost)return;
   if(u.req&&!u.req(S))return;
-  S.ore-=u.cost; S.ups[u.id]=1; toast(t("t_up",tr(u.nm))); render();
+  S.ore-=u.cost; S.ups[u.id]=1; if(!muet)toast(t("t_up",tr(u.nm))); render();
+}
+function buyAuto(a){
+  const l=alvl(a.id); if(l>=a.max)return;
+  const c=autoCost(a,l); if(S.am<c)return;
+  S.am-=c; S.auto[a.id]=l+1; toast(t("t_auto",tr(a.nm),l+1),"violet"); render();
+}
+function toggleAuto(a){
+  if(alvl(a.id)<1)return;
+  if(S.autoOff[a.id]){delete S.autoOff[a.id]; toast(t("t_auto_on",tr(a.nm)))}
+  else{S.autoOff[a.id]=1; toast(t("t_auto_off",tr(a.nm)))}
+  render();
 }
 function buyRes(r){
   const l=lvl(r.id); if(l>=r.max)return;
   const c=resCost(r,l); if(S.am<c)return;
   S.am-=c; S.res[r.id]=l+1; toast(t("t_res",tr(r.nm),l+1),"violet"); render();
 }
-function doPrestige(){
+function doPrestige(muet){
   const g=amGain(); if(g<1)return;
-  if(!confirm(t("pr_confirm",fmt(g))))return;
+  if(!muet&&!confirm(t("pr_confirm",fmt(g))))return;
   S.am+=g; S.amTotal+=g; S.prestiges++;
   S.ore=0;S.runOre=0;S.gens={};S.ups={};S.buffs=[];
   const cap=lvl("capsule"); if(cap)gain(1e4*Math.pow(25,cap));
-  toast(t("t_am",fmt(g)),"violet"); save(); render();
+  toast(muet?t("t_autocyc",fmt(g)):t("t_am",fmt(g)),"violet"); save(); render();
 }
 
 /* ---------- buffs & anomalies ---------- */
@@ -1075,6 +1205,7 @@ function anomInterval(){
 /* L'anomalie apparaît toujours DANS la zone visible, jamais en haut d'une page
    qu'on a déjà fait défiler. On évite l'en-tête et le bas de l'écran. */
 let anomCourante=null;
+let anomNee=0;
 function spawnAnom(){
   const el=$("#anomaly");
   anomCourante=tirerAnom();
@@ -1086,15 +1217,17 @@ function spawnAnom(){
   const y=haut+Math.random()*Math.max(30,bas-haut);
   el.style.left=Math.round(x)+"px";
   el.style.top=Math.round(Math.min(y,bas))+"px";
-  el.style.display="block";
+  el.style.display="block"; anomNee=Date.now();
   clearTimeout(el._t); el._t=setTimeout(()=>el.style.display="none",14000);
 }
-bindAction($("#anomaly"),()=>{
-  if($("#anomaly").style.display==="none")return;
-  $("#anomaly").style.display="none"; S.anoms++;
+function collectAnom(){
+  const el=$("#anomaly");
+  if(el.style.display!=="block")return;
+  el.style.display="none"; S.anoms++;
   (anomCourante||ANOMS[ANOMS.length-1]).f(); anomCourante=null;
   S.nextAnom=Date.now()+anomInterval(); render();
-});
+}
+bindAction($("#anomaly"),collectAnom);
 
 /* ---------- toasts ---------- */
 function toast(msg,cls){
@@ -1214,6 +1347,30 @@ function getCard(key,act){
   if(act)bindAction(c,act);
   CARDS.set(key,c); return c;
 }
+/* carte d'automatisation : carte normale + un interrupteur qui n'achète pas.
+   Les événements de l'interrupteur sont arrêtés avant d'atteindre la carte,
+   sinon un basculement déclencherait aussi un achat. */
+function getAutoCard(a){
+  const key="auto:"+a.id, deja=CARDS.get(key);
+  if(deja)return deja;
+  const c=getCard(key,()=>buyAuto(a));
+  c.classList.add("acard");
+  const sw=document.createElement("div");
+  sw.className="sw"; sw.innerHTML="<i></i>";
+  ["pointerdown","pointerup","pointermove","pointercancel","click"]
+    .forEach(ev=>sw.addEventListener(ev,e=>e.stopPropagation()));
+  bindAction(sw,()=>toggleAuto(a));
+  c.appendChild(sw); c.q.sw=sw;
+  return c;
+}
+function autoEtat(a){
+  const l=alvl(a.id);
+  if(a.id==="clic")  return t("au_e_clic",l);
+  if(a.id==="contre")return t("au_e_contre",CONTRE_S);
+  if(a.id==="ing")   return t("au_e_ing");
+  if(a.id==="sonde") return t("au_e_sonde",SONDE_S);
+  return t("au_e_cycle",fmt(cycSeuil()));
+}
 function upd(c,o){
   const q=c.q;
   txt(q.ico,o.ico); html(q.nm,o.nm); txt(q.ds,o.ds);
@@ -1241,7 +1398,7 @@ function priceInfo(cost,cur,rate,unit){
 }
 
 /* ---------- squelette statique des onglets (reconstruit au changement de langue) ---------- */
-let QBTN=[], ACHNODES=[], STROWS=[];
+let QBTN=[], ACHNODES=[], STROWS=[], RESSEL=null, CYCIN=null;
 function buildSkeleton(){
   /* --- Extraction --- */
   $("#pGen").innerHTML=
@@ -1275,6 +1432,43 @@ function buildSkeleton(){
     '<p class="hint">'+t("res_hint")+'</p>'+
     '<div id="resList"></div>';
   bindAction($("#prBtn"),()=>{if(!$("#prBtn").disabled)doPrestige()});
+
+  /* --- Automatisation --- */
+  $("#pAu").innerHTML=
+    '<p class="hint">'+t("au_hint")+'</p>'+
+    '<h3 class="sec" id="auTitle"></h3>'+
+    '<div id="auList"></div>'+
+    '<h3 class="sec" id="auSetT" style="display:none">'+t("au_set")+'</h3>'+
+    '<div class="setbox" id="auSet1" style="display:none">'+
+      '<div class="setrow"><div class="setlbl">'+t("au_res")+'</div>'+
+        '<div class="setctl" id="auPartCtl"></div></div>'+
+      '<div class="setnow" id="auResNow"></div>'+
+      '<div class="sethint">'+t("au_res_hint")+'</div>'+
+    '</div>'+
+    '<div class="setbox" id="auSet2" style="display:none">'+
+      '<div class="setrow"><div class="setlbl">'+t("au_cyc")+'</div>'+
+        '<div class="setctl" id="auCycCtl"></div></div>'+
+      '<div class="setnow" id="auCycNow"></div>'+
+      '<div class="sethint">'+t("au_cyc_hint")+'</div>'+
+    '</div>';
+  RESSEL=document.createElement("select");
+  RESSEL.className="sel";
+  PARTS.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v+" %";RESSEL.appendChild(o)});
+  RESSEL.addEventListener("change",()=>{S.autoPart=Number(RESSEL.value);render()});
+  $("#auPartCtl").appendChild(RESSEL);
+  CYCIN=document.createElement("input");
+  CYCIN.type="number"; CYCIN.min="1"; CYCIN.step="1"; CYCIN.className="numin";
+  CYCIN.inputMode="numeric";
+  const majSeuil=()=>{
+    const v=Math.floor(Number(CYCIN.value));
+    if(isFinite(v)&&v>=1){S.autoCyc=v;render()}
+  };
+  CYCIN.addEventListener("input",majSeuil);
+  CYCIN.addEventListener("change",()=>{majSeuil();CYCIN.value=cycSeuil()});
+  CYCIN.addEventListener("blur",()=>{CYCIN.value=cycSeuil()});
+  const uni=document.createElement("span");
+  uni.className="unit"; uni.textContent=t("au_unit_am");
+  $("#auCycCtl").appendChild(CYCIN); $("#auCycCtl").appendChild(uni);
 
   /* --- Succès --- */
   $("#pAc").innerHTML='<p class="hint" id="acHint"></p><div class="achgrid" id="acGrid"></div>';
@@ -1389,7 +1583,7 @@ function renderUps(){
 function renderPrestige(){
   const g=amGain();
   txt($("#prGain"),"+"+fmt(g));
-  html($("#prInfo"),t("pr_info",(amBonus()*100).toFixed(1),fmt(1+S.am*amBonus()),S.prestiges));
+  html($("#prInfo"),t("pr_info",(amBonus()*100).toFixed(1),mfmt(amMult()),S.prestiges,String(AM_EXP)));
   const note=$("#prNote");
   show(note,g<1);
   if(g<1){
@@ -1404,12 +1598,50 @@ function renderPrestige(){
     const c=getCard("res:"+r.id,()=>buyRes(r));
     const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
     upd(c,{ico:r.ico,nm:tr(r.nm)+'  <span class="lvl">'+t("lvl",l,r.max)+"</span>",ds:tr(r.ds),
-      clbl:maxed?"":t("price_lvl",l+1),
+      clbl:maxed?"":tm("price_lvl",l+1),
       cost:maxed?"MAX":t("cost_am",fmt(cost)),
       miss:maxed?t("maxed"):p.miss, ok:maxed?1:p.ok,
       done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost});
     return c;
   }));
+}
+
+function renderAuto(){
+  txt($("#auTitle"),t("au_title",fmt(S.am)));
+  syncList($("#auList"),AUTOS.map(a=>{
+    const l=alvl(a.id), maxed=l>=a.max, cost=autoCost(a,l), coupe=l>0&&!!S.autoOff[a.id];
+    const c=getAutoCard(a);
+    const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
+    show(c.q.sw,l>0); cls(c.q.sw,"on",l>0&&!coupe); cls(c,"off",coupe);
+    upd(c,{ico:a.ico,
+      nm:tr(a.nm)+(a.max>1?'  <span class="lvl">'+t("lvl",l,a.max)+"</span>":""),
+      ds:tr(a.ds),
+      rt:l>0?(coupe?autoEtat(a)+" — "+t("au_off"):autoEtat(a)):"",
+      clbl:maxed?"":tm("price_lvl",l+1),
+      cost:maxed?"MAX":t("cost_am",fmt(cost)),
+      miss:maxed?t("maxed"):p.miss, ok:maxed?1:p.ok,
+      done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost});
+    return c;
+  }));
+  const s1=alvl("contre")>0||alvl("ing")>0, s2=alvl("cycle")>0;
+  show($("#auSetT"),s1||s2); show($("#auSet1"),s1); show($("#auSet2"),s2);
+  html($("#auResNow"),t("au_res_now",fmt(oreDispo())));
+  const pv=String(normPart()); if(RESSEL.value!==pv)RESSEL.value=pv;
+  if(document.activeElement!==CYCIN){          // on n'écrase pas la saisie en cours
+    const v=String(cycSeuil()); if(CYCIN.value!==v)CYCIN.value=v;
+  }
+  const g=amGain(), reste=cycSeuil()-g;
+  let etat;
+  if(reste<=0) etat=t("au_cyc_ready");
+  else{
+    const r=perSec();
+    // minerai encore à extraire pour franchir le seuil, converti en temps
+    const besoin=Math.pow(cycSeuil()/12,2)*1e12-S.runOre;
+    let d="";
+    if(r>0&&besoin>0) d=(besoin/r>86400*60)?tm("far"):t("eta",fmtTime(besoin/r));
+    etat=t("au_cyc_wait",fmt(reste),d);
+  }
+  html($("#auCycNow"),t("au_cyc_now",fmt(g),etat));
 }
 
 function renderAchs(){
@@ -1440,7 +1672,7 @@ function renderStats(){
 function multParts(){
   let up=1; UPS.forEach(u=>{if(u.kind==="glob"&&S.ups[u.id])up*=u.mult});
   let bf=1; S.buffs.forEach(b=>{if(b.k==="prod")bf*=b.m});
-  return {am:1+S.am*amBonus(), ach:achMult(), tech:up*Math.pow(1.3,lvl("mining")), buff:bf};
+  return {am:amMult(), ach:achMult(), tech:up*Math.pow(1.3,lvl("mining")), buff:bf};
 }
 function renderHeader(){
   const rate=perSec(), g=amGain(), m=multParts(), cv=clickVal();
@@ -1479,12 +1711,15 @@ function render(){
   if(currentTab==="gen")renderGens();
   else if(currentTab==="up")renderUps();
   else if(currentTab==="pr")renderPrestige();
+  else if(currentTab==="au")renderAuto();
   else if(currentTab==="ac")renderAchs();
   else renderStats();
+  show($("#tabAu"),S.amTotal>0);   // l'onglet apparaît au premier cycle
   const n=upBadge(), badge=$("#bUp");
   txt(badge,n); cls(badge,"hidden",n===0);
 }
-const TAB_ORDER=["gen","up","pr","ac","st"];
+const TAB_ORDER=["gen","up","pr","au","ac","st"];
+const tabsVus=()=>TAB_ORDER.filter(p=>p!=="au"||S.amTotal>0);
 function activerOnglet(p){
   const tab=$$(".tab").find(x=>x.dataset.p===p);
   if(!tab||currentTab===p)return;
@@ -1522,8 +1757,9 @@ $$(".tab").forEach(tab=>bindAction(tab,()=>activerOnglet(tab.dataset.p)));
     const dx=t.clientX-sx, dy=t.clientY-sy;
     if(Date.now()-st>600)return;
     if(Math.abs(dx)<64||Math.abs(dx)<Math.abs(dy)*1.8)return;
-    const i=TAB_ORDER.indexOf(currentTab)+(dx<0?1:-1);
-    if(i>=0&&i<TAB_ORDER.length)activerOnglet(TAB_ORDER[i]);
+    const ord=tabsVus();
+    const i=ord.indexOf(currentTab)+(dx<0?1:-1);
+    if(i>=0&&i<ord.length)activerOnglet(ord[i]);
   },{passive:true});
 })();
 $$(".lang").forEach(b=>bindAction(b,()=>setLang(b.dataset.lang)));
@@ -1554,6 +1790,57 @@ function creditElapsed(sec,quiet){
   return g;
 }
 
+/* ---------- moteur des automates ----------
+   Volontairement bridé à 1 s de rattrapage : un retour d'arrière-plan ou de
+   hors-ligne ne doit pas déclencher des milliers de clics d'un coup. */
+const autoAcc={clic:0,contre:0,ing:0};
+function runAutos(dt){
+  const d=Math.min(dt,1);
+
+  if(aOn("clic")){
+    autoAcc.clic+=d*alvl("clic");
+    const n=Math.floor(autoAcc.clic);
+    if(n>0){ autoAcc.clic-=n; gain(clickVal()*n); S.clicks+=n; }
+  }
+
+  if(aOn("contre")){
+    autoAcc.contre+=d;
+    if(autoAcc.contre>=CONTRE_S){
+      autoAcc.contre=0;
+      const dispo=oreDispo();
+      let cible=null, prix=Infinity;
+      GENS.forEach((g,i)=>{
+        if(i>=S.seen)return;                       // structure pas encore révélée
+        const c=genCost(g,1);
+        if(c<=dispo&&c<prix){prix=c;cible=g}
+      });
+      if(cible){ S.ore-=prix; S.gens[cible.id]=(S.gens[cible.id]||0)+1; }
+    }
+  }
+
+  if(aOn("ing")){
+    autoAcc.ing+=d;
+    if(autoAcc.ing>=1){
+      autoAcc.ing=0;
+      const dispo=oreDispo();
+      let cible=null;
+      UPS.forEach(u=>{
+        if(S.ups[u.id]||u.cost>dispo)return;
+        if(u.req&&!u.req(S))return;
+        if(!cible||u.cost<cible.cost)cible=u;
+      });
+      if(cible)buyUp(cible,true);
+    }
+  }
+
+  if(aOn("sonde")&&$("#anomaly").style.display==="block"
+     &&Date.now()-anomNee>=SONDE_S*1000) collectAnom();
+
+  if(aOn("cycle")){
+    if(amGain()>=cycSeuil()) doPrestige(true);
+  }
+}
+
 let acc=0, uiAcc=0;
 function step(){
   const now=Date.now();
@@ -1561,6 +1848,7 @@ function step(){
   if(dt<0)dt=0;                                   // horloge système reculée
   S.buffs=S.buffs.filter(b=>b.until>now);         // avant le crédit : pas de bonus expiré payé
   creditElapsed(dt);
+  runAutos(dt);
   if(now>=S.nextAnom&&$("#anomaly").style.display!=="block"){
     spawnAnom(); S.nextAnom=now+anomInterval();
   }
