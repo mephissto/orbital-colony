@@ -42,6 +42,7 @@ Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
 | `apple-touch-icon.png` | icône iOS |
 | `LICENSE` | texte complet de la GPL 3.0 |
 | `README.md` | ce document |
+| `ROADMAP.md` | ce qui est prévu pour la suite, et pourquoi |
 
 Tous les fichiers vont **à la racine du dépôt**, à plat. L'installation exige
 HTTPS — GitHub Pages et Netlify le fournissent automatiquement.
@@ -314,17 +315,22 @@ rembourse rien et ne fait pas perdre les niveaux : il suffit de le rallumer.
 
 | Automate | Effet | Max | Coût | Coût cumulé |
 |---|---|---|---|---|
-| 🖱️ Bras automatique | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
+| 🖱️ Bras automatique | +1 clic/s par niveau | 10 | 100, ×2 par niveau | 102 300 |
 | 🏗️ Contremaître | rachète chaque seconde la structure la moins chère | 1 | 300 | 300 |
 | ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 450 | 450 |
 | 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 600 | 600 |
 | ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 1 000 | 1 000 |
 
-Tout automatiser coûte **33 040 antimatière**, à mettre en balance avec les
-106 434 nécessaires pour terminer les recherches : acheter un automate, c'est
-retarder un niveau de Résonance. Le Bras automatique en représente à lui seul
-30 690, ses derniers niveaux (3 840, 7 680, 15 360) restant un objectif bien
-après que le reste soit acheté.
+Tout automatiser coûte **104 650 antimatière**, soit presque exactement le prix
+des recherches complètes (106 434) : les deux puits sont volontairement du même
+ordre de grandeur, pour que chaque achat d'automate soit un vrai renoncement à
+un niveau de Résonance.
+
+Le Bras automatique en représente à lui seul **102 300**. Ses quatre derniers
+niveaux (6 400, 12 800, 25 600, 51 200) restent un objectif très longtemps après
+que tout le reste soit acheté : c'est le débouché de fond de l'antimatière, celui
+qui empêche la ressource de n'avoir plus aucun usage une fois les recherches
+terminées.
 
 Seul le Bras automatique a plusieurs niveaux, parce que sa cadence est son
 effet. Les autres n'ont qu'un seul palier : ils font une chose, ils la font
@@ -489,7 +495,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.12.1", BUILD="2026-08-22";
+const VERSION="2.13.0", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -513,7 +519,8 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.12.1** | le projet passe sous licence GPL 3.0 ou ultérieure : fichier `LICENSE`, en-têtes dans `index.html` et `sw.js`, tuile « Licence » dans les statistiques |
+| **2.13.0** | le Bras automatique démarre à 100 antimatière au lieu de 30 (toujours ×2 par niveau) : 102 300 pour les dix niveaux |
+| 2.12.1 | le projet passe sous licence GPL 3.0 ou ultérieure : fichier `LICENSE`, en-têtes dans `index.html` et `sw.js`, tuile « Licence » dans les statistiques |
 | 2.12.0 | écran des statistiques refait en tuiles groupées par thème, avec le détail des anomalies par type ; succès « Réflexe éclair » (71 au total) |
 | 2.11.0 | 5 succès de plus (70 au total) : 100 000 et 1 000 000 de clics, puissance de clic jusqu'à 1 Sx, et 1 000 anomalies |
 | 2.10.0 | 13 succès de plus (65 au total) : quatre paliers de clic, dont deux au-delà de 1 B, et neuf sur les anomalies dont un par type, calés sur leurs probabilités |

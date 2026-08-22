@@ -613,7 +613,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.12.1", BUILD="2026-08-22";
+const VERSION="2.13.0", BUILD="2026-08-22";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -938,7 +938,7 @@ const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
    fait rien qu'un joueur présent ne puisse faire à la main. Chacune possède un
    interrupteur, pour la couper sans la revendre. */
 const AUTOS=[
- {id:"clic",  ico:"🖱️", max:10, c0:30,  cg:2,
+ {id:"clic",  ico:"🖱️", max:10, c0:100, cg:2,
   nm:{fr:"Bras automatique",en:"Robotic arm"},
   ds:{fr:"Clique tout seul, +1 clic/s par niveau",en:"Clicks on its own, +1 click/s per level"}},
  {id:"contre",ico:"🏗️", max:1, c0:300, cg:1,
