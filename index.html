@@ -686,7 +686,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.17.4";
+const VERSION="2.20.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -978,31 +978,35 @@ UPS.push(
 
 /* ---------- données : recherche (antimatière) ---------- */
 const RES=[
- {id:"mining", ico:"⚙️", max:15, c0:4,  cg:1.55,
+ {id:"mining", ico:"⚙️", max:15, c0:8,  cg:1.8,
   nm:{fr:"Optimisation minière",en:"Mining optimisation"},
   ds:{fr:"+30 % de production par niveau",en:"+30 % output per level"}},
- {id:"servo",  ico:"🤖", max:12, c0:3,  cg:1.5,
+ {id:"servo",  ico:"🤖", max:12, c0:6,  cg:1.8,
   nm:{fr:"Bras servo-assistés",en:"Servo-assisted arms"},
   ds:{fr:"×2 puissance de clic par niveau",en:"×2 click power per level"}},
- {id:"buffer", ico:"💾", max:8,  c0:6,  cg:1.8,
+ {id:"buffer", ico:"💾", max:8,  c0:10, cg:2,
   nm:{fr:"Mémoire tampon",en:"Buffer memory"},
   ds:{fr:"+3 h de gains hors-ligne par niveau",en:"+3 h of offline gains per level"}},
- {id:"auto",   ico:"🔁", max:6,  c0:8,  cg:2,
+ {id:"auto",   ico:"🔁", max:6,  c0:14, cg:2.1,
   nm:{fr:"Automatisation",en:"Automation"},
   ds:{fr:"+10 % d'efficacité hors-ligne par niveau",en:"+10 % offline efficiency per level"}},
- {id:"nego",   ico:"💠", max:10, c0:10, cg:1.9,
+ {id:"nego",   ico:"💠", max:10, c0:16, cg:2,
   nm:{fr:"Négociation",en:"Negotiation"},
   ds:{fr:"−4 % sur le coût des générateurs par niveau",en:"−4 % on structure costs per level"}},
- {id:"detec",  ico:"📶", max:5,  c0:14, cg:2.2,
+ {id:"detec",  ico:"📶", max:5,  c0:20, cg:2.2,
   nm:{fr:"Détecteur d'anomalies",en:"Anomaly detector"},
   ds:{fr:"Anomalies +25 % fréquentes et +30 % longues",en:"Anomalies +25 % more frequent, +30 % longer"}},
- {id:"reso",   ico:"✨", max:10, c0:20, cg:2.4,
+ {id:"reso",   ico:"✨", max:10, c0:30, cg:2.4,
   nm:{fr:"Résonance d'antimatière",en:"Antimatter resonance"},
   ds:{fr:"Chaque antimatière donne +1,5 % de bonus en plus",en:"Each antimatter grants +1.5 % extra bonus"}},
- {id:"capsule",ico:"📦", max:6,  c0:15, cg:2.1,
+ {id:"capsule",ico:"📦", max:6,  c0:22, cg:2.2,
   nm:{fr:"Capsule de départ",en:"Starter capsule"},
   ds:{fr:"Démarre chaque cycle avec du minerai",en:"Begin each cycle with some ore"}},
 ];
+/* Croissance d'au moins ×1,8 par niveau, et bases relevées : les premiers
+   paliers doivent déjà se sentir. Avec l'ancien barème (×1,55 à partir de 4) on
+   passait de 4 à 7 puis 10 antimatière — la progression était bien là, mais
+   invisible à l'œil sur d'aussi petits nombres. */
 const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
 
 /* ---------- automatisations ----------
@@ -1011,20 +1015,20 @@ const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
    ne font rien qu'un joueur présent ne puisse faire à la main. Chacune possède un
    interrupteur, pour la couper sans la revendre. */
 const AUTOS=[
- {id:"clic",  ico:"🛰️", max:10, c0:100, cg:2,
+ {id:"clic",  ico:"🛰️", max:10, c0:30,  cg:2,
   nm:{fr:"Satellites d'extraction",en:"Mining satellites"},
   ds:{fr:"Un satellite en orbite par niveau, chacun frappe une fois par seconde",
       en:"One orbiting satellite per level, each strikes once a second"}},
- {id:"contre",ico:"🏗️", max:1, c0:300, cg:1,
+ {id:"contre",ico:"🏗️", max:1, c0:100, cg:1,
   nm:{fr:"Contremaître",en:"Foreman"},
   ds:{fr:"Rachète chaque seconde la structure la moins chère",en:"Rebuys the cheapest structure every second"}},
- {id:"ing",   ico:"⬆️", max:1, c0:450, cg:1,
+ {id:"ing",   ico:"⬆️", max:1, c0:150, cg:1,
   nm:{fr:"Ingénieur",en:"Engineer"},
   ds:{fr:"Achète les améliorations dès qu'elles sont payables",en:"Buys upgrades as soon as they are affordable"}},
- {id:"sonde", ico:"📡", max:1, c0:600, cg:1,
+ {id:"sonde", ico:"📡", max:1, c0:200, cg:1,
   nm:{fr:"Sonde de récupération",en:"Recovery probe"},
   ds:{fr:"Ramasse les anomalies à ta place",en:"Collects anomalies for you"}},
- {id:"cycle", ico:"♻️", max:1, c0:1000, cg:1,
+ {id:"cycle", ico:"♻️", max:1, c0:400, cg:1,
   nm:{fr:"Cycle automatique",en:"Auto cycle"},
   ds:{fr:"Relance un cycle dès que le gain atteint le seuil",en:"Starts a new cycle once the gain hits the threshold"}},
 ];
@@ -1336,10 +1340,25 @@ function maxAffordable(g){
   const n=Math.floor(Math.log(1+S.ore*(GROWTH-1)/b)/Math.log(GROWTH));
   return Math.max(0,n);
 }
+/* Gain d'antimatière du cycle.
+   L'ancienne racine carrée (12·√(minerai/1e12)) rendait l'antimatière quasi
+   gratuite passé un certain stade : mesuré en simulation, un cycle rapportant
+   +50 % ne durait qu'une vingtaine de secondes, à 100 comme à 1 000 000
+   d'antimatière. La raison est que la longueur d'un cycle est fixée par le
+   rachat des structures, pas par le seuil d'antimatière — une fois les
+   structures reconstruites, la production est telle que le seuil tombe
+   instantanément, quel qu'il soit.
+   Il fallait donc un exposant plus bas, pas seulement un seuil plus haut : à
+   0,35, le minerai réclamé grandit bien plus vite que la production, et la
+   durée d'un cycle repasse de 20 s à quelques minutes puis à quelques heures. */
+const AM_SEUIL=1e10;      // minerai pour la première antimatière
+const AM_EXPG=0.32;       // exposant du gain (0,5 = racine carrée)
 function amGain(){
-  const raw=Math.floor(12*Math.sqrt(S.runOre/1e12));
-  return Math.max(0,raw);
+  if(!(S.runOre>0))return 0;
+  return Math.max(0,Math.floor(Math.pow(S.runOre/AM_SEUIL,AM_EXPG)));
 }
+/* minerai nécessaire pour un gain donné — l'inverse exact de amGain() */
+const amMinerai=g=>AM_SEUIL*Math.pow(g,1/AM_EXPG)*(1+1e-9);  // marge d'arrondi
 
 /* ---------- actions ---------- */
 function gain(n){S.ore+=n;S.totalOre+=n;S.runOre+=n}
@@ -1838,8 +1857,9 @@ function renderPrestige(){
   const note=$("#prNote");
   show(note,g<1);
   if(g<1){
-    const need=1e12/144, r=perSec(), left=Math.max(0,need-S.runOre);
-    txt(note,t("pr_note",fmt(need),fmt(left),r>0?t("eta",fmtTime(left/r)):""));
+    const need=AM_SEUIL, r=perSec(), left=Math.max(0,need-S.runOre);
+    let d=""; if(r>0)d=(left/r>86400*60)?tm("far"):t("eta",fmtTime(left/r));
+    txt(note,t("pr_note",fmt(need),fmt(left),d));
   }
   const b=$("#prBtn"); if(b.disabled!==(g<1))b.disabled=(g<1);
 
@@ -1891,7 +1911,7 @@ function renderAuto(){
   else{
     const r=perSec();
     // minerai encore à extraire pour franchir le seuil, converti en temps
-    const besoin=Math.pow(cycSeuil()/12,2)*1e12-S.runOre;
+    const besoin=amMinerai(cycSeuil())-S.runOre;
     let d="";
     if(r>0&&besoin>0) d=(besoin/r>86400*60)?tm("far"):t("eta",fmtTime(besoin/r));
     etat=t("au_cyc_wait",fmt(reste),d);

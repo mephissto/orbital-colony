@@ -1,6 +1,6 @@
 # Feuille de route
 
-Version **2.17.4**. Ce document sert de mémoire entre
+Version **2.20.0**. Ce document sert de mémoire entre
 deux sessions : ce qui est décidé, ce qui reste à faire, et pourquoi.
 
 ---
@@ -21,8 +21,12 @@ Entre-temps : succès rangés en catégories et portés à 71 (v2.9 → 2.11),
 statistiques refaites en tuiles (v2.12.0), licence GPL 3.0 (v2.12.1).
 
 Le diagnostic de départ reste la référence : maxer les 8 recherches coûte
-**106 434 antimatière**, après quoi l'antimatière n'avait plus aucun débouché.
-L'automatisation en a ouvert un premier (104 650, dont 102 300 pour les dix
+**234 890 antimatière** (106 434 avant le rebarèmage de la 2.18.0), après quoi
+l'antimatière n'avait plus aucun débouché. La 2.19.0 a par ailleurs corrigé la
+cause profonde : le gain d'antimatière était tel qu'un cycle ne durait qu'une
+vingtaine de secondes à toute échelle, ce qui vidait n'importe quel barème en
+quelques minutes.
+L'automatisation en a ouvert un premier (31 540, dont 30 690 pour les dix
 niveaux des Satellites d'extraction). Les défis et l'effondrement
 doivent ouvrir la suite.
 
@@ -90,7 +94,7 @@ produites au total**.
 
 Les automates sont conservés délibérément : perdre ses satellites à chaque
 effondrement serait une punition, pas un défi, et découragerait d'effondrer.
-Les recherches, elles, repartent à zéro — le puits de 106 434 antimatière se
+Les recherches, elles, repartent à zéro — le puits de 234 890 antimatière se
 rouvre.
 
 ### Les Éclats

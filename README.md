@@ -246,13 +246,47 @@ découvertes, statistiques.
 **Antimatière gagnée :**
 
 ```
-gain = ⌊ 12 × √( minerai extrait pendant ce cycle ÷ 1e12 ) ⌋
+gain = ⌊ ( minerai extrait pendant ce cycle ÷ 1e10 ) ^ 0,32 ⌋
 ```
 
-Il faut donc environ **6,94 milliards** de minerai extrait sur le cycle pour la
-première unité. Le rendement est en racine carrée : rester dix fois plus
-longtemps ne rapporte que ~3,2 fois plus d'antimatière — mieux vaut relancer
-régulièrement que s'acharner.
+Il faut donc **10 milliards** de minerai extrait sur le cycle pour la première
+unité (`AM_SEUIL`), et l'exposant `AM_EXPG` vaut 0,32. Le rendement décroît très
+vite : 87 milliards pour 2 unités, 13,3 T pour 10, 17,8 Qa pour 100, 23,7 Qi pour
+1 000.
+
+### Pourquoi cet exposant, et pas une racine carrée
+
+Jusqu'à la 2.19.0 le gain valait `12 × √(minerai / 1e12)`. Mesuré en simulation
+— rachat automatique des structures et des améliorations, seuil de relance à
++50 % —, un cycle durait alors **une vingtaine de secondes, à 100 comme à
+1 000 000 d'antimatière**. L'antimatière était de fait gratuite, et aucun prix
+de recherche n'y pouvait rien : à ce rythme, n'importe quel barème est épuisé en
+quelques minutes.
+
+La cause n'est pas le seuil mais l'exposant. La longueur d'un cycle est fixée par
+le **rachat des structures**, pas par le seuil d'antimatière : une fois les
+structures reconstruites, la production est telle que le seuil tombe
+instantanément, quel qu'il soit. Multiplier le seuil par 16 ne faisait passer un
+cycle que de 21 à 40 secondes. Il fallait que le minerai réclamé grandisse **plus
+vite que la production**, donc un exposant nettement sous 0,5.
+
+Durée d'un cycle rapportant +50 % d'antimatière, avec les recherches montées en
+parallèle :
+
+| Antimatière | Avant (racine carrée) | Après (0,32) |
+|---|---|---|
+| 200 | 21 s | 25 min |
+| 1 000 | 18 s | 9 min |
+| 5 000 | 19 s | 13 min |
+| 20 000 | 20 s | 47 min |
+| 100 000 | 22 s | 1,5 h |
+| 1 000 000 | 26 s | 18,8 h |
+
+Les cycles les plus courts se situent désormais autour de 1 000 à 5 000
+antimatière — le cœur de la partie — puis s'allongent progressivement. Le seuil
+de la première unité a été **abaissé** en même temps (10 milliards au lieu des
+6,94 d'origine puis 20 en 2.19.0) : c'est le haut de la courbe qu'il fallait
+étirer, pas le début de partie.
 
 **Bonus permanent :** chaque unité d'antimatière donne **+2 %** de production.
 La recherche Résonance ajoute +1,5 point par niveau, soit **+17 % par unité** au
@@ -287,16 +321,22 @@ L'exposant est la constante `AM_EXP`.
 Payées en **antimatière**, jamais perdues. Le prix du niveau `n` vaut
 `coût de base × croissance^n`.
 
-| Recherche | Effet par niveau | Max | Coût de base | Croissance |
-|---|---|---|---|---|
-| ⚙️ Optimisation minière | +30 % de production | 15 | 4 | ×1,55 |
-| 🤖 Bras servo-assistés | ×2 puissance de clic | 12 | 3 | ×1,5 |
-| 💾 Mémoire tampon | +3 h de gains hors-ligne | 8 | 6 | ×1,8 |
-| 🔁 Automatisation | +10 % d'efficacité hors-ligne | 6 | 8 | ×2 |
-| 💠 Négociation | −4 % sur le coût des structures | 10 | 10 | ×1,9 |
-| 📶 Détecteur d'anomalies | anomalies +25 % fréquentes, +30 % longues | 5 | 14 | ×2,2 |
-| ✨ Résonance d'antimatière | +1,5 % de bonus par antimatière | 10 | 20 | ×2,4 |
-| 📦 Capsule de départ | minerai offert à chaque nouveau cycle | 6 | 15 | ×2,1 |
+| Recherche | Effet par niveau | Max | Base | Croissance | Dernier niveau | Total |
+|---|---|---|---|---|---|---|
+| ⚙️ Optimisation minière | +30 % de production | 15 | 8 | ×1,8 | 29 986 | 67 463 |
+| 🤖 Bras servo-assistés | ×2 puissance de clic | 12 | 6 | ×1,8 | 3 857 | 8 675 |
+| 💾 Mémoire tampon | +3 h de gains hors-ligne | 8 | 10 | ×2 | 1 280 | 2 550 |
+| 🔁 Automatisation | +10 % d'efficacité hors-ligne | 6 | 14 | ×2,1 | 572 | 1 081 |
+| 💠 Négociation | −4 % sur le coût des structures | 10 | 16 | ×2 | 8 192 | 16 368 |
+| 📶 Détecteur d'anomalies | anomalies +25 % fréquentes, +30 % longues | 5 | 20 | ×2,2 | 469 | 843 |
+| ✨ Résonance d'antimatière | +1,5 % de bonus par antimatière | 10 | 30 | ×2,4 | 79 255 | 135 847 |
+| 📦 Capsule de départ | minerai offert à chaque nouveau cycle | 6 | 22 | ×2,2 | 1 134 | 2 063 |
+
+Tout terminer coûte **234 890 antimatière**, dont 135 847 pour la seule
+Résonance. La croissance ne descend jamais sous ×1,8 : chaque niveau doit coûter
+visiblement plus que le précédent **dès le début**. L'ancien barème partait de
+4 antimatière avec une croissance de ×1,55, ce qui donnait 4 → 7 → 10 : la
+progression était bien là, mais invisible à l'œil sur d'aussi petits nombres.
 
 La Capsule donne `10 000 × 25^niveau` de minerai au début de chaque cycle, soit
 2 441 milliards (2,44e12) au niveau 6.
@@ -345,22 +385,20 @@ rembourse rien et ne fait pas perdre les niveaux : il suffit de le rallumer.
 
 | Automate | Effet | Max | Coût | Coût cumulé |
 |---|---|---|---|---|
-| 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 100, ×2 par niveau | 102 300 |
-| 🏗️ Contremaître | rachète chaque seconde la structure la moins chère | 1 | 300 | 300 |
-| ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 450 | 450 |
-| 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 600 | 600 |
-| ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 1 000 | 1 000 |
+| 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
+| 🏗️ Contremaître | rachète chaque seconde la structure la moins chère | 1 | 100 | 100 |
+| ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 150 | 150 |
+| 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 200 | 200 |
+| ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 400 | 400 |
 
-Tout automatiser coûte **104 650 antimatière**, soit presque exactement le prix
-des recherches complètes (106 434) : les deux puits sont volontairement du même
-ordre de grandeur, pour que chaque achat d'automate soit un vrai renoncement à
-un niveau de Résonance.
+Tout automatiser coûte **31 540 antimatière**, contre 234 890 pour terminer les
+recherches. Ces prix ont été divisés par 3,3 en 2.20.0 : ils avaient été fixés
+quand l'antimatière s'accumulait vite, et le changement de formule du gain les
+avait rendus hors de portée.
 
-Les Satellites d'extraction en représentent à eux seuls **102 300**. Leurs quatre derniers
-niveaux (6 400, 12 800, 25 600, 51 200) restent un objectif très longtemps après
-que tout le reste soit acheté : c'est le débouché de fond de l'antimatière, celui
-qui empêche la ressource de n'avoir plus aucun usage une fois les recherches
-terminées.
+Les Satellites d'extraction en représentent à eux seuls **30 690**. Leurs quatre
+derniers niveaux (1 920, 3 840, 7 680, 15 360) restent un objectif longtemps
+après que tout le reste soit acheté.
 
 Seuls les Satellites d'extraction ont plusieurs niveaux, parce que leur nombre est leur
 effet. Les autres n'ont qu'un seul palier : ils font une chose, ils la font
@@ -595,7 +633,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.17.4";
+const VERSION="2.20.0";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans une tuile de l'onglet
@@ -622,7 +660,10 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.17.4** | la date de compilation disparaît de l'affichage : seul le numéro de version subsiste |
+| **2.20.0** | exposant du gain abaissé à 0,32 et seuil de la première unité ramené à 10 milliards ; prix de l'automatisation divisés par 3,3 pour suivre le nouveau revenu |
+| 2.19.0 | le gain d'antimatière passe de `12·√(minerai/1e12)` à une puissance : un cycle durait 20 s à toute échelle, il va maintenant de quelques minutes à plusieurs heures |
+| 2.18.0 | barème des recherches revu : croissance d'au moins ×1,8 et bases relevées, pour que chaque niveau coûte nettement plus que le précédent dès le premier (234 890 au total au lieu de 106 434) |
+| 2.17.4 | la date de compilation disparaît de l'affichage : seul le numéro de version subsiste |
 | 2.17.3 | le clic automatique devient les **Satellites d'extraction** (🛰️), avec les deux succès correspondants renommés |
 | 2.17.2 | derniers multiplicateurs passés au vert : bonus des succès, bonus du panneau de cycle, pastilles de bonus temporaire |
 | 2.17.1 | satellites à vitesse fixe, avec pulsation, et orbite recalibrée pour ne plus déborder sur les éléments voisins |
@@ -669,7 +710,7 @@ Tout est regroupé en haut du `<script>` dans `index.html` :
 | Contenu des statistiques | tableaux `STATS` et `STATCATS` |
 | Anomalies, effets et **probabilités** (`w`) | tableau `ANOMS` |
 | Fréquence des anomalies | `anomInterval()` |
-| Gain de prestige | `amGain()` |
+| Gain de prestige | `amGain()`, `AM_SEUIL`, `AM_EXPG` |
 | Automatisations, prix, cadences | tableau `AUTOS`, `CONTRE_S`, `SONDE_S` |
 | Paliers du plafond de dépense | tableau `PARTS` |
 | Bonus par antimatière | `amBonus()`, `amMult()`, `AM_EXP` |
