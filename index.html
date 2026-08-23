@@ -47,7 +47,10 @@
   --anom:#ff7ad9;
 }
 *{box-sizing:border-box}
-html{touch-action:manipulation}          /* pas de zoom au double-tap ; le pincement reste possible */
+/* Le zoom au double-appui est refusé partout. Une zone défilante est le cas où
+   certains moteurs « oublient » la valeur héritée : on la repose explicitement
+   sur chacune d'elles. Le pincement, lui, reste possible dans un navigateur. */
+html,body,main,#hero,#panels,#right{touch-action:manipulation}
 html,body{height:100%;overscroll-behavior:none}
 body{
   margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
@@ -99,10 +102,14 @@ header{
   color:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .sub{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .sub b{color:var(--txt);font-weight:600}
-.kpi.ore{--acc:#e6eeff}
+/* Une couleur par unité, la même partout dans le jeu :
+   minerai = doré, antimatière = violet, production = cyan.
+   Le multiplicateur n'est pas une unité mais un résultat : il prend le vert,
+   qui restait libre, pour laisser le doré au seul minerai. */
+.kpi.ore{--acc:var(--gold)}
 .kpi.rate{--acc:var(--cyan)}
 .kpi.am{--acc:var(--violet)}
-.kpi.mult{--acc:var(--gold)}
+.kpi.mult{--acc:var(--green)}
 @media (max-width:880px){.kpis{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:470px){
   .kpi{padding:8px 11px;gap:9px}
@@ -214,13 +221,26 @@ body.anomsoon #anomChip{color:var(--anom);animation:anompulse 1.2s ease-in-out i
 nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);
   flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 nav::-webkit-scrollbar{display:none}
+/* Les libellés ne sont jamais tronqués : quand la barre déborde, elle défile.
+   Un dégradé sur le bord concerné signale qu'il reste des onglets de ce côté —
+   posé sur le conteneur défilant lui-même, donc il ne bouge pas au défilement. */
+nav.fl{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px);
+             mask-image:linear-gradient(90deg,transparent 0,#000 24px)}
+nav.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent 100%);
+             mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent 100%)}
+nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%);
+                mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%)}
 .tab{
-  padding:9px 16px;font-size:13px;cursor:pointer;color:var(--dim);border:1px solid transparent;
+  display:flex;align-items:center;gap:7px;
+  padding:9px 15px;font-size:13px;cursor:pointer;color:var(--dim);border:1px solid transparent;
   border-bottom:none;border-radius:9px 9px 0 0;position:relative;top:1px;white-space:nowrap;
+  flex:0 0 auto;
 }
+.tab .ti{font-size:14px;line-height:1;opacity:.6;transition:opacity .15s;filter:grayscale(.35)}
+.tab:hover .ti,.tab.on .ti{opacity:1;filter:none}
 .tab:hover{color:#fff}
 .tab.on{color:#fff;background:var(--panel);border-color:var(--line)}
-.tab .badge{display:inline-block;min-width:16px;padding:0 4px;margin-left:6px;border-radius:9px;
+.tab .badge{display:inline-block;min-width:16px;padding:0 4px;border-radius:9px;
   background:var(--cyan);color:#04121c;font-size:10px;font-weight:700;text-align:center}
 .tab .badge.hidden{display:none}
 #panels{flex:1;overflow-y:auto;padding:16px}
@@ -297,6 +317,8 @@ nav::-webkit-scrollbar{display:none}
 .right{text-align:right;white-space:nowrap;min-width:150px}
 .clbl{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--dim);margin-bottom:1px}
 .cost{font-size:16px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.15}
+.cost.am{color:var(--violet)}          /* prix payé en antimatière */
+.card.done .cost{color:var(--green)}   /* « MAX » : ce n'est plus un prix */
 .miss{font-size:10.5px;color:var(--red);margin-top:3px}
 .miss.ok{color:var(--green)}
 .own{font-size:19px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;margin-top:6px}
@@ -408,6 +430,11 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
     transition:padding .2s;
   }
   #herospacer{display:block}
+  /* En-tête fixe et de hauteur automatique : il n'y a jamais rien à faire
+     défiler dedans. Sans ceci, overflow-y:auto (utile en colonne d'ordinateur)
+     en fait une zone défilante, et un glissement sur la planète « rebondit »
+     au lieu de ne rien faire. */
+  #hero{overflow:hidden}
   /* disposition mobile unique : tuiles complètes à gauche, planète à droite,
      badges (anomalie + bonus) en dessous — pas d'état déployé/compacté */
   #hero{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;padding:8px}
@@ -436,7 +463,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
     background:rgba(8,12,24,.94);backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line)}
   #stickyhead nav{border-bottom:none}
-  nav{padding:6px 10px 0;gap:1px}
+  nav{padding:6px 10px 0;gap:2px}
   #panels{padding:12px 10px}
   .card{grid-template-columns:32px minmax(0,1fr) auto;gap:9px;padding:10px 11px}
   .acard{grid-template-columns:32px minmax(0,1fr) auto auto;gap:8px}
@@ -454,8 +481,9 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
   .own{font-size:17px;margin-top:4px}
   .bar{margin-top:6px}
   h3.sec{margin:18px 0 8px}
-  .tab{padding:8px 9px;font-size:12px}
-  .tab .badge{margin-left:4px;min-width:14px;font-size:9.5px;padding:0 3px}
+  .tab{padding:8px 12px;font-size:12.5px;gap:6px}
+  .tab .ti{font-size:13px}
+  .tab .badge{min-width:14px;font-size:9.5px;padding:0 3px}
   body{overflow:auto}
   #panels{overflow:visible}
 }
@@ -481,9 +509,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
   #hero .kpi{padding:6px 8px}
   #hero .kpi .v{font-size:15px}
   #hero .kpi .k{font-size:8px;letter-spacing:.04em}
-  nav{padding:6px 5px 0}
-  .tab{padding:7px 4px;font-size:11.5px}
-  .tab .badge{margin-left:3px;min-width:13px;font-size:9px}
+  nav{padding:6px 8px 0}
 }
 </style>
 </head>
@@ -571,12 +597,12 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
   <section id="right">
    <div id="stickyhead">
     <nav>
-      <div class="tab on" data-p="gen"><span data-i18n="tab_gen" data-i18n-s="tab_gen_s">Extraction</span></div>
-      <div class="tab" data-p="up"><span data-i18n="tab_up" data-i18n-s="tab_up_s">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
-      <div class="tab" data-p="pr"><span data-i18n="tab_pr" data-i18n-s="tab_pr_s">Recherche</span></div>
-      <div class="tab" data-p="au" id="tabAu" style="display:none"><span data-i18n="tab_au" data-i18n-s="tab_au_s">Automatisation</span></div>
-      <div class="tab" data-p="ac"><span data-i18n="tab_ac" data-i18n-s="tab_ac_s">Succès</span></div>
-      <div class="tab" data-p="st"><span data-i18n="tab_st" data-i18n-s="tab_st_s">Statistiques</span></div>
+      <div class="tab on" data-p="gen"><span class="ti">⛏️</span><span data-i18n="tab_gen">Extraction</span></div>
+      <div class="tab" data-p="up"><span class="ti">🔧</span><span data-i18n="tab_up">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
+      <div class="tab" data-p="pr"><span class="ti">🔬</span><span data-i18n="tab_pr">Recherche</span></div>
+      <div class="tab" data-p="au" id="tabAu" style="display:none"><span class="ti">⚙️</span><span data-i18n="tab_au">Automatisation</span></div>
+      <div class="tab" data-p="ac"><span class="ti">🏆</span><span data-i18n="tab_ac">Succès</span></div>
+      <div class="tab" data-p="st"><span class="ti">📊</span><span data-i18n="tab_st">Statistiques</span></div>
     </nav>
    </div>
     <div id="panels">
@@ -613,7 +639,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.13.1", BUILD="2026-08-22";
+const VERSION="2.15.0", BUILD="2026-08-22";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -645,7 +671,6 @@ fr:{
   logo:"◈ Colonie Orbitale", doc_title:"Colonie Orbitale — idle game spatial",
   save:"Sauvegarder", export:"Export / Import", reset:"Reset",
   tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_au:"Automatisation", tab_ac:"Succès", tab_st:"Statistiques",
-  tab_gen_s:"Extraction", tab_up_s:"Amélio.", tab_pr_s:"Recherche", tab_au_s:"Auto", tab_ac_s:"Succès", tab_st_s:"Stats",
   manual:"Foreuse manuelle", per_click:"par clic",
   kpi_ore:"Minerai", kpi_rate:"Production", kpi_am:"Antimatière", kpi_mult:"Multiplicateur",
   sub_total:"total extrait : <b>{0}</b>",
@@ -686,7 +711,7 @@ fr:{
   au_set:"Réglages",
   au_res:"Les automates ne dépensent pas plus de", au_cyc:"Relancer le cycle à partir de",
   au_res_hint:"Part de ton minerai qu'un seul achat peut coûter au maximum. Il en reste donc toujours : plus le plafond est bas, plus ta réserve grossit et plus il te reste pour les gros achats que tu veux faire toi-même.",
-  au_res_now:"En ce moment, ils n'achètent rien au-dessus de <b style=\"color:var(--cyan)\">{0} minerai</b>.",
+  au_res_now:"En ce moment, ils n'achètent rien au-dessus de <b style=\"color:var(--gold)\">{0} minerai</b>.",
   au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. À toi de le relever quand tu progresses.",
   au_cyc_now:"Gain actuel : <b>+{0}</b> — {1}",
   au_cyc_ready:"le seuil est atteint, le cycle repart.",
@@ -700,6 +725,7 @@ fr:{
   t_autocyc:"Cycle automatique : +{0} antimatière",
   res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
   lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
+  lvl_sub:"niveaux", au_owned:"acquis",
   ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--gold)\">×{2}</b> (+1 % par succès)",
   st_off:"max {0} à {1} %",
   st_save_ok:"navigateur (auto toutes les 20 s)", st_save_mem:"mémoire seule — utilise Export !",
@@ -721,7 +747,6 @@ en:{
   logo:"◈ Orbital Colony", doc_title:"Orbital Colony — space idle game",
   save:"Save", export:"Export / Import", reset:"Reset",
   tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_au:"Automation", tab_ac:"Achievements", tab_st:"Statistics",
-  tab_gen_s:"Mining", tab_up_s:"Upgrades", tab_pr_s:"Research", tab_au_s:"Auto", tab_ac_s:"Trophies", tab_st_s:"Stats",
   manual:"Manual drill", per_click:"per click",
   kpi_ore:"Ore", kpi_rate:"Output", kpi_am:"Antimatter", kpi_mult:"Multiplier",
   sub_total:"total mined: <b>{0}</b>",
@@ -762,7 +787,7 @@ en:{
   au_set:"Settings",
   au_res:"Automations never spend more than", au_cyc:"Restart the cycle from",
   au_res_hint:"The largest share of your ore a single purchase may cost. Some is always left over: the lower the cap, the more your stock grows and the more you keep for the big purchases you want to make yourself.",
-  au_res_now:"Right now they buy nothing above <b style=\"color:var(--cyan)\">{0} ore</b>.",
+  au_res_now:"Right now they buy nothing above <b style=\"color:var(--gold)\">{0} ore</b>.",
   au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. Raise it as you progress.",
   au_cyc_now:"Current gain: <b>+{0}</b> — {1}",
   au_cyc_ready:"the threshold is reached, the cycle restarts.",
@@ -776,6 +801,7 @@ en:{
   t_autocyc:"Auto cycle: +{0} antimatter",
   res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
   lvl:"lvl {0}/{1}", maxed:"maximum level reached",
+  lvl_sub:"levels", au_owned:"owned",
   ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--gold)\">×{2}</b> (+1 % each)",
   st_off:"max {0} at {1} %",
   st_save_ok:"browser (auto every 20 s)", st_save_mem:"memory only — use Export!",
@@ -985,11 +1011,11 @@ const ank=k=>(S.anomK&&S.anomK[k])||0;
    lignes étiquette/valeur, illisible sur un écran large où l'étiquette et sa
    valeur se retrouvaient à 900 px l'une de l'autre. */
 const STATCATS=[
- {id:"ext", ico:"⛏️", acc:"var(--cyan)",   nm:{fr:"Extraction",en:"Mining"}},
+ {id:"ext", ico:"⛏️", acc:"var(--gold)",   nm:{fr:"Extraction",en:"Mining"}},
  {id:"anom",ico:"✦",  acc:"var(--anom)",   nm:{fr:"Anomalies",en:"Anomalies"}},
  {id:"cyc", ico:"♻️", acc:"var(--violet)", nm:{fr:"Cycles et antimatière",en:"Cycles and antimatter"}},
  {id:"auto",ico:"⚙️", acc:"var(--green)",  nm:{fr:"Automatisation",en:"Automation"}},
- {id:"prog",ico:"🏆", acc:"var(--gold)",   nm:{fr:"Progression",en:"Progress"}},
+ {id:"prog",ico:"🏆", acc:"var(--cyan)",   nm:{fr:"Progression",en:"Progress"}},
  {id:"game",ico:"💾", acc:"var(--dim)",    nm:{fr:"Partie",en:"Game"}},
 ];
 const STATS=[
@@ -1454,7 +1480,7 @@ setTimeout(syncHero,60);
 function txt(el,v){v=(v==null)?"":String(v);if(el._v!==v){el._v=v;el.textContent=v}}
 function html(el,v){v=(v==null)?"":String(v);if(el._v!==v){el._v=v;el.innerHTML=v}}
 function cls(el,c,on){if(el.classList.contains(c)!==!!on)el.classList.toggle(c,!!on)}
-function show(el,on){const d=on?"":"none";if(el.style.display!==d)el.style.display=d}
+function show(el,on){const d=on?"":"none";if(el.style.display===d)return false;el.style.display=d;return true}
 function syncList(box,items){
   const cur=box.children;
   let same=cur.length===items.length;
@@ -1535,7 +1561,7 @@ function upd(c,o){
   txt(q.ico,o.ico); html(q.nm,o.nm); txt(q.ds,o.ds);
   txt(q.rt,o.rt);       show(q.rt,!!o.rt);
   txt(q.clbl,o.clbl);   show(q.clbl,!!o.clbl);
-  txt(q.cost,o.cost);   show(q.cost,o.cost!=null);
+  txt(q.cost,o.cost);   show(q.cost,o.cost!=null); cls(q.cost,"am",!!o.am);
   txt(q.miss,o.miss);   show(q.miss,!!o.miss); cls(q.miss,"ok",!!o.ok);
   txt(q.own,o.own);     show(q.own,o.own!=null);
   txt(q.owsub,o.owsub); show(q.owsub,!!o.owsub);
@@ -1769,35 +1795,38 @@ function renderPrestige(){
   }
   const b=$("#prBtn"); if(b.disabled!==(g<1))b.disabled=(g<1);
 
-  txt($("#resTitle"),t("res_title",fmt(S.am)));
+  html($("#resTitle"),t("res_title",'<b style="color:var(--violet)">'+fmt(S.am)+"</b>"));
   syncList($("#resList"),RES.map(r=>{
     const l=lvl(r.id), maxed=l>=r.max, cost=resCost(r,l);
     const c=getCard("res:"+r.id,()=>buyRes(r));
     const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
-    upd(c,{ico:r.ico,nm:tr(r.nm)+'  <span class="lvl">'+t("lvl",l,r.max)+"</span>",ds:tr(r.ds),
+    // Ce qu'il manque en antimatière n'apprend rien de plus : la carte grisée et
+    // la barre de progression le disent déjà. On met à la place le niveau
+    // possédé, au même endroit que le nombre d'exemplaires dans Extraction.
+    upd(c,{ico:r.ico,nm:tr(r.nm),ds:tr(r.ds),
       clbl:maxed?"":tm("price_lvl",l+1),
-      cost:maxed?"MAX":t("cost_am",fmt(cost)),
-      miss:maxed?t("maxed"):p.miss, ok:maxed?1:p.ok,
-      done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost});
+      cost:maxed?"MAX":t("cost_am",fmt(cost)), am:1,
+      miss:"", done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost,
+      own:l+"/"+r.max, owsub:t("lvl_sub")});
     return c;
   }));
 }
 
 function renderAuto(){
-  txt($("#auTitle"),t("au_title",fmt(S.am)));
+  html($("#auTitle"),t("au_title",'<b style="color:var(--violet)">'+fmt(S.am)+"</b>"));
   syncList($("#auList"),AUTOS.map(a=>{
     const l=alvl(a.id), maxed=l>=a.max, cost=autoCost(a,l), coupe=l>0&&!!S.autoOff[a.id];
     const c=getAutoCard(a);
     const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
     show(c.q.sw,l>0); cls(c.q.sw,"on",l>0&&!coupe); cls(c,"off",coupe);
-    upd(c,{ico:a.ico,
-      nm:tr(a.nm)+(a.max>1?'  <span class="lvl">'+t("lvl",l,a.max)+"</span>":""),
-      ds:tr(a.ds),
+    upd(c,{ico:a.ico, nm:tr(a.nm), ds:tr(a.ds),
       rt:l>0?(coupe?autoEtat(a)+" — "+t("au_off"):autoEtat(a)):"",
       clbl:maxed?"":(a.max>1?tm("price_lvl",l+1):t("price")),
-      cost:maxed?"MAX":t("cost_am",fmt(cost)),
-      miss:maxed?t("maxed"):p.miss, ok:maxed?1:p.ok,
-      done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost});
+      // un automate à palier unique n'a pas de « MAX » à annoncer : « ✓ acquis » suffit
+      cost:maxed?(a.max>1?"MAX":null):t("cost_am",fmt(cost)), am:1,
+      miss:"", done:maxed?1:0, cant:maxed?0:p.cant, prog:maxed?null:S.am/cost,
+      own:a.max>1?l+"/"+a.max:(l>0?"✓":null),
+      owsub:a.max>1?t("lvl_sub"):(l>0?t("au_owned"):"")});
     return c;
   }));
   const s1=alvl("contre")>0||alvl("ing")>0, s2=alvl("cycle")>0;
@@ -1887,7 +1916,7 @@ function render(){
   else if(currentTab==="au")renderAuto();
   else if(currentTab==="ac")renderAchs();
   else renderStats();
-  show($("#tabAu"),S.amTotal>0);   // l'onglet apparaît au premier cycle
+  if(show($("#tabAu"),S.amTotal>0))majNavFade();   // l'onglet apparaît au premier cycle
   const n=upBadge(), badge=$("#bUp");
   txt(badge,n); cls(badge,"hidden",n===0);
 }
@@ -1902,6 +1931,7 @@ function activerOnglet(p){
   $("#p"+p[0].toUpperCase()+p.slice(1)).classList.add("on");
   render();
   tab.scrollIntoView({inline:"center",block:"nearest"});   // barre d'onglets défilante
+  majNavFade();
   if(matchMedia("(max-width:880px)").matches){
     // le haut du nouveau panneau doit être visible : si on avait défilé plus
     // profond que son début, on remonte juste sous les onglets collés
@@ -1912,6 +1942,16 @@ function activerOnglet(p){
   }
 }
 $$(".tab").forEach(tab=>bindAction(tab,()=>activerOnglet(tab.dataset.p)));
+
+/* dégradés de bord : ils n'apparaissent que du côté où il reste des onglets */
+function majNavFade(){
+  const n=$("nav"), max=n.scrollWidth-n.clientWidth;
+  cls(n,"fl",n.scrollLeft>4);
+  cls(n,"fr",n.scrollLeft<max-4);
+}
+$("nav").addEventListener("scroll",majNavFade,{passive:true});
+addEventListener("resize",()=>setTimeout(majNavFade,60));
+new ResizeObserver(majNavFade).observe($("nav"));
 
 /* Balayage horizontal dans la zone de contenu : onglet suivant / précédent.
    Critères stricts pour ne jamais gêner le défilement vertical ni les taps :
@@ -2097,23 +2137,47 @@ document.addEventListener("visibilitychange",()=>{
    On annule le geste natif du 2e appui rapproché — sans risque, car toutes les
    commandes du jeu écoutent les événements Pointer, pas le clic synthétisé. */
 (function noDoubleTapZoom(){
+  const enApp=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+
+  /* Dans l'application installée, on verrouille aussi l'échelle par la balise
+     viewport : c'est la seule barrière que iOS respecte vraiment en mode
+     standalone, où il ignore parfois touch-action:manipulation. Dans un
+     navigateur ordinaire on n'y touche pas — y désactiver le zoom serait un
+     problème d'accessibilité. */
+  if(enApp()){
+    const mv=document.querySelector('meta[name="viewport"]');
+    if(mv)mv.setAttribute("content",
+      "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover");
+  }
+
+  // les commandes natives gardent leur comportement par défaut
+  const natif=t=>t&&(t.tagName==="TEXTAREA"||t.tagName==="INPUT"||t.tagName==="SELECT"||
+                     t.tagName==="OPTION"||(t.closest&&t.closest("select")));
+
   let last=0, lx=0, ly=0;
   document.addEventListener("touchend",e=>{
-    const tg=e.target;
-    if(tg&&(tg.tagName==="TEXTAREA"||tg.tagName==="INPUT"))return;   // saisie de texte : on ne touche à rien
+    if(natif(e.target))return;
     if(e.changedTouches.length!==1)return;                            // pincement : on laisse faire
     const t=e.changedTouches[0], now=Date.now();
-    if(now-last<=400&&Math.abs(t.clientX-lx)<40&&Math.abs(t.clientY-ly)<40){
-      e.preventDefault();
+    if(now-last<=500&&Math.abs(t.clientX-lx)<45&&Math.abs(t.clientY-ly)<45){
+      // Sans risque pour le jeu : toutes les commandes écoutent les événements
+      // Pointer, pas le clic synthétisé qu'on annule ici.
+      if(e.cancelable)e.preventDefault();
       last=0;                                                         // un triple appui ne s'enchaîne pas
     }else{
       last=now; lx=t.clientX; ly=t.clientY;
     }
   },{passive:false});
+
+  // certains moteurs passent par dblclick pour déclencher le zoom
+  document.addEventListener("dblclick",e=>{
+    if(natif(e.target))return;
+    if(e.cancelable)e.preventDefault();
+  },{passive:false});
+
   // pincement-zoom : bloqué uniquement dans l'app installée, conservé au navigateur
-  const enApp=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
-  document.addEventListener("gesturestart",e=>{if(enApp())e.preventDefault()});
-  document.addEventListener("gesturechange",e=>{if(enApp())e.preventDefault()});
+  document.addEventListener("gesturestart",e=>{if(enApp()&&e.cancelable)e.preventDefault()});
+  document.addEventListener("gesturechange",e=>{if(enApp()&&e.cancelable)e.preventDefault()});
 })();
 
 /* ---------- service worker (jeu installable + hors connexion) ---------- */

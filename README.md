@@ -469,10 +469,57 @@ listes à droite. La colonne devient défilable si la fenêtre est trop courte.
 badges en dessous), listes en dessous. Un **balayage horizontal** dans la zone
 de contenu passe d'un onglet à l'autre.
 
+**Barre d'onglets** — chaque onglet porte une icône et son libellé **complet**,
+sur toutes les tailles d'écran : plus d'abréviations du genre « Amélio. » ou
+« Stats ». Quand l'ensemble ne tient pas — c'est le cas dès 430 px, où les six
+onglets réclament 772 px — la barre **défile horizontalement**, et un dégradé
+apparaît du côté où il reste des onglets à voir (classes `fl` / `fr` posées par
+`majNavFade()`). Le masque est appliqué au conteneur défilant lui-même, il ne
+bouge donc pas avec le contenu. Changer d'onglet recentre l'onglet actif dans la
+barre, y compris par balayage.
+
 **Toucher** — un achat n'est validé qu'au relâchement du doigt, et seulement si
 tu n'as pas bougé de plus de 12 px en moins de 0,9 s : faire défiler ne déclenche
-jamais d'achat par erreur. Le clic sur la planète reste instantané. Le zoom par
-double-tap est neutralisé.
+jamais d'achat par erreur. Le clic sur la planète reste instantané.
+
+**Zoom au double-appui** — neutralisé par trois barrières successives, parce
+qu'aucune n'est fiable partout : `touch-action:manipulation` posé explicitement
+sur chaque conteneur défilant, l'annulation du second appui rapproché
+(500 ms / 45 px) et de l'événement `dblclick`, et — **uniquement dans
+l'application installée** — le verrouillage de l'échelle dans la balise
+`viewport`. Cette dernière n'est pas appliquée dans un navigateur ordinaire :
+y désactiver le zoom serait un problème d'accessibilité. Les champs de saisie et
+les menus déroulants sont exclus de l'annulation, sans quoi un second appui
+rapproché les empêcherait de s'ouvrir. Le pincement reste possible dans le
+navigateur, et n'est bloqué que dans l'application.
+
+**En-tête mobile non défilant** — `#hero` porte `overflow-y:auto` pour la colonne
+d'ordinateur, où elle sert vraiment quand la fenêtre est basse. Sur mobile, où
+l'en-tête est en position fixe et de hauteur automatique, cette valeur en faisait
+une zone défilante inutile : un glissement sur la planète « rebondissait » au
+lieu de ne rien faire. La règle est donc annulée sous 880 px.
+
+**Une couleur par unité** — la même dans tout le jeu, tuiles comprises :
+
+| | Couleur |
+|---|---|
+| Minerai | doré `--gold` |
+| Antimatière | violet `--violet` |
+| Production par seconde | cyan `--cyan` |
+| Multiplicateur global | vert `--green` |
+
+Le multiplicateur, qui occupait le doré, a été déplacé sur le vert : ce n'est pas
+une unité mais un résultat, et le doré revient au minerai, qu'il désignait déjà
+dans tous les prix. Un prix payé en antimatière porte la classe `.cost.am` et
+passe donc en violet ; un « MAX » n'est plus un prix et passe en vert.
+
+**Niveaux possédés** — dans **Recherche** et **Automatisation**, le coin
+inférieur droit de chaque carte affiche le niveau possédé (`3/15 niveaux`,
+`✓ acquis` pour un automate à palier unique), exactement là où l'onglet
+Extraction affiche le nombre d'exemplaires. Ce qui manquait en antimatière n'y
+est plus affiché : la carte grisée et la barre de progression le disaient déjà,
+et le niveau possédé est l'information qu'on cherche vraiment du regard.
+L'onglet **Améliorations** n'est pas concerné, ses achats étant uniques.
 
 **Statistiques** — l'onglet est découpé en six sections (`STATCATS`), chacune
 affichant ses valeurs sous forme de **tuiles** : intitulé en petit au-dessus,
@@ -495,7 +542,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.13.1", BUILD="2026-08-22";
+const VERSION="2.15.0", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -519,7 +566,10 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.13.1** | les automates à palier unique affichent « Prix » au lieu de « Prix du niveau 1 » |
+| **2.15.0** | niveau possédé en bas à droite des cartes Recherche et Automatisation ; une couleur par unité dans tout le jeu (minerai doré, antimatière violette, multiplicateur vert) |
+| 2.14.0 | barre d'onglets refaite : une icône par onglet, libellés complets partout et défilement horizontal avec dégradés de bord |
+| 2.13.2 | zoom au double-appui : trois barrières au lieu d'une, dont le verrouillage de l'échelle dans l'application installée ; l'en-tête mobile n'est plus une zone défilante |
+| 2.13.1 | les automates à palier unique affichent « Prix » au lieu de « Prix du niveau 1 » |
 | 2.13.0 | le Bras automatique démarre à 100 antimatière au lieu de 30 (toujours ×2 par niveau) : 102 300 pour les dix niveaux |
 | 2.12.1 | le projet passe sous licence GPL 3.0 ou ultérieure : fichier `LICENSE`, en-têtes dans `index.html` et `sw.js`, tuile « Licence » dans les statistiques |
 | 2.12.0 | écran des statistiques refait en tuiles groupées par thème, avec le détail des anomalies par type ; succès « Réflexe éclair » (71 au total) |
