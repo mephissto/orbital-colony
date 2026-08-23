@@ -1,6 +1,6 @@
 # Feuille de route
 
-État au **2026-08-22**, version **2.17.3**. Ce document sert de mémoire entre
+Version **2.17.4**. Ce document sert de mémoire entre
 deux sessions : ce qui est décidé, ce qui reste à faire, et pourquoi.
 
 ---

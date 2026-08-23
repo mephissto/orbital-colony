@@ -686,7 +686,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.17.3", BUILD="2026-08-22";
+const VERSION="2.17.4";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1102,7 +1102,7 @@ const STATS=[
  {c:"game",nm:{fr:"Temps de jeu",en:"Play time"},                    v:()=>fmtTime((Date.now()-S.started)/1000)},
  {c:"game",nm:{fr:"Gains hors-ligne",en:"Offline gains"},            txt:1, v:()=>t("st_off",fmtTime(offlineCap()),Math.round(offlineRate()*100))},
  {c:"game",nm:{fr:"Sauvegarde",en:"Save"},                           txt:1, v:()=>storageOK?t("st_save_ok"):t("st_save_mem")},
- {c:"game",nm:{fr:"Version",en:"Version"},                           txt:1, v:()=>VERSION+" ("+BUILD+")"},
+ {c:"game",nm:{fr:"Version",en:"Version"},                           txt:1, v:()=>VERSION},
  {c:"game",nm:{fr:"Licence",en:"Licence"},                           txt:1, v:()=>LICENCE},
 ];
 const ACHCATS=[

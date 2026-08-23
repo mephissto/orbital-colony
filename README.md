@@ -595,13 +595,16 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.17.3", BUILD="2026-08-22";
+const VERSION="2.17.4";
 ```
 
-Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
-l'onglet **Statistiques** sur toutes les tailles d'écran. C'est le moyen le plus
-simple de vérifier quelle version est réellement servie, le service worker
-pouvant garder une page en cache.
+Il s'affiche à côté du titre sur ordinateur, et dans une tuile de l'onglet
+**Statistiques** sur toutes les tailles d'écran. C'est le moyen le plus simple de
+vérifier quelle version est réellement servie, le service worker pouvant garder
+une page en cache.
+
+Aucune date de compilation n'y figure : une date écrite à la main finit toujours
+par mentir, et le numéro de version suffit à identifier une livraison.
 
 **Règle d'incrémentation** (`MAJEUR.MINEUR.CORRECTIF`) :
 
@@ -619,7 +622,8 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.17.3** | le clic automatique devient les **Satellites d'extraction** (🛰️), avec les deux succès correspondants renommés |
+| **2.17.4** | la date de compilation disparaît de l'affichage : seul le numéro de version subsiste |
+| 2.17.3 | le clic automatique devient les **Satellites d'extraction** (🛰️), avec les deux succès correspondants renommés |
 | 2.17.2 | derniers multiplicateurs passés au vert : bonus des succès, bonus du panneau de cycle, pastilles de bonus temporaire |
 | 2.17.1 | satellites à vitesse fixe, avec pulsation, et orbite recalibrée pour ne plus déborder sur les éléments voisins |
 | 2.17.0 | l'onde est remplacée par des satellites en orbite, un par niveau du clic automatique |
@@ -671,7 +675,7 @@ Tout est regroupé en haut du `<script>` dans `index.html` :
 | Bonus par antimatière | `amBonus()`, `amMult()`, `AM_EXP` |
 | Hors-ligne | `offlineCap()`, `offlineRate()`, `GRACE` |
 | Textes des deux langues | objet `T` |
-| Numéro de version | constantes `VERSION` et `BUILD` |
+| Numéro de version | constante `VERSION` |
 | Licence affichée dans le jeu | constante `LICENCE` |
 
 Les poids `w` du tableau `ANOMS` totalisent 200 : un point vaut 0,5 %.
