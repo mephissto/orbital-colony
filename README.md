@@ -478,6 +478,14 @@ apparaît du côté où il reste des onglets à voir (classes `fl` / `fr` posée
 bouge donc pas avec le contenu. Changer d'onglet recentre l'onglet actif dans la
 barre, y compris par balayage.
 
+Deux précautions au toucher : la barre porte `touch-action:pan-x`, donc seul le
+glissement gauche-droite l'atteint — sans quoi la moindre composante verticale
+du geste faisait défiler la page en même temps et la barre semblait monter et
+descendre sous le doigt. Et le recentrage écrit `scrollLeft` à la main plutôt que
+d'appeler `scrollIntoView`, qui fait défiler *tous* les ancêtres défilables :
+sous un en-tête fixe, le navigateur croit l'onglet caché et provoque un saut
+vertical.
+
 **Toucher** — un achat n'est validé qu'au relâchement du doigt, et seulement si
 tu n'as pas bougé de plus de 12 px en moins de 0,9 s : faire défiler ne déclenche
 jamais d'achat par erreur. Le clic sur la planète reste instantané.
@@ -542,7 +550,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.15.0", BUILD="2026-08-22";
+const VERSION="2.15.1", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -566,7 +574,8 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.15.0** | niveau possédé en bas à droite des cartes Recherche et Automatisation ; une couleur par unité dans tout le jeu (minerai doré, antimatière violette, multiplicateur vert) |
+| **2.15.1** | la barre d'onglets ne bouge plus verticalement au toucher : geste limité à l'horizontale et recentrage sans `scrollIntoView` |
+| 2.15.0 | niveau possédé en bas à droite des cartes Recherche et Automatisation ; une couleur par unité dans tout le jeu (minerai doré, antimatière violette, multiplicateur vert) |
 | 2.14.0 | barre d'onglets refaite : une icône par onglet, libellés complets partout et défilement horizontal avec dégradés de bord |
 | 2.13.2 | zoom au double-appui : trois barrières au lieu d'une, dont le verrouillage de l'échelle dans l'application installée ; l'en-tête mobile n'est plus une zone défilante |
 | 2.13.1 | les automates à palier unique affichent « Prix » au lieu de « Prix du niveau 1 » |

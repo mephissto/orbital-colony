@@ -51,6 +51,12 @@
    certains moteurs « oublient » la valeur héritée : on la repose explicitement
    sur chacune d'elles. Le pincement, lui, reste possible dans un navigateur. */
 html,body,main,#hero,#panels,#right{touch-action:manipulation}
+/* La barre d'onglets est une commande horizontale : on n'y autorise que le
+   glissement gauche-droite. Sinon la moindre composante verticale du geste
+   faisait défiler la page en même temps, et la barre semblait monter et
+   descendre sous le doigt. overscroll-behavior évite d'enchaîner sur le geste
+   « page précédente » du navigateur en bout de course. */
+nav{touch-action:pan-x;overscroll-behavior-x:contain}
 html,body{height:100%;overscroll-behavior:none}
 body{
   margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
@@ -639,7 +645,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.15.0", BUILD="2026-08-22";
+const VERSION="2.15.1", BUILD="2026-08-22";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1930,7 +1936,7 @@ function activerOnglet(p){
   currentTab=p;
   $("#p"+p[0].toUpperCase()+p.slice(1)).classList.add("on");
   render();
-  tab.scrollIntoView({inline:"center",block:"nearest"});   // barre d'onglets défilante
+  centrerOnglet(tab);
   majNavFade();
   if(matchMedia("(max-width:880px)").matches){
     // le haut du nouveau panneau doit être visible : si on avait défilé plus
@@ -1942,6 +1948,20 @@ function activerOnglet(p){
   }
 }
 $$(".tab").forEach(tab=>bindAction(tab,()=>activerOnglet(tab.dataset.p)));
+
+/* Recentrage de l'onglet actif. On écrit scrollLeft à la main plutôt que
+   d'appeler scrollIntoView : celui-ci fait défiler *tous* les ancêtres
+   défilables, donc aussi la page — et sous un en-tête fixe le navigateur croit
+   l'onglet caché et provoque un saut vertical. */
+function centrerOnglet(tab){
+  const n=$("nav");
+  if(n.scrollWidth<=n.clientWidth+1)return;
+  const x=tab.offsetLeft-(n.clientWidth-tab.offsetWidth)/2;
+  const max=n.scrollWidth-n.clientWidth;
+  const cible=Math.max(0,Math.min(max,x));
+  if(Math.abs(n.scrollLeft-cible)<2)return;
+  try{n.scrollTo({left:cible,behavior:"smooth"})}catch(e){n.scrollLeft=cible}
+}
 
 /* dégradés de bord : ils n'apparaissent que du côté où il reste des onglets */
 function majNavFade(){
