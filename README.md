@@ -310,6 +310,36 @@ automates se paient en **antimatière** et ne sont jamais perdus. Ils font gagne
 du confort, pas de la puissance : le Bras automatique ne fait rien qu'un joueur
 présent ne puisse faire à la main.
 
+**Les satellites du Bras automatique** — dès qu'il tourne, **un point par
+niveau** se met en orbite autour de la planète, réparti à parts égales sur le
+cercle : on lit son niveau en les comptant. **Les deux cadences sont fixes**, un
+tour en 8 s et une pulsation de 2,4 s par point, quel que soit le niveau — c'est
+le nombre de points qui porte l'information, la vitesse n'a rien à ajouter. Les
+pulsations sont simplement décalées d'un point au suivant, de sorte qu'une onde
+fait le tour de la couronne exactement une fois par rotation. Un petit point
+clignote aussi sur la carte du Bras, comme témoin de marche.
+
+Le rayon de l'orbite est calibré pour que les points ne débordent nulle part :
+sur mobile, la place utile est celle qui sépare le bas de la pastille d'anomalie
+du haut de la barre d'onglets, et la planète réserve en plus une marge verticale
+sur ordinateur.
+
+Côté coût, un seul élément est animé — la couronne entière — et uniquement par
+`transform:rotate`, la propriété que le compositeur traite sur le GPU sans
+recalculer la mise en page ni redessiner. Le DOM n'est reconstruit qu'au
+changement de niveau (`majOrbite()` sort immédiatement si le compte n'a pas
+bougé) : en régime établi il n'y a plus une ligne de JavaScript par image. La
+période d'une animation ne change d'ailleurs rien à son coût — elle est jouée à
+la fréquence de l'écran quelle que soit sa durée —, donc le niveau 10 ne pèse pas
+plus lourd que le niveau 1 à ce titre.
+
+L'orbite disparaît si l'automate est coupé, et l'animation est désactivée si le
+système demande des mouvements réduits (`prefers-reduced-motion`).
+
+Volontairement, aucun « +N » flottant n'est émis pour un clic automatique : à
+10 clics/s ce serait illisible, et ça noierait les « +N » des clics manuels, qui
+sont le retour visuel du geste du joueur.
+
 **Chaque automate possède un interrupteur** (à droite de sa carte). Le couper ne
 rembourse rien et ne fait pas perdre les niveaux : il suffit de le rallumer.
 
@@ -469,7 +499,14 @@ listes à droite. La colonne devient défilable si la fenêtre est trop courte.
 badges en dessous), listes en dessous. Un **balayage horizontal** dans la zone
 de contenu passe d'un onglet à l'autre.
 
-**Barre d'onglets** — chaque onglet porte une icône et son libellé **complet**,
+**Barre d'onglets** — un onglet inactif garde sa forme d'onglet, en sourdine :
+même fond et même bordure que l'actif, simplement beaucoup plus discrets, avec
+son icône désaturée. L'onglet courant se distingue par son fond plein et un
+liseré cyan sur son bord supérieur. Auparavant seul l'onglet actif avait une
+forme, les autres flottaient en texte libre et on ne voyait pas qu'il y avait
+une barre.
+
+Chaque onglet porte une icône et son libellé **complet**,
 sur toutes les tailles d'écran : plus d'abréviations du genre « Amélio. » ou
 « Stats ». Quand l'ensemble ne tient pas — c'est le cas dès 430 px, où les six
 onglets réclament 772 px — la barre **défile horizontalement**, et un dégradé
@@ -521,6 +558,13 @@ une unité mais un résultat, et le doré revient au minerai, qu'il désignait d
 dans tous les prix. Un prix payé en antimatière porte la classe `.cost.am` et
 passe donc en violet ; un « MAX » n'est plus un prix et passe en vert.
 
+Le vert vaut pour **tout ce qui est un multiplicateur**, où qu'il apparaisse : la
+tuile, le bonus des succès en tête de leur onglet, le bonus d'antimatière du
+panneau de cycle, et les pastilles de bonus temporaire sous la planète — celles-ci
+étaient dorées alors qu'elles n'ont rien à voir avec du minerai. En revanche les
+propriétés de l'antimatière elles-mêmes (le « +17 % par unité », l'exposant)
+restent violettes : elles décrivent la ressource, pas son résultat.
+
 **Niveaux possédés** — dans **Recherche** et **Automatisation**, le coin
 inférieur droit de chaque carte affiche le niveau possédé (`3/15 niveaux`,
 `✓ acquis` pour un automate à palier unique), exactement là où l'onglet
@@ -550,7 +594,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.15.1", BUILD="2026-08-22";
+const VERSION="2.17.2", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -574,7 +618,12 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.15.1** | la barre d'onglets ne bouge plus verticalement au toucher : geste limité à l'horizontale et recentrage sans `scrollIntoView` |
+| **2.17.2** | derniers multiplicateurs passés au vert : bonus des succès, bonus du panneau de cycle, pastilles de bonus temporaire |
+| 2.17.1 | satellites à vitesse fixe, avec pulsation, et orbite recalibrée pour ne plus déborder sur les éléments voisins |
+| 2.17.0 | l'onde est remplacée par des satellites en orbite, un par niveau du Bras automatique |
+| 2.16.0 | onde cyan sur la planète et point clignotant sur la carte, à la cadence du Bras automatique |
+| 2.15.2 | les onglets inactifs redeviennent visibles, en sourdine, et l'onglet actif gagne un liseré cyan |
+| 2.15.1 | la barre d'onglets ne bouge plus verticalement au toucher : geste limité à l'horizontale et recentrage sans `scrollIntoView` |
 | 2.15.0 | niveau possédé en bas à droite des cartes Recherche et Automatisation ; une couleur par unité dans tout le jeu (minerai doré, antimatière violette, multiplicateur vert) |
 | 2.14.0 | barre d'onglets refaite : une icône par onglet, libellés complets partout et défilement horizontal avec dégradés de bord |
 | 2.13.2 | zoom au double-appui : trois barrières au lieu d'une, dont le verrouillage de l'échelle dans l'application installée ; l'en-tête mobile n'est plus une zone défilante |

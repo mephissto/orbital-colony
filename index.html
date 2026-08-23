@@ -182,6 +182,25 @@ main{flex:1;display:grid;min-height:0;position:relative;
   position:relative;transition:transform .07s;flex:none;
 }
 #rock:active{transform:scale(.94)}
+/* Satellites du Bras automatique : un point en orbite par niveau, donc on lit
+   son niveau en les comptant. Un seul élément est animé — la couronne entière
+   tourne — et uniquement par transform:rotate, que le compositeur traite sur
+   le GPU : ni recalcul de mise en page, ni redessin. */
+#orbit{position:absolute;inset:-9px;pointer-events:none;
+  animation:spin 8s linear infinite;will-change:transform}
+#orbit i{position:absolute;inset:0;transform:rotate(var(--a,0deg))}
+#orbit i::before{
+  content:"";position:absolute;top:-3px;left:50%;width:6px;height:6px;margin-left:-3px;
+  border-radius:50%;background:var(--cyan);box-shadow:0 0 7px rgba(79,216,255,.85);
+  /* pulsation à cadence fixe elle aussi ; le décalage fait courir une onde
+     autour de la couronne, une fois par tour */
+  animation:dotglow 2.4s ease-in-out infinite;animation-delay:var(--d,0s);
+}
+@keyframes dotglow{0%,100%{opacity:.35;transform:scale(.7)}50%{opacity:1;transform:scale(1.1)}}
+/* la planète réserve la place de l'orbite : les points ne débordent jamais sur
+   les tuiles voisines ni sur la barre d'onglets */
+#rock{margin:13px 0}
+@media (prefers-reduced-motion:reduce){ #orbit,#orbit i::before{animation:none} }
 #rock::after{
   content:"";position:absolute;inset:-6px;border-radius:50%;
   border:1px dashed rgba(79,216,255,.35);animation:spin 24s linear infinite;
@@ -218,8 +237,8 @@ body.anomsoon #rock::after{border-color:var(--anom);
 #anomChip .acw{margin-right:-.06em}
 body.anomsoon #anomChip{color:var(--anom);animation:anompulse 1.2s ease-in-out infinite}
 @keyframes anompulse{50%{opacity:.45}}
-.buff{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--gold);
-  color:var(--gold);background:rgba(255,196,92,.09);animation:pulse 1.6s infinite}
+.buff{font-size:11px;padding:3px 9px;border-radius:20px;border:1px solid var(--green);
+  color:var(--green);background:rgba(87,230,164,.09);animation:pulse 1.6s infinite}
 @keyframes pulse{50%{box-shadow:0 0 9px rgba(255,196,92,.22)}}
 
 
@@ -238,14 +257,22 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
                 mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%)}
 .tab{
   display:flex;align-items:center;gap:7px;
-  padding:9px 15px;font-size:13px;cursor:pointer;color:var(--dim);border:1px solid transparent;
+  padding:9px 15px;font-size:13px;cursor:pointer;color:var(--dim);
+  /* Un onglet inactif garde sa forme d'onglet, en sourdine : même fond et même
+     bordure que l'actif, simplement beaucoup plus discrets. Sans ça, seul
+     l'onglet courant existait visuellement et les autres flottaient en texte
+     libre — on ne voyait pas qu'il y avait une barre. */
+  background:rgba(255,255,255,.028);
+  border:1px solid rgba(120,180,255,.09);
   border-bottom:none;border-radius:9px 9px 0 0;position:relative;top:1px;white-space:nowrap;
   flex:0 0 auto;
+  transition:color .15s, background-color .15s, border-color .15s;
 }
-.tab .ti{font-size:14px;line-height:1;opacity:.6;transition:opacity .15s;filter:grayscale(.35)}
+.tab .ti{font-size:14px;line-height:1;opacity:.55;transition:opacity .15s;filter:grayscale(.5)}
 .tab:hover .ti,.tab.on .ti{opacity:1;filter:none}
-.tab:hover{color:#fff}
-.tab.on{color:#fff;background:var(--panel);border-color:var(--line)}
+.tab:hover{color:var(--txt);background:rgba(255,255,255,.07);border-color:rgba(79,216,255,.3)}
+.tab.on{color:#fff;background:var(--panel);border-color:var(--line);
+  box-shadow:inset 0 2px 0 var(--cyan)}
 .tab .badge{display:inline-block;min-width:16px;padding:0 4px;border-radius:9px;
   background:var(--cyan);color:#04121c;font-size:10px;font-weight:700;text-align:center}
 .tab .badge.hidden{display:none}
@@ -309,6 +336,14 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
   background:var(--dim);transition:left .18s, background-color .18s}
 .sw.on{background:rgba(79,216,255,.18);border-color:var(--cyan)}
 .sw.on i{left:23px;background:var(--cyan)}
+/* même cadence, en petit, sur la ligne d'état de la carte */
+.acard.pulsing .rt::before{
+  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--cyan);margin-right:7px;vertical-align:middle;
+  animation:dotpulse 1.5s ease-in-out infinite;
+}
+@keyframes dotpulse{0%,100%{opacity:.25}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){ .acard.pulsing .rt::before{animation:none;opacity:.8} }
 
 .ico{font-size:24px;text-align:center;filter:drop-shadow(0 0 5px rgba(79,216,255,.22))}
 .nm{font-size:14.5px;font-weight:600}
@@ -453,6 +488,12 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
   #rock{width:90px;height:90px;box-shadow:0 0 18px rgba(79,216,255,.13),
     inset -9px -11px 24px rgba(0,0,0,.75), inset 6px 7px 16px rgba(160,200,255,.12)}
   #rock::after{inset:-4px}
+  /* Place disponible en hauteur sur mobile : entre le bas de la pastille
+     d'anomalie et le haut de la barre d'onglets. L'orbite est calibrée pour
+     rester dedans, points compris. */
+  #orbit{inset:-4px}
+  #orbit i::before{width:4px;height:4px;top:-2px;margin-left:-2px;box-shadow:0 0 5px rgba(79,216,255,.85)}
+  #rock{margin:0}
   .crater{transform:scale(.49);transform-origin:top left}
   #hero .kpis{gap:6px}
   /* moins larges qu'en pleine page (la planète est à côté) : on resserre le
@@ -552,7 +593,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
       <div id="anomChip" data-i18n-title="anom_title"><span class="aci"><svg viewBox="0 0 64 64" aria-hidden="true"><path
         d="M32 10 L38 26 L54 32 L38 38 L32 54 L26 38 L10 32 L26 26 Z"/></svg></span><span
         class="acw" data-i18n="anom_word">Anomalie ·</span><span class="acv"></span></div>
-      <div id="rock"></div>
+      <div id="rock"><div id="orbit" style="display:none" aria-hidden="true"></div></div>
     </div>
     <div id="buffs"></div>
     <div id="heroside">
@@ -645,7 +686,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.15.1", BUILD="2026-08-22";
+const VERSION="2.17.2", BUILD="2026-08-22";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -708,7 +749,7 @@ fr:{
   locked_ds:"Continue de progresser pour débloquer cette structure.",
   pr_head:"Cycle d'antimatière — tu repars de zéro, tu gardes un bonus permanent",
   pr_btn:"Lancer un nouveau cycle",
-  pr_info:"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne <b style=\"color:var(--violet)\">+{0} %</b> de production, le total étant amplifié à la <b style=\"color:var(--violet)\">puissance {3}</b><br>Bonus actuel : <b style=\"color:var(--violet)\">×{1}</b> — cycles effectués : {2}",
+  pr_info:"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne <b style=\"color:var(--violet)\">+{0} %</b> de production, le total étant amplifié à la <b style=\"color:var(--violet)\">puissance {3}</b><br>Bonus actuel : <b style=\"color:var(--green)\">×{1}</b> — cycles effectués : {2}",
   pr_note:"Il faut extraire {0} de minerai sur ce cycle pour gagner 1 antimatière — il t'en manque {1}{2}",
   pr_confirm:"Lancer un nouveau cycle ?\n\nTu perds minerai, générateurs et améliorations,\nmais tu gagnes {0} antimatière (bonus permanent).",
   res_title:"Laboratoire — {0} antimatière disponible",
@@ -732,7 +773,7 @@ fr:{
   res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
   lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
   lvl_sub:"niveaux", au_owned:"acquis",
-  ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--gold)\">×{2}</b> (+1 % par succès)",
+  ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--green)\">×{2}</b> (+1 % par succès)",
   st_off:"max {0} à {1} %",
   st_save_ok:"navigateur (auto toutes les 20 s)", st_save_mem:"mémoire seule — utilise Export !",
   t_up:"Amélioration : {0}", t_res:"Recherche : {0} niv.{1}", t_ach:"🏆 Succès : {0}  (+1 % production)",
@@ -784,7 +825,7 @@ en:{
   locked_ds:"Keep progressing to unlock this structure.",
   pr_head:"Antimatter cycle — you start over, you keep a permanent bonus",
   pr_btn:"Start a new cycle",
-  pr_info:"antimatter on the next cycle &nbsp;•&nbsp; each unit grants <b style=\"color:var(--violet)\">+{0} %</b> output, the total raised to the <b style=\"color:var(--violet)\">power {3}</b><br>Current bonus: <b style=\"color:var(--violet)\">×{1}</b> — cycles completed: {2}",
+  pr_info:"antimatter on the next cycle &nbsp;•&nbsp; each unit grants <b style=\"color:var(--violet)\">+{0} %</b> output, the total raised to the <b style=\"color:var(--violet)\">power {3}</b><br>Current bonus: <b style=\"color:var(--green)\">×{1}</b> — cycles completed: {2}",
   pr_note:"You need to mine {0} ore this cycle to earn 1 antimatter — {1} to go{2}",
   pr_confirm:"Start a new cycle?\n\nYou lose ore, structures and upgrades,\nbut you gain {0} antimatter (permanent bonus).",
   res_title:"Laboratory — {0} antimatter available",
@@ -808,7 +849,7 @@ en:{
   res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
   lvl:"lvl {0}/{1}", maxed:"maximum level reached",
   lvl_sub:"levels", au_owned:"owned",
-  ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--gold)\">×{2}</b> (+1 % each)",
+  ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--green)\">×{2}</b> (+1 % each)",
   st_off:"max {0} at {1} %",
   st_save_ok:"browser (auto every 20 s)", st_save_mem:"memory only — use Export!",
   t_up:"Upgrade: {0}", t_res:"Research: {0} lvl {1}", t_ach:"🏆 Achievement: {0}  (+1 % output)",
@@ -1825,6 +1866,7 @@ function renderAuto(){
     const c=getAutoCard(a);
     const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
     show(c.q.sw,l>0); cls(c.q.sw,"on",l>0&&!coupe); cls(c,"off",coupe);
+    cls(c,"pulsing",a.id==="clic"&&l>0&&!coupe);
     upd(c,{ico:a.ico, nm:tr(a.nm), ds:tr(a.ds),
       rt:l>0?(coupe?autoEtat(a)+" — "+t("au_off"):autoEtat(a)):"",
       clbl:maxed?"":(a.max>1?tm("price_lvl",l+1):t("price")),
@@ -1882,7 +1924,22 @@ function multParts(){
   let bf=1; S.buffs.forEach(b=>{if(b.k==="prod")bf*=b.m});
   return {am:amMult(), ach:achMult(), tech:up*Math.pow(1.3,lvl("mining")), buff:bf};
 }
+/* Un satellite par niveau du Bras automatique, répartis à parts égales sur le
+   cercle. Le DOM n'est refait qu'au changement de niveau : en régime établi,
+   il n'y a plus une seule ligne de JavaScript par image. */
+function majOrbite(){
+  const n=aOn("clic")?alvl("clic"):0;
+  const o=$("#orbit");
+  if(o._n===n)return;
+  o._n=n;
+  let h="";
+  for(let i=0;i<n;i++)
+    h+='<i style="--a:'+(i*360/n).toFixed(1)+'deg;--d:'+(-2.4*i/n).toFixed(2)+'s"></i>';
+  o.innerHTML=h;
+  show(o,n>0);
+}
 function renderHeader(){
+  majOrbite();
   const rate=perSec(), g=amGain(), m=multParts(), cv=clickVal();
   txt($("#hOre"),fmt(S.ore));
   txt($("#hRate"),fmt(rate)+"/s");
