@@ -1,6 +1,6 @@
 # Feuille de route
 
-État au **2026-08-22**, version **2.17.2**. Ce document sert de mémoire entre
+État au **2026-08-22**, version **2.17.3**. Ce document sert de mémoire entre
 deux sessions : ce qui est décidé, ce qui reste à faire, et pourquoi.
 
 ---
@@ -23,7 +23,7 @@ statistiques refaites en tuiles (v2.12.0), licence GPL 3.0 (v2.12.1).
 Le diagnostic de départ reste la référence : maxer les 8 recherches coûte
 **106 434 antimatière**, après quoi l'antimatière n'avait plus aucun débouché.
 L'automatisation en a ouvert un premier (104 650, dont 102 300 pour les dix
-niveaux du Bras automatique). Les défis et l'effondrement
+niveaux des Satellites d'extraction). Les défis et l'effondrement
 doivent ouvrir la suite.
 
 ---
@@ -88,7 +88,7 @@ produites au total**.
 |---|---|
 | minerai, structures, améliorations, **antimatière, recherches** | succès, défis réussis, **automates**, Éclats |
 
-Les automates sont conservés délibérément : perdre son bras automatique à chaque
+Les automates sont conservés délibérément : perdre ses satellites à chaque
 effondrement serait une punition, pas un défi, et découragerait d'effondrer.
 Les recherches, elles, repartent à zéro — le puits de 106 434 antimatière se
 rouvre.

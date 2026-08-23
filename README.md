@@ -307,17 +307,17 @@ La Capsule donne `10 000 × 25^niveau` de minerai au début de chaque cycle, soi
 
 Onglet **Auto**, révélé au premier cycle de prestige. Comme les recherches, les
 automates se paient en **antimatière** et ne sont jamais perdus. Ils font gagner
-du confort, pas de la puissance : le Bras automatique ne fait rien qu'un joueur
+du confort, pas de la puissance : les Satellites d'extraction ne font rien qu'un joueur
 présent ne puisse faire à la main.
 
-**Les satellites du Bras automatique** — dès qu'il tourne, **un point par
+**Les satellites d'extraction** — dès qu'il tourne, **un point par
 niveau** se met en orbite autour de la planète, réparti à parts égales sur le
 cercle : on lit son niveau en les comptant. **Les deux cadences sont fixes**, un
 tour en 8 s et une pulsation de 2,4 s par point, quel que soit le niveau — c'est
 le nombre de points qui porte l'information, la vitesse n'a rien à ajouter. Les
 pulsations sont simplement décalées d'un point au suivant, de sorte qu'une onde
 fait le tour de la couronne exactement une fois par rotation. Un petit point
-clignote aussi sur la carte du Bras, comme témoin de marche.
+clignote aussi sur leur carte, comme témoin de marche.
 
 Le rayon de l'orbite est calibré pour que les points ne débordent nulle part :
 sur mobile, la place utile est celle qui sépare le bas de la pastille d'anomalie
@@ -345,7 +345,7 @@ rembourse rien et ne fait pas perdre les niveaux : il suffit de le rallumer.
 
 | Automate | Effet | Max | Coût | Coût cumulé |
 |---|---|---|---|---|
-| 🖱️ Bras automatique | +1 clic/s par niveau | 10 | 100, ×2 par niveau | 102 300 |
+| 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 100, ×2 par niveau | 102 300 |
 | 🏗️ Contremaître | rachète chaque seconde la structure la moins chère | 1 | 300 | 300 |
 | ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 450 | 450 |
 | 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 600 | 600 |
@@ -356,13 +356,13 @@ des recherches complètes (106 434) : les deux puits sont volontairement du mêm
 ordre de grandeur, pour que chaque achat d'automate soit un vrai renoncement à
 un niveau de Résonance.
 
-Le Bras automatique en représente à lui seul **102 300**. Ses quatre derniers
+Les Satellites d'extraction en représentent à eux seuls **102 300**. Leurs quatre derniers
 niveaux (6 400, 12 800, 25 600, 51 200) restent un objectif très longtemps après
 que tout le reste soit acheté : c'est le débouché de fond de l'antimatière, celui
 qui empêche la ressource de n'avoir plus aucun usage une fois les recherches
 terminées.
 
-Seul le Bras automatique a plusieurs niveaux, parce que sa cadence est son
+Seuls les Satellites d'extraction ont plusieurs niveaux, parce que leur nombre est leur
 effet. Les autres n'ont qu'un seul palier : ils font une chose, ils la font
 bien, et un découpage en niveaux n'aurait fait qu'étaler artificiellement une
 dépense. Contremaître : un achat par seconde (`CONTRE_S`). Sonde : ramassage
@@ -428,7 +428,7 @@ une fois la catégorie complète.
 | ⚙️ Automatisation | 8 | achat et usage des automates |
 
 Les deux échelles de la catégorie Clics sont volontairement séparées : le
-**nombre** de clics (que le Bras automatique fait grimper de 10/s, soit
+**nombre** de clics (que les Satellites d'extraction font grimper de 10/s, soit
 1 000 000 en une trentaine d'heures) et la **puissance** d'un clic. Le plafond
 de puissance est monté jusqu'à 1 Sx parce que 1 Qa se franchit vers « 100 de
 chaque structure + toutes les améliorations + 100 antimatière », donc bien avant
@@ -447,8 +447,9 @@ surtensions, 25 échos et 5 bonds temporels. Les cinq seuils (200 / 200 / 25 /
 demande 500 anomalies. Le comptage par type utilise la clé `k` de chaque entrée
 de `ANOMS` et le compteur `S.anomK`.
 
-Les huit succès d'automatisation vont du premier achat (Délégation) au Bras
-automatique niveau 10 et à tous les automates au maximum (Colonie autonome).
+Les huit succès d'automatisation vont du premier achat (Délégation) aux
+Satellites d'extraction au niveau 10, et à tous les automates au maximum
+(Colonie autonome).
 Deux d'entre eux portent sur l'**usage** et non sur l'achat : 50 anomalies
 ramassées par la Sonde (`S.asonde`) et 10 puis 100 cycles relancés par le Cycle
 automatique (`S.acyc`) — deux compteurs ajoutés à la sauvegarde, sans effet sur
@@ -594,7 +595,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.17.2", BUILD="2026-08-22";
+const VERSION="2.17.3", BUILD="2026-08-22";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans la dernière ligne de
@@ -618,17 +619,18 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.17.2** | derniers multiplicateurs passés au vert : bonus des succès, bonus du panneau de cycle, pastilles de bonus temporaire |
+| **2.17.3** | le clic automatique devient les **Satellites d'extraction** (🛰️), avec les deux succès correspondants renommés |
+| 2.17.2 | derniers multiplicateurs passés au vert : bonus des succès, bonus du panneau de cycle, pastilles de bonus temporaire |
 | 2.17.1 | satellites à vitesse fixe, avec pulsation, et orbite recalibrée pour ne plus déborder sur les éléments voisins |
-| 2.17.0 | l'onde est remplacée par des satellites en orbite, un par niveau du Bras automatique |
-| 2.16.0 | onde cyan sur la planète et point clignotant sur la carte, à la cadence du Bras automatique |
+| 2.17.0 | l'onde est remplacée par des satellites en orbite, un par niveau du clic automatique |
+| 2.16.0 | onde cyan sur la planète et point clignotant sur la carte, à la cadence du clic automatique |
 | 2.15.2 | les onglets inactifs redeviennent visibles, en sourdine, et l'onglet actif gagne un liseré cyan |
 | 2.15.1 | la barre d'onglets ne bouge plus verticalement au toucher : geste limité à l'horizontale et recentrage sans `scrollIntoView` |
 | 2.15.0 | niveau possédé en bas à droite des cartes Recherche et Automatisation ; une couleur par unité dans tout le jeu (minerai doré, antimatière violette, multiplicateur vert) |
 | 2.14.0 | barre d'onglets refaite : une icône par onglet, libellés complets partout et défilement horizontal avec dégradés de bord |
 | 2.13.2 | zoom au double-appui : trois barrières au lieu d'une, dont le verrouillage de l'échelle dans l'application installée ; l'en-tête mobile n'est plus une zone défilante |
 | 2.13.1 | les automates à palier unique affichent « Prix » au lieu de « Prix du niveau 1 » |
-| 2.13.0 | le Bras automatique démarre à 100 antimatière au lieu de 30 (toujours ×2 par niveau) : 102 300 pour les dix niveaux |
+| 2.13.0 | le clic automatique démarre à 100 antimatière au lieu de 30 (toujours ×2 par niveau) : 102 300 pour les dix niveaux |
 | 2.12.1 | le projet passe sous licence GPL 3.0 ou ultérieure : fichier `LICENSE`, en-têtes dans `index.html` et `sw.js`, tuile « Licence » dans les statistiques |
 | 2.12.0 | écran des statistiques refait en tuiles groupées par thème, avec le détail des anomalies par type ; succès « Réflexe éclair » (71 au total) |
 | 2.11.0 | 5 succès de plus (70 au total) : 100 000 et 1 000 000 de clics, puissance de clic jusqu'à 1 Sx, et 1 000 anomalies |
@@ -637,9 +639,9 @@ un nouveau contenu `2.1.0`.
 | 2.8.0 | les réglages d'automatisation deviennent deux cadres autonomes sous une section « Réglages », et le plafond de dépense passe en menu déroulant |
 | 2.7.0 | plafond de dépense par paliers de 10 % ; seuil de relance du cycle saisi à la main, en antimatière |
 | 2.6.0 | les deux réglages d'automatisation passent de pourcentages à trois modes nommés, doublés d'une ligne qui affiche le chiffre concret du moment |
-| 2.5.0 | Bras automatique jusqu'au niveau 10 (jusqu'à 10 clics/s) ; Contremaître à 300 et Ingénieur à 450 antimatière |
+| 2.5.0 | clic automatique jusqu'au niveau 10 (jusqu'à 10 clics/s) ; Contremaître à 300 et Ingénieur à 450 antimatière |
 | 2.4.0 | Contremaître, Sonde et Cycle automatique passent à un palier unique (200 / 600 / 1 000 antimatière) au lieu de niveaux successifs |
-| 2.3.0 | onglet **Automatisation** : bras automatique, contremaître, ingénieur, sonde de récupération et cycle automatique, achetés en antimatière et coupables à volonté |
+| 2.3.0 | onglet **Automatisation** : clic automatique, contremaître, ingénieur, sonde de récupération et cycle automatique, achetés en antimatière et coupables à volonté |
 | 2.2.0 | le bonus d'antimatière n'est plus linéaire : le total est élevé à la puissance 1,5 (`AM_EXP`), pour que les cycles tardifs restent rentables |
 | 2.1.0 | toutes les anomalies tirent leur valeur au hasard ; le badge et le message affichent le montant obtenu |
 | 2.0.0 | version publique consolidée : PWA installable, bilingue FR/EN, en-tête mobile fixe, 44 succès, anomalies pondérées avec bond temporel |

@@ -182,7 +182,7 @@ main{flex:1;display:grid;min-height:0;position:relative;
   position:relative;transition:transform .07s;flex:none;
 }
 #rock:active{transform:scale(.94)}
-/* Satellites du Bras automatique : un point en orbite par niveau, donc on lit
+/* Satellites d'extraction : un point en orbite par niveau, donc on lit
    son niveau en les comptant. Un seul élément est animé — la couronne entière
    tourne — et uniquement par transform:rotate, que le compositeur traite sur
    le GPU : ni recalcul de mise en page, ni redessin. */
@@ -686,7 +686,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.17.2", BUILD="2026-08-22";
+const VERSION="2.17.3", BUILD="2026-08-22";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -765,7 +765,7 @@ fr:{
   au_cyc_wait:"il manque <b style=\"color:var(--violet)\">{0}</b>{1}.",
   au_unit_am:"antimatière",
   au_off:"coupé",
-  au_e_clic:"{0} clic/s automatiques", au_e_contre:"un achat par seconde",
+  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"un achat par seconde",
   au_e_ing:"achète l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
   au_e_cycle:"relance à +{0} antimatière",
   t_auto:"{0} — niveau {1}", t_auto_on:"{0} : remis en marche", t_auto_off:"{0} : coupé",
@@ -841,7 +841,7 @@ en:{
   au_cyc_wait:"<b style=\"color:var(--violet)\">{0}</b> to go{1}.",
   au_unit_am:"antimatter",
   au_off:"off",
-  au_e_clic:"{0} automatic click/s", au_e_contre:"one purchase per second",
+  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"one purchase per second",
   au_e_ing:"buys the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
   au_e_cycle:"restarts at +{0} antimatter",
   t_auto:"{0} — level {1}", t_auto_on:"{0}: switched back on", t_auto_off:"{0}: switched off",
@@ -1007,13 +1007,14 @@ const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
 
 /* ---------- automatisations ----------
    Payées en antimatière comme les recherches, conservées d'un cycle à l'autre.
-   Elles font gagner du confort, pas de la puissance : le Bras automatique ne
-   fait rien qu'un joueur présent ne puisse faire à la main. Chacune possède un
+   Elles font gagner du confort, pas de la puissance : les Satellites d'extraction
+   ne font rien qu'un joueur présent ne puisse faire à la main. Chacune possède un
    interrupteur, pour la couper sans la revendre. */
 const AUTOS=[
- {id:"clic",  ico:"🖱️", max:10, c0:100, cg:2,
-  nm:{fr:"Bras automatique",en:"Robotic arm"},
-  ds:{fr:"Clique tout seul, +1 clic/s par niveau",en:"Clicks on its own, +1 click/s per level"}},
+ {id:"clic",  ico:"🛰️", max:10, c0:100, cg:2,
+  nm:{fr:"Satellites d'extraction",en:"Mining satellites"},
+  ds:{fr:"Un satellite en orbite par niveau, chacun frappe une fois par seconde",
+      en:"One orbiting satellite per level, each strikes once a second"}},
  {id:"contre",ico:"🏗️", max:1, c0:300, cg:1,
   nm:{fr:"Contremaître",en:"Foreman"},
   ds:{fr:"Rachète chaque seconde la structure la moins chère",en:"Rebuys the cheapest structure every second"}},
@@ -1252,9 +1253,9 @@ const ACHS=[
  {id:"a_auto1",c:"auto",f:S=>Object.keys(S.auto).length>=1,
   nm:{fr:"Délégation",en:"Delegation"},ds:{fr:"Acheter une première automatisation",en:"Buy a first automation"}},
  {id:"a_autoclic5",c:"auto",f:S=>alvl("clic")>=5,
-  nm:{fr:"Cinq doigts",en:"Five fingers"},ds:{fr:"Bras automatique niveau 5",en:"Robotic arm level 5"}},
+  nm:{fr:"Escadrille",en:"Squadron"},ds:{fr:"5 satellites en orbite",en:"5 satellites in orbit"}},
  {id:"a_autoclic10",c:"auto",f:S=>alvl("clic")>=10,
-  nm:{fr:"Dix doigts d'acier",en:"Ten steel fingers"},ds:{fr:"Bras automatique niveau 10",en:"Robotic arm level 10"}},
+  nm:{fr:"Ceinture orbitale",en:"Orbital belt"},ds:{fr:"10 satellites en orbite",en:"10 satellites in orbit"}},
  {id:"a_autofull",c:"auto",f:S=>AUTOS.every(a=>alvl(a.id)>=1),
   nm:{fr:"Équipe au complet",en:"Full crew"},ds:{fr:"Posséder les cinq automates",en:"Own all five automations"}},
  {id:"a_automax",c:"auto",f:S=>AUTOS.every(a=>alvl(a.id)>=a.max),
@@ -1597,7 +1598,7 @@ function getAutoCard(a){
 }
 function autoEtat(a){
   const l=alvl(a.id);
-  if(a.id==="clic")  return t("au_e_clic",l);
+  if(a.id==="clic")  return t("au_e_clic",l,l>1?"s":"");
   if(a.id==="contre")return t("au_e_contre",CONTRE_S);
   if(a.id==="ing")   return t("au_e_ing");
   if(a.id==="sonde") return t("au_e_sonde",SONDE_S);
@@ -1924,7 +1925,7 @@ function multParts(){
   let bf=1; S.buffs.forEach(b=>{if(b.k==="prod")bf*=b.m});
   return {am:amMult(), ach:achMult(), tech:up*Math.pow(1.3,lvl("mining")), buff:bf};
 }
-/* Un satellite par niveau du Bras automatique, répartis à parts égales sur le
+/* Un satellite par niveau des Satellites d'extraction, répartis à parts égales sur le
    cercle. Le DOM n'est refait qu'au changement de niveau : en régime établi,
    il n'y a plus une seule ligne de JavaScript par image. */
 function majOrbite(){
