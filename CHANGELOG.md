@@ -17,6 +17,20 @@ restent valides**.
 
 ---
 
+## 2.21.3 — La barre d'onglets ne bouge plus verticalement (pour de bon)
+
+- 🐛 **Faille corrigée** : `touch-action:pan-x` était bien posé sur `<nav>`
+  depuis la 2.15.1, mais chaque onglet recevait individuellement, en style
+  inline, `touch-action:manipulation` — posé par la fonction générique
+  utilisée pour tous les éléments cliquables du jeu. Comme un onglet occupe
+  presque toute la largeur de la barre, c'est presque toujours lui que le
+  doigt touche, pas l'espace autour : son propre réglage l'emportait, et un
+  glissement un peu diagonal sur un onglet pouvait encore faire défiler la
+  page verticalement.
+- Chaque onglet reçoit maintenant `pan-x` comme sa barre, pour de bon.
+
+---
+
 ## 2.21.2 — Le filon et le bond ignorent la Surtension en cours
 
 - 🐛 **Faille corrigée** : le filon riche et le bond temporel calculaient leur

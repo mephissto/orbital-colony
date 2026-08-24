@@ -16,6 +16,19 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.3 — The tab bar stops moving vertically (for good)
+
+- 🐛 **Bug fixed**: `touch-action:pan-x` had been set on `<nav>` since 2.15.1,
+  but every tab also got its own inline `touch-action:manipulation`, set by
+  the generic function used for every clickable element in the game. Since a
+  tab covers almost the entire width of the bar, a finger almost always
+  touches the tab itself rather than the space around it — its own setting
+  won out, and a slightly diagonal drag on a tab could still scroll the page
+  vertically.
+- Every tab now gets `pan-x` just like its bar, for good.
+
+---
+
 ## 2.21.2 — Rich vein and time leap now ignore an active power surge
 
 - 🐛 **Bug fixed**: the rich vein and the time leap computed their gain as
