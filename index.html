@@ -686,7 +686,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.20.0";
+const VERSION="2.21.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -759,7 +759,7 @@ fr:{
   au_res:"Les automates ne dépensent pas plus de", au_cyc:"Relancer le cycle à partir de",
   au_res_hint:"Part de ton minerai qu'un seul achat peut coûter au maximum. Il en reste donc toujours : plus le plafond est bas, plus ta réserve grossit et plus il te reste pour les gros achats que tu veux faire toi-même.",
   au_res_now:"En ce moment, ils n'achètent rien au-dessus de <b style=\"color:var(--gold)\">{0} minerai</b>.",
-  au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. À toi de le relever quand tu progresses.",
+  au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. Le cycle ne repart jamais pour moins de 10 % de ta réserve, même si tu saisis moins.",
   au_cyc_now:"Gain actuel : <b>+{0}</b> — {1}",
   au_cyc_ready:"le seuil est atteint, le cycle repart.",
   au_cyc_wait:"il manque <b style=\"color:var(--violet)\">{0}</b>{1}.",
@@ -835,7 +835,7 @@ en:{
   au_res:"Automations never spend more than", au_cyc:"Restart the cycle from",
   au_res_hint:"The largest share of your ore a single purchase may cost. Some is always left over: the lower the cap, the more your stock grows and the more you keep for the big purchases you want to make yourself.",
   au_res_now:"Right now they buy nothing above <b style=\"color:var(--gold)\">{0} ore</b>.",
-  au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. Raise it as you progress.",
+  au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. It never restarts for less than 10 % of your stock, even if you type less.",
   au_cyc_now:"Current gain: <b>+{0}</b> — {1}",
   au_cyc_ready:"the threshold is reached, the cycle restarts.",
   au_cyc_wait:"<b style=\"color:var(--violet)\">{0}</b> to go{1}.",
@@ -1048,8 +1048,13 @@ const proche=(v,l,d)=>l.includes(v)?v:(v==null?d:l.reduce((a,b)=>Math.abs(b-v)<M
 function normPart(){return S.autoPart=proche(S.autoPart,PARTS,30)}
 /* Seuil de relance : saisi à la main, en antimatière. Un chiffre qu'on tape
    soi-même se comprend sans explication — contrairement à un pourcentage
-   d'une réserve qui bouge. */
-const cycSeuil=()=>Math.max(1,Math.floor(S.autoCyc)||1);
+   d'une réserve qui bouge.
+   Mais un nombre fixe ne suit pas la progression : réglé à 50 puis oublié, il
+   déclenchait un cycle par image une fois la réserve à 100 000. D'où un
+   plancher à 10 % de l'antimatière possédée. Le panneau affiche toujours le
+   seuil réellement appliqué, jamais la seule valeur saisie. */
+const CYC_MIN=0.10;
+const cycSeuil=()=>Math.max(1,Math.floor(S.autoCyc)||1,Math.ceil(S.am*CYC_MIN));
 
 /* ---------- données : succès ---------- */
 /* Les succès sont rangés par catégorie : la liste avait dépassé la quarantaine
@@ -1238,8 +1243,9 @@ const ACHS=[
  {id:"a_fast",c:"anom",f:S=>!!S.fastAnom,
   nm:{fr:"Réflexe éclair",en:"Lightning reflex"},
   ds:{fr:"Attraper une anomalie à la main en moins de 2 s",en:"Catch an anomaly by hand in under 2 s"}},
- {id:"a_2buffs",c:"anom",f:S=>S.buffs.length>=2,
-  nm:{fr:"Résonance parfaite",en:"Perfect resonance"},ds:{fr:"Deux bonus actifs en même temps",en:"Two buffs active at once"}},
+ {id:"a_2buffs",c:"anom",f:S=>!!S.chain,
+  nm:{fr:"Résonance parfaite",en:"Perfect resonance"},
+  ds:{fr:"Attraper un bonus alors qu'un autre est encore actif",en:"Catch a buff while another is still running"}},
  {id:"a_pr10",c:"cycle",f:S=>S.prestiges>=10,
   nm:{fr:"Éternel retour",en:"Eternal return"},ds:{fr:"10 cycles",en:"10 cycles"}},
  {id:"a_pr25",c:"cycle",f:S=>S.prestiges>=25,
@@ -1276,7 +1282,7 @@ const ACHS=[
 const NEW=()=>({
   ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
   gens:{},ups:{},res:{},achs:{},seen:1,
-  auto:{},autoOff:{},autoPart:30,autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,
+  auto:{},autoOff:{},autoPart:30,autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,chain:0,
   clicks:0,anoms:0,buffs:[],buy:1,
   started:Date.now(),lastTick:Date.now(),lastSave:Date.now(),
   nextAnom:Date.now()+45000
@@ -1319,7 +1325,12 @@ function perSec(){
   GENS.forEach(g=>{t+=(S.gens[g.id]||0)*g.rate*genMult(g.id)});
   return t*globalMult();
 }
-function clickVal(){
+/* auto = clic produit par les satellites. Ils ignorent le bonus de clic : sinon
+   l'Écho quantique cessait d'être une récompense du joueur actif pour devenir un
+   multiplicateur de production déguisé — à 10 satellites et résonateur au
+   maximum, un clic vaut 0,4 × la production, donc un ×12 sur les clics
+   automatiques valait ×49 sur la production totale. */
+function clickVal(auto){
   let base=1, m=1;
   UPS.forEach(u=>{if(u.kind==="click"&&S.ups[u.id])m*=u.mult});
   m*=Math.pow(2,lvl("servo"));
@@ -1327,7 +1338,7 @@ function clickVal(){
   // Le bonus de clic multiplie la valeur TOTALE, résonateur compris.
   // Sinon il ne portait que sur la puissance brute — devenue négligeable en fin
   // de partie face au résonateur (99 % du clic), et le ×12 ne donnait plus que ×1,09.
-  let bf=1; S.buffs.forEach(b=>{if(b.k==="click")bf*=b.m});
+  let bf=1; if(!auto)S.buffs.forEach(b=>{if(b.k==="click")bf*=b.m});
   return (base*m*globalMult()+perSec()*reso)*bf;
 }
 function costMult(){return Math.pow(0.96,lvl("nego"))}
@@ -1400,13 +1411,26 @@ function doPrestige(muet){
   if(!muet&&!confirm(t("pr_confirm",fmt(g))))return;
   S.am+=g; S.amTotal+=g; S.prestiges++;
   S.ore=0;S.runOre=0;S.gens={};S.ups={};S.buffs=[];
-  const cap=lvl("capsule"); if(cap)gain(1e4*Math.pow(25,cap));
+  // La Capsule offre du minerai, elle n'en extrait pas : il ne doit pas compter
+  // dans le total du cycle. Sinon, au niveau maximum, chaque cycle démarrait
+  // avec 2,44 T de « minerai extrait » — soit 5 antimatière gratuites avant
+  // d'avoir joué une seconde, et un cycle automatique à seuil bas en récoltait
+  // une poignée à chaque image.
+  const cap=lvl("capsule"); if(cap)S.ore+=1e4*Math.pow(25,cap);
   toast(muet?t("t_autocyc",fmt(g)):t("t_am",fmt(g)),"violet"); save(); render();
 }
 
 /* ---------- buffs & anomalies ---------- */
+/* Un seul bonus multiplicateur à la fois, production et clic confondus.
+   Ils se cumulaient : quatre surtensions ×10 attrapées coup sur coup donnaient
+   ×10 000 sur la production, et un bonus de clic par-dessus multipliait encore
+   le tout. Un nouveau bonus remplace donc l'ancien, comme un objet ramassé dans
+   un jeu d'arcade. */
 function addBuff(k,m,sec,key){
-  S.buffs.push({k,m,key,until:Date.now()+sec*1000});
+  // enchaîner deux bonus reste un exploit de joueur attentif : on le mémorise
+  // pour le succès, même si le second remplace désormais le premier
+  if(S.buffs.length&&S.buffs[0].until>Date.now())S.chain=1;
+  S.buffs=[{k,m,key,until:Date.now()+sec*1000}];
 }
 /* w = poids du tirage (total 200 → 1 point = 0,5 %). Les multiplicateurs sont
    rares : ils se cumulent avec tout le reste et deviennent démesurés en fin de
@@ -2111,7 +2135,7 @@ function runAutos(dt){
   if(aOn("clic")){
     autoAcc.clic+=d*alvl("clic");
     const n=Math.floor(autoAcc.clic);
-    if(n>0){ autoAcc.clic-=n; gain(clickVal()*n); S.clicks+=n; }
+    if(n>0){ autoAcc.clic-=n; gain(clickVal(true)*n); S.clicks+=n; }
   }
 
   if(aOn("contre")){

@@ -196,10 +196,21 @@ chaque apparition — le message et le badge affichent le montant exact obtenu
 (« Production ×6,4 », « +813K minerai (21 minutes d'avance) »). Les
 multiplicateurs sont arrondis au dixième.
 
-Les multiplicateurs sont volontairement rares : ils se cumulent avec tout le
-reste et deviennent démesurés en fin de partie, alors que le filon et la cache
-restent proportionnés à ta progression. Les durées sont allongées de 30 % par
-niveau de Détecteur.
+Les multiplicateurs sont volontairement rares, et **un seul bonus peut être
+actif à la fois**, production et clic confondus : un nouveau remplace le
+précédent. Ils se cumulaient jusqu'à la 2.21.0 — quatre surtensions ×10
+attrapées coup sur coup donnaient **×10 000 sur la production**, et un bonus de
+clic par-dessus portait le tout à ×490 000. Le filon et la cache, eux, restent
+proportionnés à la progression. Les durées sont allongées de 30 % par niveau de
+Détecteur.
+
+Le bonus de clic ne s'applique **qu'aux clics du joueur**, pas à ceux des
+Satellites d'extraction. Sinon l'Écho quantique cessait d'être une récompense du
+joueur présent pour devenir un multiplicateur de production déguisé : à dix
+satellites et résonateur au maximum, un clic vaut 0,4 fois la production, donc un
+×12 sur les clics automatiques valait ×49 sur la production totale. À la main, à
+cinq clics par seconde, un ×12 rapporte encore l'équivalent de 24 fois la
+production — la récompense reste forte, mais il faut être devant l'écran.
 
 ### Le bond temporel
 
@@ -339,7 +350,10 @@ visiblement plus que le précédent **dès le début**. L'ancien barème partait
 progression était bien là, mais invisible à l'œil sur d'aussi petits nombres.
 
 La Capsule donne `10 000 × 25^niveau` de minerai au début de chaque cycle, soit
-2 441 milliards (2,44e12) au niveau 6.
+2 441 milliards (2,44e12) au niveau 6. Ce minerai est **offert, pas extrait** : il
+ne compte donc pas dans le total du cycle et ne rapporte aucune antimatière. Avant
+la 2.21.0 il y comptait, et chaque cycle démarrait au niveau 6 avec 5 antimatière
+déjà acquises sans avoir joué une seconde.
 
 ---
 
@@ -423,7 +437,11 @@ acheter soi-même — au prix de quelques structures en moins. La ligne affiché
 donne le prix plafond du moment (`oreDispo()`).
 
 **Relancer le cycle à partir de** — un **seuil saisi à la main**, en antimatière
-(`S.autoCyc`, 50 par défaut, `cycSeuil()` en garantit au moins 1). Le Cycle
+(`S.autoCyc`, 50 par défaut). `cycSeuil()` applique un **plancher à 10 % de
+l'antimatière possédée** (`CYC_MIN`) : un nombre fixe ne suit pas la progression,
+et réglé à 50 puis oublié il déclenchait un cycle par image une fois la réserve à
+100 000 — mesuré à **600 cycles et +75 400 antimatière en une minute**. Le panneau
+affiche toujours le seuil réellement appliqué, jamais la seule valeur saisie. Le Cycle
 automatique repart dès que `amGain()` atteint ce nombre. Un seuil absolu se
 comprend sans explication, mais ne suit pas la progression : c'est au joueur de
 le relever, et la ligne sous le champ lui donne son gain courant, ce qu'il reste
@@ -473,7 +491,9 @@ chaque structure + toutes les améliorations + 100 antimatière », donc bien av
 la fin de partie ; à 250 de chaque et 100 000 antimatière on dépasse 1 Sx.
 
 Deux succès de la catégorie Anomalies ne se comptent pas : **Résonance
-parfaite** demande deux bonus actifs en même temps, et **Réflexe éclair** une
+parfaite** demande d'attraper un bonus alors qu'un autre est encore actif (elle
+demandait deux bonus simultanés avant la 2.21.0, devenue impossible), et
+**Réflexe éclair** une
 anomalie ramassée **à la main** en moins de 2 s. Comme la Sonde attend
 justement 2 s, celui-là ne peut se décrocher qu'en étant réellement devant
 l'écran — c'est le seul succès du jeu qui demande de l'adresse.
@@ -633,7 +653,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.20.0";
+const VERSION="2.21.0";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans une tuile de l'onglet
@@ -660,7 +680,8 @@ un nouveau contenu `2.1.0`.
 
 | Version | Contenu |
 |---|---|
-| **2.20.0** | exposant du gain abaissé à 0,32 et seuil de la première unité ramené à 10 milliards ; prix de l'automatisation divisés par 3,3 pour suivre le nouveau revenu |
+| **2.21.0** | un seul bonus d'anomalie à la fois (ils se cumulaient jusqu'à ×10 000) ; le bonus de clic ne s'applique plus aux satellites ; le minerai de la Capsule ne compte plus comme extrait ; plancher à 10 % sur le seuil de relance automatique |
+| 2.20.0 | exposant du gain abaissé à 0,32 et seuil de la première unité ramené à 10 milliards ; prix de l'automatisation divisés par 3,3 pour suivre le nouveau revenu |
 | 2.19.0 | le gain d'antimatière passe de `12·√(minerai/1e12)` à une puissance : un cycle durait 20 s à toute échelle, il va maintenant de quelques minutes à plusieurs heures |
 | 2.18.0 | barème des recherches revu : croissance d'au moins ×1,8 et bases relevées, pour que chaque niveau coûte nettement plus que le précédent dès le premier (234 890 au total au lieu de 106 434) |
 | 2.17.4 | la date de compilation disparaît de l'affichage : seul le numéro de version subsiste |
