@@ -1,5 +1,7 @@
 # Colonie Orbitale
 
+🇫🇷 Français · [🇬🇧 English](README.en.md)
+
 Idle game spatial, bilingue FR / EN, installable en application (PWA) et jouable
 hors connexion. Tout le jeu tient dans `index.html` : aucune dépendance, aucun
 serveur, aucune donnée qui sort de ton navigateur.
@@ -41,7 +43,8 @@ Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
 | `icon-maskable-512.png` | icône adaptative Android (recadrable en rond) |
 | `apple-touch-icon.png` | icône iOS |
 | `LICENSE` | texte complet de la GPL 3.0 |
-| `README.md` | ce document |
+| `README.md` / `README.en.md` | ce document, en français et en anglais |
+| `CHANGELOG.md` / `CHANGELOG.en.md` | une note de version par livraison |
 | `ROADMAP.md` | ce qui est prévu pour la suite, et pourquoi |
 
 Tous les fichiers vont **à la racine du dépôt**, à plat. L'installation exige
@@ -653,7 +656,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.21.0";
+const VERSION="2.21.1";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans une tuile de l'onglet
@@ -676,42 +679,8 @@ Une même livraison ne fait avancer qu'un seul niveau — le plus élevé concer
 et remet à zéro ceux de droite : après `2.0.0`, une correction donne `2.0.1`,
 un nouveau contenu `2.1.0`.
 
-### Historique
-
-| Version | Contenu |
-|---|---|
-| **2.21.0** | un seul bonus d'anomalie à la fois (ils se cumulaient jusqu'à ×10 000) ; le bonus de clic ne s'applique plus aux satellites ; le minerai de la Capsule ne compte plus comme extrait ; plancher à 10 % sur le seuil de relance automatique |
-| 2.20.0 | exposant du gain abaissé à 0,32 et seuil de la première unité ramené à 10 milliards ; prix de l'automatisation divisés par 3,3 pour suivre le nouveau revenu |
-| 2.19.0 | le gain d'antimatière passe de `12·√(minerai/1e12)` à une puissance : un cycle durait 20 s à toute échelle, il va maintenant de quelques minutes à plusieurs heures |
-| 2.18.0 | barème des recherches revu : croissance d'au moins ×1,8 et bases relevées, pour que chaque niveau coûte nettement plus que le précédent dès le premier (234 890 au total au lieu de 106 434) |
-| 2.17.4 | la date de compilation disparaît de l'affichage : seul le numéro de version subsiste |
-| 2.17.3 | le clic automatique devient les **Satellites d'extraction** (🛰️), avec les deux succès correspondants renommés |
-| 2.17.2 | derniers multiplicateurs passés au vert : bonus des succès, bonus du panneau de cycle, pastilles de bonus temporaire |
-| 2.17.1 | satellites à vitesse fixe, avec pulsation, et orbite recalibrée pour ne plus déborder sur les éléments voisins |
-| 2.17.0 | l'onde est remplacée par des satellites en orbite, un par niveau du clic automatique |
-| 2.16.0 | onde cyan sur la planète et point clignotant sur la carte, à la cadence du clic automatique |
-| 2.15.2 | les onglets inactifs redeviennent visibles, en sourdine, et l'onglet actif gagne un liseré cyan |
-| 2.15.1 | la barre d'onglets ne bouge plus verticalement au toucher : geste limité à l'horizontale et recentrage sans `scrollIntoView` |
-| 2.15.0 | niveau possédé en bas à droite des cartes Recherche et Automatisation ; une couleur par unité dans tout le jeu (minerai doré, antimatière violette, multiplicateur vert) |
-| 2.14.0 | barre d'onglets refaite : une icône par onglet, libellés complets partout et défilement horizontal avec dégradés de bord |
-| 2.13.2 | zoom au double-appui : trois barrières au lieu d'une, dont le verrouillage de l'échelle dans l'application installée ; l'en-tête mobile n'est plus une zone défilante |
-| 2.13.1 | les automates à palier unique affichent « Prix » au lieu de « Prix du niveau 1 » |
-| 2.13.0 | le clic automatique démarre à 100 antimatière au lieu de 30 (toujours ×2 par niveau) : 102 300 pour les dix niveaux |
-| 2.12.1 | le projet passe sous licence GPL 3.0 ou ultérieure : fichier `LICENSE`, en-têtes dans `index.html` et `sw.js`, tuile « Licence » dans les statistiques |
-| 2.12.0 | écran des statistiques refait en tuiles groupées par thème, avec le détail des anomalies par type ; succès « Réflexe éclair » (71 au total) |
-| 2.11.0 | 5 succès de plus (70 au total) : 100 000 et 1 000 000 de clics, puissance de clic jusqu'à 1 Sx, et 1 000 anomalies |
-| 2.10.0 | 13 succès de plus (65 au total) : quatre paliers de clic, dont deux au-delà de 1 B, et neuf sur les anomalies dont un par type, calés sur leurs probabilités |
-| 2.9.0 | les succès sont rangés en huit catégories avec leur progression, et huit succès d'automatisation s'ajoutent (52 au total, +52 % au complet) |
-| 2.8.0 | les réglages d'automatisation deviennent deux cadres autonomes sous une section « Réglages », et le plafond de dépense passe en menu déroulant |
-| 2.7.0 | plafond de dépense par paliers de 10 % ; seuil de relance du cycle saisi à la main, en antimatière |
-| 2.6.0 | les deux réglages d'automatisation passent de pourcentages à trois modes nommés, doublés d'une ligne qui affiche le chiffre concret du moment |
-| 2.5.0 | clic automatique jusqu'au niveau 10 (jusqu'à 10 clics/s) ; Contremaître à 300 et Ingénieur à 450 antimatière |
-| 2.4.0 | Contremaître, Sonde et Cycle automatique passent à un palier unique (200 / 600 / 1 000 antimatière) au lieu de niveaux successifs |
-| 2.3.0 | onglet **Automatisation** : clic automatique, contremaître, ingénieur, sonde de récupération et cycle automatique, achetés en antimatière et coupables à volonté |
-| 2.2.0 | le bonus d'antimatière n'est plus linéaire : le total est élevé à la puissance 1,5 (`AM_EXP`), pour que les cycles tardifs restent rentables |
-| 2.1.0 | toutes les anomalies tirent leur valeur au hasard ; le badge et le message affichent le montant obtenu |
-| 2.0.0 | version publique consolidée : PWA installable, bilingue FR/EN, en-tête mobile fixe, 44 succès, anomalies pondérées avec bond temporel |
-| 1.0.0 | première numérotation, introduite en même temps que l'affichage de version |
+L'historique complet est dans [`CHANGELOG.md`](CHANGELOG.md), avec une note de
+version par livraison.
 
 ---
 

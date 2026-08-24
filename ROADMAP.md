@@ -1,6 +1,6 @@
 # Feuille de route
 
-Version **2.21.0**. Ce document sert de mémoire entre
+Version **2.21.1**. Ce document sert de mémoire entre
 deux sessions : ce qui est décidé, ce qui reste à faire, et pourquoi.
 
 ---
@@ -174,7 +174,12 @@ c'est une vraie décision à chaque cycle et l'interface reste la même.
 - **Version** — `MAJEUR.MINEUR.CORRECTIF`, un seul niveau par livraison, et
   annoncer lequel a été incrémenté. Voir la section Version du README.
 - **README** — tenir les chiffres à jour ; ils sont vérifiés automatiquement
-  contre le code.
+  contre le code. **Deux versions à maintenir** : `README.md` (français) et
+  `README.en.md` (anglais).
+- **CHANGELOG** — chaque nouvelle version ajoute sa section en tête de
+  `CHANGELOG.md` **et** de `CHANGELOG.en.md`, prête à être collée dans une
+  *release* GitHub. Les entrées récentes sont détaillées ; les anciennes
+  redescendent dans le tableau de fin.
 - **Licence** — GPL 3.0 ou ultérieure. Remplacer `Guilhem` par le nom complet
   dans `index.html`, `sw.js` et le README si souhaité.
 
