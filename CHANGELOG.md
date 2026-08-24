@@ -17,6 +17,19 @@ restent valides**.
 
 ---
 
+## 2.21.5 — La barre d'onglets ne défile plus verticalement (Mac / trackpad)
+
+- 🐛 **Faille corrigée** : `<nav>` ne fixait que `overflow-x:auto`, sans
+  préciser `overflow-y`. Un axe ne peut pas rester "visible" quand l'autre
+  défile : le navigateur calcule alors `overflow-y:auto` tout seul. La barre
+  déborde par ailleurs réellement de 1px en hauteur (le `top:1px` des
+  onglets), assez pour la rendre scrollable verticalement — au clic-molette
+  ou au trackpad sur ordinateur, un cas que `touch-action:pan-x` (2.15.1,
+  2.21.3) ne couvrait pas puisqu'il ne s'applique qu'au tactile.
+- `overflow-y:hidden` est maintenant posé explicitement sur `<nav>`.
+
+---
+
 ## 2.21.4 — Liens de jeu en ligne
 
 - 🔗 **README** (FR et EN) : ajout des deux adresses où jouer en ligne,

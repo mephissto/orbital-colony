@@ -16,6 +16,19 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.5 — The tab bar stops scrolling vertically (Mac / trackpad)
+
+- 🐛 **Bug fixed**: `<nav>` only set `overflow-x:auto`, without specifying
+  `overflow-y`. One axis cannot stay "visible" while the other scrolls: the
+  browser then computes `overflow-y:auto` on its own. The bar also genuinely
+  overflows by 1px in height (the tabs' `top:1px`), enough to make it
+  scrollable vertically — with a mouse wheel or a trackpad on desktop, a case
+  `touch-action:pan-x` (2.15.1, 2.21.3) didn't cover since it only applies to
+  touch input.
+- `overflow-y:hidden` is now set explicitly on `<nav>`.
+
+---
+
 ## 2.21.4 — Online play links
 
 - 🔗 **README** (FR and EN): added the two addresses where the game can be

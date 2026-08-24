@@ -243,8 +243,14 @@ body.anomsoon #anomChip{color:var(--anom);animation:anompulse 1.2s ease-in-out i
 
 
 /* ---------- TABS ---------- */
+/* overflow-y:hidden est nécessaire, pas cosmétique : ne fixer que overflow-x
+   fait calculer overflow-y à "auto" par le navigateur (impossible d'avoir un
+   axe "visible" quand l'autre défile). La barre déborde d'ailleurs bien de
+   1px verticalement (le top:1px des onglets), ce qui suffisait à la rendre
+   scrollable en hauteur à la molette/trackpad — indépendant du tactile, donc
+   non couvert par touch-action:pan-x. */
 nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);
-  flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 nav::-webkit-scrollbar{display:none}
 /* Les libellés ne sont jamais tronqués : quand la barre déborde, elle défile.
    Un dégradé sur le bord concerné signale qu'il reste des onglets de ce côté —
@@ -686,7 +692,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.21.4";
+const VERSION="2.21.5";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
