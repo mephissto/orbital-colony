@@ -17,6 +17,21 @@ restent valides**.
 
 ---
 
+## 2.21.9 — Flèches de défilement et espace mobile corrigé
+
+- ◀▶ **Flèches de défilement sur la barre d'onglets** (souris/trackpad,
+  desktop uniquement — au doigt le glissement suffit). Elles n'apparaissent
+  que du côté où il reste effectivement des onglets cachés, et disparaissent
+  automatiquement une fois arrivé au bout.
+- 🐛 **Faille corrigée** : sur mobile, `#hero` (le bandeau planète) se calait
+  à une hauteur d'en-tête figée à 53px. Un en-tête réellement un peu plus
+  haut — rendu de police différent selon navigateur/OS — laissait un espace
+  visible entre le bandeau du haut et la planète. La hauteur réelle de
+  `<header>` est maintenant mesurée en JS et suit tout changement (rotation,
+  changement de langue, etc.), plus aucune valeur figée.
+
+---
+
 ## 2.21.8 — La vraie cause des sauts de la barre d'onglets
 
 - 🐛 **Faille corrigée, la bonne cette fois** : `<nav>` n'avait pas de

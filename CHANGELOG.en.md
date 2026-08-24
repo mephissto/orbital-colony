@@ -16,6 +16,20 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.9 — Scroll arrows and fixed mobile gap
+
+- ◀▶ **Scroll arrows on the tab bar** (mouse/trackpad, desktop only —
+  touch already has swipe). They only appear on the side where tabs are
+  actually hidden, and disappear automatically once you reach the end.
+- 🐛 **Bug fixed**: on mobile, `#hero` (the planet banner) was pinned to a
+  header height fixed at 53px. A header genuinely a bit taller — different
+  font rendering across browsers/OS — left a visible gap between the top bar
+  and the planet. `<header>`'s real height is now measured in JS and
+  tracked through any change (rotation, language switch, etc.), no more
+  fixed value.
+
+---
+
 ## 2.21.8 — The actual cause of the tab bar jumping
 
 - 🐛 **Bug fixed, properly this time**: `<nav>` had no `position` of its own,

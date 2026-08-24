@@ -271,6 +271,20 @@ nav.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transpare
              mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent 100%)}
 nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%);
                 mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%)}
+/* Flèches de défilement (souris/trackpad, desktop uniquement — au doigt le
+   glissement suffit). En dehors de <nav> pour ne pas subir son propre
+   dégradé de bord, qui les aurait rendues semi-transparentes juste là où on
+   veut qu'elles soient bien visibles. La classe .show est posée en JS par
+   majNavFade(), qui sait déjà de quel côté il reste des onglets cachés — et
+   seulement en largeur desktop, pas mobile. */
+.navwrap{position:relative}
+.navarrow{display:none;position:absolute;top:0;bottom:1px;width:26px;z-index:6;
+  align-items:center;justify-content:center;border:none;cursor:pointer;
+  color:var(--dim);font-size:17px;line-height:1;padding:0}
+.navarrow.show{display:flex}
+.navarrow:hover{color:#fff}
+.navarrow-l{left:0;background:linear-gradient(90deg,rgba(10,16,32,.9) 40%,transparent)}
+.navarrow-r{right:0;background:linear-gradient(270deg,rgba(10,16,32,.9) 40%,transparent)}
 .tab{
   display:flex;align-items:center;gap:7px;
   padding:9px 15px;font-size:13px;cursor:pointer;color:var(--dim);
@@ -480,7 +494,13 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
   /* l'en-tête sort du flux : sa réduction ne décale donc jamais le contenu */
   #hero{
     position:fixed;left:0;right:0;z-index:26;
-    top:calc(53px + env(safe-area-inset-top));
+    /* --headerH est mesurée en JS (syncHeaderH) : une hauteur figée à 53px
+       laissait un espace visible dès que l'en-tête réel était un peu plus
+       haut (rendu de police différent selon le navigateur/OS), et ajoutait
+       en plus l'encoche une seconde fois — elle est déjà comprise dans le
+       padding de <header>, donc dans sa hauteur mesurée. 53px ne reste ici
+       que comme repli avant le premier calcul JS. */
+    top:var(--headerH,53px);
     border-right:none;border-bottom:1px solid var(--line);
     background:rgba(8,12,24,.96);backdrop-filter:blur(10px);
     padding:10px 12px;gap:10px;
@@ -659,14 +679,18 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
 
   <section id="right">
    <div id="stickyhead">
-    <nav>
+    <div class="navwrap">
+     <nav>
       <div class="tab on" data-p="gen"><span class="ti">⛏️</span><span data-i18n="tab_gen">Extraction</span></div>
       <div class="tab" data-p="up"><span class="ti">🔧</span><span data-i18n="tab_up">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
       <div class="tab" data-p="pr"><span class="ti">🔬</span><span data-i18n="tab_pr">Recherche</span></div>
       <div class="tab" data-p="au" id="tabAu" style="display:none"><span class="ti">⚙️</span><span data-i18n="tab_au">Automatisation</span></div>
       <div class="tab" data-p="ac"><span class="ti">🏆</span><span data-i18n="tab_ac">Succès</span></div>
       <div class="tab" data-p="st"><span class="ti">📊</span><span data-i18n="tab_st">Statistiques</span></div>
-    </nav>
+     </nav>
+     <button type="button" class="navarrow navarrow-l" id="navArrL" data-i18n-title="nav_prev" title="Onglets précédents">‹</button>
+     <button type="button" class="navarrow navarrow-r" id="navArrR" data-i18n-title="nav_next" title="Onglets suivants">›</button>
+    </div>
    </div>
     <div id="panels">
       <div class="panel on" id="pGen"></div>
@@ -702,7 +726,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.21.8";
+const VERSION="2.21.9";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -734,6 +758,7 @@ fr:{
   logo:"◈ Colonie Orbitale", doc_title:"Colonie Orbitale — idle game spatial",
   save:"Sauvegarder", export:"Export / Import", reset:"Reset",
   tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_au:"Automatisation", tab_ac:"Succès", tab_st:"Statistiques",
+  nav_prev:"Onglets précédents", nav_next:"Onglets suivants",
   manual:"Foreuse manuelle", per_click:"par clic",
   kpi_ore:"Minerai", kpi_rate:"Production", kpi_am:"Antimatière", kpi_mult:"Multiplicateur",
   sub_total:"total extrait : <b>{0}</b>",
@@ -810,6 +835,7 @@ en:{
   logo:"◈ Orbital Colony", doc_title:"Orbital Colony — space idle game",
   save:"Save", export:"Export / Import", reset:"Reset",
   tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_au:"Automation", tab_ac:"Achievements", tab_st:"Statistics",
+  nav_prev:"Previous tabs", nav_next:"Next tabs",
   manual:"Manual drill", per_click:"per click",
   kpi_ore:"Ore", kpi_rate:"Output", kpi_am:"Antimatter", kpi_mult:"Multiplier",
   sub_total:"total mined: <b>{0}</b>",
@@ -1553,10 +1579,25 @@ function doTap(x,y){
 $("#rock").addEventListener("pointerdown",e=>doTap(e.clientX,e.clientY));
 /* Planète compacte de la barre collante : même action, position fixe en haut au centre. */
 
+/* Hauteur réelle de <header>, pour caler #hero juste en dessous (mobile).
+   Une valeur figée en CSS (53px) suppose une police et des boutons rendus
+   pile pareil partout : sur un autre navigateur/OS, l'en-tête réel est un
+   peu plus ou moins haut, et l'écart laissait un espace (ou un recouvrement)
+   visible entre le bandeau et la planète. On mesure, un point c'est tout. */
+function syncHeaderH(){
+  const h=Math.round($("header").getBoundingClientRect().height);
+  document.documentElement.style.setProperty("--headerH",h+"px");
+}
+if("ResizeObserver" in window){
+  new ResizeObserver(syncHeaderH).observe($("header"));
+}
+syncHeaderH();
+
 /* ---------- en-tête fixe (mobile) ----------
    #hero est en position fixe, dans une forme unique : #herospacer réserve sa
    hauteur dans le flux, et les onglets se collent juste en dessous. */
 function syncHero(){
+  syncHeaderH();
   const mobile=matchMedia("(max-width:880px)").matches;
   const sp=$("#herospacer");
   if(!mobile){sp.style.height="";$("#panels").style.minHeight="";return}
@@ -2101,15 +2142,30 @@ function centrerOnglet(tab){
   try{n.scrollTo({left:cible,behavior:"smooth"})}catch(e){n.scrollLeft=cible}
 }
 
-/* dégradés de bord : ils n'apparaissent que du côté où il reste des onglets */
+/* dégradés de bord : ils n'apparaissent que du côté où il reste des onglets.
+   Les flèches de défilement (souris/trackpad, desktop uniquement) réutilisent
+   le même calcul : pas de flèche s'il n'y a rien à faire défiler de ce côté. */
 function majNavFade(){
   const n=$("nav"), max=n.scrollWidth-n.clientWidth;
-  cls(n,"fl",n.scrollLeft>4);
-  cls(n,"fr",n.scrollLeft<max-4);
+  const gauche=n.scrollLeft>4, droite=n.scrollLeft<max-4;
+  cls(n,"fl",gauche);
+  cls(n,"fr",droite);
+  const desktop=matchMedia("(min-width:881px)").matches;
+  cls($("#navArrL"),"show",desktop&&gauche);
+  cls($("#navArrR"),"show",desktop&&droite);
 }
 $("nav").addEventListener("scroll",majNavFade,{passive:true});
 addEventListener("resize",()=>setTimeout(majNavFade,60));
 new ResizeObserver(majNavFade).observe($("nav"));
+/* Un clic fait défiler d'un peu moins qu'un plein écran d'onglets, pour
+   qu'un onglet reste visible des deux côtés comme repère. */
+function scrollerNav(sens){
+  const n=$("nav");
+  const cible=Math.max(0,Math.min(n.scrollWidth-n.clientWidth,n.scrollLeft+sens*n.clientWidth*0.7));
+  try{n.scrollTo({left:cible,behavior:"smooth"})}catch(e){n.scrollLeft=cible}
+}
+bindAction($("#navArrL"),()=>scrollerNav(-1));
+bindAction($("#navArrR"),()=>scrollerNav(1));
 
 /* Balayage horizontal dans la zone de contenu : onglet suivant / précédent.
    Critères stricts pour ne jamais gêner le défilement vertical ni les taps :

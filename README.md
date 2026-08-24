@@ -583,8 +583,11 @@ sur toutes les tailles d'écran : plus d'abréviations du genre « Amélio. » o
 onglets réclament 772 px — la barre **défile horizontalement**, et un dégradé
 apparaît du côté où il reste des onglets à voir (classes `fl` / `fr` posées par
 `majNavFade()`). Le masque est appliqué au conteneur défilant lui-même, il ne
-bouge donc pas avec le contenu. Changer d'onglet recentre l'onglet actif dans la
-barre, y compris par balayage.
+bouge donc pas avec le contenu. Changer d'onglet ajuste la vue au **minimum**
+nécessaire pour révéler l'onglet choisi — jamais plus — y compris par balayage.
+Sur ordinateur, deux flèches ◀▶ apparaissent en superposition du dégradé pour
+défiler à la souris ou au trackpad ; elles ne s'affichent que du côté où il
+reste des onglets cachés.
 
 Deux précautions au toucher : la barre porte `touch-action:pan-x`, donc seul le
 glissement gauche-droite l'atteint — sans quoi la moindre composante verticale

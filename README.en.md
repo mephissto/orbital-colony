@@ -561,8 +561,11 @@ abbreviations like "Upgr." or "Stats". When the whole thing does not fit — whi
 is the case from 430 px, where the six tabs demand 772 px — the bar **scrolls
 horizontally**, and a fade appears on the side where tabs remain to be seen
 (`fl` / `fr` classes set by `majNavFade()`). The mask is applied to the scrolling
-container itself, so it does not move with the content. Changing tabs recentres
-the active tab in the bar, including by swiping.
+container itself, so it does not move with the content. Changing tabs adjusts
+the view by the **minimum** needed to reveal the chosen tab — never more —
+including by swiping. On desktop, two ◀▶ arrows appear over the fade to scroll
+with a mouse or trackpad; they only show on the side where tabs are actually
+hidden.
 
 Two touch precautions: the bar carries `touch-action:pan-x`, so only a
 left-right slide reaches it — without which the slightest vertical component of
