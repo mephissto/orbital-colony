@@ -17,6 +17,18 @@ restent valides**.
 
 ---
 
+## 2.21.6 — Cliquer sur un onglet visible ne recentre plus la barre
+
+- 🐛 **Faille corrigée** : `centrerOnglet()` recentrait l'onglet cliqué à
+  chaque clic, même s'il était déjà entièrement visible. Sur une fenêtre
+  étroite (deux jeux côte à côte, écran partagé), cliquer sur Améliorations
+  (2ᵉ onglet) recentrait quand même la vue et repoussait Extraction hors
+  champ, sans qu'il y ait rien eu à faire défiler au départ.
+- La barre ne défile désormais que si l'onglet cliqué est réellement caché,
+  en tout ou en partie — un onglet déjà visible reste où il est.
+
+---
+
 ## 2.21.5 — La barre d'onglets ne défile plus verticalement (Mac / trackpad)
 
 - 🐛 **Faille corrigée** : `<nav>` ne fixait que `overflow-x:auto`, sans

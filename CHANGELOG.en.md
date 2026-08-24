@@ -16,6 +16,18 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.6 — Clicking a visible tab no longer re-centers the bar
+
+- 🐛 **Bug fixed**: `centrerOnglet()` re-centered the clicked tab on every
+  click, even when it was already fully visible. On a narrow window (two
+  games side by side, split screen), clicking Upgrades (2nd tab) still
+  re-centered the view and pushed Extraction out of sight, even though
+  nothing needed scrolling in the first place.
+- The bar now only scrolls when the clicked tab is actually hidden, in whole
+  or in part — a tab that's already visible stays put.
+
+---
+
 ## 2.21.5 — The tab bar stops scrolling vertically (Mac / trackpad)
 
 - 🐛 **Bug fixed**: `<nav>` only set `overflow-x:auto`, without specifying

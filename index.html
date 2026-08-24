@@ -692,7 +692,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.21.5";
+const VERSION="2.21.6";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2073,6 +2073,12 @@ $$(".tab").forEach(tab=>bindAction(tab,()=>activerOnglet(tab.dataset.p),"pan-x")
 function centrerOnglet(tab){
   const n=$("nav");
   if(n.scrollWidth<=n.clientWidth+1)return;
+  // Un onglet déjà entièrement visible ne doit PAS être recentré : sinon
+  // cliquer sur un onglet proche du début (ex. Améliorations) recentrait
+  // quand même la vue et repoussait Extraction hors champ, sans aucune
+  // raison puisque rien n'était caché avant le clic.
+  const gauche=tab.offsetLeft, droite=gauche+tab.offsetWidth;
+  if(gauche>=n.scrollLeft && droite<=n.scrollLeft+n.clientWidth)return;
   const x=tab.offsetLeft-(n.clientWidth-tab.offsetWidth)/2;
   const max=n.scrollWidth-n.clientWidth;
   const cible=Math.max(0,Math.min(max,x));
