@@ -271,12 +271,13 @@ nav.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transpare
              mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent 100%)}
 nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%);
                 mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent 100%)}
-/* Flèches de défilement (souris/trackpad, desktop uniquement — au doigt le
-   glissement suffit). En dehors de <nav> pour ne pas subir son propre
-   dégradé de bord, qui les aurait rendues semi-transparentes juste là où on
-   veut qu'elles soient bien visibles. La classe .show est posée en JS par
-   majNavFade(), qui sait déjà de quel côté il reste des onglets cachés — et
-   seulement en largeur desktop, pas mobile. */
+/* Flèches de défilement (souris/trackpad — au doigt le glissement suffit).
+   En dehors de <nav> pour ne pas subir son propre dégradé de bord, qui les
+   aurait rendues semi-transparentes juste là où on veut qu'elles soient bien
+   visibles. La classe .show est posée en JS par majNavFade(), qui sait déjà
+   de quel côté il reste des onglets cachés ET si le pointeur disponible est
+   fin (souris/trackpad) — indépendant de la largeur, donc actives aussi en
+   mise en page mobile tant qu'il n'y a pas d'écran tactile. */
 .navwrap{position:relative}
 .navarrow{display:none;position:absolute;top:0;bottom:1px;width:26px;z-index:6;
   align-items:center;justify-content:center;border:none;cursor:pointer;
@@ -726,7 +727,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.21.9";
+const VERSION="2.21.10";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2143,16 +2144,21 @@ function centrerOnglet(tab){
 }
 
 /* dégradés de bord : ils n'apparaissent que du côté où il reste des onglets.
-   Les flèches de défilement (souris/trackpad, desktop uniquement) réutilisent
-   le même calcul : pas de flèche s'il n'y a rien à faire défiler de ce côté. */
+   Les flèches de défilement réutilisent le même calcul : pas de flèche s'il
+   n'y a rien à faire défiler de ce côté. Elles dépendent du POINTEUR
+   disponible, pas de la largeur : une fenêtre étroite sur ordinateur (deux
+   jeux côte à côte, par exemple) passe par la mise en page "mobile" tout en
+   restant pilotée à la souris/au trackpad — c'est justement là qu'elles
+   servent le plus. Sur un écran tactile, le pointeur primaire est "coarse" :
+   pas de flèches, le glissement au doigt suffit déjà. */
 function majNavFade(){
   const n=$("nav"), max=n.scrollWidth-n.clientWidth;
   const gauche=n.scrollLeft>4, droite=n.scrollLeft<max-4;
   cls(n,"fl",gauche);
   cls(n,"fr",droite);
-  const desktop=matchMedia("(min-width:881px)").matches;
-  cls($("#navArrL"),"show",desktop&&gauche);
-  cls($("#navArrR"),"show",desktop&&droite);
+  const pointeurFin=matchMedia("(pointer:fine)").matches;
+  cls($("#navArrL"),"show",pointeurFin&&gauche);
+  cls($("#navArrR"),"show",pointeurFin&&droite);
 }
 $("nav").addEventListener("scroll",majNavFade,{passive:true});
 addEventListener("resize",()=>setTimeout(majNavFade,60));

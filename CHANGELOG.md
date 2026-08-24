@@ -17,6 +17,19 @@ restent valides**.
 
 ---
 
+## 2.21.10 — Les flèches de défilement suivent le pointeur, pas la largeur
+
+- ◀▶ Les flèches de la barre d'onglets (2.21.9) étaient limitées à la mise en
+  page desktop (largeur ≥ 881px). Une fenêtre étroite sur ordinateur — deux
+  jeux côte à côte, écran partagé — passe par la mise en page mobile tout en
+  restant pilotée à la souris ou au trackpad, exactement le cas où elles
+  servent le plus. Elles dépendent maintenant du **pointeur disponible**
+  (`pointer:fine`, souris/trackpad) plutôt que de la largeur : actives dans
+  les deux mises en page tant qu'il n'y a pas d'écran tactile, masquées dès
+  que le pointeur est tactile.
+
+---
+
 ## 2.21.9 — Flèches de défilement et espace mobile corrigé
 
 - ◀▶ **Flèches de défilement sur la barre d'onglets** (souris/trackpad,

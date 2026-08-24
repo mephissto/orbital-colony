@@ -585,9 +585,11 @@ apparaît du côté où il reste des onglets à voir (classes `fl` / `fr` posée
 `majNavFade()`). Le masque est appliqué au conteneur défilant lui-même, il ne
 bouge donc pas avec le contenu. Changer d'onglet ajuste la vue au **minimum**
 nécessaire pour révéler l'onglet choisi — jamais plus — y compris par balayage.
-Sur ordinateur, deux flèches ◀▶ apparaissent en superposition du dégradé pour
-défiler à la souris ou au trackpad ; elles ne s'affichent que du côté où il
-reste des onglets cachés.
+Deux flèches ◀▶ apparaissent en superposition du dégradé pour défiler à la
+souris ou au trackpad ; elles ne s'affichent que du côté où il reste des
+onglets cachés, et seulement s'il n'y a pas d'écran tactile (`pointer:fine`)
+— une fenêtre étroite sur ordinateur en profite donc aussi bien qu'un grand
+écran.
 
 Deux précautions au toucher : la barre porte `touch-action:pan-x`, donc seul le
 glissement gauche-droite l'atteint — sans quoi la moindre composante verticale

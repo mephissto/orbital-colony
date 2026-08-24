@@ -16,6 +16,18 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.10 — Scroll arrows now follow the pointer, not the width
+
+- ◀▶ The tab bar's scroll arrows (2.21.9) were limited to the desktop layout
+  (width ≥ 881px). A narrow window on a computer — two games side by side,
+  split screen — switches to the mobile layout while still being driven by a
+  mouse or trackpad, exactly the case where they help the most. They now
+  depend on the **available pointer** (`pointer:fine`, mouse/trackpad)
+  rather than width: active in both layouts as long as there's no
+  touchscreen, hidden as soon as the pointer is touch-based.
+
+---
+
 ## 2.21.9 — Scroll arrows and fixed mobile gap
 
 - ◀▶ **Scroll arrows on the tab bar** (mouse/trackpad, desktop only —
