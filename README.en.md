@@ -202,6 +202,12 @@ and a click buff on top pushed it to ×490,000. The vein and the cache, by
 contrast, stay proportional to your progress. Durations are extended by 30 % per
 Detector level.
 
+The rich vein and the time leap compute their gain from your **base** output,
+ignoring any power surge currently active: otherwise, catching a vein or a leap
+right after a ×10 surge would have multiplied their gain by 10, contradicting
+the rule below ("never grants power you do not already have, only time ahead").
+Fixed in 2.21.2.
+
 The click buff applies **only to the player's own clicks**, not to those of the
 Mining satellites. Otherwise the Quantum echo stopped being a reward for an
 attentive player and became a disguised output multiplier: with ten satellites

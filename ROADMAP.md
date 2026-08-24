@@ -1,6 +1,6 @@
 # Feuille de route
 
-Version **2.21.1**. Ce document sert de mémoire entre
+Version **2.21.2**. Ce document sert de mémoire entre
 deux sessions : ce qui est décidé, ce qui reste à faire, et pourquoi.
 
 ---
@@ -190,3 +190,19 @@ c'est une vraie décision à chaque cycle et l'interface reste la même.
 - Catégories de succès **Extraction** (8) et **Production** (5) : ce sont de purs
   paliers de nombres, la partie la plus mécanique de la liste. À retravailler
   éventuellement en même temps que les défis.
+
+## Décision actée — sécurisation de l'export/import
+
+Discuté (v2.21.1, sans code) : l'export est aujourd'hui `btoa(JSON.stringify(S))`,
+sans vérification. Un salt ou une clé codés en dur dans `index.html` ne
+protègent de rien : le jeu est un fichier unique, GPL, sans serveur — le
+"secret" est visible en clair par n'importe qui via *Afficher le source*, ce
+qui est même l'esprit de la licence. Un checksum protégerait contre la
+corruption accidentelle (copier-coller tronqué, edit à la main qui casse un
+champ), mais pas contre une triche volontaire — et dans un jeu solo sans
+classement, éditer sa propre sauvegarde ne lèse que soi-même.
+
+**Décision : on n'y touche pas.** Le rapport effort/bénéfice ne le justifie
+pas. À reconsidérer seulement si un jour le jeu gagne une dimension partagée
+(classement, comparaison entre joueurs) qui rendrait la triche opposable à
+quelqu'un d'autre.

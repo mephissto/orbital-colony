@@ -17,6 +17,21 @@ restent valides**.
 
 ---
 
+## 2.21.2 — Le filon et le bond ignorent la Surtension en cours
+
+- 🐛 **Faille corrigée** : le filon riche et le bond temporel calculaient leur
+  gain avec `production/s × durée`, mais la production/s utilisée incluait une
+  Surtension en cours. Une Surtension ×10 attrapée juste avant multipliait par
+  10 le gain du filon ou du bond suivant — jusqu'à donner en une fois plusieurs
+  fois le gain prévu, en contradiction avec la règle du bond temporel (« jamais
+  un pouvoir que tu n'as pas déjà, seulement du temps d'avance »).
+- Les deux calculent désormais leur gain sur la production **de base**, hors
+  bonus temporaire. Aucun autre système touché : l'affichage de la production,
+  le clic et le bonus hors-ligne continuent d'inclure les bonus actifs, comme
+  prévu.
+
+---
+
 ## 2.21.1 — Documentation bilingue
 
 - 🇬🇧 **README traduit en anglais** ([`README.en.md`](README.en.md)), avec un

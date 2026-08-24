@@ -16,6 +16,20 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.2 — Rich vein and time leap now ignore an active power surge
+
+- 🐛 **Bug fixed**: the rich vein and the time leap computed their gain as
+  `output/s × duration`, but the output/s used included an active power surge.
+  A ×10 surge caught just before multiplied the following vein's or leap's
+  gain by 10 — handing out several times the intended amount at once, against
+  the time leap's own rule ("never grants power you do not already have, only
+  time ahead").
+- Both now compute their gain from **base** output, excluding temporary buffs.
+  Nothing else changed: the output display, clicks, and the offline bonus
+  still include active buffs, as intended.
+
+---
+
 ## 2.21.1 — Bilingual documentation
 
 - 🇬🇧 **README translated into English** ([`README.en.md`](README.en.md)), with a

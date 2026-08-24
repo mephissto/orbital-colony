@@ -207,6 +207,12 @@ clic par-dessus portait le tout à ×490 000. Le filon et la cache, eux, restent
 proportionnés à la progression. Les durées sont allongées de 30 % par niveau de
 Détecteur.
 
+Le filon et le bond temporel calculent leur gain sur ta production **de base**,
+sans tenir compte d'une Surtension en cours : sinon, attraper un filon ou un
+bond juste après une Surtension ×10 aurait multiplié leur gain par 10, en
+contradiction avec la règle ci-dessous (« jamais un pouvoir que tu n'as pas
+déjà, seulement du temps d'avance »). Corrigé en 2.21.2.
+
 Le bonus de clic ne s'applique **qu'aux clics du joueur**, pas à ceux des
 Satellites d'extraction. Sinon l'Écho quantique cessait d'être une récompense du
 joueur présent pour devenir un multiplicateur de production déguisé : à dix
