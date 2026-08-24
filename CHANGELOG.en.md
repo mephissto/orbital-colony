@@ -16,6 +16,16 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.4 — Online play links
+
+- 🔗 **README** (FR and EN): added the two addresses where the game can be
+  played online, [orbital-colony.mephissto.fr](https://orbital-colony.mephissto.fr/)
+  and [mephissto.github.io/orbital-colony](https://mephissto.github.io/orbital-colony/).
+
+No change in the game itself.
+
+---
+
 ## 2.21.3 — The tab bar stops moving vertically (for good)
 
 - 🐛 **Bug fixed**: `touch-action:pan-x` had been set on `<nav>` since 2.15.1,

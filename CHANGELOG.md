@@ -17,6 +17,16 @@ restent valides**.
 
 ---
 
+## 2.21.4 — Liens de jeu en ligne
+
+- 🔗 **README** (FR et EN) : ajout des deux adresses où jouer en ligne,
+  [orbital-colony.mephissto.fr](https://orbital-colony.mephissto.fr/) et
+  [mephissto.github.io/orbital-colony](https://mephissto.github.io/orbital-colony/).
+
+Aucun changement dans le jeu.
+
+---
+
 ## 2.21.3 — La barre d'onglets ne bouge plus verticalement (pour de bon)
 
 - 🐛 **Faille corrigée** : `touch-action:pan-x` était bien posé sur `<nav>`

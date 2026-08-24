@@ -8,6 +8,9 @@ serveur, aucune donnée qui sort de ton navigateur.
 
 Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
 
+**Jouer en ligne :** [orbital-colony.mephissto.fr](https://orbital-colony.mephissto.fr/) ·
+[mephissto.github.io/orbital-colony](https://mephissto.github.io/orbital-colony/)
+
 ---
 
 ## Sommaire

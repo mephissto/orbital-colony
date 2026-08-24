@@ -8,6 +8,9 @@ ever leaving your browser.
 
 Free software under [GPL 3.0 or later](#licence).
 
+**Play online:** [orbital-colony.mephissto.fr](https://orbital-colony.mephissto.fr/) ·
+[mephissto.github.io/orbital-colony](https://mephissto.github.io/orbital-colony/)
+
 ---
 
 ## Contents
