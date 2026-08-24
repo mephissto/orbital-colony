@@ -249,8 +249,18 @@ body.anomsoon #anomChip{color:var(--anom);animation:anompulse 1.2s ease-in-out i
    1px verticalement (le top:1px des onglets), ce qui suffisait à la rendre
    scrollable en hauteur à la molette/trackpad — indépendant du tactile, donc
    non couvert par touch-action:pan-x. */
+/* position:relative est la vraie cause des sauts de la barre : <main> est lui
+   -même position:relative (grille hero/right), et <nav> ne l'était pas. Sans
+   position propre, .tab.offsetLeft se mesurait par rapport à <main> — donc
+   décalé de la largeur de la colonne hero (352px) — alors que centrerOnglet()
+   le comparait à nav.scrollLeft, qui démarre à 0 au bord de <nav> lui-même.
+   La cible de défilement calculée était donc systématiquement bien trop
+   grande, et le clamp au maximum scrollable la ramenait presque toujours
+   tout à droite : cliquer sur n'importe quel onglet, même Améliorations,
+   poussait la barre au bout et cachait Extraction. */
 nav{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);
-  flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  position:relative}
 nav::-webkit-scrollbar{display:none}
 /* Les libellés ne sont jamais tronqués : quand la barre déborde, elle défile.
    Un dégradé sur le bord concerné signale qu'il reste des onglets de ce côté —
@@ -692,7 +702,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.21.6";
+const VERSION="2.21.8";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2073,15 +2083,20 @@ $$(".tab").forEach(tab=>bindAction(tab,()=>activerOnglet(tab.dataset.p),"pan-x")
 function centrerOnglet(tab){
   const n=$("nav");
   if(n.scrollWidth<=n.clientWidth+1)return;
-  // Un onglet déjà entièrement visible ne doit PAS être recentré : sinon
-  // cliquer sur un onglet proche du début (ex. Améliorations) recentrait
-  // quand même la vue et repoussait Extraction hors champ, sans aucune
-  // raison puisque rien n'était caché avant le clic.
+  // Ajustement MINIMAL, pas un recentrage : un onglet caché de quelques
+  // pixels seulement (invisible à l'œil sous le dégradé de bord) déclenchait
+  // quand même un centrage complet — un saut bien plus large que nécessaire,
+  // qui repoussait les onglets précédents (Extraction) hors champ pour rien.
+  // On colle juste le bord manquant à la vue, comme scrollIntoView("nearest")
+  // sans son effet de bord (faire défiler aussi les ancêtres, cf. plus haut).
   const gauche=tab.offsetLeft, droite=gauche+tab.offsetWidth;
-  if(gauche>=n.scrollLeft && droite<=n.scrollLeft+n.clientWidth)return;
-  const x=tab.offsetLeft-(n.clientWidth-tab.offsetWidth)/2;
+  const vGauche=n.scrollLeft, vDroite=n.scrollLeft+n.clientWidth;
+  let cible;
+  if(gauche<vGauche)cible=gauche;
+  else if(droite>vDroite)cible=droite-n.clientWidth;
+  else return;                                    // déjà entièrement visible
   const max=n.scrollWidth-n.clientWidth;
-  const cible=Math.max(0,Math.min(max,x));
+  cible=Math.max(0,Math.min(max,cible));
   if(Math.abs(n.scrollLeft-cible)<2)return;
   try{n.scrollTo({left:cible,behavior:"smooth"})}catch(e){n.scrollLeft=cible}
 }

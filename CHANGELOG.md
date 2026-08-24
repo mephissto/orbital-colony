@@ -17,6 +17,28 @@ restent valides**.
 
 ---
 
+## 2.21.8 — La vraie cause des sauts de la barre d'onglets
+
+- 🐛 **Faille corrigée, la bonne cette fois** : `<nav>` n'avait pas de
+  `position` propre, alors que son parent `<main>` est `position:relative`
+  (grille hero/panneau). Sans ça, `offsetLeft` d'un onglet se mesurait par
+  rapport à `<main>` — donc décalé de la largeur de la colonne planète
+  (352px) — alors que le calcul de défilement le comparait à
+  `nav.scrollLeft`, qui démarre à 0 au bord de `<nav>` lui-même. La cible
+  était donc systématiquement bien trop grande, et se faisait quasiment
+  toujours ramener au maximum scrollable par la limite de sécurité : cliquer
+  sur n'importe quel onglet, même Améliorations juste à côté d'Extraction,
+  envoyait la barre tout au bout et cachait Extraction. C'était la vraie
+  cause des deux tentatives précédentes (2.21.6, 2.21.7), qui corrigeaient
+  des symptômes sans toucher à cette racine commune.
+- `position:relative` posé sur `<nav>` : ses onglets se mesurent maintenant
+  dans le même repère que son propre défilement.
+- Au passage, `centrerOnglet()` fait désormais l'ajustement **minimal**
+  nécessaire (coller le bord caché à la vue) plutôt qu'un recentrage complet,
+  pour ne jamais déplacer la barre plus que nécessaire.
+
+---
+
 ## 2.21.6 — Cliquer sur un onglet visible ne recentre plus la barre
 
 - 🐛 **Faille corrigée** : `centrerOnglet()` recentrait l'onglet cliqué à

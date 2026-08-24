@@ -16,6 +16,27 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.21.8 — The actual cause of the tab bar jumping
+
+- 🐛 **Bug fixed, properly this time**: `<nav>` had no `position` of its own,
+  while its parent `<main>` is `position:relative` (the hero/panel grid).
+  Without that, a tab's `offsetLeft` was measured relative to `<main>` — so
+  offset by the width of the planet column (352px) — while the scroll
+  calculation compared it against `nav.scrollLeft`, which starts at 0 at
+  `<nav>`'s own edge. The target was therefore systematically far too large,
+  and almost always got clamped to the maximum scrollable position by the
+  safety limit: clicking any tab, even Upgrades right next to Extraction,
+  sent the bar all the way to the end and hid Extraction. This was the real
+  cause behind the previous two attempts (2.21.6, 2.21.7), which fixed
+  symptoms without touching this shared root cause.
+- `position:relative` set on `<nav>`: its tabs are now measured in the same
+  coordinate space as its own scrolling.
+- Along the way, `centrerOnglet()` now makes the **minimal** adjustment
+  needed (bringing the hidden edge into view) instead of a full re-center, so
+  the bar is never moved more than necessary.
+
+---
+
 ## 2.21.6 — Clicking a visible tab no longer re-centers the bar
 
 - 🐛 **Bug fixed**: `centrerOnglet()` re-centered the clicked tab on every
