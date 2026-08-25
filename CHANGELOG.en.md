@@ -16,6 +16,21 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.28.0 — Upgrades are rediscovered every cycle
+
+- 🔎 An upgrade appeared in the list as soon as you had mined 8 % of its price
+  **over the whole run** — a total that is never reset. As a result, from the
+  second cycle on, **every upgrade not tied to a structure** (click, resonators,
+  global output, beacon) showed up in one block within the first second, and the
+  progressive rediscovery was gone for good.
+- ♻️ The criterion now uses the ore mined **during the current cycle**. It stays
+  monotone within a cycle — the list never jumps around while you play — but it
+  resets at prestige, like the upgrades themselves, which are lost at that point.
+- **Structure tiers** are unchanged: they also carry their "N units owned"
+  condition, so they already reappeared as the cycle went on.
+
+---
+
 ## 2.27.1 — No more blinking dot on the Satellites card
 
 - 🔕 The small cyan dot pulsing on the **Mining satellites**' state line, in the

@@ -745,7 +745,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.27.1";
+const VERSION="2.28.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2066,8 +2066,16 @@ function renderGens(){
   syncList($("#genList"),list);
 }
 
-/* visible dès qu'on a déjà extrait 8 % du prix (critère monotone => aucune liste qui saute) */
-function upVisible(u){return (!u.req||u.req(S))&&S.totalOre>=u.cost*0.08}
+/* Visible dès qu'on a extrait 8 % du prix **sur le cycle en cours** (`runOre`).
+   Le critère reste monotone à l'intérieur d'un cycle — la liste ne saute jamais
+   pendant qu'on joue — mais il repart de zéro au prestige, comme tout le reste :
+   les améliorations sont perdues au cycle, il n'y a aucune raison que leurs
+   cartes restent affichées d'emblée. Avec le total de la partie (`totalOre`,
+   jamais remis à zéro), dès le 2e cycle la liste entière apparaissait d'un coup
+   et la redécouverte progressive disparaissait définitivement.
+   Les paliers de structure, eux, ont en plus leur `req` (N exemplaires
+   possédés) : ils réapparaissaient déjà au fil du cycle. */
+function upVisible(u){return (!u.req||u.req(S))&&S.runOre>=u.cost*0.08}
 function upBadge(){return UPS.filter(u=>!S.ups[u.id]&&(!u.req||u.req(S))&&S.ore>=u.cost).length}
 
 /* en-têtes de catégorie réutilisés d'un rendu à l'autre, comme les cartes */

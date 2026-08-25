@@ -144,9 +144,12 @@ le reste, même après un prestige.
 ## Les améliorations
 
 Achats **uniques et permanents**, payés en minerai, perdus au prestige. Elles
-apparaissent dans la liste dès que tu as extrait 8 % de leur prix au cours de la
-partie — critère volontairement basé sur le total extrait, pour que la liste ne
-saute pas pendant que tu joues.
+apparaissent dans la liste dès que tu as extrait 8 % de leur prix **sur le cycle
+en cours** (`S.runOre`). Le critère reste monotone à l'intérieur d'un cycle — la
+liste ne saute jamais pendant que tu joues — mais il repart de zéro au prestige,
+comme les améliorations elles-mêmes : chaque cycle redécouvre sa liste au fil de
+l'extraction. Jusqu'à la 2.28.0 il s'appuyait sur le total de la partie, jamais
+remis à zéro : dès le deuxième cycle la liste entière apparaissait d'un coup.
 
 **Paliers de structure** — 6 par structure, soit 60 au total. Chacun exige un
 nombre d'exemplaires et multiplie la production de cette seule structure :

@@ -17,6 +17,22 @@ restent valides**.
 
 ---
 
+## 2.28.0 — Les améliorations se redécouvrent à chaque cycle
+
+- 🔎 Une amélioration apparaissait dans la liste dès que tu avais extrait 8 % de
+  son prix **sur toute la partie** — un total jamais remis à zéro. Résultat : à
+  partir du deuxième cycle, **toutes les améliorations non liées aux structures**
+  (clic, résonateurs, production globale, balise) s'affichaient d'un bloc dès la
+  première seconde, et la redécouverte progressive disparaissait définitivement.
+- ♻️ Le critère porte maintenant sur le minerai extrait **sur le cycle en
+  cours**. Il reste monotone à l'intérieur d'un cycle — la liste ne saute jamais
+  pendant que tu joues — mais il repart de zéro au prestige, comme les
+  améliorations elles-mêmes, qui sont perdues à ce moment-là.
+- Les **paliers de structure** ne changent pas : ils ont en plus leur condition
+  de N exemplaires possédés, donc ils réapparaissaient déjà au fil du cycle.
+
+---
+
 ## 2.27.1 — Plus de pastille clignotante sur la carte des Satellites
 
 - 🔕 Le petit point cyan qui pulsait sur la ligne d'état des **Satellites

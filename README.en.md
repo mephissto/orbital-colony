@@ -141,9 +141,12 @@ even after a prestige.
 ## Upgrades
 
 **One-off, permanent** purchases, paid in ore, lost on prestige. They appear in
-the list as soon as you have mined 8 % of their price over the whole run — a
-criterion deliberately based on the lifetime total, so the list does not jump
-around while you play.
+the list as soon as you have mined 8 % of their price **during the current cycle**
+(`S.runOre`). The criterion stays monotone within a cycle — the list never jumps
+around while you play — but it resets at prestige, like the upgrades themselves:
+every cycle rediscovers its list as you mine. Up to 2.28.0 it was based on the
+lifetime total, never reset: from the second cycle on, the whole list appeared at
+once.
 
 **Structure tiers** — 6 per structure, 60 in total. Each requires a number of
 units and multiplies that one structure's output:
