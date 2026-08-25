@@ -16,6 +16,144 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.27.0 — The idle automation's switch is now locked
+
+- 🔒 While one of the two is working, the other's switch is **greyed out and
+  inert** (`not-allowed` cursor) — including when that one had been **switched
+  off by hand** beforehand. Until now it was only locked if it had been
+  suspended: you could therefore believe you had switched it back on when it
+  would not actually have run. To hand control back, switch off the one that is
+  running first.
+- 🏷️ The label tells the two situations apart: "**paused by the Engineer**" when
+  it will restart on its own (knob on the right), and "**off — the Engineer is
+  working**" when you switched it off yourself (knob on the left). The knob's
+  position therefore says what will happen once the other stops.
+- 💬 Clicking a locked switch shows "Switch the Engineer off first to free this
+  one" rather than silently doing nothing.
+
+No new save field.
+
+---
+
+## 2.26.0 — Switching the Engineer off hands control back to the Foreman
+
+- 🐛 **Bug fixed**: since 2.25.0 the exclusivity pause was stored as a **manual
+  switch-off**. Switching the Engineer off therefore left the Foreman dark even
+  though the player had never switched it off — merely suspended it — and it had
+  to be switched back on by hand.
+- 🔁 The two states are now distinct: **switched off by hand** (`S.autoOff`, the
+  player's intent, which nothing clears automatically) and **paused**
+  (`S.autoPause`, a derived state cleared as soon as the other stops). Switching
+  the Engineer off therefore **hands control back to the Foreman** — but does not
+  revive a Foreman you deliberately switched off.
+- 🗃️ A save from before 2.26.0 is read back on load: if exactly one of the two is
+  off while the other runs, that switch-off is reinterpreted as a pause.
+
+Two new purely additive fields, `S.autoPause` and `S.autoMain` (which of the two
+took over last). Earlier saves remain compatible.
+
+---
+
+## 2.25.2 — The pause now says who triggered it
+
+- 🏷️ A suspended automation no longer reads "paused" but **"paused by the
+  Engineer"** (or "by the Foreman"): the cause is named right where you read it,
+  with no guessing which of the two took over.
+- 📱 On narrow screens (< 520 px) the state line now moves **below the name**
+  instead of disappearing. It had been hidden since 2.24.0 to save room — which
+  made exactly this message invisible on a phone.
+
+---
+
+## 2.25.1 — A paused automation stays visibly armed
+
+- 🎚️ The switch of an automation **paused by exclusivity** keeps its knob **on
+  the right**, merely **greyed out**, instead of flipping left as if it had been
+  switched off. It is armed, the game suspended it — and you no longer think you
+  turned it off by mistake. Its row is also less faded than one switched off by
+  hand.
+- 📝 Both cards now explain it in their description: the Foreman "pauses the
+  Engineer", the Engineer "pauses the Foreman".
+
+Display fix only, no change in behaviour.
+
+---
+
+## 2.25.0 — Foreman and Engineer become mutually exclusive
+
+- 🔀 The automatic ore sharing introduced in 2.24.0 (half the stock to the
+  Foreman) gave good figures but **was not legible while playing**: you see your
+  structures slow down without understanding why. The two automations are now
+  **mutually exclusive** — **switching one on pauses the other**, the switch
+  shows it, and you decide which one works.
+- ⏸️ A row paused by exclusivity reads "**paused**", not "switched off": at a
+  glance you can tell what you switched off yourself from what the game put on
+  hold.
+- 🆕 An automation you have just **paid for starts switched on** and takes over
+  from its exclusive partner: no "I just bought it and it does nothing" surprise.
+- ↩️ The Foreman has **no brake left**: it buys its target as soon as it has the
+  price, full stop.
+- 🗃️ A save from before 2.25.0 where both were running is fixed up on load: the
+  **Engineer keeps control**, its job being finished once all 73 upgrades are
+  bought.
+
+No new save field.
+
+---
+
+## 2.24.0 — Foreman and Engineer now share the ore
+
+- ⚖️ Since 2.23.0 the two automations were stepping on each other: the Foreman
+  buys as soon as the ore covers its target, so the stock never grew and the
+  **Engineer starved permanently** — no even mildly expensive upgrade ever became
+  affordable. The Foreman now spends only **half the stock** while the Engineer
+  still has something to buy, and all of it once it is done. No setting to
+  understand. Measured over 30 simulated minutes in mid-game, Drone target:
+  **15 upgrades and 56,267/s** instead of 13 and 37,515/s, for 2 fewer
+  structures.
+- 🚫 The **% spending cap** disappears from the UI: it only ever served that
+  sharing, which the rule above now handles on its own. The `S.autoPart` field
+  stays in the state so earlier saves and exports remain symmetric.
+- 🎛️ The **switches move up into the Settings**, one row per owned automation
+  (icon, name, state, switch). The list below now only serves for buying and for
+  the Satellites' levels.
+- ✂️ Setting explanations **shortened**.
+
+An intermediate approach was tried then dropped: reserving the **exact price** of
+the next upgrade pinned the Foreman at **zero purchases** without gaining the
+Engineer anything — the stock never durably exceeds that price, since the
+Engineer buys it the moment it is reached.
+
+---
+
+## 2.23.0 — The Foreman now targets the structure you choose
+
+- 🎯 The **Foreman** always rebought the **cheapest** affordable structure. That
+  is the opposite of what you do by hand: later structures pay off far more per
+  ore spent, and letting the automation pile up drones wastes output. It now has
+  a **dropdown** in the Settings, listing the structures **already revealed**
+  with their icon: it only ever buys that one, one per second.
+- 💰 It is **no longer subject to the % spending cap**. Aiming at a big structure
+  would be pointless if the automation were not allowed to put all the required
+  ore into it. The cap therefore now concerns the **Engineer** only, and its
+  label says so explicitly.
+- ⏳ If the target is not affordable it **buys nothing and waits** — no falling
+  back on a cheaper structure, that is the whole point of "one at a time". The
+  panel line gives the target price, what is missing and a time estimate, and the
+  automation's card shows its target at all times.
+- ⬆️ **Settings moved to the top of the tab**, before the automation list. Once
+  those are bought the list no longer changes, whereas the panel is what you come
+  back to: you had to scroll the whole tab for every adjustment.
+- 🔒 The dropdown only offers structures you have already discovered (`S.seen`):
+  nothing is disclosed early. Until you pick one, it aims at the **last revealed
+  structure** — the best default, and it avoids an automation bought late piling
+  up drones.
+
+New `S.autoGen` field, purely additive: earlier saves load without conversion and
+start on the default above.
+
+---
+
 ## 2.22.0 — Owned upgrades are now sorted into categories
 
 - 🗂️ The **Already owned** list in the Upgrades tab was one long flat queue in

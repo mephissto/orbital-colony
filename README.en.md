@@ -399,13 +399,14 @@ Deliberately, no floating "+N" is emitted for an automatic click: at 10 clicks/s
 it would be unreadable, and it would drown the "+N" of manual clicks, which are
 the visual feedback of the player's own gesture.
 
-**Every automation has a switch** (on the right of its card). Switching it off
-refunds nothing and loses no level: just switch it back on.
+**Every automation has a switch**, in the Settings section at the top of the
+tab. Switching it off refunds nothing and loses no level: just switch it back
+on.
 
 | Automation | Effect | Max | Cost | Cumulative cost |
 |---|---|---|---|---|
 | 🛰️ Mining satellites | +1 click/s per level | 10 | 30, ×2 per level | 30,690 |
-| 🏗️ Foreman | rebuys the cheapest structure every second | 1 | 100 | 100 |
+| 🏗️ Foreman | rebuys the structure you assign it, every second | 1 | 100 | 100 |
 | ⬆️ Engineer | buys the cheapest affordable upgrade | 1 | 150 | 150 |
 | 📡 Recovery probe | collects the anomaly for you | 1 | 200 | 200 |
 | ♻️ Auto cycle | starts a new cycle at the chosen threshold | 1 | 400 | 400 |
@@ -424,20 +425,73 @@ splitting them into levels would only have spread a purchase artificially.
 Foreman: one purchase per second (`CONTRE_S`). Probe: collection 2 s after the
 anomaly appears (`SONDE_S`), well under an anomaly's 14 s lifetime.
 
-Below the list, a **Settings** section groups two boxes. Each contains, in this
+**At the top of the tab**, a **Settings** section groups the switches and the two
+settings, each revealed by the automation it concerns. Each box contains, in this
 order: the label and its control on the same line, then a rule, then the
-**concrete figure** of the moment, then the explanation in small type.
-Everything about a setting is thus enclosed in its own frame — no ambiguity about
-which explanation goes with what — and the player never has any mental arithmetic
-to do to know what their setting actually gives.
+**concrete figure** of the moment, then the explanation in small type. Settings
+come **before** the automation list: once those are bought, the list only serves
+for buying and levels, whereas the panel is what you come back to.
 
-**Automations never spend more than** — a dropdown, steps from 10 % to 100 %
-(`PARTS`, `S.autoPart`, 30 % by default). The Foreman and the Engineer only buy
-if the price stays under that share of the ore you own. Below 100 %, every
-purchase necessarily leaves a remainder: the reserve therefore never falls to
-zero. The lower the cap, the more the stock grows and the more you keep to buy
-with yourself — at the cost of a few structures. The line shown gives the
-price ceiling of the moment (`oreDispo()`).
+**Active automations** — one row per owned automation: icon, name, current state
+and its switch. Switching one off refunds nothing and loses no level. Under
+520 px wide the state moves **below** the name instead of disappearing: it is the
+one carrying "paused by…", the most useful information on the row.
+
+**The Foreman rebuys** — a dropdown listing the structures **already revealed**
+(`genRev()`, bounded by `S.seen`: nothing is disclosed early), with their icon.
+It only ever buys that one, one per second. Until the player picks one,
+`autoGenId()` aims at the **last revealed structure**; as soon as they pick,
+`S.autoGen` is written and no longer moves on its own. The line shown gives the
+target price, the ore still to own and a time estimate.
+
+**The Foreman and the Engineer are mutually exclusive.** They draw on the same
+ore: switching one on **pauses** the other, the switch shows it, and the player
+decides which one works. **Only one of the two can run at a time, and the other's
+switch is inert** (`verrouille()`, `not-allowed` cursor): to hand control back to
+the Foreman you must switch the Engineer off first. One extra click, but you can
+never believe you switched an automation back on when it will not actually run.
+
+An automation therefore has **three states**, and telling them apart is what
+makes the whole thing work:
+
+| State | Field | Cleared |
+|---|---|---|
+| active | — | — |
+| **switched off by hand** | `S.autoOff` | never automatically: it is the player's intent |
+| **paused** by its exclusive partner | `S.autoPause` | as soon as the other stops, for any reason |
+
+`S.autoMain` remembers which of the two took over last, `normExclus()` recomputes
+the pauses from the player's intents alone (idempotent, called after every
+change, on load and on import), and `buyAuto()` hands control to the one you just
+paid for. Concretely: switching the Engineer off **hands control back to the
+Foreman** if it had only been suspended, but does not revive a Foreman the player
+deliberately switched off. `migrerExclus()` reads back a save from before 2.26.0,
+where the pause was written as a manual switch-off. A row
+paused by exclusivity reads "paused by *the other automation*" rather than
+"switched off" — `enPause()` returns the automation responsible, `txtPause()`
+names it via its `nmd` field (name with article) — and **its switch keeps the
+knob on the right, merely greyed out**: the automation
+is armed, the game suspended it — telling that apart from one you switched off
+yourself avoids thinking you turned it off by mistake. Both cards say so in their
+description too ("pauses the Engineer" / "pauses the Foreman").
+
+Two **automatic** arbitration rules were tried then dropped, because neither was
+legible while playing:
+
+| Rule | Structures | Upgrades | Final output |
+|---|---|---|---|
+| none (Drone target) | 33 | 13 | 37,515 /s |
+| half the stock to the Foreman (2.24.0) | 31 | 15 | 56,267 /s |
+| reserve the next upgrade's exact price | 0 | 15 | 56,198 /s |
+
+Measured over 30 simulated minutes in mid-game. Reserving the exact price pinned
+the Foreman at zero purchases: the stock never durably exceeds the next upgrade's
+price, since the Engineer buys it the moment it is reached. Half the stock gave
+better figures, but the player saw structures slow down without understanding
+why — an invisible arbitration is worth less than an explicit switch. The %
+spending cap (`S.autoPart`), which played that role up to 2.23.0, disappeared
+from the UI in 2.24.0; the field stays in the state so earlier saves and exports
+remain symmetric.
 
 **Restart the cycle from** — a **threshold typed by hand**, in antimatter
 (`S.autoCyc`, 50 by default). `cycSeuil()` applies a **floor at 10 % of the

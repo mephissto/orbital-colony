@@ -358,8 +358,25 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
 .card.done{border-color:rgba(87,230,164,.35);background:rgba(87,230,164,.07);cursor:default}
 .card.done:hover{box-shadow:none;background:rgba(87,230,164,.07)}
 /* carte d'automatisation : une 4e colonne pour l'interrupteur */
-.acard{grid-template-columns:44px minmax(0,1fr) auto auto}
+.acard{grid-template-columns:44px minmax(0,1fr) auto}
 .card.off{opacity:.5;filter:grayscale(.55)}
+.swlist{margin-top:9px;padding-top:4px;border-top:1px solid var(--line)}
+.swrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.swrow:first-child{border-top:none}
+.swrow.off{opacity:.5}
+.swrow.pause{opacity:.72}
+.swico{font-size:17px;flex:0 0 auto;line-height:1}
+.swnm{font-size:13.5px;font-weight:600;color:var(--txt);flex:0 0 auto}
+.swst{font-size:11.5px;color:var(--dim);flex:1 1 auto;text-align:right;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Sur écran étroit l'état passe sous le nom plutôt que de disparaître : c'est
+   justement lui qui explique « mise en pause par… », l'info la plus utile de la
+   ligne. L'interrupteur reste sur la première ligne grâce à order. */
+@media(max-width:520px){
+  .swrow{flex-wrap:wrap;gap:8px}
+  .swico{order:0} .swnm{order:1;flex:1 1 auto} .sw{order:2}
+  .swst{order:3;flex:1 0 100%;text-align:left;white-space:normal;overflow:visible;margin:-2px 0 0}
+}
 .sw{width:46px;height:26px;border-radius:13px;border:1px solid var(--line);
   background:var(--panel-2);position:relative;transition:background-color .18s,border-color .18s;
   flex:0 0 auto;align-self:center}
@@ -367,6 +384,12 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
   background:var(--dim);transition:left .18s, background-color .18s}
 .sw.on{background:rgba(79,216,255,.18);border-color:var(--cyan)}
 .sw.on i{left:23px;background:var(--cyan)}
+/* En pause par exclusivité : le curseur reste à droite — l'automate est bien
+   armé, c'est le jeu qui l'a suspendu, pas le joueur qui l'a coupé — mais tout
+   est grisé pour qu'on ne le confonde pas avec un automate qui travaille. */
+.sw.pause{background:var(--panel-2);border-color:var(--line)}
+.sw.pause i{background:var(--dim)}
+.sw.lock{cursor:not-allowed}
 /* même cadence, en petit, sur la ligne d'état de la carte */
 .acard.pulsing .rt::before{
   content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
@@ -553,7 +576,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
   nav{padding:6px 10px 0;gap:2px}
   #panels{padding:12px 10px}
   .card{grid-template-columns:32px minmax(0,1fr) auto;gap:9px;padding:10px 11px}
-  .acard{grid-template-columns:32px minmax(0,1fr) auto auto;gap:8px}
+  .acard{grid-template-columns:32px minmax(0,1fr) auto;gap:8px}
   .acard .right{min-width:86px}
   .sw{width:40px;height:23px}.sw i{width:16px;height:16px;top:2.5px}
   .sw.on i{left:20px}
@@ -730,7 +753,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.22.0";
+const VERSION="2.27.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -801,19 +824,25 @@ fr:{
   au_title:"Automatisation — {0} antimatière disponible",
   au_hint:"Les automates se paient en <b style=\"color:var(--violet)\">antimatière</b>, se gardent d'un cycle à l'autre, et chacun peut être <b>coupé</b> avec son interrupteur sans être remboursé.",
   au_set:"Réglages",
-  au_res:"Les automates ne dépensent pas plus de", au_cyc:"Relancer le cycle à partir de",
-  au_res_hint:"Part de ton minerai qu'un seul achat peut coûter au maximum. Il en reste donc toujours : plus le plafond est bas, plus ta réserve grossit et plus il te reste pour les gros achats que tu veux faire toi-même.",
-  au_res_now:"En ce moment, ils n'achètent rien au-dessus de <b style=\"color:var(--gold)\">{0} minerai</b>.",
+  au_cyc:"Relancer le cycle à partir de",
+  au_sw:"Automates actifs", au_pause:"mise en pause par {0}", au_off_by:"coupé — {0} travaille",
+  au_sw_hint:"Couper un automate ne rembourse rien et ne fait perdre aucun niveau. Le Contremaître et l'Ingénieur puisent dans le même minerai : un seul des deux peut travailler, et l'interrupteur de l'autre reste verrouillé tant que celui-là tourne.",
+  au_gen:"Le Contremaître rachète",
+  au_gen_hint:"Il n'achète que cette structure, une par seconde, dès qu'il a le minerai.",
+  au_gen_ready:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b>, disponible.",
+  au_gen_wait:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b> — il manque <b>{1}</b>{2}.",
   au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. Le cycle ne repart jamais pour moins de 10 % de ta réserve, même si tu saisis moins.",
   au_cyc_now:"Gain actuel : <b>+{0}</b> — {1}",
   au_cyc_ready:"le seuil est atteint, le cycle repart.",
   au_cyc_wait:"il manque <b style=\"color:var(--violet)\">{0}</b>{1}.",
   au_unit_am:"antimatière",
   au_off:"coupé",
-  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"un achat par seconde",
+  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · un achat par seconde",
   au_e_ing:"achète l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
   au_e_cycle:"relance à +{0} antimatière",
   t_auto:"{0} — niveau {1}", t_auto_on:"{0} : remis en marche", t_auto_off:"{0} : coupé",
+  t_auto_excl:"{0} : remis en marche — {1} est mis en pause",
+  t_auto_lock:"Coupe d'abord {0} pour libérer celui-ci.",
   t_autocyc:"Cycle automatique : +{0} antimatière",
   res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
   lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
@@ -878,19 +907,25 @@ en:{
   au_title:"Automation — {0} antimatter available",
   au_hint:"Automations are paid in <b style=\"color:var(--violet)\">antimatter</b>, kept from one cycle to the next, and each one can be <b>switched off</b> without being refunded.",
   au_set:"Settings",
-  au_res:"Automations never spend more than", au_cyc:"Restart the cycle from",
-  au_res_hint:"The largest share of your ore a single purchase may cost. Some is always left over: the lower the cap, the more your stock grows and the more you keep for the big purchases you want to make yourself.",
-  au_res_now:"Right now they buy nothing above <b style=\"color:var(--gold)\">{0} ore</b>.",
+  au_cyc:"Restart the cycle from",
+  au_sw:"Active automations", au_pause:"paused by {0}", au_off_by:"off — {0} is working",
+  au_sw_hint:"Switching one off refunds nothing and loses no level. The Foreman and the Engineer draw on the same ore: only one of them can work, and the other's switch stays locked while it does.",
+  au_gen:"The Foreman rebuys",
+  au_gen_hint:"It only ever buys that one structure, one per second, as soon as it has the ore.",
+  au_gen_ready:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b>, available.",
+  au_gen_wait:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b> — <b>{1}</b> to go{2}.",
   au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. It never restarts for less than 10 % of your stock, even if you type less.",
   au_cyc_now:"Current gain: <b>+{0}</b> — {1}",
   au_cyc_ready:"the threshold is reached, the cycle restarts.",
   au_cyc_wait:"<b style=\"color:var(--violet)\">{0}</b> to go{1}.",
   au_unit_am:"antimatter",
   au_off:"off",
-  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"one purchase per second",
+  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · one purchase per second",
   au_e_ing:"buys the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
   au_e_cycle:"restarts at +{0} antimatter",
   t_auto:"{0} — level {1}", t_auto_on:"{0}: switched back on", t_auto_off:"{0}: switched off",
+  t_auto_excl:"{0}: switched back on — {1} is paused",
+  t_auto_lock:"Switch {0} off first to free this one.",
   t_autocyc:"Auto cycle: +{0} antimatter",
   res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
   lvl:"lvl {0}/{1}", maxed:"maximum level reached",
@@ -1083,11 +1118,11 @@ const AUTOS=[
   ds:{fr:"Un satellite en orbite par niveau, chacun frappe une fois par seconde",
       en:"One orbiting satellite per level, each strikes once a second"}},
  {id:"contre",ico:"🏗️", max:1, c0:100, cg:1,
-  nm:{fr:"Contremaître",en:"Foreman"},
-  ds:{fr:"Rachète chaque seconde la structure la moins chère",en:"Rebuys the cheapest structure every second"}},
+  nm:{fr:"Contremaître",en:"Foreman"}, nmd:{fr:"le Contremaître",en:"the Foreman"},
+  ds:{fr:"Rachète chaque seconde la structure que tu lui désignes — met l'Ingénieur en pause",en:"Rebuys the structure you assign it, every second — pauses the Engineer"}},
  {id:"ing",   ico:"⬆️", max:1, c0:150, cg:1,
-  nm:{fr:"Ingénieur",en:"Engineer"},
-  ds:{fr:"Achète les améliorations dès qu'elles sont payables",en:"Buys upgrades as soon as they are affordable"}},
+  nm:{fr:"Ingénieur",en:"Engineer"}, nmd:{fr:"l'Ingénieur",en:"the Engineer"},
+  ds:{fr:"Achète les améliorations dès qu'elles sont payables — met le Contremaître en pause",en:"Buys upgrades as soon as they are affordable — pauses the Foreman"}},
  {id:"sonde", ico:"📡", max:1, c0:200, cg:1,
   nm:{fr:"Sonde de récupération",en:"Recovery probe"},
   ds:{fr:"Ramasse les anomalies à ta place",en:"Collects anomalies for you"}},
@@ -1097,18 +1132,96 @@ const AUTOS=[
 ];
 const autoCost=(a,l)=>Math.ceil(a.c0*Math.pow(a.cg,l));
 const alvl=id=>S.auto[id]||0;
-const aOn=id=>alvl(id)>0&&!S.autoOff[id];
+/* Trois états par automate, et il faut les distinguer :
+   - actif ;
+   - **coupé à la main** (`S.autoOff`) : une intention du joueur, elle survit à
+     tout et rien ne la lève automatiquement ;
+   - **mis en pause** par son exclusif (`S.autoPause`) : un état dérivé, qui se
+     lève tout seul dès que l'autre s'arrête.
+   Sans cette séparation, couper l'Ingénieur laissait le Contremaître éteint
+   alors qu'il n'avait jamais été coupé par le joueur — juste suspendu. */
+const aOn=id=>alvl(id)>0&&!S.autoOff[id]&&!S.autoPause[id];
 const CONTRE_S=1;                   // délai entre deux achats du Contremaître
 const SONDE_S =2;                   // délai avant ramassage de la Sonde
-/* Plafond de dépense d'un automate pour un seul achat, en part du minerai
-   possédé. Sous 100 %, chaque achat laisse forcément un reste : la réserve ne
-   tombe jamais à zéro et il te reste toujours de quoi acheter toi-même. */
-const oreDispo=()=>S.ore*normPart()/100;
-/* Trois réglages nommés plutôt que des pourcentages : le joueur choisit un
-   comportement, le panneau lui montre ensuite le chiffre que ça donne. */
-const PARTS=[10,20,30,40,50,60,70,80,90,100];   // plafond de dépense, en %
-const proche=(v,l,d)=>l.includes(v)?v:(v==null?d:l.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a));
-function normPart(){return S.autoPart=proche(S.autoPart,PARTS,30)}
+/* Structures déjà révélées : c'est la liste que voit le joueur dans Extraction,
+   donc la seule qu'on puisse proposer sans rien dévoiler d'avance. */
+function genRev(){return GENS.slice(0,Math.max(1,Math.min(S.seen,GENS.length)))}
+/* Cible du Contremaître. Tant que le joueur n'a rien choisi, on vise la
+   dernière structure révélée : c'est la plus rentable au minerai dépensé, et ça
+   évite qu'un automate acheté tard se mette à empiler des drones. Dès qu'il
+   choisit dans la liste, S.autoGen est écrit et ne bouge plus tout seul. */
+function autoGenId(){
+  const rev=genRev();
+  return rev.some(g=>g.id===S.autoGen)?S.autoGen:rev[rev.length-1].id;
+}
+function autoGen(){const id=autoGenId();return GENS.find(g=>g.id===id)}
+/* Prochaine amélioration de l'Ingénieur : la moins chère encore disponible,
+   payable ou non. C'est aussi la somme que le Contremaître laisse de côté —
+   sans cette réserve il viderait le stock chaque seconde et plus aucune
+   amélioration un peu chère ne deviendrait jamais payable. */
+function prochaineUp(){
+  let c=null;
+  UPS.forEach(u=>{
+    if(S.ups[u.id])return;
+    if(u.req&&!u.req(S))return;
+    if(!c||u.cost<c.cost)c=u;
+  });
+  return c;
+}
+/* Contremaître et Ingénieur puisent dans le même minerai, et deux tentatives
+   d'arbitrage automatique ont été écartées : réserver le prix exact de la
+   prochaine amélioration bloquait le Contremaître à zéro achat, et lui laisser
+   la moitié du stock marchait sur le papier mais restait illisible — on voit
+   les structures ralentir sans savoir pourquoi.
+   Ils sont donc **exclusifs** : allumer l'un coupe l'autre, l'interrupteur le
+   montre, et c'est le joueur qui décide lequel travaille. Rien d'implicite. */
+const EXCLUS={contre:"ing", ing:"contre"};
+function autreAuto(id){return AUTOS.find(a=>a.id===EXCLUS[id])}
+/* Coupé par l'exclusivité plutôt qu'à la main : renvoie l'automate responsable
+   (pour le nommer dans l'interface), ou null si ce n'est pas le cas. */
+function enPause(a){return S.autoPause[a.id]?autreAuto(a.id):null}
+/* Verrou : tant que l'un des deux travaille, l'interrupteur de l'autre est
+   **inerte**, qu'il ait été suspendu ou coupé à la main. Il faut d'abord couper
+   celui qui tourne. Un clic de plus, mais plus aucune ambiguïté sur qui prend la
+   main — et surtout on ne peut jamais croire avoir rallumé un automate qui, en
+   réalité, ne démarrera pas. Renvoie l'automate responsable, ou null. */
+function verrouille(a){
+  const o=autreAuto(a.id);
+  return (o&&alvl(a.id)>0&&!aOn(a.id)&&aOn(o.id))?o:null;
+}
+/* Texte d'état d'une ligne / d'une carte, partagé pour qu'ils ne divergent pas. */
+function etatTexte(a){
+  const v=verrouille(a);
+  if(v)return enPause(a)?txtPause(v):t("au_off_by",tr(v.nmd));
+  return aOn(a.id)?autoEtat(a):t("au_off");
+}
+function txtPause(o){return t("au_pause",tr(o.nmd))}
+/* Rattrape une sauvegarde d'avant la 2.25.0 où les deux pouvaient tourner
+   ensemble : l'Ingénieur garde la main, son travail étant fini une fois les
+   73 améliorations achetées. */
+/* Recalcule les pauses à partir des seules intentions du joueur. Idempotent,
+   appelé après chaque changement, au chargement et à l'import. `S.autoMain`
+   retient lequel des deux a pris la main en dernier : c'est lui qui travaille
+   quand le joueur veut les deux allumés. */
+function normExclus(){
+  const veut=id=>alvl(id)>0&&!S.autoOff[id];
+  S.autoPause={};
+  if(veut("contre")&&veut("ing"))S.autoPause[S.autoMain==="contre"?"ing":"contre"]=1;
+}
+/* Sauvegarde d'avant la 2.26.0 : la pause y était écrite comme une coupure
+   manuelle. Si exactement l'un des deux est coupé pendant que l'autre tourne, on
+   la relit comme une pause — sinon le joueur retrouverait un Contremaître
+   « coupé à la main » qui ne se rallumerait plus jamais tout seul. */
+function migrerExclus(d){
+  if(d.autoPause)return;
+  const c=alvl("contre")>0&&!!S.autoOff.contre, i=alvl("ing")>0&&!!S.autoOff.ing;
+  if(c&&!i&&alvl("ing")>0){delete S.autoOff.contre; S.autoMain="ing"}
+  else if(i&&!c&&alvl("contre")>0){delete S.autoOff.ing; S.autoMain="contre"}
+}
+/* `S.autoPart` (plafond de dépense en %) a disparu de l'interface en 2.24.0 :
+   la réserve de l'Ingénieur règle le partage du minerai toute seule. Le champ
+   reste dans l'état pour que les sauvegardes antérieures et les exports
+   d'avant la 2.24.0 restent symétriques — il n'est plus lu nulle part. */
 /* Seuil de relance : saisi à la main, en antimatière. Un chiffre qu'on tape
    soi-même se comprend sans explication — contrairement à un pourcentage
    d'une réserve qui bouge.
@@ -1345,7 +1458,7 @@ const ACHS=[
 const NEW=()=>({
   ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
   gens:{},ups:{},res:{},achs:{},seen:1,
-  auto:{},autoOff:{},autoPart:30,autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,chain:0,
+  auto:{},autoOff:{},autoPause:{},autoMain:"",autoPart:30,autoGen:"",autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,chain:0,
   clicks:0,anoms:0,buffs:[],buy:1,
   started:Date.now(),lastTick:Date.now(),lastSave:Date.now(),
   nextAnom:Date.now()+45000
@@ -1461,12 +1574,29 @@ function buyUp(u,muet){
 function buyAuto(a){
   const l=alvl(a.id); if(l>=a.max)return;
   const c=autoCost(a,l); if(S.am<c)return;
-  S.am-=c; S.auto[a.id]=l+1; toast(t("t_auto",tr(a.nm),l+1),"violet"); render();
+  S.am-=c; S.auto[a.id]=l+1;
+  // un automate qu'on vient de payer démarre allumé : c'est lui qui prend la main
+  delete S.autoOff[a.id]; S.autoMain=a.id; normExclus();
+  toast(t("t_auto",tr(a.nm),l+1),"violet");
+  const o=autreAuto(a.id);
+  if(o&&S.autoPause[o.id])toast(t("t_auto_excl",tr(a.nm),tr(o.nm)));
+  render();
 }
 function toggleAuto(a){
   if(alvl(a.id)<1)return;
-  if(S.autoOff[a.id]){delete S.autoOff[a.id]; toast(t("t_auto_on",tr(a.nm)))}
-  else{S.autoOff[a.id]=1; toast(t("t_auto_off",tr(a.nm)))}
+  const v=verrouille(a);
+  if(v){ toast(t("t_auto_lock",tr(v.nmd))); return }   // interrupteur inerte
+  const o=autreAuto(a.id);
+  if(aOn(a.id)){                       // il travaille : le joueur le coupe
+    S.autoOff[a.id]=1;
+    // il rend la main à son exclusif, qui n'était que suspendu
+    if(S.autoMain===a.id&&o)S.autoMain=o.id;
+    normExclus();
+    toast(t("t_auto_off",tr(a.nm)));
+  }else{                               // libre et coupé : le joueur le rallume
+    delete S.autoOff[a.id]; S.autoMain=a.id; normExclus();
+    toast(t("t_auto_on",tr(a.nm)));
+  }
   render();
 }
 function buyRes(r){
@@ -1716,20 +1846,16 @@ function getCard(key,act){
 function getAutoCard(a){
   const key="auto:"+a.id, deja=CARDS.get(key);
   if(deja)return deja;
+  /* Plus d'interrupteur sur la carte depuis la 2.24.0 : la carte ne sert plus
+     qu'à l'achat et aux niveaux, les interrupteurs sont dans les Réglages. */
   const c=getCard(key,()=>buyAuto(a));
   c.classList.add("acard");
-  const sw=document.createElement("div");
-  sw.className="sw"; sw.innerHTML="<i></i>";
-  ["pointerdown","pointerup","pointermove","pointercancel","click"]
-    .forEach(ev=>sw.addEventListener(ev,e=>e.stopPropagation()));
-  bindAction(sw,()=>toggleAuto(a));
-  c.appendChild(sw); c.q.sw=sw;
   return c;
 }
 function autoEtat(a){
   const l=alvl(a.id);
   if(a.id==="clic")  return t("au_e_clic",l,l>1?"s":"");
-  if(a.id==="contre")return t("au_e_contre",CONTRE_S);
+  if(a.id==="contre"){const g=autoGen();return t("au_e_contre",g?g.ico+" "+tr(g.nm):"—")}
   if(a.id==="ing")   return t("au_e_ing");
   if(a.id==="sonde") return t("au_e_sonde",SONDE_S);
   return t("au_e_cycle",fmt(cycSeuil()));
@@ -1761,7 +1887,7 @@ function priceInfo(cost,cur,rate,unit){
 }
 
 /* ---------- squelette statique des onglets (reconstruit au changement de langue) ---------- */
-let QBTN=[], ACHNODES=[], ACHSECS=[], STROWS=[], RESSEL=null, CYCIN=null;
+let QBTN=[], ACHNODES=[], ACHSECS=[], STROWS=[], SWROWS=[], CYCIN=null, GENSEL=null;
 function buildSkeleton(){
   /* --- Extraction --- */
   $("#pGen").innerHTML=
@@ -1797,28 +1923,48 @@ function buildSkeleton(){
   bindAction($("#prBtn"),()=>{if(!$("#prBtn").disabled)doPrestige()});
 
   /* --- Automatisation --- */
+  /* Les réglages sont passés AVANT la liste des automates : une fois les
+     automates achetés, c'est le panneau qu'on revient consulter, alors que la
+     liste ne bouge plus. En bas de page il fallait faire défiler tout l'onglet
+     à chaque ajustement. */
   $("#pAu").innerHTML=
     '<p class="hint">'+t("au_hint")+'</p>'+
-    '<h3 class="sec" id="auTitle"></h3>'+
-    '<div id="auList"></div>'+
     '<h3 class="sec" id="auSetT" style="display:none">'+t("au_set")+'</h3>'+
-    '<div class="setbox" id="auSet1" style="display:none">'+
-      '<div class="setrow"><div class="setlbl">'+t("au_res")+'</div>'+
-        '<div class="setctl" id="auPartCtl"></div></div>'+
-      '<div class="setnow" id="auResNow"></div>'+
-      '<div class="sethint">'+t("au_res_hint")+'</div>'+
+    '<div class="setbox" id="auSetSw" style="display:none">'+
+      '<div class="setrow"><div class="setlbl">'+t("au_sw")+'</div></div>'+
+      '<div class="swlist" id="auSwList"></div>'+
+      '<div class="sethint">'+t("au_sw_hint")+'</div>'+
+    '</div>'+
+    '<div class="setbox" id="auSet0" style="display:none">'+
+      '<div class="setrow"><div class="setlbl">'+t("au_gen")+'</div>'+
+        '<div class="setctl" id="auGenCtl"></div></div>'+
+      '<div class="setnow" id="auGenNow"></div>'+
+      '<div class="sethint">'+t("au_gen_hint")+'</div>'+
     '</div>'+
     '<div class="setbox" id="auSet2" style="display:none">'+
       '<div class="setrow"><div class="setlbl">'+t("au_cyc")+'</div>'+
         '<div class="setctl" id="auCycCtl"></div></div>'+
       '<div class="setnow" id="auCycNow"></div>'+
       '<div class="sethint">'+t("au_cyc_hint")+'</div>'+
-    '</div>';
-  RESSEL=document.createElement("select");
-  RESSEL.className="sel";
-  PARTS.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v+" %";RESSEL.appendChild(o)});
-  RESSEL.addEventListener("change",()=>{S.autoPart=Number(RESSEL.value);render()});
-  $("#auPartCtl").appendChild(RESSEL);
+    '</div>'+
+    '<h3 class="sec" id="auTitle"></h3>'+
+    '<div id="auList"></div>';
+  GENSEL=document.createElement("select");
+  GENSEL.className="sel"; GENSEL._sig=null;
+  GENSEL.addEventListener("change",()=>{S.autoGen=GENSEL.value;render()});
+  $("#auGenCtl").appendChild(GENSEL);
+  /* Une ligne par automate, montrée seulement s'il est possédé : les
+     interrupteurs remontent avec les réglages, la liste du bas ne sert plus
+     qu'à l'achat et aux niveaux. */
+  SWROWS=AUTOS.map(a=>{
+    const r=document.createElement("div"); r.className="swrow";
+    r.innerHTML='<span class="swico"></span><span class="swnm"></span><span class="swst"></span>';
+    const sw=document.createElement("div"); sw.className="sw"; sw.innerHTML="<i></i>";
+    bindAction(sw,()=>toggleAuto(a));
+    r.appendChild(sw);
+    r.q={ico:r.querySelector(".swico"),nm:r.querySelector(".swnm"),st:r.querySelector(".swst"),sw};
+    return {a,r};
+  });
   CYCIN=document.createElement("input");
   CYCIN.type="number"; CYCIN.min="1"; CYCIN.step="1"; CYCIN.className="numin";
   CYCIN.inputMode="numeric";
@@ -2015,13 +2161,13 @@ function renderPrestige(){
 function renderAuto(){
   html($("#auTitle"),t("au_title",'<b style="color:var(--violet)">'+fmt(S.am)+"</b>"));
   syncList($("#auList"),AUTOS.map(a=>{
-    const l=alvl(a.id), maxed=l>=a.max, cost=autoCost(a,l), coupe=l>0&&!!S.autoOff[a.id];
+    const l=alvl(a.id), maxed=l>=a.max, cost=autoCost(a,l), coupe=l>0&&!aOn(a.id);
     const c=getAutoCard(a);
     const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
-    show(c.q.sw,l>0); cls(c.q.sw,"on",l>0&&!coupe); cls(c,"off",coupe);
+    cls(c,"off",coupe);
     cls(c,"pulsing",a.id==="clic"&&l>0&&!coupe);
     upd(c,{ico:a.ico, nm:tr(a.nm), ds:tr(a.ds),
-      rt:l>0?(coupe?autoEtat(a)+" — "+t("au_off"):autoEtat(a)):"",
+      rt:l>0?(coupe?autoEtat(a)+" — "+etatTexte(a):autoEtat(a)):"",
       clbl:maxed?"":(a.max>1?tm("price_lvl",l+1):t("price")),
       // un automate à palier unique n'a pas de « MAX » à annoncer : « ✓ acquis » suffit
       cost:maxed?(a.max>1?"MAX":null):t("cost_am",fmt(cost)), am:1,
@@ -2030,10 +2176,48 @@ function renderAuto(){
       owsub:a.max>1?t("lvl_sub"):(l>0?t("au_owned"):"")});
     return c;
   }));
-  const s1=alvl("contre")>0||alvl("ing")>0, s2=alvl("cycle")>0;
-  show($("#auSetT"),s1||s2); show($("#auSet1"),s1); show($("#auSet2"),s2);
-  html($("#auResNow"),t("au_res_now",fmt(oreDispo())));
-  const pv=String(normPart()); if(RESSEL.value!==pv)RESSEL.value=pv;
+  /* Interrupteurs : une ligne par automate possédé, en tête d'onglet. */
+  const poss=SWROWS.filter(x=>alvl(x.a.id)>0);
+  poss.forEach(({a,r})=>{
+    const coupe=!aOn(a.id);
+    const pause=enPause(a), verrou=verrouille(a);
+    txt(r.q.ico,a.ico); txt(r.q.nm,tr(a.nm));
+    txt(r.q.st,etatTexte(a));
+    cls(r,"off",coupe&&!pause); cls(r,"pause",!!pause);
+    // curseur à droite = il repartira dès que l'autre s'arrête ; grisé+inerte = verrouillé
+    cls(r.q.sw,"on",!coupe||!!pause);
+    cls(r.q.sw,"pause",!!verrou); cls(r.q.sw,"lock",!!verrou);
+  });
+  syncList($("#auSwList"),poss.map(x=>x.r));
+
+  const s0=alvl("contre")>0, s2=alvl("cycle")>0;
+  show($("#auSetT"),poss.length>0); show($("#auSetSw"),poss.length>0);
+  show($("#auSet0"),s0); show($("#auSet2"),s2);
+
+  /* Cible du Contremaître : la liste ne contient que les structures déjà
+     révélées, et n'est reconstruite que quand elle change vraiment (nouvelle
+     structure ou changement de langue) — sinon le menu se refermerait tout
+     seul pendant qu'on le parcourt. */
+  if(s0){
+    const rev=genRev(), sig=LANG+"|"+rev.length;
+    if(GENSEL._sig!==sig){
+      GENSEL._sig=sig; GENSEL.innerHTML="";
+      rev.forEach(g=>{
+        const o=document.createElement("option");
+        o.value=g.id; o.textContent=g.ico+"  "+tr(g.nm);
+        GENSEL.appendChild(o);
+      });
+    }
+    const cible=autoGenId();
+    if(GENSEL.value!==cible)GENSEL.value=cible;
+    const g=autoGen(), cout=genCost(g,1), manque=cout-S.ore;
+    if(manque<=0) html($("#auGenNow"),t("au_gen_ready",fmt(cout)));
+    else{
+      const r=perSec();
+      let d=""; if(r>0)d=(manque/r>86400*60)?tm("far"):t("eta",fmtTime(manque/r));
+      html($("#auGenNow"),t("au_gen_wait",fmt(cout),fmt(manque),d));
+    }
+  }
   if(document.activeElement!==CYCIN){          // on n'écrase pas la saisie en cours
     const v=String(cycSeuil()); if(CYCIN.value!==v)CYCIN.value=v;
   }
@@ -2277,33 +2461,23 @@ function runAutos(dt){
     if(n>0){ autoAcc.clic-=n; gain(clickVal(true)*n); S.clicks+=n; }
   }
 
-  if(aOn("contre")){
-    autoAcc.contre+=d;
-    if(autoAcc.contre>=CONTRE_S){
-      autoAcc.contre=0;
-      const dispo=oreDispo();
-      let cible=null, prix=Infinity;
-      GENS.forEach((g,i)=>{
-        if(i>=S.seen)return;                       // structure pas encore révélée
-        const c=genCost(g,1);
-        if(c<=dispo&&c<prix){prix=c;cible=g}
-      });
-      if(cible){ S.ore-=prix; S.gens[cible.id]=(S.gens[cible.id]||0)+1; }
-    }
-  }
-
   if(aOn("ing")){
     autoAcc.ing+=d;
     if(autoAcc.ing>=1){
       autoAcc.ing=0;
-      const dispo=oreDispo();
-      let cible=null;
-      UPS.forEach(u=>{
-        if(S.ups[u.id]||u.cost>dispo)return;
-        if(u.req&&!u.req(S))return;
-        if(!cible||u.cost<cible.cost)cible=u;
-      });
-      if(cible)buyUp(cible,true);
+      const cible=prochaineUp();
+      if(cible&&cible.cost<=S.ore)buyUp(cible,true);
+    }
+  }
+
+  if(aOn("contre")){
+    autoAcc.contre+=d;
+    if(autoAcc.contre>=CONTRE_S){
+      autoAcc.contre=0;
+      /* Une seule cible, celle choisie par le joueur. Pas d'arbitrage à faire
+         avec l'Ingénieur : ils ne tournent jamais en même temps. */
+      const g=autoGen(), c=g?genCost(g,1):Infinity;
+      if(c<=S.ore){ S.ore-=c; S.gens[g.id]=(S.gens[g.id]||0)+1; }
     }
   }
 
@@ -2344,7 +2518,7 @@ function load(){
   const raw=readSave(); if(!raw)return false;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(raw))));
-    S=Object.assign(NEW(),d);
+    S=Object.assign(NEW(),d); migrerExclus(d); normExclus();
     S.buffs=(S.buffs||[]).filter(b=>b.until>Date.now());
     // gains hors-ligne (même règle que le retour d'arrière-plan)
     const away=(Date.now()-(d.lastSave||Date.now()))/1000;
@@ -2368,7 +2542,7 @@ bindAction($("#mImport"),()=>{
   const v=$("#mText").value.trim(); if(!v)return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(v))));
-    S=Object.assign(NEW(),d); S.lastTick=Date.now(); save(); render();
+    S=Object.assign(NEW(),d); migrerExclus(d); normExclus(); S.lastTick=Date.now(); save(); render();
     $("#modal").classList.remove("on"); toast(t("t_imported"));
   }catch(e){alert(t("bad_code"))}
 });

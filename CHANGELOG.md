@@ -17,6 +17,150 @@ restent valides**.
 
 ---
 
+## 2.27.0 — L'interrupteur de l'automate à l'arrêt est verrouillé
+
+- 🔒 Tant que l'un des deux travaille, l'interrupteur de l'autre est
+  **grisé et inerte** (curseur `not-allowed`) — y compris quand celui-ci avait
+  été **coupé à la main** avant. Il n'était jusque-là verrouillé que s'il avait
+  été suspendu : on pouvait donc croire l'avoir rallumé alors qu'il n'aurait pas
+  démarré. Pour lui rendre la main, il faut d'abord couper celui qui tourne.
+- 🏷️ Le libellé distingue les deux situations : « **mise en pause par
+  l'Ingénieur** » quand il repartira tout seul (curseur du bouton à droite), et
+  « **coupé — l'Ingénieur travaille** » quand tu l'avais coupé toi-même (curseur
+  à gauche). La position du bouton dit donc ce qui se passera une fois l'autre
+  arrêté.
+- 💬 Un clic sur un interrupteur verrouillé affiche « Coupe d'abord l'Ingénieur
+  pour libérer celui-ci » plutôt que de ne rien faire en silence.
+
+Aucun nouveau champ de sauvegarde.
+
+---
+
+## 2.26.0 — Couper l'Ingénieur rend la main au Contremaître
+
+- 🐛 **Bug corrigé** : depuis la 2.25.0, la pause d'exclusivité était stockée
+  comme une **coupure manuelle**. Couper l'Ingénieur laissait donc le
+  Contremaître éteint alors qu'il n'avait jamais été coupé par le joueur — juste
+  suspendu — et il fallait le rallumer à la main.
+- 🔁 Les deux états sont maintenant distincts : **coupé à la main**
+  (`S.autoOff`, une intention du joueur, que rien ne lève automatiquement) et
+  **mis en pause** (`S.autoPause`, un état dérivé qui se lève dès que l'autre
+  s'arrête). Couper l'Ingénieur **rend donc la main au Contremaître** — mais ne
+  ressuscite pas un Contremaître que tu avais délibérément coupé.
+- 🗃️ Une sauvegarde d'avant la 2.26.0 est relue au chargement : si exactement
+  l'un des deux est coupé pendant que l'autre tourne, la coupure est
+  réinterprétée comme une pause.
+
+Deux nouveaux champs purement additifs, `S.autoPause` et `S.autoMain` (lequel des
+deux a pris la main en dernier). Sauvegardes antérieures compatibles.
+
+---
+
+## 2.25.2 — La pause dit qui l'a déclenchée
+
+- 🏷️ Un automate suspendu n'affiche plus « en pause » mais **« mise en pause par
+  l'Ingénieur »** (ou « par le Contremaître ») : la cause est nommée là où on la
+  lit, sans avoir à deviner lequel des deux a pris la main.
+- 📱 Sur écran étroit (< 520 px), la ligne d'état **passe sous le nom** au lieu
+  de disparaître. Elle était masquée depuis la 2.24.0 pour gagner de la place —
+  ce qui rendait justement ce message invisible sur téléphone.
+
+---
+
+## 2.25.1 — L'automate en pause reste visiblement armé
+
+- 🎚️ L'interrupteur d'un automate **mis en pause par l'exclusivité** garde son
+  curseur **à droite**, simplement **grisé**, au lieu de basculer à gauche comme
+  s'il avait été coupé. Il est armé, c'est le jeu qui l'a suspendu — et on ne
+  croit plus l'avoir éteint par erreur. Sa ligne est aussi moins estompée qu'une
+  ligne coupée à la main.
+- 📝 Les deux cartes l'expliquent maintenant dans leur description : le
+  Contremaître « met l'Ingénieur en pause », l'Ingénieur « met le Contremaître
+  en pause ».
+
+Correctif d'affichage uniquement, aucun changement de comportement.
+
+---
+
+## 2.25.0 — Contremaître et Ingénieur deviennent exclusifs
+
+- 🔀 Le partage automatique du minerai introduit en 2.24.0 (moitié du stock au
+  Contremaître) donnait de bons chiffres mais **restait illisible en jouant** :
+  on voit ses structures ralentir sans comprendre pourquoi. Les deux automates
+  sont désormais **exclusifs** — **allumer l'un met l'autre en pause**,
+  l'interrupteur le montre, et c'est toi qui décides lequel travaille.
+- ⏸️ Une ligne coupée par l'exclusivité affiche « **en pause** » et non
+  « coupé » : on distingue au premier coup d'œil ce qu'on a coupé soi-même de ce
+  que le jeu a mis en attente.
+- 🆕 Un automate qu'on vient de **payer démarre allumé** et prend la main sur son
+  exclusif : pas de surprise du genre « je viens de l'acheter et il ne fait rien ».
+- ↩️ Le Contremaître **n'a plus aucun frein** : il achète sa cible dès qu'il a
+  le prix, point.
+- 🗃️ Une sauvegarde d'avant la 2.25.0 où les deux tournaient ensemble est
+  rattrapée au chargement : l'**Ingénieur garde la main**, son travail étant fini
+  une fois les 73 améliorations achetées.
+
+Aucun nouveau champ de sauvegarde.
+
+---
+
+## 2.24.0 — Contremaître et Ingénieur se partagent le minerai
+
+- ⚖️ Depuis la 2.23.0 les deux automates se marchaient dessus : le Contremaître
+  achète dès que le minerai couvre sa cible, donc le stock ne montait jamais et
+  l'**Ingénieur était affamé en permanence** — plus aucune amélioration un peu
+  chère ne devenait payable. Le Contremaître ne dépense désormais que **la
+  moitié du stock** tant que l'Ingénieur a encore quelque chose à acheter, et la
+  totalité une fois qu'il a fini. Aucun réglage à comprendre.
+  Mesuré sur 30 minutes simulées en milieu de partie, cible Drone :
+  **15 améliorations et 56 267/s** au lieu de 13 et 37 515/s, pour 2 structures
+  de moins.
+- 🚫 Le **plafond de dépense en %** disparaît de l'interface : il ne servait
+  qu'à ce partage, que la règle ci-dessus fait maintenant toute seule. Le champ
+  `S.autoPart` reste dans l'état pour que les sauvegardes et les exports
+  antérieurs restent symétriques.
+- 🎛️ Les **interrupteurs remontent dans les Réglages**, une ligne par automate
+  possédé (icône, nom, état, interrupteur). La liste du bas ne sert plus qu'à
+  l'achat et aux niveaux des Satellites.
+- ✂️ Explications des réglages **raccourcies**.
+
+Une piste intermédiaire a été essayée puis écartée : réserver le **prix exact**
+de la prochaine amélioration bloquait le Contremaître à **zéro achat** sans rien
+gagner à l'Ingénieur — le stock ne dépasse jamais durablement ce prix, puisque
+l'Ingénieur l'achète dès qu'il l'atteint.
+
+---
+
+## 2.23.0 — Le Contremaître vise la structure de ton choix
+
+- 🎯 Le **Contremaître** rachetait toujours la structure **la moins chère**
+  payable. C'est l'inverse de ce qu'on fait à la main : les structures tardives
+  rapportent beaucoup plus par minerai dépensé, et laisser l'automate empiler
+  des drones revient à gaspiller la production. Il a désormais un **menu
+  déroulant** dans les Réglages, listant les structures **déjà révélées** avec
+  leur icône : il n'achète plus que celle-là, une par seconde.
+- 💰 Il n'est **plus soumis au plafond de dépense en %**. Viser une grosse
+  structure n'aurait aucun sens si l'automate n'avait pas le droit d'y mettre
+  tout le minerai nécessaire. Le plafond ne concerne donc plus que
+  l'**Ingénieur**, et son intitulé le dit maintenant explicitement.
+- ⏳ Si la cible n'est pas payable, il **n'achète rien et attend** — pas de repli
+  sur une structure moins chère, c'est tout l'intérêt du « une seule à la fois ».
+  La ligne du panneau donne le prix visé, ce qu'il manque et une estimation de
+  temps, et la carte de l'automate rappelle sa cible en permanence.
+- ⬆️ Les **Réglages sont passés en haut de l'onglet**, avant la liste des
+  automates. Une fois ceux-ci achetés, la liste ne bouge plus alors que le
+  panneau est ce qu'on revient consulter : il fallait faire défiler tout
+  l'onglet à chaque ajustement.
+- 🔒 Le menu ne propose que les structures déjà découvertes (`S.seen`) : rien ne
+  se dévoile d'avance. Tant que tu n'as rien choisi, il vise la **dernière
+  structure révélée** — le meilleur défaut, et ça évite qu'un automate acheté
+  tard se mette à empiler des drones.
+
+Nouveau champ `S.autoGen`, purement additif : les sauvegardes antérieures se
+chargent sans conversion et repartent sur le défaut ci-dessus.
+
+---
+
 ## 2.22.0 — Les améliorations acquises sont rangées par catégorie
 
 - 🗂️ La liste **Acquises** de l'onglet Améliorations était une longue file

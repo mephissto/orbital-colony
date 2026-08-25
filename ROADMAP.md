@@ -1,6 +1,6 @@
 # Feuille de route
 
-Version **2.22.0**. Ce document sert de mémoire entre
+Version **2.27.0**. Ce document sert de mémoire entre
 deux sessions : ce qui est décidé, ce qui reste à faire, et pourquoi.
 
 ---

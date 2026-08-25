@@ -414,13 +414,14 @@ Volontairement, aucun « +N » flottant n'est émis pour un clic automatique : �
 10 clics/s ce serait illisible, et ça noierait les « +N » des clics manuels, qui
 sont le retour visuel du geste du joueur.
 
-**Chaque automate possède un interrupteur** (à droite de sa carte). Le couper ne
-rembourse rien et ne fait pas perdre les niveaux : il suffit de le rallumer.
+**Chaque automate possède un interrupteur**, dans la section Réglages en tête
+d'onglet. Le couper ne rembourse rien et ne fait pas perdre les niveaux : il
+suffit de le rallumer.
 
 | Automate | Effet | Max | Coût | Coût cumulé |
 |---|---|---|---|---|
 | 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
-| 🏗️ Contremaître | rachète chaque seconde la structure la moins chère | 1 | 100 | 100 |
+| 🏗️ Contremaître | rachète chaque seconde la structure que tu lui désignes | 1 | 100 | 100 |
 | ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 150 | 150 |
 | 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 200 | 200 |
 | ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 400 | 400 |
@@ -441,20 +442,77 @@ dépense. Contremaître : un achat par seconde (`CONTRE_S`). Sonde : ramassage
 2 s après l'apparition (`SONDE_S`), largement sous les 14 s de durée de vie
 d'une anomalie.
 
-Sous la liste, une section **Réglages** regroupe deux boîtes. Chacune contient,
-dans cet ordre : l'intitulé et sa commande sur la même ligne, puis un trait, puis
-le **chiffre concret** du moment, puis l'explication en petit. Tout ce qui
-concerne un réglage est ainsi enfermé dans son propre cadre — aucune ambiguïté
-sur l'explication qui va avec quoi — et le joueur n'a jamais de calcul mental à
-faire pour savoir ce que son réglage donne réellement.
+**En tête d'onglet**, une section **Réglages** regroupe les interrupteurs et les
+deux réglages, chacun révélé par l'automate qu'il concerne. Chaque boîte
+contient, dans cet ordre : l'intitulé et sa commande sur la même ligne, puis un
+trait, puis le **chiffre concret** du moment, puis l'explication en petit. Les
+réglages sont placés **avant** la liste des automates : une fois ceux-ci
+achetés, la liste ne sert plus qu'à l'achat et aux niveaux alors que le panneau
+est ce qu'on revient consulter.
 
-**Les automates ne dépensent pas plus de** — menu déroulant, paliers de 10 % à
-100 % (`PARTS`, `S.autoPart`, 30 % par défaut). Le Contremaître et l'Ingénieur
-n'achètent que si le prix ne dépasse pas cette part du minerai possédé. Sous
-100 %, chaque achat laisse forcément un reste : la réserve ne tombe donc jamais
-à zéro. Plus le plafond est bas, plus le stock grossit et plus il reste de quoi
-acheter soi-même — au prix de quelques structures en moins. La ligne affichée
-donne le prix plafond du moment (`oreDispo()`).
+**Automates actifs** — une ligne par automate possédé : icône, nom, état courant
+et son interrupteur. Le couper ne rembourse rien et ne fait perdre aucun niveau.
+Sous 520 px de large l'état passe **sous** le nom au lieu de disparaître : c'est
+lui qui porte le « mise en pause par… », l'information la plus utile de la ligne.
+
+**Le Contremaître rachète** — menu déroulant listant les structures **déjà
+révélées** (`genRev()`, borné par `S.seen` : rien ne se dévoile d'avance), avec
+leur icône. Il n'achète que celle-là, une par seconde. Tant que le joueur n'a
+rien choisi, `autoGenId()` vise la **dernière structure révélée** ; dès qu'il
+choisit, `S.autoGen` est écrit et ne bouge plus tout seul. La ligne affichée
+donne le prix visé, le minerai qu'il reste à posséder et une estimation de temps.
+
+**Le Contremaître et l'Ingénieur sont exclusifs.** Ils puisent dans le même
+minerai : allumer l'un met l'autre **en pause**, l'interrupteur le montre, et
+c'est le joueur qui décide lequel travaille. **Un seul des deux peut tourner à la
+fois, et l'interrupteur de l'autre est inerte** (`verrouille()`, curseur
+`not-allowed`) : pour rendre la main au Contremaître il faut d'abord couper
+l'Ingénieur. Un clic de plus, mais on ne peut jamais croire avoir rallumé un
+automate qui, en réalité, ne démarrera pas.
+
+Un automate a donc **trois états**, et les distinguer est ce qui fait marcher
+l'ensemble :
+
+| État | Champ | Levée |
+|---|---|---|
+| actif | — | — |
+| **coupé à la main** | `S.autoOff` | jamais automatiquement : c'est une intention du joueur |
+| **mis en pause** par son exclusif | `S.autoPause` | dès que l'autre s'arrête, quelle qu'en soit la raison |
+
+`S.autoMain` retient lequel des deux a pris la main en dernier, `normExclus()`
+recalcule les pauses à partir des seules intentions du joueur (idempotent, appelé
+après chaque changement, au chargement et à l'import), et `buyAuto()` donne la
+main à celui qu'on vient de payer. Concrètement : couper l'Ingénieur **rend la
+main au Contremaître** s'il n'avait été que suspendu, mais ne ressuscite pas un
+Contremaître que le joueur avait délibérément coupé. `migrerExclus()` relit une
+sauvegarde d'avant la 2.26.0, où la pause était écrite comme une coupure
+manuelle. Une ligne coupée par l'exclusivité affiche
+« mise en pause par *l'autre automate* » plutôt que « coupé » — `enPause()`
+renvoie l'automate responsable, `txtPause()` le nomme via son champ `nmd` (nom
+avec article) — et **son interrupteur garde le curseur à droite, simplement
+grisé** : l'automate est armé, c'est le jeu qui l'a
+suspendu — le distinguer visuellement d'un automate qu'on a coupé soi-même évite
+de croire qu'on l'a éteint par erreur. Les deux cartes le disent aussi dans leur
+description (« met l'Ingénieur en pause » / « met le Contremaître en pause »).
+
+Deux arbitrages **automatiques** ont été essayés puis abandonnés, parce qu'aucun
+n'était lisible en jouant :
+
+| Règle | Structures | Améliorations | Production finale |
+|---|---|---|---|
+| aucune (cible Drone) | 33 | 13 | 37 515 /s |
+| moitié du stock au Contremaître (2.24.0) | 31 | 15 | 56 267 /s |
+| réserver le prix exact de la prochaine amélioration | 0 | 15 | 56 198 /s |
+
+Mesures sur 30 minutes simulées en milieu de partie. Réserver le prix exact
+bloquait le Contremaître à zéro achat : le stock ne dépasse jamais durablement le
+prix de l'amélioration suivante, puisque l'Ingénieur l'achète dès qu'il
+l'atteint. La moitié du stock donnait de meilleurs chiffres, mais le joueur
+voyait ses structures ralentir sans comprendre pourquoi — un arbitrage invisible
+vaut moins qu'un interrupteur explicite. Le plafond de dépense en %
+(`S.autoPart`), qui jouait ce rôle jusqu'à la 2.23.0, a disparu de l'interface
+en 2.24.0 ; le champ reste dans l'état pour que les sauvegardes et les exports
+antérieurs restent symétriques.
 
 **Relancer le cycle à partir de** — un **seuil saisi à la main**, en antimatière
 (`S.autoCyc`, 50 par défaut). `cycSeuil()` applique un **plancher à 10 % de
