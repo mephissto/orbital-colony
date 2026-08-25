@@ -17,6 +17,29 @@ restent valides**.
 
 ---
 
+## 2.22.0 — Les améliorations acquises sont rangées par catégorie
+
+- 🗂️ La liste **Acquises** de l'onglet Améliorations était une longue file
+  plate, dans l'ordre de la définition interne : au bout de 30 ou 40 achats on
+  ne retrouvait plus rien. Elle est maintenant découpée en sous-sections :
+  - **un en-tête par structure** pour les paliers (🛸 Drone, ⛏️ Foreuse… dans
+    l'ordre de l'onglet Extraction) ;
+  - puis 🔨 **Puissance de clic**, 📡 **Résonance du clic**, 🔗 **Production
+    globale** et 🔮 **Anomalies** pour les autres familles.
+- 🔢 Chaque en-tête porte un compteur `acquis/total` (`4/6`, `2/4`…) qui passe
+  en **doré** quand la famille est complète, comme dans l'onglet Succès.
+- 🙈 Une catégorie n'apparaît **qu'à partir de la première amélioration acquise
+  dedans**. Sortir « 0/6 » pour la Sphère de Dyson dès la première partie
+  révélerait son existence bien avant l'heure ; ici le compteur ne dit que
+  *combien* il reste dans une famille déjà entamée, jamais lesquelles ni ce
+  qu'elles font.
+- La liste **Disponibles** est inchangée : elle reste triée par prix croissant,
+  c'est ce qu'on regarde pour acheter.
+
+Aucun changement d'économie, d'équilibrage ni de format de sauvegarde.
+
+---
+
 ## 2.21.10 — Les flèches de défilement suivent le pointeur, pas la largeur
 
 - ◀▶ Les flèches de la barre d'onglets (2.21.9) étaient limitées à la mise en

@@ -172,6 +172,14 @@ Quantum relay ×2 (1.2e9), Bio-engineering ×2.5 (3e11), Singularity engine ×4
 
 Total: **73 upgrades**.
 
+**How owned upgrades are sorted** — the list of already-purchased upgrades is
+split into sub-sections: one per structure for the tiers (in Mining-tab order),
+then Click power, Click resonance, Global output and Anomalies. Each header
+carries an `owned/total` counter that turns gold once the family is complete. A
+category only shows up once you own your first upgrade in it: the counter tells
+you *how many* are left in the family, never which ones, so nothing is revealed
+early.
+
 ---
 
 ## Anomalies

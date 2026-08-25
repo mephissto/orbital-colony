@@ -16,6 +16,28 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.22.0 — Owned upgrades are now sorted into categories
+
+- 🗂️ The **Already owned** list in the Upgrades tab was one long flat queue in
+  internal definition order: after 30 or 40 purchases you could no longer find
+  anything in it. It is now split into sub-sections:
+  - **one header per structure** for the tiers (🛸 Mining drone, ⛏️ Automated
+    drill… in Mining-tab order);
+  - then 🔨 **Click power**, 📡 **Click resonance**, 🔗 **Global output** and
+    🔮 **Anomalies** for the other families.
+- 🔢 Each header carries an `owned/total` counter (`4/6`, `2/4`…) that turns
+  **gold** once the family is complete, just like in the Achievements tab.
+- 🙈 A category only appears **once you own your first upgrade in it**. Showing
+  "0/6" for the Dyson sphere on a first run would reveal its existence far too
+  early; here the counter only tells you *how many* are left in a family you
+  have already started, never which ones or what they do.
+- The **Available** list is unchanged: still sorted by ascending price, which is
+  what you actually look at when buying.
+
+No change to the economy, balance or save format.
+
+---
+
 ## 2.21.10 — Scroll arrows now follow the pointer, not the width
 
 - ◀▶ The tab bar's scroll arrows (2.21.9) were limited to the desktop layout

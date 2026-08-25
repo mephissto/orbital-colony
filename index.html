@@ -425,7 +425,10 @@ h3.sec:first-child{margin-top:0}
   .stt{padding:9px 10px}
   .stt .v{font-size:16px}
 }
-h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+/* sous-sections des améliorations acquises : elles suivent immédiatement le
+   titre « Acquises », d'où le margin-top rétabli malgré la règle :first-child */
+#upOwn h3.upsec:first-child{margin-top:14px}
 .secn{font-size:11px;letter-spacing:.08em;color:var(--dim);font-variant-numeric:tabular-nums;flex:0 0 auto}
 .secn.full{color:var(--gold)}
 .achgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
@@ -727,7 +730,7 @@ h3.achsec{display:flex;align-items:baseline;justify-content:space-between;gap:10
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.21.10";
+const VERSION="2.22.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1018,6 +1021,23 @@ UPS.push(
   nm:{fr:"Balise d'anomalie",en:"Anomaly beacon"},
   ds:{fr:"Les anomalies apparaissent 30 % plus souvent",en:"Anomalies appear 30 % more often"}}
 );
+
+/* ---------- catégories des améliorations acquises ---------- */
+/* Les paliers sont regroupés par structure (dans l'ordre d'Extraction), le
+   reste par famille d'effet. Une catégorie n'est affichée que si le joueur y
+   possède déjà au moins une amélioration : sortir « 0/6 » pour la Sphère de
+   Dyson révélerait son existence bien avant l'heure. Le compteur n/total ne
+   dit que *combien* il en reste dans la famille, jamais lesquelles. */
+const UPCATS=[];
+GENS.forEach(g=>UPCATS.push({id:"gen_"+g.id,ico:g.ico,nm:g.nm,
+  f:u=>u.kind==="gen"&&u.target===g.id}));
+UPCATS.push(
+ {id:"click",ico:"🔨",nm:{fr:"Puissance de clic", en:"Click power"},     f:u=>u.kind==="click"},
+ {id:"reso", ico:"📡",nm:{fr:"Résonance du clic",en:"Click resonance"}, f:u=>u.kind==="reso"},
+ {id:"glob", ico:"🔗",nm:{fr:"Production globale",en:"Global output"},  f:u=>u.kind==="glob"},
+ {id:"anom", ico:"🔮",nm:{fr:"Anomalies",         en:"Anomalies"},       f:u=>u.kind==="anom"}
+);
+UPCATS.forEach(c=>c.list=UPS.filter(c.f));
 
 /* ---------- données : recherche (antimatière) ---------- */
 const RES=[
@@ -1912,6 +1932,14 @@ function renderGens(){
 function upVisible(u){return (!u.req||u.req(S))&&S.totalOre>=u.cost*0.08}
 function upBadge(){return UPS.filter(u=>!S.ups[u.id]&&(!u.req||u.req(S))&&S.ore>=u.cost).length}
 
+/* en-têtes de catégorie réutilisés d'un rendu à l'autre, comme les cartes */
+const UPHEADS=new Map();
+function upHead(cat){
+  let h=UPHEADS.get(cat.id);
+  if(!h){h=document.createElement("h3"); h.className="sec upsec"; UPHEADS.set(cat.id,h)}
+  return h;
+}
+
 function renderUps(){
   const rate=perSec();
   const avail=UPS.filter(u=>!S.ups[u.id]&&upVisible(u)).sort((a,b)=>a.cost-b.cost);
@@ -1934,11 +1962,24 @@ function renderUps(){
   }
   syncList($("#upList"),l1);
 
-  syncList($("#upOwn"),own.map(u=>{
-    const c=getCard("upo:"+u.id);
-    upd(c,{ico:u.ico,nm:tr(u.nm),ds:tr(u.ds),clbl:t("acquired"),cost:"✔",done:1});
-    return c;
-  }));
+  /* Acquises : une sous-section par catégorie, en-tête + cartes dans la même
+     liste. syncList compare les nœuds un à un, donc mélanger <h3> et cartes ne
+     coûte rien tant que les nœuds sont stables — d'où le cache UPHEADS. */
+  const l2=[];
+  UPCATS.forEach(cat=>{
+    const got=cat.list.filter(u=>S.ups[u.id]);
+    if(!got.length)return;                       // catégorie jamais entamée : on ne la montre pas
+    const h=upHead(cat), plein=got.length===cat.list.length;
+    html(h,'<span>'+cat.ico+" "+tr(cat.nm)+'</span>'+
+           '<span class="secn'+(plein?" full":"")+'">'+got.length+"/"+cat.list.length+"</span>");
+    l2.push(h);
+    got.forEach(u=>{
+      const c=getCard("upo:"+u.id);
+      upd(c,{ico:u.ico,nm:tr(u.nm),ds:tr(u.ds),clbl:t("acquired"),cost:"✔",done:1});
+      l2.push(c);
+    });
+  });
+  syncList($("#upOwn"),l2);
 }
 
 function renderPrestige(){

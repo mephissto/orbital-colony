@@ -175,6 +175,14 @@ singularité ×4 (9e13). Au complet : **×37,5**.
 
 Total : **73 améliorations**.
 
+**Rangement des acquises** — la liste des améliorations déjà achetées est
+découpée en sous-sections : une par structure pour les paliers (dans l'ordre de
+l'onglet Extraction), puis Puissance de clic, Résonance du clic, Production
+globale et Anomalies. Chaque en-tête porte un compteur `acquis/total` qui passe
+en doré une fois la famille complète. Une catégorie n'apparaît qu'à partir de la
+première amélioration acquise dedans : le compteur dit *combien* il en reste,
+jamais lesquelles, et rien ne se dévoile avant l'heure.
+
 ---
 
 ## Les anomalies

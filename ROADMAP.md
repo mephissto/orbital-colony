@@ -1,6 +1,6 @@
 # Feuille de route
 
-Version **2.21.10**. Ce document sert de mémoire entre
+Version **2.22.0**. Ce document sert de mémoire entre
 deux sessions : ce qui est décidé, ce qui reste à faire, et pourquoi.
 
 ---
@@ -206,3 +206,28 @@ classement, éditer sa propre sauvegarde ne lèse que soi-même.
 pas. À reconsidérer seulement si un jour le jeu gagne une dimension partagée
 (classement, comparaison entre joueurs) qui rendrait la triche opposable à
 quelqu'un d'autre.
+
+## Décision actée — prix des paliers (améliorations « Palier N »)
+
+Discuté (v2.21.10, sans code) : sur le Drone, le prix d'un palier
+(`base×18×11^i`) est très en-dessous de l'investissement cumulé en structure
+nécessaire pour l'atteindre — écart minime aux paliers 1-3 (need 10/25/50,
+ratio cumul/palier ~1-3×) mais qui explose aux paliers 5-6 (need 175/250,
+ratio 1,06M puis 3,44Md à ×11).
+
+Deux pistes testées, aucune ne convient :
+- **Augmenter le facteur de croissance ×11** (essayé jusqu'à ×30) : ne peut
+  pas suivre, la structure grandit en exposant du nombre possédé (jusqu'à
+  250) alors que le palier grandit en exposant d'un simple indice 0-5. Même
+  à ×30 le ratio reste à 19 200 puis 22,8M — et ça rend déjà les paliers 2-3
+  relativement trop chers (ratio < 1).
+- **Indexer le prix sur l'investissement englouti** (fraction du cumul) :
+  corrige le ratio partout, mais rend les derniers paliers d'une structure
+  faible (Drone) coûteux en dizaines de milliards pour un simple ×5/×6 sur
+  une production qui ne pèse plus grand-chose à ce stade — exactement le
+  défaut pointé par le joueur.
+
+**Décision : on n'y touche pas.** À 175-250 Drones possédés, la production
+du Drone est de toute façon négligeable face aux structures plus tardives ;
+l'écart de prix ne fausse aucune progression, c'est une curiosité sans
+conséquence plutôt qu'un vrai problème d'équilibrage.
