@@ -377,8 +377,10 @@ orbit around the planet, evenly spread around the circle: you read your level by
 counting them. **Both rates are fixed**, one turn in 8 s and a 2.4 s pulse per
 dot, whatever the level — it is the number of dots that carries the information,
 speed has nothing to add. The pulses are simply offset from one dot to the next,
-so that a wave travels around the ring exactly once per rotation. A small dot
-also blinks on their card, as a running indicator.
+so that a wave travels around the ring exactly once per rotation. Their card in
+the Automation tab does not blink: it already spells out "N satellites in orbit",
+and one more animated dot added nothing but a distraction in a panel you come to
+read, not to watch.
 
 The orbit radius is calibrated so the dots never spill over anything: on mobile,
 the usable space is the gap between the bottom of the anomaly chip and the top of

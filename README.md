@@ -390,8 +390,10 @@ cercle : on lit son niveau en les comptant. **Les deux cadences sont fixes**, un
 tour en 8 s et une pulsation de 2,4 s par point, quel que soit le niveau — c'est
 le nombre de points qui porte l'information, la vitesse n'a rien à ajouter. Les
 pulsations sont simplement décalées d'un point au suivant, de sorte qu'une onde
-fait le tour de la couronne exactement une fois par rotation. Un petit point
-clignote aussi sur leur carte, comme témoin de marche.
+fait le tour de la couronne exactement une fois par rotation. La carte de
+l'onglet Automatisation, elle, ne clignote pas : elle porte déjà « N satellites
+en orbite » en toutes lettres, et une pastille animée de plus n'ajoutait rien
+qu'une distraction dans un panneau qu'on vient consulter, pas surveiller.
 
 Le rayon de l'orbite est calibré pour que les points ne débordent nulle part :
 sur mobile, la place utile est celle qui sépare le bas de la pastille d'anomalie

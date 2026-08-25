@@ -16,6 +16,16 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.27.1 — No more blinking dot on the Satellites card
+
+- 🔕 The small cyan dot pulsing on the **Mining satellites**' state line, in the
+  Automation tab, is gone. The card already spells out "N satellites in orbit",
+  and the dots orbiting the planet carry the same information: one more animation
+  only distracted in a panel you come to read, not to watch.
+- The **dots orbiting the planet are unchanged**, they keep turning and pulsing.
+
+---
+
 ## 2.27.0 — The idle automation's switch is now locked
 
 - 🔒 While one of the two is working, the other's switch is **greyed out and

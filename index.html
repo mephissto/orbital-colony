@@ -390,14 +390,6 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
 .sw.pause{background:var(--panel-2);border-color:var(--line)}
 .sw.pause i{background:var(--dim)}
 .sw.lock{cursor:not-allowed}
-/* même cadence, en petit, sur la ligne d'état de la carte */
-.acard.pulsing .rt::before{
-  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
-  background:var(--cyan);margin-right:7px;vertical-align:middle;
-  animation:dotpulse 1.5s ease-in-out infinite;
-}
-@keyframes dotpulse{0%,100%{opacity:.25}50%{opacity:1}}
-@media (prefers-reduced-motion:reduce){ .acard.pulsing .rt::before{animation:none;opacity:.8} }
 
 .ico{font-size:24px;text-align:center;filter:drop-shadow(0 0 5px rgba(79,216,255,.22))}
 .nm{font-size:14.5px;font-weight:600}
@@ -753,7 +745,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.27.0";
+const VERSION="2.27.1";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2165,7 +2157,6 @@ function renderAuto(){
     const c=getAutoCard(a);
     const p=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
     cls(c,"off",coupe);
-    cls(c,"pulsing",a.id==="clic"&&l>0&&!coupe);
     upd(c,{ico:a.ico, nm:tr(a.nm), ds:tr(a.ds),
       rt:l>0?(coupe?autoEtat(a)+" — "+etatTexte(a):autoEtat(a)):"",
       clbl:maxed?"":(a.max>1?tm("price_lvl",l+1):t("price")),

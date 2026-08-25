@@ -17,6 +17,18 @@ restent valides**.
 
 ---
 
+## 2.27.1 — Plus de pastille clignotante sur la carte des Satellites
+
+- 🔕 Le petit point cyan qui pulsait sur la ligne d'état des **Satellites
+  d'extraction**, dans l'onglet Automatisation, est retiré. La carte annonce
+  déjà « N satellites en orbite » en toutes lettres, et les points en orbite
+  autour de la planète portent la même information : une animation de plus ne
+  servait qu'à distraire dans un panneau qu'on vient consulter, pas surveiller.
+- Les **points en orbite autour de la planète sont inchangés**, eux continuent
+  de tourner et de pulser.
+
+---
+
 ## 2.27.0 — L'interrupteur de l'automate à l'arrêt est verrouillé
 
 - 🔒 Tant que l'un des deux travaille, l'interrupteur de l'autre est
