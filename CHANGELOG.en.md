@@ -16,6 +16,13 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.33.1 — Version number
+
+No code or balance change. Version bumped to mark the 2.31 → 2.33 release as a
+whole.
+
+---
+
 ## 2.33.0 — Antimatter gain returns to its former pace
 
 - ⚖️ The click fixes (2.30 → 2.32) had, **without that being the goal**, nearly

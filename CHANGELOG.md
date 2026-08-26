@@ -17,6 +17,13 @@ restent valides**.
 
 ---
 
+## 2.33.1 — Numéro de version
+
+Aucun changement de code ni d'équilibrage. Version incrémentée pour marquer la
+livraison de l'ensemble 2.31 → 2.33.
+
+---
+
 ## 2.33.0 — Le gain d'antimatière revient à son rythme d'avant
 
 - ⚖️ Les corrections du clic (2.30 → 2.32) avaient, **sans que ce soit le but**,
