@@ -16,6 +16,72 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.31.0 — A click never exceeds output again
+
+- 📏 **New balance rule: a click must never be worth more than one second of
+  output.** 2.30.0 broke it by a wide margin — the click reached **6.40 s of
+  output** late in the game.
+- ✖️ Click upgrades move from ×2 across the board to **×1.5 / ×1.6 / ×1.8 / ×2**
+  (×8.64 in full instead of ×16), with a progression that finally follows the
+  price.
+- 📡 **Resonators** drop from 3/12/40 % to **2/5/10 %**. The two go together: at
+  40 % the click was already worth 0.40 s of output **before any click upgrade**,
+  so no multiplier above ×2.5 could be added without breaking the rule.
+- 📊 Measured result: the click **peaks at 0.86 s of output** (against 6.40 in
+  2.30.0 and 0.40 originally), while staying **2.15× stronger than it originally
+  was**. Each upgrade keeps its exact gain — ×1.50, ×1.60, ×1.80, ×2.00 — right
+  to the end of the game, which was the whole problem in the first place.
+- ⏱️ Over a simulated 30-minute cycle with ten Satellites, antimatter earned goes
+  from 101K (2.30.0) to about **50K**, against 36K for the original behaviour —
+  the gap drops from ×2.8 to ×1.4.
+
+No new save field.
+
+---
+
+## 2.30.0 — Click upgrades: one number, on the whole click
+
+- ✖️ The four click upgrades are now worth **×2 each, on the click's total
+  value**, resonator echo included. The card says "Click ×2" and it means exactly
+  ×2, however far along you are. All four: **×16**.
+- 🧹 The double effect from 2.29.0 (×N on the strike + resonance points) is
+  dropped: it did fix the underlying problem, but **two numbers on a card, one of
+  which only applies conditionally, do not read**.
+- ⚖️ Accepted rebalance in both directions: all four give ×16 instead of ×480
+  very early on (weaker click at the start), and **3.04M instead of 328K** late
+  in the game on the reference scenario.
+- 💰 All four give the same ×2 despite very different prices: doubling a large
+  click is already worth far more in absolute terms than doubling a small one —
+  that is what the rising price buys.
+- **Servo-assisted arms** stay on the strike only (×4096 on the whole click would
+  be out of scale): like the whole strike, that research matters less and less as
+  the echo takes over.
+
+No new save field.
+
+---
+
+## 2.29.0 — Click upgrades now strengthen resonance too
+
+- 🖱️ The "**click power**" upgrades only multiplied the first term of the click
+  formula — `1 × multipliers × global multiplier` — a base of **1 that never
+  grows**, whereas the resonator term follows your output. As soon as raw output
+  passes a few thousand/s, the first term is drowned out. Measured by buying the
+  **Magnetic field ×8**: **×7.33** early on, **×1.31** at medium output with
+  resonator v2, and **×1.00** with v3 and a large output — for 2 billion ore.
+- ➕ Each one now also adds **resonance points** on top of its ×N: Ion hammer
+  **+2**, Exoskeleton **+4**, Capacitor **+8**, Magnetic field **+15**.
+  Resonator v3 alone gives 40 %, v3 with all four click upgrades gives **69 %**.
+  The Magnetic field is now worth **×5.71 / ×1.71 / ×1.28** depending on how far
+  you are: always noticeable, without upending the economy.
+- 🚫 The points **only apply if you own a resonator** — without one there is no
+  resonance to strengthen, and the raw ×N is plenty at that stage.
+- 📝 The cards state both effects ("Click power ×8, resonance +15 points").
+
+No new save field.
+
+---
+
 ## 2.28.0 — Upgrades are rediscovered every cycle
 
 - 🔎 An upgrade appeared in the list as soon as you had mined 8 % of its price

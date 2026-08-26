@@ -90,17 +90,50 @@ Clicking the planet yields ore immediately. A click's value is the sum of two
 terms, the whole multiplied by the global multiplier:
 
 ```
-click = ( 1 × click upgrades × 2^(Servo arms) × global multiplier
-          + output/s × resonator )
-        × active click buff
+click = ( strike + echo ) × click upgrades × active click buff
+
+  strike = 1 × 2^(Servo arms) × global multiplier
+  echo   = output/s × best resonator owned
 ```
 
-- **Click upgrades** — Ion hammer ×3, Exoskeleton ×4, Capacitor ×5, Magnetic
-  field ×8 (cumulative, ×480 in full).
-- **Servo-assisted arms** (research) — ×2 per level, up to ×4096.
+- **Click upgrades** — **on the click's total value**, echo included: Ion hammer
+  ×1.5, Exoskeleton ×1.6, Capacitor ×1.8, Magnetic field ×2. In full: **×8.64**.
+  Each is worth exactly its ×N however far along you are, which is what the card
+  states as a single number.
+- **Servo-assisted arms** (research) — ×2 per level up to ×4096, **on the strike
+  only**. It is a strike-power research, and ×4096 on the whole click would be
+  out of scale. Accepted consequence: like the whole strike, this research
+  matters less and less as the echo takes over.
 - **Resonators** — add a percentage of your output per second to every click:
-  v1 +3 %, v2 +12 %, v3 +40 %. Only the best one counts, they do not stack. Late
+  v1 +2 %, v2 +5 %, v3 +10 %. Only the best one counts, they do not stack. Late
   in the game this term dominates by far.
+
+**The balance rule: a click must never exceed output/s.** With resonator v3 at
+40 % (up to 2.30.0) the click was already worth 0.40 s of output **before any
+click upgrade** — so no multiplier above ×2.5 could be added without breaking the
+rule. That is why the resonators dropped to 2/5/10 % at the same time as the
+multipliers moved to ×1.5–×2: together, the click **peaks at 0.86 s of output**
+while staying 2.15× stronger than it originally was.
+
+| Stage | Click upgrades | Output/s | Click | sec. of output/click |
+|---|---|---|---|---|
+| First minutes | 0 | 3 | 1 | 0.33 |
+| Exoskeleton | 2 | 369 | 5.0 | 0.01 |
+| Resonator v2 | 3 | 956K | 207K | 0.22 |
+| Magnetic field | 4 | 18.0M | 7.80M | 0.43 |
+| Very advanced run | 4 | 407T | 352T | **0.86** |
+
+To watch if these values change: the **Mining satellites** click up to 10 times a
+second. At 0.86 s of output per click they therefore yield **8.6× passive
+output** — automatic clicking remains, as before, the main ore source of an
+advanced cycle.
+
+**History of this formula.** Up to 2.28.0 the click upgrades only multiplied the
+strike — a base of 1 that never grows — while the echo follows your output.
+Measured: the Magnetic field ×8 was worth ×7.33 early on but **×1.00** with
+resonator v3 and a large output, for 2 billion ore. 2.29.0 tried a double effect
+(×N on the strike + echo points): correct on paper, but unreadable on a card.
+2.30.0 settles it with **a single number applied to everything**.
 
 ---
 
@@ -162,10 +195,12 @@ units and multiplies that one structure's output:
 
 A fully upgraded structure produces **×1,440**.
 
-**Click upgrades** — Ion hammer (400), Exoskeleton (35,000, from 50 clicks),
-Capacitor (5e6, from 250 clicks), Magnetic field (2e9, from 600 clicks).
+**Click upgrades** — on the whole click: Ion hammer ×1.5 (400), Exoskeleton ×1.6
+(35,000, from 50 clicks), Capacitor ×1.8 (5e6, from 250 clicks), Magnetic field
+×2 (2e9, from 600 clicks). In full: **×8.64**.
 
-**Resonators** — v1 (2e5), v2 (4e8, requires v1), v3 (6e11, requires v2).
+**Resonators** — v1 +2 % (2e5), v2 +5 % (4e8, requires v1), v3 +10 % (6e11,
+requires v2).
 
 **Global upgrades** — Logistics network ×1.25 (5e4), Coordination AI ×1.5 (8e6),
 Quantum relay ×2 (1.2e9), Bio-engineering ×2.5 (3e11), Singularity engine ×4

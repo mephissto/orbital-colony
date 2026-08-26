@@ -17,6 +17,78 @@ restent valides**.
 
 ---
 
+## 2.31.0 — Le clic ne dépasse plus jamais la production
+
+- 📏 **Nouvelle règle d'équilibrage : un clic ne doit jamais valoir plus d'une
+  seconde de production.** La 2.30.0 l'enfreignait largement — le clic montait à
+  **6,40 s de production** en fin de partie.
+- ✖️ Les améliorations de clic passent de ×2 partout à **×1,5 / ×1,6 / ×1,8 /
+  ×2** (soit ×8,64 au complet au lieu de ×16), avec une progression qui suit
+  enfin le prix.
+- 📡 Les **Résonateurs** descendent de 3/12/40 % à **2/5/10 %**. Les deux vont
+  ensemble : à 40 %, le clic valait déjà 0,40 s de production **avant toute
+  amélioration de clic**, donc aucun multiplicateur au-dessus de ×2,5 ne pouvait
+  s'ajouter sans casser la règle.
+- 📊 Résultat mesuré : le clic **plafonne à 0,86 s de production** (contre 6,40
+  en 2.30.0 et 0,40 à l'origine), tout en restant **2,15× plus fort qu'à
+  l'origine**. Chaque amélioration garde son gain exact — ×1,50, ×1,60, ×1,80,
+  ×2,00 — jusqu'en fin de partie, ce qui était tout le problème de départ.
+- ⏱️ Sur un cycle simulé de 30 minutes avec dix Satellites, l'antimatière gagnée
+  passe de 101K (2.30.0) à environ **50K**, contre 36K pour le comportement
+  d'origine — au lieu de ×2,8, l'écart n'est plus que de ×1,4.
+
+Aucun nouveau champ de sauvegarde.
+
+---
+
+## 2.30.0 — Les améliorations de clic : un seul nombre, sur tout le clic
+
+- ✖️ Les quatre améliorations de clic valent maintenant **×2 chacune, sur la
+  valeur totale du clic**, écho du résonateur compris. La carte dit « Clic ×2 »
+  et ça veut dire exactement ×2, quel que soit ton avancement. Au complet :
+  **×16**.
+- 🧹 L'effet double de la 2.29.0 (×N sur la frappe + points de résonance) est
+  abandonné : il corrigeait bien le problème de fond, mais **deux nombres sur une
+  carte, dont un qui ne s'applique que sous condition, ne se lisent pas**.
+- ⚖️ Rééquilibrage assumé dans les deux sens : les quatre donnent ×16 au lieu de
+  ×480 en tout début de partie (clic plus faible au démarrage), et **3,04M au
+  lieu de 328K** en fin de partie sur le scénario de référence.
+- 💰 Les quatre donnent le même ×2 malgré des prix très différents : doubler un
+  gros clic rapporte déjà bien plus en absolu que doubler un petit, c'est ce que
+  le prix croissant paie.
+- Les **Bras servo-assistés** restent sur la frappe seule (×4096 sur le clic
+  entier serait hors d'échelle) : comme toute la frappe, cette recherche pèse de
+  moins en moins à mesure que l'écho domine.
+
+Aucun nouveau champ de sauvegarde.
+
+---
+
+## 2.29.0 — Les améliorations de clic renforcent aussi la résonance
+
+- 🖱️ Les améliorations « **puissance de clic** » ne multipliaient que le premier
+  terme de la formule du clic — `1 × multiplicateurs × multiplicateur global` —
+  une base de **1 qui ne grandit jamais**, alors que le terme du résonateur suit
+  ta production. Dès que la production brute dépasse quelques milliers/s, le
+  premier terme est noyé. Mesuré en achetant le **Champ magnétique ×8** :
+  **×7,33** en début de partie, **×1,31** à production moyenne avec le
+  résonateur v2, et **×1,00** avec le v3 et une grosse production — pour
+  2 milliards de minerai.
+- ➕ Chacune ajoute maintenant des **points de résonance** en plus de son ×N :
+  Marteau ionique **+2**, Exosquelette **+4**, Condensateur **+8**, Champ
+  magnétique **+15**. Le résonateur v3 seul donne 40 %, v3 avec les quatre
+  améliorations de clic donne **69 %**. Le Champ magnétique vaut désormais
+  **×5,71 / ×1,71 / ×1,28** selon l'avancement : toujours perceptible, sans
+  bouleverser l'économie.
+- 🚫 Les points **n'agissent que si un résonateur est possédé** — sans lui, il
+  n'y a pas de résonance à renforcer, et le ×N brut suffit largement à ce stade.
+- 📝 Les cartes annoncent les deux effets (« Puissance de clic ×8, résonance
+  +15 points »).
+
+Aucun nouveau champ de sauvegarde.
+
+---
+
 ## 2.28.0 — Les améliorations se redécouvrent à chaque cycle
 
 - 🔎 Une amélioration apparaissait dans la liste dès que tu avais extrait 8 % de

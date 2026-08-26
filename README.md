@@ -93,17 +93,52 @@ Cliquer sur la planète rapporte du minerai immédiatement. La valeur d'un clic
 est la somme de deux termes, le tout multiplié par le multiplicateur global :
 
 ```
-clic = ( 1 × améliorations de clic × 2^(Bras servo) × multiplicateur global
-         + production/s × résonateur )
-       × bonus de clic actif
+clic = ( frappe + écho ) × améliorations de clic × bonus de clic actif
+
+  frappe = 1 × 2^(Bras servo) × multiplicateur global
+  écho   = production/s × meilleur résonateur possédé
 ```
 
-- **Améliorations de clic** — Marteau ionique ×3, Exosquelette ×4,
-  Condensateur ×5, Champ magnétique ×8 (cumulatifs, soit ×480 au complet).
-- **Bras servo-assistés** (recherche) — ×2 par niveau, jusqu'à ×4096.
+- **Améliorations de clic** — **sur la valeur totale du clic**, écho compris :
+  Marteau ionique ×1,5, Exosquelette ×1,6, Condensateur ×1,8, Champ magnétique
+  ×2. Au complet : **×8,64**. Chacune vaut exactement son ×N quel que soit ton
+  avancement, ce que la carte annonce en un seul nombre.
+- **Bras servo-assistés** (recherche) — ×2 par niveau jusqu'à ×4096, **sur la
+  frappe seulement**. C'est une recherche de puissance de frappe, et ×4096 sur le
+  clic entier serait hors d'échelle. Conséquence assumée : comme toute la frappe,
+  cette recherche pèse de moins en moins à mesure que l'écho domine.
 - **Résonateurs** — ajoutent un pourcentage de ta production par seconde à
-  chaque clic : v1 +3 %, v2 +12 %, v3 +40 %. Seul le meilleur compte, ils ne se
+  chaque clic : v1 +2 %, v2 +5 %, v3 +10 %. Seul le meilleur compte, ils ne se
   cumulent pas entre eux. En fin de partie c'est ce terme qui domine largement.
+
+**La règle d'équilibrage : un clic ne doit jamais dépasser la production/s.**
+Avec le résonateur v3 à 40 % (jusqu'à la 2.30.0), le clic valait déjà 0,40 s de
+production **avant toute amélioration de clic** — donc aucun multiplicateur
+au-dessus de ×2,5 ne pouvait s'y ajouter sans casser la règle. C'est pourquoi les
+résonateurs sont descendus à 2/5/10 % en même temps que les multiplicateurs sont
+passés à ×1,5–×2 : ensemble, le clic **plafonne à 0,86 s de production** tout en
+restant 2,15× plus fort qu'à l'origine.
+
+| Étape | Amél. de clic | Production/s | Clic | sec. de prod./clic |
+|---|---|---|---|---|
+| Premières minutes | 0 | 3 | 1 | 0,33 |
+| Exosquelette | 2 | 369 | 5,0 | 0,01 |
+| Résonateur v2 | 3 | 956K | 207K | 0,22 |
+| Champ magnétique | 4 | 18,0M | 7,80M | 0,43 |
+| Partie très avancée | 4 | 407T | 352T | **0,86** |
+
+À surveiller si ces valeurs bougent : les **Satellites d'extraction** cliquent
+jusqu'à 10 fois par seconde. À 0,86 s de production par clic, ils rapportent donc
+**8,6 fois la production passive** — le clic automatique reste, comme avant, la
+première source de minerai d'un cycle avancé.
+
+**Historique de ce calcul.** Jusqu'à la 2.28.0, les améliorations de clic ne
+multipliaient que la frappe — une base de 1 qui ne grandit jamais — alors que
+l'écho suit la production. Mesuré : le Champ magnétique ×8 valait ×7,33 en début
+de partie mais **×1,00** avec le résonateur v3 et une grosse production, pour
+2 milliards de minerai. La 2.29.0 a essayé un effet double (×N sur la frappe +
+points d'écho) : correct sur le papier, mais illisible sur une carte. La 2.30.0
+tranche avec **un seul nombre appliqué à tout**.
 
 ---
 
@@ -165,10 +200,11 @@ nombre d'exemplaires et multiplie la production de cette seule structure :
 
 Une structure entièrement améliorée produit **×1 440**.
 
-**Améliorations de clic** — Marteau ionique (400), Exosquelette (35 000, dès 50
-clics), Condensateur (5e6, dès 250 clics), Champ magnétique (2e9, dès 600 clics).
+**Améliorations de clic** — sur le clic entier : Marteau ionique ×1,5 (400),
+Exosquelette ×1,6 (35 000, dès 50 clics), Condensateur ×1,8 (5e6, dès 250 clics),
+Champ magnétique ×2 (2e9, dès 600 clics). Au complet : **×8,64**.
 
-**Résonateurs** — v1 (2e5), v2 (4e8, exige v1), v3 (6e11, exige v2).
+**Résonateurs** — v1 +2 % (2e5), v2 +5 % (4e8, exige v1), v3 +10 % (6e11, exige v2).
 
 **Améliorations globales** — Réseau logistique ×1,25 (5e4), IA de coordination
 ×1,5 (8e6), Relais quantique ×2 (1,2e9), Bio-ingénierie ×2,5 (3e11), Moteur à

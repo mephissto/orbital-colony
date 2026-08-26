@@ -745,7 +745,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.28.0";
+const VERSION="2.31.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1014,23 +1014,42 @@ GENS.forEach(g=>{
 });
 // clic
 UPS.push(
- {id:"c1",ico:"🔨",cost:400,  kind:"click",mult:3,
-  nm:{fr:"Marteau ionique",en:"Ion hammer"},ds:{fr:"Puissance de clic ×3",en:"Click power ×3"}},
- {id:"c2",ico:"🦾",cost:3.5e4,kind:"click",mult:4,req:S=>S.clicks>=50,
-  nm:{fr:"Exosquelette",en:"Exoskeleton"},ds:{fr:"Puissance de clic ×4",en:"Click power ×4"}},
- {id:"c3",ico:"⚡",cost:5e6,  kind:"click",mult:5,req:S=>S.clicks>=250,
-  nm:{fr:"Condensateur",en:"Capacitor"},ds:{fr:"Puissance de clic ×5",en:"Click power ×5"}},
- {id:"c4",ico:"🧲",cost:2e9,  kind:"click",mult:8,req:S=>S.clicks>=600,
-  nm:{fr:"Champ magnétique",en:"Magnetic field"},ds:{fr:"Puissance de clic ×8",en:"Click power ×8"}},
- {id:"r1",ico:"📡",cost:2e5,  kind:"reso",val:.03,
+ /* Un seul effet, et il porte sur la valeur TOTALE du clic — résonateur compris.
+    Avant la 2.30.0 le multiplicateur ne s'appliquait qu'à la frappe, une base de
+    1 qui ne grandit jamais, alors que le terme du résonateur suit la production :
+    mesuré, le Champ magnétique ×8 valait ×7,33 en début de partie mais ×1,00
+    avec le résonateur v3 et une grosse production, pour 2 milliards de minerai.
+    La 2.29.0 avait tenté un effet double (×N sur la frappe + points de
+    résonance) : correct sur le papier, illisible sur une carte.
+    Barème : ×1,5 / ×1,6 / ×1,8 / ×2, soit ×8,64 au complet. Il va de pair avec
+    les résonateurs abaissés à 2/5/10 % — le multiplicateur seul ne peut pas
+    tenir la contrainte « un clic ne doit jamais dépasser la production », car
+    sans résonateur modifié le clic vaut déjà 0,40 s de production et tout
+    facteur au-dessus de ×2,5 la dépasse. Ensemble, le clic plafonne à
+    **0,86 s de production** tout en restant 2,15× plus fort qu'à l'origine, et
+    chaque amélioration garde son ×1,5 à ×2 exact jusqu'en fin de partie. */
+ {id:"c1",ico:"🔨",cost:400,  kind:"click",mult:1.5,
+  nm:{fr:"Marteau ionique",en:"Ion hammer"},ds:{fr:"Clic ×1,5",en:"Click ×1.5"}},
+ {id:"c2",ico:"🦾",cost:3.5e4,kind:"click",mult:1.6,req:S=>S.clicks>=50,
+  nm:{fr:"Exosquelette",en:"Exoskeleton"},ds:{fr:"Clic ×1,6",en:"Click ×1.6"}},
+ {id:"c3",ico:"⚡",cost:5e6,  kind:"click",mult:1.8,req:S=>S.clicks>=250,
+  nm:{fr:"Condensateur",en:"Capacitor"},ds:{fr:"Clic ×1,8",en:"Click ×1.8"}},
+ {id:"c4",ico:"🧲",cost:2e9,  kind:"click",mult:2,req:S=>S.clicks>=600,
+  nm:{fr:"Champ magnétique",en:"Magnetic field"},ds:{fr:"Clic ×2",en:"Click ×2"}},
+/* Résonateurs abaissés de 3/12/40 % à 2/5/10 % en 2.31.0. À 40 %, le clic valait
+   à lui seul 0,40 s de production AVANT toute amélioration de clic : plus aucun
+   multiplicateur intéressant ne pouvait s'ajouter sans que le clic dépasse la
+   production — et avec dix Satellites qui cliquent 10 fois par seconde, le clic
+   pesait déjà 80 % du minerai extrait d'un cycle. */
+ {id:"r1",ico:"📡",cost:2e5,  kind:"reso",val:.02,
   nm:{fr:"Résonateur v1",en:"Resonator v1"},
-  ds:{fr:"Le clic gagne +3 % de ta production/s",en:"Clicks gain +3 % of your output/s"}},
- {id:"r2",ico:"📡",cost:4e8,  kind:"reso",val:.12,req:S=>S.ups.r1,
+  ds:{fr:"Le clic gagne +2 % de ta production/s",en:"Clicks gain +2 % of your output/s"}},
+ {id:"r2",ico:"📡",cost:4e8,  kind:"reso",val:.05,req:S=>S.ups.r1,
   nm:{fr:"Résonateur v2",en:"Resonator v2"},
-  ds:{fr:"Le clic gagne +12 % de ta production/s",en:"Clicks gain +12 % of your output/s"}},
- {id:"r3",ico:"📡",cost:6e11, kind:"reso",val:.40,req:S=>S.ups.r2,
+  ds:{fr:"Le clic gagne +5 % de ta production/s",en:"Clicks gain +5 % of your output/s"}},
+ {id:"r3",ico:"📡",cost:6e11, kind:"reso",val:.10,req:S=>S.ups.r2,
   nm:{fr:"Résonateur v3",en:"Resonator v3"},
-  ds:{fr:"Le clic gagne +40 % de ta production/s",en:"Clicks gain +40 % of your output/s"}}
+  ds:{fr:"Le clic gagne +10 % de ta production/s",en:"Clicks gain +10 % of your output/s"}}
 );
 // globales
 UPS.push(
@@ -1503,16 +1522,20 @@ function perSec(noBuff){
    multiplicateur de production déguisé — à 10 satellites et résonateur au
    maximum, un clic vaut 0,4 × la production, donc un ×12 sur les clics
    automatiques valait ×49 sur la production totale. */
+/* clic = ( frappe + écho ) × améliorations de clic × bonus de clic actif
+     frappe = 1 × 2^(Bras servo) × multiplicateur global
+     écho   = production/s × meilleur résonateur possédé
+   Les améliorations de clic et le bonus d'anomalie multiplient la valeur
+   TOTALE : appliqués à la seule frappe — une base de 1 qui ne grandit jamais —
+   ils devenaient invisibles dès que l'écho dominait, c'est-à-dire très vite.
+   Les Bras servo-assistés, eux, restent sur la frappe : c'est une recherche de
+   puissance de frappe, et ×4096 sur le clic entier serait hors d'échelle. */
 function clickVal(auto){
-  let base=1, m=1;
-  UPS.forEach(u=>{if(u.kind==="click"&&S.ups[u.id])m*=u.mult});
-  m*=Math.pow(2,lvl("servo"));
+  let m=1; UPS.forEach(u=>{if(u.kind==="click"&&S.ups[u.id])m*=u.mult});
   let reso=0; UPS.forEach(u=>{if(u.kind==="reso"&&S.ups[u.id])reso=Math.max(reso,u.val)});
-  // Le bonus de clic multiplie la valeur TOTALE, résonateur compris.
-  // Sinon il ne portait que sur la puissance brute — devenue négligeable en fin
-  // de partie face au résonateur (99 % du clic), et le ×12 ne donnait plus que ×1,09.
+  const frappe=1*Math.pow(2,lvl("servo"))*globalMult();
   let bf=1; if(!auto)S.buffs.forEach(b=>{if(b.k==="click")bf*=b.m});
-  return (base*m*globalMult()+perSec()*reso)*bf;
+  return (frappe+perSec()*reso)*m*bf;
 }
 function costMult(){return Math.pow(0.96,lvl("nego"))}
 function genCost(g,n){
