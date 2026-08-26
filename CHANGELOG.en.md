@@ -16,6 +16,22 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.34.0 — Foreman and Engineer swap prices
+
+- 🔄 The **Foreman goes from 100 to 150 antimatter**, the **Engineer from 150 to
+  100**. The two are mutually exclusive, and the one you actually keep switched
+  on is the Foreman: it rebuys structures continuously, whereas the Engineer's
+  job is **finished** once all 73 upgrades are bought. The more useful one had to
+  be the more expensive.
+- 📋 They also swap places in the list, so it stays in ascending price order:
+  30 → 100 → 150 → 200 → 400.
+- 💰 **The automation total does not move** (31,540 antimatter): this is a swap,
+  not a rise.
+
+No save field touched; an automation already bought stays bought.
+
+---
+
 ## 2.33.1 — Version number
 
 No code or balance change. Version bumped to mark the 2.31 → 2.33 release as a

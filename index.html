@@ -745,7 +745,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.33.1";
+const VERSION="2.34.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1135,12 +1135,18 @@ const AUTOS=[
   nm:{fr:"Satellites d'extraction",en:"Mining satellites"},
   ds:{fr:"Un satellite en orbite par niveau, chacun frappe une fois par seconde",
       en:"One orbiting satellite per level, each strikes once a second"}},
- {id:"contre",ico:"🏗️", max:1, c0:100, cg:1,
-  nm:{fr:"Contremaître",en:"Foreman"}, nmd:{fr:"le Contremaître",en:"the Foreman"},
-  ds:{fr:"Rachète chaque seconde la structure que tu lui désignes — met l'Ingénieur en pause",en:"Rebuys the structure you assign it, every second — pauses the Engineer"}},
- {id:"ing",   ico:"⬆️", max:1, c0:150, cg:1,
+ /* Prix échangés en 2.34.0, et l'ordre de la liste avec, pour qu'elle reste
+    croissante. Les deux sont exclusifs : celui qu'on garde allumé en pratique
+    est le Contremaître, qui rachète des structures en continu, alors que le
+    travail de l'Ingénieur est fini une fois les 73 améliorations achetées.
+    Le plus utile doit donc être le plus cher. Total de l'automatisation
+    inchangé (31 540) : c'est un échange, pas une hausse. */
+ {id:"ing",   ico:"⬆️", max:1, c0:100, cg:1,
   nm:{fr:"Ingénieur",en:"Engineer"}, nmd:{fr:"l'Ingénieur",en:"the Engineer"},
   ds:{fr:"Achète les améliorations dès qu'elles sont payables — met le Contremaître en pause",en:"Buys upgrades as soon as they are affordable — pauses the Foreman"}},
+ {id:"contre",ico:"🏗️", max:1, c0:150, cg:1,
+  nm:{fr:"Contremaître",en:"Foreman"}, nmd:{fr:"le Contremaître",en:"the Foreman"},
+  ds:{fr:"Rachète chaque seconde la structure que tu lui désignes — met l'Ingénieur en pause",en:"Rebuys the structure you assign it, every second — pauses the Engineer"}},
  {id:"sonde", ico:"📡", max:1, c0:200, cg:1,
   nm:{fr:"Sonde de récupération",en:"Recovery probe"},
   ds:{fr:"Ramasse les anomalies à ta place",en:"Collects anomalies for you"}},

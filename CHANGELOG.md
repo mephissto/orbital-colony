@@ -17,6 +17,22 @@ restent valides**.
 
 ---
 
+## 2.34.0 — Contremaître et Ingénieur échangent leur prix
+
+- 🔄 Le **Contremaître passe de 100 à 150 antimatière**, l'**Ingénieur de 150 à
+  100**. Les deux sont exclusifs, et celui qu'on garde allumé en pratique est le
+  Contremaître : il rachète des structures en continu, alors que le travail de
+  l'Ingénieur est **fini** une fois les 73 améliorations achetées. Le plus utile
+  devait être le plus cher.
+- 📋 Ils échangent aussi leur place dans la liste, pour qu'elle reste en prix
+  croissant : 30 → 100 → 150 → 200 → 400.
+- 💰 **Le total de l'automatisation ne bouge pas** (31 540 antimatière) : c'est un
+  échange, pas une hausse.
+
+Aucun champ de sauvegarde touché ; un automate déjà acheté le reste.
+
+---
+
 ## 2.33.1 — Numéro de version
 
 Aucun changement de code ni d'équilibrage. Version incrémentée pour marquer la

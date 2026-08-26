@@ -491,10 +491,17 @@ suffit de le rallumer.
 | Automate | Effet | Max | Coût | Coût cumulé |
 |---|---|---|---|---|
 | 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
-| 🏗️ Contremaître | rachète chaque seconde la structure que tu lui désignes | 1 | 100 | 100 |
-| ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 150 | 150 |
+| ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 100 | 100 |
+| 🏗️ Contremaître | rachète chaque seconde la structure que tu lui désignes | 1 | 150 | 150 |
 | 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 200 | 200 |
 | ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 400 | 400 |
+
+**Pourquoi le Contremaître coûte plus cher que l'Ingénieur** (150 contre 100,
+échangés en 2.34.0) : les deux sont exclusifs, et celui qu'on garde allumé en
+pratique est le Contremaître, qui rachète des structures en continu. Le travail
+de l'Ingénieur, lui, est **fini** une fois les 73 améliorations achetées — passé
+ce point il n'a plus rien à faire. Le plus utile devait donc être le plus cher.
+Le total de l'automatisation est inchangé : c'est un échange, pas une hausse.
 
 Tout automatiser coûte **31 540 antimatière**, contre 234 890 pour terminer les
 recherches. Ces prix ont été divisés par 3,3 en 2.20.0 : ils avaient été fixés
