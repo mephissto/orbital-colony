@@ -17,6 +17,50 @@ restent valides**.
 
 ---
 
+## 2.33.0 — Le gain d'antimatière revient à son rythme d'avant
+
+- ⚖️ Les corrections du clic (2.30 → 2.32) avaient, **sans que ce soit le but**,
+  presque doublé le minerai d'un cycle avancé — donc le gain d'antimatière :
+  **69,9K par cycle contre 36,2K** à l'origine. L'exposant du gain (`AM_EXPG`)
+  passe de **0,32 à 0,30** pour annuler cette inflation.
+- 🎯 L'exposant plutôt que le seuil, parce qu'il **ne touche pas au premier
+  prestige** — 1 antimatière dans les deux cas — et corrige d'autant plus fort
+  que le cycle est gros, exactement là où l'inflation s'est produite :
+  intermédiaire 83 → 63, avancé 1,58K → 999, très avancé 69,9K → 34,8K.
+- 🕳️ L'enjeu réel : l'antimatière n'a qu'un débouché, les 8 recherches
+  (234 890 au total). Doubler le gain, c'était **diviser par deux le temps avant
+  qu'elle ne serve plus à rien**. Maxer les recherches repasse de **4 cycles à
+  7** pour un joueur très avancé.
+- Un joueur tout équipé retrouve le rendement d'avant la 2.30.0 (×0,96). Un
+  joueur qui n'automatise pas ses clics reste environ 30 % en dessous — cas
+  volontairement écarté, les Satellites étant acquis de longue date à ce stade.
+
+Aucun champ de sauvegarde touché : l'antimatière déjà gagnée n'est pas reprise.
+
+---
+
+## 2.32.0 — Les Bras servo-assistés servent enfin à quelque chose
+
+- 🤖 La recherche **Bras servo-assistés** donnait ×2 de puissance de clic par
+  niveau, mais **sur la seule frappe** — une base de 1 qui ne grandit jamais.
+  Mesuré : un joueur avancé relançant un cycle obtenait **exactement le même
+  minerai et la même production au bout de 5 minutes avec 0 ou 12 niveaux**.
+  8 675 antimatière pour rien, et c'est la recherche la plus chère après
+  l'Optimisation minière et la Résonance.
+- ✖️ Elle donne maintenant **+8 % par niveau sur le clic entier**, soit **×2,52**
+  au maximum. Chaque niveau se sent, du premier au douzième.
+- 💰 **Le barème de prix ne bouge pas d'un antimatière** (6 → 3 857, 8 675 au
+  total). C'est ce qui garde la recherche cohérente avec les sept autres, dont
+  les premiers niveaux coûtent tous entre 6 et 30 : une base relevée à 150,
+  envisagée un moment, aurait été cinq fois plus chère que le plus cher du jeu.
+- 📈 Sur un cycle de 30 min avec dix satellites : **50,1K d'antimatière** à 0/12
+  (identique à avant), **59,1K** à 6/12, **69,9K** à 12/12. La recherche maxée
+  rapporte donc **+39 % par cycle**, contre 0 % auparavant.
+- Le clic plafonne à **2,18 s de production** par clic, atteint seulement avec
+  les douze niveaux payés.
+
+---
+
 ## 2.31.0 — Le clic ne dépasse plus jamais la production
 
 - 📏 **Nouvelle règle d'équilibrage : un clic ne doit jamais valoir plus d'une

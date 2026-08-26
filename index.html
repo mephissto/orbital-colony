@@ -745,7 +745,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.31.0";
+const VERSION="2.33.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1090,9 +1090,16 @@ const RES=[
  {id:"mining", ico:"⚙️", max:15, c0:8,  cg:1.8,
   nm:{fr:"Optimisation minière",en:"Mining optimisation"},
   ds:{fr:"+30 % de production par niveau",en:"+30 % output per level"}},
- {id:"servo",  ico:"🤖", max:12, c0:6,  cg:1.8,
+ /* Effet passé de « ×2 sur la frappe » à « +8 % sur le clic entier » en 2.32.0.
+    La frappe est une base de 1 qui ne grandit jamais : mesuré, un joueur avancé
+    relançant un cycle obtenait exactement le même minerai et la même production
+    au bout de 5 minutes avec 0 ou 12 niveaux — 8 675 antimatière pour rien.
+    Le barème de prix n'a pas bougé d'un antimatière : c'est ce qui garde la
+    recherche cohérente avec les sept autres, dont les premiers niveaux coûtent
+    tous entre 6 et 30. Au max : ×2,52 sur le clic. */
+ {id:"servo",  ico:"🤖", max:12, c0:6,  cg:1.8, clic:1.08,
   nm:{fr:"Bras servo-assistés",en:"Servo-assisted arms"},
-  ds:{fr:"×2 puissance de clic par niveau",en:"×2 click power per level"}},
+  ds:{fr:"+8 % de puissance de clic par niveau",en:"+8 % click power per level"}},
  {id:"buffer", ico:"💾", max:8,  c0:10, cg:2,
   nm:{fr:"Mémoire tampon",en:"Buffer memory"},
   ds:{fr:"+3 h de gains hors-ligne par niveau",en:"+3 h of offline gains per level"}},
@@ -1522,20 +1529,20 @@ function perSec(noBuff){
    multiplicateur de production déguisé — à 10 satellites et résonateur au
    maximum, un clic vaut 0,4 × la production, donc un ×12 sur les clics
    automatiques valait ×49 sur la production totale. */
-/* clic = ( frappe + écho ) × améliorations de clic × bonus de clic actif
-     frappe = 1 × 2^(Bras servo) × multiplicateur global
+/* clic = ( frappe + écho ) × améliorations de clic × Bras servo × bonus de clic
+     frappe = 1 × multiplicateur global
      écho   = production/s × meilleur résonateur possédé
-   Les améliorations de clic et le bonus d'anomalie multiplient la valeur
-   TOTALE : appliqués à la seule frappe — une base de 1 qui ne grandit jamais —
-   ils devenaient invisibles dès que l'écho dominait, c'est-à-dire très vite.
-   Les Bras servo-assistés, eux, restent sur la frappe : c'est une recherche de
-   puissance de frappe, et ×4096 sur le clic entier serait hors d'échelle. */
+   Tout ce qui multiplie le clic porte sur la valeur TOTALE. Appliqué à la seule
+   frappe — une base de 1 qui ne grandit jamais — un multiplicateur devient
+   invisible dès que l'écho domine, c'est-à-dire très vite : c'est ce qui a tué
+   successivement les améliorations de clic (corrigé en 2.30.0) puis les Bras
+   servo-assistés (corrigé en 2.32.0). */
 function clickVal(auto){
   let m=1; UPS.forEach(u=>{if(u.kind==="click"&&S.ups[u.id])m*=u.mult});
+  m*=Math.pow(RES.find(r=>r.id==="servo").clic,lvl("servo"));
   let reso=0; UPS.forEach(u=>{if(u.kind==="reso"&&S.ups[u.id])reso=Math.max(reso,u.val)});
-  const frappe=1*Math.pow(2,lvl("servo"))*globalMult();
   let bf=1; if(!auto)S.buffs.forEach(b=>{if(b.k==="click")bf*=b.m});
-  return (frappe+perSec()*reso)*m*bf;
+  return (globalMult()+perSec()*reso)*m*bf;
 }
 function costMult(){return Math.pow(0.96,lvl("nego"))}
 function genCost(g,n){
@@ -1559,7 +1566,18 @@ function maxAffordable(g){
    0,35, le minerai réclamé grandit bien plus vite que la production, et la
    durée d'un cycle repasse de 20 s à quelques minutes puis à quelques heures. */
 const AM_SEUIL=1e10;      // minerai pour la première antimatière
-const AM_EXPG=0.32;       // exposant du gain (0,5 = racine carrée)
+/* Exposant du gain (0,5 = racine carrée). Descendu de 0,32 à 0,30 en 2.33.0.
+   Les corrections du clic (2.30 → 2.32) ont, sans qu'on le vise, presque doublé
+   le minerai d'un cycle avancé, donc le gain d'antimatière : 69,9K par cycle
+   contre 36,2K à l'origine. Or l'antimatière n'a qu'un débouché, les 8
+   recherches (234 890 au total) — doubler le gain, c'était diviser par deux le
+   temps avant qu'elle ne serve plus à rien.
+   L'exposant est le bon levier plutôt que le seuil : il ne touche pas au premier
+   prestige (1 antimatière dans les deux cas) et corrige d'autant plus fort que
+   le cycle est gros — exactement là où l'inflation s'est produite. À 0,30 un
+   joueur tout équipé retrouve le rendement d'origine (×0,96), et maxer les
+   recherches repasse de 4 cycles à 7. */
+const AM_EXPG=0.30;
 function amGain(){
   if(!(S.runOre>0))return 0;
   return Math.max(0,Math.floor(Math.pow(S.runOre/AM_SEUIL,AM_EXPG)));

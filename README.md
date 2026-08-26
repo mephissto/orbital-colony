@@ -93,9 +93,9 @@ Cliquer sur la planète rapporte du minerai immédiatement. La valeur d'un clic
 est la somme de deux termes, le tout multiplié par le multiplicateur global :
 
 ```
-clic = ( frappe + écho ) × améliorations de clic × bonus de clic actif
+clic = ( frappe + écho ) × améliorations de clic × Bras servo × bonus de clic
 
-  frappe = 1 × 2^(Bras servo) × multiplicateur global
+  frappe = 1 × multiplicateur global
   écho   = production/s × meilleur résonateur possédé
 ```
 
@@ -103,10 +103,13 @@ clic = ( frappe + écho ) × améliorations de clic × bonus de clic actif
   Marteau ionique ×1,5, Exosquelette ×1,6, Condensateur ×1,8, Champ magnétique
   ×2. Au complet : **×8,64**. Chacune vaut exactement son ×N quel que soit ton
   avancement, ce que la carte annonce en un seul nombre.
-- **Bras servo-assistés** (recherche) — ×2 par niveau jusqu'à ×4096, **sur la
-  frappe seulement**. C'est une recherche de puissance de frappe, et ×4096 sur le
-  clic entier serait hors d'échelle. Conséquence assumée : comme toute la frappe,
-  cette recherche pèse de moins en moins à mesure que l'écho domine.
+- **Bras servo-assistés** (recherche) — **+8 % par niveau sur le clic entier**,
+  12 niveaux, soit **×2,52** au maximum. Jusqu'à la 2.32.0 c'était ×2 par niveau
+  **sur la seule frappe** : mesuré, un joueur avancé relançant un cycle obtenait
+  exactement le même minerai et la même production au bout de 5 minutes avec 0 ou
+  12 niveaux — 8 675 antimatière pour rien. Le barème de prix n'a pas bougé d'un
+  antimatière, ce qui garde la recherche cohérente avec les sept autres (dont les
+  premiers niveaux coûtent tous entre 6 et 30).
 - **Résonateurs** — ajoutent un pourcentage de ta production par seconde à
   chaque clic : v1 +2 %, v2 +5 %, v3 +10 %. Seul le meilleur compte, ils ne se
   cumulent pas entre eux. En fin de partie c'est ce terme qui domine largement.
@@ -116,20 +119,26 @@ Avec le résonateur v3 à 40 % (jusqu'à la 2.30.0), le clic valait déjà 0,40 
 production **avant toute amélioration de clic** — donc aucun multiplicateur
 au-dessus de ×2,5 ne pouvait s'y ajouter sans casser la règle. C'est pourquoi les
 résonateurs sont descendus à 2/5/10 % en même temps que les multiplicateurs sont
-passés à ×1,5–×2 : ensemble, le clic **plafonne à 0,86 s de production** tout en
-restant 2,15× plus fort qu'à l'origine.
+passés à ×1,5–×2 : sans les Bras servo, le clic **plafonne à 0,86 s de
+production** tout en restant 2,15× plus fort qu'à l'origine.
 
-| Étape | Amél. de clic | Production/s | Clic | sec. de prod./clic |
-|---|---|---|---|---|
-| Premières minutes | 0 | 3 | 1 | 0,33 |
-| Exosquelette | 2 | 369 | 5,0 | 0,01 |
-| Résonateur v2 | 3 | 956K | 207K | 0,22 |
-| Champ magnétique | 4 | 18,0M | 7,80M | 0,43 |
-| Partie très avancée | 4 | 407T | 352T | **0,86** |
+**La seule chose autorisée à franchir ce plafond, ce sont les Bras servo** — et
+seulement au prix des douze niveaux payés : à 12/12 le clic atteint **2,18 s de
+production**. C'est un dépassement assumé, un joueur qui a investi 8 675
+antimatière dans une recherche a le droit d'en voir l'effet.
+
+| Étape | Amél. de clic | Servo | Production/s | Clic | sec. de prod./clic |
+|---|---|---|---|---|---|
+| Premières minutes | 0 | 0/12 | 3 | 1 | 0,33 |
+| Exosquelette | 2 | 1/12 | 485 | 3,6 | 0,01 |
+| Résonateur v2 | 3 | 7/12 | 20,5M | 7,61M | 0,37 |
+| Champ magnétique | 4 | 9/12 | 822M | 710M | 0,86 |
+| Résonateur v3 | 4 | 11/12 | 80,6B | 162B | 2,01 |
+| Partie très avancée | 4 | 12/12 | 407T | 887T | **2,18** |
 
 À surveiller si ces valeurs bougent : les **Satellites d'extraction** cliquent
-jusqu'à 10 fois par seconde. À 0,86 s de production par clic, ils rapportent donc
-**8,6 fois la production passive** — le clic automatique reste, comme avant, la
+jusqu'à 10 fois par seconde. À 2,18 s de production par clic, ils rapportent donc
+**21,8 fois la production passive** — le clic automatique reste, comme avant, la
 première source de minerai d'un cycle avancé.
 
 **Historique de ce calcul.** Jusqu'à la 2.28.0, les améliorations de clic ne
@@ -316,13 +325,33 @@ découvertes, statistiques.
 **Antimatière gagnée :**
 
 ```
-gain = ⌊ ( minerai extrait pendant ce cycle ÷ 1e10 ) ^ 0,32 ⌋
+gain = ⌊ ( minerai extrait pendant ce cycle ÷ 1e10 ) ^ 0,30 ⌋
 ```
 
 Il faut donc **10 milliards** de minerai extrait sur le cycle pour la première
-unité (`AM_SEUIL`), et l'exposant `AM_EXPG` vaut 0,32. Le rendement décroît très
-vite : 87 milliards pour 2 unités, 13,3 T pour 10, 17,8 Qa pour 100, 23,7 Qi pour
-1 000.
+unité (`AM_SEUIL`), et l'exposant `AM_EXPG` vaut **0,30**. Le rendement décroît
+très vite : 101 milliards pour 2 unités, 21,5 T pour 10, 46,4 Qa pour 100,
+100 Qi pour 1 000.
+
+L'exposant est passé de 0,32 à 0,30 en **2.33.0**. Les corrections du clic
+(2.30 → 2.32) avaient, sans qu'on le vise, presque doublé le minerai d'un cycle
+avancé — donc le gain d'antimatière, passé de 36,2K à 69,9K par cycle. Or
+l'antimatière n'a qu'un seul débouché, les 8 recherches (234 890 au total) :
+doubler le gain revenait à diviser par deux le temps avant qu'elle ne serve plus
+à rien. L'exposant est le bon levier plutôt que le seuil, parce qu'il **ne touche
+pas au premier prestige** (1 antimatière dans les deux cas) et corrige d'autant
+plus fort que le cycle est gros, exactement là où l'inflation s'est produite.
+
+| Cycle | Minerai | Gain à 0,32 | Gain à 0,30 |
+|---|---|---|---|
+| 1er prestige | 10,0B | 1 | 1 |
+| Intermédiaire | 10,0Qa | 83 | 63 |
+| Avancé | 100Qi | 1,58K | 999 |
+| Très avancé | 13,8Sp | 69,9K | 34,8K |
+
+Maxer les 8 recherches repasse ainsi de **4 cycles à 7** pour un joueur très
+avancé, et un joueur tout équipé retrouve le rendement d'avant la 2.30.0
+(×0,96).
 
 ### Pourquoi cet exposant, et pas une racine carrée
 
@@ -343,7 +372,7 @@ vite que la production**, donc un exposant nettement sous 0,5.
 Durée d'un cycle rapportant +50 % d'antimatière, avec les recherches montées en
 parallèle :
 
-| Antimatière | Avant (racine carrée) | Après (0,32) |
+| Antimatière | Avant (racine carrée) | Après (exposant fractionnaire) |
 |---|---|---|
 | 200 | 21 s | 25 min |
 | 1 000 | 18 s | 9 min |

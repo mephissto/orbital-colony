@@ -90,9 +90,9 @@ Clicking the planet yields ore immediately. A click's value is the sum of two
 terms, the whole multiplied by the global multiplier:
 
 ```
-click = ( strike + echo ) × click upgrades × active click buff
+click = ( strike + echo ) × click upgrades × Servo arms × active click buff
 
-  strike = 1 × 2^(Servo arms) × global multiplier
+  strike = 1 × global multiplier
   echo   = output/s × best resonator owned
 ```
 
@@ -100,10 +100,13 @@ click = ( strike + echo ) × click upgrades × active click buff
   ×1.5, Exoskeleton ×1.6, Capacitor ×1.8, Magnetic field ×2. In full: **×8.64**.
   Each is worth exactly its ×N however far along you are, which is what the card
   states as a single number.
-- **Servo-assisted arms** (research) — ×2 per level up to ×4096, **on the strike
-  only**. It is a strike-power research, and ×4096 on the whole click would be
-  out of scale. Accepted consequence: like the whole strike, this research
-  matters less and less as the echo takes over.
+- **Servo-assisted arms** (research) — **+8 % per level on the whole click**,
+  12 levels, i.e. **×2.52** at maximum. Up to 2.32.0 it was ×2 per level **on the
+  strike alone**: measured, an advanced player restarting a cycle ended up with
+  exactly the same ore and the same output after 5 minutes with 0 or 12 levels —
+  8,675 antimatter for nothing. The price ladder has not moved by a single
+  antimatter, which keeps the research consistent with the other seven (whose
+  first levels all cost between 6 and 30).
 - **Resonators** — add a percentage of your output per second to every click:
   v1 +2 %, v2 +5 %, v3 +10 %. Only the best one counts, they do not stack. Late
   in the game this term dominates by far.
@@ -112,19 +115,25 @@ click = ( strike + echo ) × click upgrades × active click buff
 40 % (up to 2.30.0) the click was already worth 0.40 s of output **before any
 click upgrade** — so no multiplier above ×2.5 could be added without breaking the
 rule. That is why the resonators dropped to 2/5/10 % at the same time as the
-multipliers moved to ×1.5–×2: together, the click **peaks at 0.86 s of output**
-while staying 2.15× stronger than it originally was.
+multipliers moved to ×1.5–×2: without the Servo arms, the click **peaks at
+0.86 s of output** while staying 2.15× stronger than it originally was.
 
-| Stage | Click upgrades | Output/s | Click | sec. of output/click |
-|---|---|---|---|---|
-| First minutes | 0 | 3 | 1 | 0.33 |
-| Exoskeleton | 2 | 369 | 5.0 | 0.01 |
-| Resonator v2 | 3 | 956K | 207K | 0.22 |
-| Magnetic field | 4 | 18.0M | 7.80M | 0.43 |
-| Very advanced run | 4 | 407T | 352T | **0.86** |
+**The only thing allowed to cross that ceiling is the Servo arms research** — and
+only once all twelve levels are paid for: at 12/12 the click reaches **2.18 s of
+output**. That overshoot is deliberate: a player who sank 8,675 antimatter into a
+research is entitled to see its effect.
+
+| Stage | Click upgrades | Servo | Output/s | Click | sec. of output/click |
+|---|---|---|---|---|---|
+| First minutes | 0 | 0/12 | 3 | 1 | 0.33 |
+| Exoskeleton | 2 | 1/12 | 485 | 3.6 | 0.01 |
+| Resonator v2 | 3 | 7/12 | 20.5M | 7.61M | 0.37 |
+| Magnetic field | 4 | 9/12 | 822M | 710M | 0.86 |
+| Resonator v3 | 4 | 11/12 | 80.6B | 162B | 2.01 |
+| Very advanced run | 4 | 12/12 | 407T | 887T | **2.18** |
 
 To watch if these values change: the **Mining satellites** click up to 10 times a
-second. At 0.86 s of output per click they therefore yield **8.6× passive
+second. At 2.18 s of output per click they therefore yield **21.8× passive
 output** — automatic clicking remains, as before, the main ore source of an
 advanced cycle.
 
@@ -309,12 +318,31 @@ statistics.
 **Antimatter earned:**
 
 ```
-gain = ⌊ ( ore mined during this cycle ÷ 1e10 ) ^ 0.32 ⌋
+gain = ⌊ ( ore mined during this cycle ÷ 1e10 ) ^ 0.30 ⌋
 ```
 
 So it takes **10 billion** ore mined in the cycle for the first unit
-(`AM_SEUIL`), and the exponent `AM_EXPG` is 0.32. Returns fall off fast:
-87 billion for 2 units, 13.3 T for 10, 17.8 Qa for 100, 23.7 Qi for 1,000.
+(`AM_SEUIL`), and the exponent `AM_EXPG` is **0.30**. Returns fall off fast:
+101 billion for 2 units, 21.5 T for 10, 46.4 Qa for 100, 100 Qi for 1,000.
+
+The exponent went from 0.32 to 0.30 in **2.33.0**. The click fixes (2.30 → 2.32)
+had, without that being the goal, nearly doubled the ore of an advanced cycle —
+and therefore the antimatter gain, up from 36.2K to 69.9K per cycle. But
+antimatter has a single outlet, the 8 researches (234,890 in total): doubling the
+gain meant halving the time before it becomes useless. The exponent is the right
+lever rather than the threshold, because it **leaves the first prestige
+untouched** (1 antimatter either way) and corrects all the more strongly as the
+cycle grows — exactly where the inflation happened.
+
+| Cycle | Ore | Gain at 0.32 | Gain at 0.30 |
+|---|---|---|---|
+| 1st prestige | 10.0B | 1 | 1 |
+| Mid-game | 10.0Qa | 83 | 63 |
+| Advanced | 100Qi | 1.58K | 999 |
+| Very advanced | 13.8Sp | 69.9K | 34.8K |
+
+Maxing the 8 researches therefore goes from **4 cycles to 7** for a very advanced
+player, and a fully equipped player is back to the pre-2.30.0 yield (×0.96).
 
 ### Why this exponent, and not a square root
 
@@ -333,7 +361,7 @@ well below 0.5.
 
 Length of a cycle yielding +50 % antimatter, with research levelled in parallel:
 
-| Antimatter | Before (square root) | After (0.32) |
+| Antimatter | Before (square root) | After (fractional exponent) |
 |---|---|---|
 | 200 | 21 s | 25 min |
 | 1,000 | 18 s | 9 min |

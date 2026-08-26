@@ -16,6 +16,49 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.33.0 — Antimatter gain returns to its former pace
+
+- ⚖️ The click fixes (2.30 → 2.32) had, **without that being the goal**, nearly
+  doubled the ore of an advanced cycle — and therefore the antimatter gain:
+  **69.9K per cycle against 36.2K** originally. The gain exponent (`AM_EXPG`)
+  goes from **0.32 to 0.30** to cancel that inflation.
+- 🎯 The exponent rather than the threshold, because it **leaves the first
+  prestige untouched** — 1 antimatter either way — and corrects all the more
+  strongly as the cycle grows, exactly where the inflation happened: mid-game
+  83 → 63, advanced 1.58K → 999, very advanced 69.9K → 34.8K.
+- 🕳️ What is really at stake: antimatter has a single outlet, the 8 researches
+  (234,890 in total). Doubling the gain meant **halving the time before it
+  becomes useless**. Maxing the researches goes from **4 cycles to 7** for a very
+  advanced player.
+- A fully equipped player is back to the pre-2.30.0 yield (×0.96). A player who
+  does not automate their clicks stays about 30 % below — a case deliberately set
+  aside, since the Satellites are long since owned at that stage.
+
+No save field touched: antimatter already earned is not taken back.
+
+---
+
+## 2.32.0 — Servo-assisted arms finally do something
+
+- 🤖 The **Servo-assisted arms** research gave ×2 click power per level, but **on
+  the strike alone** — a base of 1 that never grows. Measured: an advanced player
+  restarting a cycle ended up with **exactly the same ore and the same output
+  after 5 minutes with 0 or 12 levels**. 8,675 antimatter for nothing, and it is
+  the most expensive research after Mining optimisation and Resonance.
+- ✖️ It now gives **+8 % per level on the whole click**, i.e. **×2.52** at
+  maximum. Every level is felt, from the first to the twelfth.
+- 💰 **The price ladder does not move by a single antimatter** (6 → 3,857, 8,675
+  total). That is what keeps the research consistent with the other seven, whose
+  first levels all cost between 6 and 30: a base raised to 150, considered for a
+  moment, would have been five times the most expensive in the game.
+- 📈 Over a 30-minute cycle with ten satellites: **50.1K antimatter** at 0/12
+  (same as before), **59.1K** at 6/12, **69.9K** at 12/12. The maxed research
+  therefore pays **+39 % per cycle**, against 0 % before.
+- The click peaks at **2.18 s of output** per click, reached only with all twelve
+  levels paid for.
+
+---
+
 ## 2.31.0 — A click never exceeds output again
 
 - 📏 **New balance rule: a click must never be worth more than one second of
