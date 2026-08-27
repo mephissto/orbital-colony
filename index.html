@@ -524,6 +524,15 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
 .pwad{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.55}
 .pwad br{content:"";display:block;margin-top:5px}
 .pwawhy{margin:14px 0 0;opacity:.8}
+/* Case « ne plus me le rappeler » : zone de frappe volontairement large
+   (tout le label), la case seule fait moins de 20 px sur téléphone. */
+.pwanev{display:flex;align-items:center;gap:9px;margin:13px 0 2px;padding:9px 10px;
+  border:1px solid var(--line);border-radius:10px;background:var(--panel);
+  font-size:12.5px;color:var(--dim);cursor:pointer}
+/* color-scheme:dark, sinon la case décochée est un carré blanc plein sur un fond
+   noir. Posé sur la case seule et pas sur :root, pour ne rien changer ailleurs. */
+.pwanev input{flex:0 0 auto;width:17px;height:17px;margin:0;cursor:pointer;
+  color-scheme:dark;accent-color:var(--cyan)}
 .pwabox .mrow{gap:9px}
 .pwabox .hbtn{flex:1 1 0;justify-content:center;padding:11px 12px;font-size:13px}
 .hbtn.pwago{border-color:var(--cyan);color:#04121c;background:var(--cyan);font-weight:600}
@@ -766,6 +775,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
     <div class="pwah" data-i18n="pwa_ios_h">iPhone / iPad</div>
     <div class="pwad" data-i18n="pwa_ios_d" data-i18n-html></div></div></div>
   <p class="hint pwawhy" data-i18n="pwa_why"></p>
+  <label class="pwanev"><input type="checkbox" id="pwaNev"><span data-i18n="pwa_never">Ne plus me le rappeler</span></label>
   <div class="mrow">
     <button class="hbtn pwago" id="pwaGo" data-i18n="pwa_install" style="display:none">Installer</button>
     <button class="hbtn" id="pwaNo" data-i18n="pwa_later">Plus tard</button>
@@ -794,7 +804,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.35.1";
+const VERSION="2.35.2";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -849,6 +859,7 @@ fr:{
   pwa_ios_h:"iPhone / iPad", pwa_ios_d:"Bouton Partager ⬆️ dans Safari → « Sur l'écran d'accueil ».<br>⚠️ À faire depuis Safari : les autres navigateurs iOS ne le proposent pas.",
   pwa_why:"Tu y gagnes le plein écran, le jeu hors connexion, et une icône sur ton écran d'accueil. Ta partie reste la même.",
   pwa_install:"Installer", pwa_later:"Plus tard",
+  pwa_never:"Ne plus me le rappeler sur cet appareil",
   gen_hint:"Chaque structure produit du minerai en continu. Le prix monte de 15 % à chaque exemplaire acheté.",
   buy_by:"Acheter par",
   up_hint:"Achats <b>uniques et permanents</b>, payés en minerai. À droite : le prix, puis ce qu'il te manque et le temps qu'il faut pour l'obtenir à ta production actuelle. La barre montre ta progression vers le prix.",
@@ -938,6 +949,7 @@ en:{
   pwa_ios_h:"iPhone / iPad", pwa_ios_d:"Share button ⬆️ in Safari → \"Add to Home Screen\".<br>⚠️ It has to be Safari: other iOS browsers do not offer it.",
   pwa_why:"You get full screen, offline play, and an icon on your home screen. Your save stays exactly the same.",
   pwa_install:"Install", pwa_later:"Later",
+  pwa_never:"Don't remind me on this device",
   gen_hint:"Each structure produces ore continuously. The price rises 15 % with every unit bought.",
   buy_by:"Buy in lots of",
   up_hint:"<b>One-off, permanent</b> purchases paid in ore. On the right: the price, then what you are still missing and how long it takes at your current output. The bar shows your progress towards the price.",
@@ -2682,16 +2694,21 @@ function pwaInstallee(){
 const pwaMobile=()=>matchMedia("(pointer:coarse)").matches&&matchMedia("(max-width:1024px)").matches;
 function pwaEligible(){return pwaMobile()&&!pwaInstallee()}
 function pwaPastille(on){ cls($("#pwaTab"),"on",on); cls(document.body,"pwatab",on) }
-function pwaOuvre(){ $("#pwa").classList.add("on"); pwaPastille(false) }
+function pwaOuvre(){
+  $("#pwaNev").checked=false;                                // la case ne se souvient pas d'un refus précédent
+  $("#pwa").classList.add("on"); pwaPastille(false);
+}
 function pwaFerme(){
+  const jamais=$("#pwaNev").checked;
   $("#pwa").classList.remove("on");
-  pwaEcrit("no");
-  pwaPastille(pwaEligible());                                // la pastille prend le relais
+  pwaEcrit(jamais?"never":"no");
+  // « never » : plus rien, même pas la pastille. Sinon elle prend le relais.
+  pwaPastille(!jamais&&pwaEligible());
 }
 function majPwa(){
   if(!pwaEligible()){ $("#pwa").classList.remove("on"); pwaPastille(false); return }
   const m=pwaLu();
-  if(m==="ok"){ pwaPastille(false); return }   // déjà installée ici : on n'insiste plus
+  if(m==="ok"||m==="never"){ pwaPastille(false); return }  // installée ici, ou refus définitif
   if(m==="no"){ pwaPastille(true);  return }   // refusée : la pastille suffit
   pwaOuvre();
 }

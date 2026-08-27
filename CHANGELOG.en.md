@@ -16,6 +16,21 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.35.2 — A box to stop being asked
+
+- ☑️ The install dialog gains a **"Don't remind me on this device"** box. Ticked
+  before "Later", it also removes the **📲 pill**: nothing comes back for players
+  who want to stay in their browser.
+- 🧠 The choice stays **per device** (`localStorage`, outside the save), which now
+  counts three possible refusals: *later* (pill), *never* (nothing), and
+  *installed* (nothing).
+- 🔁 The box is **unticked every time the dialog opens**: reopening it from the
+  pill must not turn a "later" into a "never" by accident.
+
+No save field touched.
+
+---
+
 ## 2.35.1 — The iOS warning gets its own line
 
 - ⚠️ In the install dialog, "It has to be Safari: other iOS browsers do not offer

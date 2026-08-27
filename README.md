@@ -78,6 +78,21 @@ un import. Une **pastille 📲 en bas à droite** prend alors le relais et rouvr
 fenêtre à la demande ; la bande des toasts lui réserve sa largeur pour ne pas la
 recouvrir.
 
+La clé connaît **trois valeurs**, et une seule ligne de code les sépare :
+
+| Valeur | Comment on y arrive | Ce qui reste affiché |
+|---|---|---|
+| *(absente)* | premier lancement | la fenêtre s'ouvre |
+| `no` | « Plus tard » | la pastille seule |
+| `never` | « Plus tard » avec la case cochée | rien du tout |
+| `ok` | installation acceptée (`appinstalled`) | rien du tout |
+
+La case **« Ne plus me le rappeler sur cet appareil »** (2.35.2) existe pour les
+joueurs qui veulent rester dans leur navigateur : sans elle, la pastille était
+définitive et le seul moyen de s'en débarrasser était d'installer le jeu. Elle
+est décochée à chaque ouverture de la fenêtre — un refus déjà mémorisé ne doit
+pas se transformer en refus définitif au premier passage par la pastille.
+
 **Mettre à jour :** le service worker cherche toujours `index.html` sur le
 réseau en priorité, donc un simple rechargement suffit après un déploiement. Si
 tu modifies **les icônes ou le manifeste**, incrémente `CACHE` en haut de

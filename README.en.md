@@ -75,6 +75,21 @@ follow the run exported to another machine, nor come back after an import. A
 **📲 pill at the bottom right** then takes over and reopens the dialog on demand;
 the toast strip reserves its width so as not to cover it.
 
+The key has **three values**, and a single line of code separates them:
+
+| Value | How you get there | What stays on screen |
+|---|---|---|
+| *(absent)* | first launch | the dialog opens |
+| `no` | "Later" | the pill only |
+| `never` | "Later" with the box ticked | nothing at all |
+| `ok` | install accepted (`appinstalled`) | nothing at all |
+
+The **"Don't remind me on this device"** box (2.35.2) is there for players who
+want to stay in their browser: without it the pill was permanent, and the only
+way to get rid of it was to install the game. It is unticked every time the
+dialog opens — an already-remembered refusal must not turn into a permanent one
+the first time you tap the pill.
+
 **Updating:** the service worker always looks for `index.html` on the network
 first, so a plain reload is enough after a deployment. If you change **the icons
 or the manifest**, bump `CACHE` at the top of `sw.js` (`colonie-orbitale-v2` →
