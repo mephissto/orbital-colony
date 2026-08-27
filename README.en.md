@@ -56,6 +56,25 @@ HTTPS — GitHub Pages and Netlify provide it automatically.
 **Installing:** Chrome Android → ⋮ menu → "Install app"; Safari iOS → Share →
 "Add to Home Screen"; on desktop the install icon appears in the address bar.
 
+**The game offers it by itself** since 2.35.0: a dialog opens after two seconds
+for players on **mobile outside app mode**, with the Android and iOS instructions
+side by side. The iOS warning (⚠️ Safari required) sits on its own line — that
+label carries markup, hence the `data-i18n-html` attribute that switches
+`applyI18n()` from `textContent` to `innerHTML` for that element. Three
+conditions to show it — coarse pointer, screen ≤ 1024 px, and
+a `display-mode` other than `standalone` (plus `navigator.standalone` for Safari
+iOS, which does not follow the standard). On Chrome/Android the
+`beforeinstallprompt` event is captured: an **Install** button is then added and
+fires the real system dialog. Elsewhere — iOS first of all, which exposes nothing
+— only the instructions remain, hence both tutorials shown together rather than
+one picked from the user agent, which is always unreliable.
+
+A refusal is remembered **per device**, in a separate `localStorage` key
+(`colonie_orbitale_pwa`) rather than in the save: refusing on your phone must not
+follow the run exported to another machine, nor come back after an import. A
+**📲 pill at the bottom right** then takes over and reopens the dialog on demand;
+the toast strip reserves its width so as not to cover it.
+
 **Updating:** the service worker always looks for `index.html` on the network
 first, so a plain reload is enough after a deployment. If you change **the icons
 or the manifest**, bump `CACHE` at the top of `sw.js` (`colonie-orbitale-v2` →

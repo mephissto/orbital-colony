@@ -17,6 +17,46 @@ restent valides**.
 
 ---
 
+## 2.35.1 — La mise en garde iOS est détachée
+
+- ⚠️ Dans la fenêtre d'installation, « À faire depuis Safari : les autres
+  navigateurs iOS ne le proposent pas » passe **sur sa propre ligne**, précédée
+  d'un ⚠️ — c'est le piège classique, il ne devait pas se perdre à la suite du
+  mode d'emploi.
+- 🔧 Les libellés traduits passaient tous par `textContent` : un `<br>` s'y
+  serait affiché littéralement. Nouvel attribut `data-i18n-html`, qui bascule
+  `applyI18n()` vers `innerHTML` pour les seuls libellés qui portent du balisage.
+
+Correctif d'affichage uniquement.
+
+---
+
+## 2.35.0 — Le jeu propose son installation sur mobile
+
+- 📲 Une fenêtre invite à **installer le jeu en application** les joueurs sur
+  mobile qui passent par le navigateur. Elle contient le mode d'emploi
+  **Android** et **iPhone / iPad** côte à côte.
+- 🎯 Elle n'apparaît **ni sur ordinateur, ni pour qui joue déjà en mode
+  application** — détecté par `display-mode: standalone` et, pour Safari iOS qui
+  ne suit pas le standard, `navigator.standalone`.
+- ⚡ Sur **Chrome/Android**, l'événement `beforeinstallprompt` est capté : un
+  bouton **Installer** s'ajoute et déclenche le vrai dialogue système, sans
+  passer par le mode d'emploi. iOS n'expose rien d'équivalent, d'où les deux
+  tutoriels affichés ensemble plutôt qu'un seul deviné sur l'user-agent.
+- 🔁 Refuser laisse une **pastille 📲 en bas à droite**, qui rouvre la fenêtre à
+  la demande. Le refus est mémorisé **par appareil**, dans une clé `localStorage`
+  distincte de la sauvegarde : il ne suit pas une partie exportée et ne
+  réapparaît pas après un import.
+- 🐛 Deux corrections d'affichage trouvées en testant : les boutons des fenêtres
+  modales étaient écrasés à 34×34 px sous 720 px de large — une règle destinée
+  aux seules icônes de la barre d'outils, désormais limitée à celle-ci — et la
+  bande des toasts réserve maintenant la largeur de la pastille pour ne pas la
+  recouvrir.
+
+Aucun champ de sauvegarde touché.
+
+---
+
 ## 2.34.0 — Contremaître et Ingénieur échangent leur prix
 
 - 🔄 Le **Contremaître passe de 100 à 150 antimatière**, l'**Ingénieur de 150 à

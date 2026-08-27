@@ -57,6 +57,27 @@ HTTPS — GitHub Pages et Netlify le fournissent automatiquement.
 iOS → Partager → « Sur l'écran d'accueil » ; sur ordinateur, l'icône
 d'installation apparaît dans la barre d'adresse.
 
+**Le jeu le propose de lui-même** depuis la 2.35.0 : une fenêtre s'ouvre au bout
+de deux secondes chez les joueurs sur **mobile hors mode application**, avec le
+mode d'emploi Android et iOS côte à côte. La mise en garde iOS (⚠️ Safari
+obligatoire) est détachée sur sa propre ligne — le libellé porte du balisage,
+d'où l'attribut `data-i18n-html` qui bascule `applyI18n()` de `textContent` vers
+`innerHTML` pour cet élément. Trois conditions pour l'afficher —
+pointeur tactile, écran ≤ 1024 px, et `display-mode` différent de `standalone`
+(plus `navigator.standalone` pour Safari iOS, qui ne suit pas le standard). Sur
+Chrome/Android, l'événement `beforeinstallprompt` est capté : un bouton
+**Installer** s'ajoute alors et déclenche le vrai dialogue système. Ailleurs — iOS
+en tête, qui n'expose rien — il ne reste que le mode d'emploi, d'où les deux
+tutoriels affichés ensemble plutôt qu'un seul choisi sur l'user-agent, toujours
+faillible.
+
+Un refus est mémorisé **par appareil**, dans une clé `localStorage` distincte
+(`colonie_orbitale_pwa`) et non dans la sauvegarde : refuser sur son téléphone ne
+doit pas suivre la partie exportée vers une autre machine, ni réapparaître après
+un import. Une **pastille 📲 en bas à droite** prend alors le relais et rouvre la
+fenêtre à la demande ; la bande des toasts lui réserve sa largeur pour ne pas la
+recouvrir.
+
 **Mettre à jour :** le service worker cherche toujours `index.html` sur le
 réseau en priorité, donc un simple rechargement suffit après un déploiement. Si
 tu modifies **les icônes ou le manifeste**, incrémente `CACHE` en haut de

@@ -132,10 +132,12 @@ header{
 .hbtn:hover{color:#fff;border-color:var(--cyan)}
 .ic{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;
   stroke-linecap:round;stroke-linejoin:round}
-/* sur petit écran : icônes seules, boutons carrés et alignés */
+/* sur petit écran : icônes seules, boutons carrés et alignés.
+   Réservé à la barre d'outils : ailleurs (fenêtres modales) les boutons portent
+   un vrai libellé, qu'un carré de 34px tronquerait. */
 @media (max-width:720px){
-  .hbtn span{display:none}
-  .hbtn{padding:8px;justify-content:center;width:34px;height:34px}
+  .topbar .hbtn span{display:none}
+  .topbar .hbtn{padding:8px;justify-content:center;width:34px;height:34px}
   .ic{width:17px;height:17px}
   .lang{padding:8px 9px}
   .tools{gap:6px}
@@ -489,6 +491,9 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
   /* au-dessus du bouton flottant, et sans couvrir tout l'écran */
   #toasts{left:10px;right:10px;align-items:stretch;
     bottom:calc(14px + env(safe-area-inset-bottom));gap:6px}
+  /* les toasts s'empilent vers le haut et finissent par croiser la pastille
+     d'installation : on leur réserve sa largeur tant qu'elle est affichée */
+  body.pwatab #toasts{right:66px}
   .toast{font-size:12px;padding:8px 12px;text-align:center}
 }
 .toast{padding:10px 16px;border-radius:10px;border:1px solid var(--cyan);background:rgba(10,20,38,.95);
@@ -506,6 +511,31 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
 .mbox textarea{width:100%;height:120px;background:#060a15;border:1px solid var(--line);border-radius:8px;
   color:var(--txt);padding:9px;font-family:monospace;font-size:11px;resize:vertical}
 .mrow{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+
+/* --- invitation à installer la PWA --- */
+#pwa{position:fixed;inset:0;z-index:90;background:rgba(2,4,10,.88);display:none;
+  align-items:center;justify-content:center;padding:18px}
+#pwa.on{display:flex}
+.pwabox{max-width:420px}
+.pwastep{display:flex;gap:12px;align-items:flex-start;margin-top:12px;padding:11px 12px;
+  border:1px solid var(--line);border-radius:11px;background:var(--panel)}
+.pwaico{font-size:22px;line-height:1.1;flex:0 0 auto}
+.pwah{font-size:13.5px;font-weight:600;color:var(--txt)}
+.pwad{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.55}
+.pwad br{content:"";display:block;margin-top:5px}
+.pwawhy{margin:14px 0 0;opacity:.8}
+.pwabox .mrow{gap:9px}
+.pwabox .hbtn{flex:1 1 0;justify-content:center;padding:11px 12px;font-size:13px}
+.hbtn.pwago{border-color:var(--cyan);color:#04121c;background:var(--cyan);font-weight:600}
+/* Pastille de rappel, si l'invitation a été refusée. Placée au-dessus de la
+   zone des toasts, qui occupe toute la largeur en bas sur mobile : superposées,
+   les deux se masquaient mutuellement. */
+#pwaTab{position:fixed;right:14px;z-index:70;display:none;
+  bottom:calc(62px + env(safe-area-inset-bottom));
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--cyan);
+  background:rgba(10,16,32,.92);color:#fff;font-size:20px;line-height:1;cursor:pointer;
+  box-shadow:0 2px 14px rgba(0,0,0,.45)}
+#pwaTab.on{display:block}
 
 @media (max-width:880px){
   main{display:block;overflow-y:auto;overflow-anchor:none}
@@ -724,6 +754,25 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
 </div>
 
 <div id="toasts"></div>
+<!-- Invitation à installer la PWA : mobile hors mode application uniquement.
+     Créée masquée, révélée par majPwa() une fois les conditions vérifiées. -->
+<div id="pwa"><div class="mbox pwabox">
+  <h2 data-i18n="pwa_title">Installe le jeu</h2>
+  <p class="hint" data-i18n="pwa_intro"></p>
+  <div class="pwastep"><div class="pwaico">🤖</div><div>
+    <div class="pwah" data-i18n="pwa_and_h">Android</div>
+    <div class="pwad" data-i18n="pwa_and_d" data-i18n-html></div></div></div>
+  <div class="pwastep"><div class="pwaico">🍎</div><div>
+    <div class="pwah" data-i18n="pwa_ios_h">iPhone / iPad</div>
+    <div class="pwad" data-i18n="pwa_ios_d" data-i18n-html></div></div></div>
+  <p class="hint pwawhy" data-i18n="pwa_why"></p>
+  <div class="mrow">
+    <button class="hbtn pwago" id="pwaGo" data-i18n="pwa_install" style="display:none">Installer</button>
+    <button class="hbtn" id="pwaNo" data-i18n="pwa_later">Plus tard</button>
+  </div>
+</div></div>
+<button type="button" id="pwaTab" data-i18n-title="pwa_title" title="Installe le jeu">📲</button>
+
 <div id="modal"><div class="mbox">
   <h2 id="mTitle" data-i18n="m_title">Sauvegarde</h2>
   <p class="hint" id="mHint" data-i18n="m_hint"></p>
@@ -745,7 +794,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.34.0";
+const VERSION="2.35.1";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -794,6 +843,12 @@ fr:{
   m_title:"Sauvegarde",
   m_hint:"Copie ce code pour sauvegarder ta partie, ou colle un code puis clique « Importer ».",
   m_import:"Importer", m_close:"Fermer", bad_code:"Code de sauvegarde invalide.",
+  pwa_title:"Installe le jeu",
+  pwa_intro:"Colonie Orbitale s'installe comme une vraie application, en deux gestes et sans passer par un magasin d'applications.",
+  pwa_and_h:"Android", pwa_and_d:"Menu ⋮ du navigateur → « Installer l'application » (ou « Ajouter à l'écran d'accueil »).",
+  pwa_ios_h:"iPhone / iPad", pwa_ios_d:"Bouton Partager ⬆️ dans Safari → « Sur l'écran d'accueil ».<br>⚠️ À faire depuis Safari : les autres navigateurs iOS ne le proposent pas.",
+  pwa_why:"Tu y gagnes le plein écran, le jeu hors connexion, et une icône sur ton écran d'accueil. Ta partie reste la même.",
+  pwa_install:"Installer", pwa_later:"Plus tard",
   gen_hint:"Chaque structure produit du minerai en continu. Le prix monte de 15 % à chaque exemplaire acheté.",
   buy_by:"Acheter par",
   up_hint:"Achats <b>uniques et permanents</b>, payés en minerai. À droite : le prix, puis ce qu'il te manque et le temps qu'il faut pour l'obtenir à ta production actuelle. La barre montre ta progression vers le prix.",
@@ -877,6 +932,12 @@ en:{
   m_title:"Save file",
   m_hint:"Copy this code to back up your game, or paste a code and click “Import”.",
   m_import:"Import", m_close:"Close", bad_code:"Invalid save code.",
+  pwa_title:"Install the game",
+  pwa_intro:"Orbital Colony installs like a real app, in two taps and without going through an app store.",
+  pwa_and_h:"Android", pwa_and_d:"Browser ⋮ menu → \"Install app\" (or \"Add to Home screen\").",
+  pwa_ios_h:"iPhone / iPad", pwa_ios_d:"Share button ⬆️ in Safari → \"Add to Home Screen\".<br>⚠️ It has to be Safari: other iOS browsers do not offer it.",
+  pwa_why:"You get full screen, offline play, and an icon on your home screen. Your save stays exactly the same.",
+  pwa_install:"Install", pwa_later:"Later",
   gen_hint:"Each structure produces ore continuously. The price rises 15 % with every unit bought.",
   buy_by:"Buy in lots of",
   up_hint:"<b>One-off, permanent</b> purchases paid in ore. On the right: the price, then what you are still missing and how long it takes at your current output. The bar shows your progress towards the price.",
@@ -2067,7 +2128,10 @@ function applyI18n(){
   const court=matchMedia("(max-width:560px)").matches;
   $$("[data-i18n]").forEach(e=>{
     const k=(court&&e.dataset.i18nS)?e.dataset.i18nS:e.dataset.i18n;
-    txt(e,t(k));
+    // data-i18n-html : le libellé contient du balisage (un <br>, un ⚠️ mis en
+    // valeur…) et doit être injecté tel quel. Les traductions sont des
+    // constantes du fichier, jamais une saisie du joueur.
+    if(e.dataset.i18nHtml!==undefined)html(e,t(k)); else txt(e,t(k));
   });
   $$("[data-i18n-title]").forEach(e=>{const v=t(e.dataset.i18nTitle);if(e.title!==v)e.title=v});
   $$(".lang").forEach(b=>cls(b,"on",b.dataset.lang===LANG));
@@ -2592,6 +2656,63 @@ bindAction($("#mImport"),()=>{
     $("#modal").classList.remove("on"); toast(t("t_imported"));
   }catch(e){alert(t("bad_code"))}
 });
+/* ---------- invitation à installer la PWA ----------
+   Cible : un téléphone ou une tablette qui joue dans le navigateur. On écarte
+   donc les ordinateurs (pointer:fine) et tout ce qui tourne déjà en mode
+   application. Le refus est mémorisé **par appareil** (localStorage à part, pas
+   dans la sauvegarde) : refuser sur son téléphone ne doit pas suivre la partie
+   exportée vers une autre machine, et ré-importer une sauvegarde ne doit pas
+   faire réapparaître l'invitation.
+   Chrome/Android laisse installer pour de vrai via `beforeinstallprompt` : quand
+   l'événement arrive, un bouton « Installer » s'ajoute et déclenche le vrai
+   dialogue système. Ailleurs — iOS en tête, qui n'expose rien — il ne reste que
+   le mode d'emploi, d'où les deux tutoriels affichés côte à côte plutôt qu'un
+   seul choisi sur l'user-agent, toujours faillible. */
+const PWAKEY="colonie_orbitale_pwa";
+const pwaLu=()=>{try{return localStorage.getItem(PWAKEY)}catch(e){return null}};
+const pwaEcrit=v=>{try{localStorage.setItem(PWAKEY,v)}catch(e){}};
+let pwaPrompt=null;
+function pwaInstallee(){
+  return matchMedia("(display-mode: standalone)").matches
+      || matchMedia("(display-mode: fullscreen)").matches
+      || matchMedia("(display-mode: minimal-ui)").matches
+      || navigator.standalone===true                         // Safari iOS
+      || document.referrer.startsWith("android-app://");
+}
+const pwaMobile=()=>matchMedia("(pointer:coarse)").matches&&matchMedia("(max-width:1024px)").matches;
+function pwaEligible(){return pwaMobile()&&!pwaInstallee()}
+function pwaPastille(on){ cls($("#pwaTab"),"on",on); cls(document.body,"pwatab",on) }
+function pwaOuvre(){ $("#pwa").classList.add("on"); pwaPastille(false) }
+function pwaFerme(){
+  $("#pwa").classList.remove("on");
+  pwaEcrit("no");
+  pwaPastille(pwaEligible());                                // la pastille prend le relais
+}
+function majPwa(){
+  if(!pwaEligible()){ $("#pwa").classList.remove("on"); pwaPastille(false); return }
+  const m=pwaLu();
+  if(m==="ok"){ pwaPastille(false); return }   // déjà installée ici : on n'insiste plus
+  if(m==="no"){ pwaPastille(true);  return }   // refusée : la pastille suffit
+  pwaOuvre();
+}
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault(); pwaPrompt=e; show($("#pwaGo"),true);
+});
+window.addEventListener("appinstalled",()=>{
+  pwaEcrit("ok"); $("#pwa").classList.remove("on"); pwaPastille(false);
+});
+bindAction($("#pwaNo"),pwaFerme);
+bindAction($("#pwaTab"),pwaOuvre);
+bindAction($("#pwaGo"),()=>{
+  if(!pwaPrompt)return;
+  const p=pwaPrompt; pwaPrompt=null; show($("#pwaGo"),false);
+  p.prompt();
+  p.userChoice.then(r=>{ if(r&&r.outcome==="accepted")pwaEcrit("ok"); else pwaFerme() });
+});
+// on laisse la première image se peindre : l'invitation ne doit pas précéder le jeu
+setTimeout(majPwa,1800);
+matchMedia("(display-mode: standalone)").addEventListener?.("change",majPwa);
+
 window.addEventListener("beforeunload",save);
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden)save();

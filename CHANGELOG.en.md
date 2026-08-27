@@ -16,6 +16,44 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.35.1 — The iOS warning gets its own line
+
+- ⚠️ In the install dialog, "It has to be Safari: other iOS browsers do not offer
+  it" now sits **on its own line**, prefixed with ⚠️ — it is the classic trap and
+  should not get lost at the end of the instructions.
+- 🔧 Translated labels all went through `textContent`, so a `<br>` would have
+  shown literally. New `data-i18n-html` attribute, switching `applyI18n()` to
+  `innerHTML` for the few labels that carry markup.
+
+Display fix only.
+
+---
+
+## 2.35.0 — The game offers to install itself on mobile
+
+- 📲 A dialog invites players on mobile who are going through the browser to
+  **install the game as an app**. It carries the **Android** and **iPhone /
+  iPad** instructions side by side.
+- 🎯 It appears **neither on desktop nor for anyone already in app mode** —
+  detected through `display-mode: standalone` and, for Safari iOS which does not
+  follow the standard, `navigator.standalone`.
+- ⚡ On **Chrome/Android** the `beforeinstallprompt` event is captured: an
+  **Install** button is added and fires the real system dialog, skipping the
+  instructions entirely. iOS exposes nothing equivalent, hence both tutorials
+  shown together rather than one guessed from the user agent.
+- 🔁 Declining leaves a **📲 pill at the bottom right**, which reopens the dialog
+  on demand. The refusal is remembered **per device**, in a `localStorage` key
+  separate from the save: it does not follow an exported run and does not come
+  back after an import.
+- 🐛 Two display fixes found while testing: modal buttons were squashed to
+  34×34 px below 720 px wide — a rule meant for the toolbar icons alone, now
+  scoped to it — and the toast strip reserves the pill's width so as not to cover
+  it.
+
+No save field touched.
+
+---
+
 ## 2.34.0 — Foreman and Engineer swap prices
 
 - 🔄 The **Foreman goes from 100 to 150 antimatter**, the **Engineer from 150 to
