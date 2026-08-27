@@ -528,13 +528,13 @@ suffit de le rallumer.
 |---|---|---|---|---|
 | 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
 | ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 100 | 100 |
-| 🏗️ Contremaître | rachète chaque seconde la structure que tu lui désignes | 1 | 150 | 150 |
+| 🏗️ Contremaître | achète chaque seconde la structure que tu lui désignes | 1 | 150 | 150 |
 | 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 200 | 200 |
 | ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 400 | 400 |
 
 **Pourquoi le Contremaître coûte plus cher que l'Ingénieur** (150 contre 100,
 échangés en 2.34.0) : les deux sont exclusifs, et celui qu'on garde allumé en
-pratique est le Contremaître, qui rachète des structures en continu. Le travail
+pratique est le Contremaître, qui achète des structures en continu. Le travail
 de l'Ingénieur, lui, est **fini** une fois les 73 améliorations achetées — passé
 ce point il n'a plus rien à faire. Le plus utile devait donc être le plus cher.
 Le total de l'automatisation est inchangé : c'est un échange, pas une hausse.
@@ -568,7 +568,7 @@ et son interrupteur. Le couper ne rembourse rien et ne fait perdre aucun niveau.
 Sous 520 px de large l'état passe **sous** le nom au lieu de disparaître : c'est
 lui qui porte le « mise en pause par… », l'information la plus utile de la ligne.
 
-**Le Contremaître rachète** — menu déroulant listant les structures **déjà
+**Le Contremaître achète** — menu déroulant listant les structures **déjà
 révélées** (`genRev()`, borné par `S.seen` : rien ne se dévoile d'avance), avec
 leur icône. Il n'achète que celle-là, une par seconde. Tant que le joueur n'a
 rien choisi, `autoGenId()` vise la **dernière structure révélée** ; dès qu'il

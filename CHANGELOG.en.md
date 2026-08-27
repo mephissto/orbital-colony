@@ -16,6 +16,19 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 2.35.3 — The Foreman buys, on two lines
+
+- 🏗️ In the automation settings, **"The Foreman rebuys" becomes "buys"** — nothing
+  is being bought back, it is one more purchase, every second. Same fix on the
+  card's description.
+- ↩️ The status line now spans **two lines**: the target price, then what is left
+  to go. On a small screen the wrap landed in a different place depending on the
+  number shown; it is now always in the same place.
+
+No save field touched.
+
+---
+
 ## 2.35.2 — A box to stop being asked
 
 - ☑️ The install dialog gains a **"Don't remind me on this device"** box. Ticked

@@ -509,13 +509,13 @@ on.
 |---|---|---|---|---|
 | 🛰️ Mining satellites | +1 click/s per level | 10 | 30, ×2 per level | 30,690 |
 | ⬆️ Engineer | buys the cheapest affordable upgrade | 1 | 100 | 100 |
-| 🏗️ Foreman | rebuys the structure you assign it, every second | 1 | 150 | 150 |
+| 🏗️ Foreman | buys the structure you assign it, every second | 1 | 150 | 150 |
 | 📡 Recovery probe | collects the anomaly for you | 1 | 200 | 200 |
 | ♻️ Auto cycle | starts a new cycle at the chosen threshold | 1 | 400 | 400 |
 
 **Why the Foreman costs more than the Engineer** (150 against 100, swapped in
 2.34.0): the two are mutually exclusive, and the one you actually keep switched
-on is the Foreman, which rebuys structures continuously. The Engineer's job, by
+on is the Foreman, which buys structures continuously. The Engineer's job, by
 contrast, is **finished** once all 73 upgrades are bought — past that point it
 has nothing left to do. The more useful one therefore had to be the more
 expensive. The automation total is unchanged: this is a swap, not a rise.
@@ -546,7 +546,7 @@ and its switch. Switching one off refunds nothing and loses no level. Under
 520 px wide the state moves **below** the name instead of disappearing: it is the
 one carrying "paused by…", the most useful information on the row.
 
-**The Foreman rebuys** — a dropdown listing the structures **already revealed**
+**The Foreman buys** — a dropdown listing the structures **already revealed**
 (`genRev()`, bounded by `S.seen`: nothing is disclosed early), with their icon.
 It only ever buys that one, one per second. Until the player picks one,
 `autoGenId()` aims at the **last revealed structure**; as soon as they pick,

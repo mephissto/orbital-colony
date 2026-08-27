@@ -523,6 +523,9 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
 .pwah{font-size:13.5px;font-weight:600;color:var(--txt)}
 .pwad{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.55}
 .pwad br{content:"";display:block;margin-top:5px}
+/* même retrait pour la 2e ligne de « prochain achat » : sur petit écran la ligne
+   se coupait toute seule à un endroit variable selon le nombre affiché. */
+.setnow br{content:"";display:block;margin-top:3px}
 .pwawhy{margin:14px 0 0;opacity:.8}
 /* Case « ne plus me le rappeler » : zone de frappe volontairement large
    (tout le label), la case seule fait moins de 20 px sur téléphone. */
@@ -804,7 +807,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.35.2";
+const VERSION="2.35.3";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -885,10 +888,10 @@ fr:{
   au_cyc:"Relancer le cycle à partir de",
   au_sw:"Automates actifs", au_pause:"mise en pause par {0}", au_off_by:"coupé — {0} travaille",
   au_sw_hint:"Couper un automate ne rembourse rien et ne fait perdre aucun niveau. Le Contremaître et l'Ingénieur puisent dans le même minerai : un seul des deux peut travailler, et l'interrupteur de l'autre reste verrouillé tant que celui-là tourne.",
-  au_gen:"Le Contremaître rachète",
+  au_gen:"Le Contremaître achète",
   au_gen_hint:"Il n'achète que cette structure, une par seconde, dès qu'il a le minerai.",
   au_gen_ready:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b>, disponible.",
-  au_gen_wait:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b> — il manque <b>{1}</b>{2}.",
+  au_gen_wait:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b><br>il manque <b>{1}</b>{2}.",
   au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. Le cycle ne repart jamais pour moins de 10 % de ta réserve, même si tu saisis moins.",
   au_cyc_now:"Gain actuel : <b>+{0}</b> — {1}",
   au_cyc_ready:"le seuil est atteint, le cycle repart.",
@@ -975,10 +978,10 @@ en:{
   au_cyc:"Restart the cycle from",
   au_sw:"Active automations", au_pause:"paused by {0}", au_off_by:"off — {0} is working",
   au_sw_hint:"Switching one off refunds nothing and loses no level. The Foreman and the Engineer draw on the same ore: only one of them can work, and the other's switch stays locked while it does.",
-  au_gen:"The Foreman rebuys",
+  au_gen:"The Foreman buys",
   au_gen_hint:"It only ever buys that one structure, one per second, as soon as it has the ore.",
   au_gen_ready:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b>, available.",
-  au_gen_wait:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b> — <b>{1}</b> to go{2}.",
+  au_gen_wait:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b><br><b>{1}</b> to go{2}.",
   au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. It never restarts for less than 10 % of your stock, even if you type less.",
   au_cyc_now:"Current gain: <b>+{0}</b> — {1}",
   au_cyc_ready:"the threshold is reached, the cycle restarts.",
@@ -1210,7 +1213,7 @@ const AUTOS=[
       en:"One orbiting satellite per level, each strikes once a second"}},
  /* Prix échangés en 2.34.0, et l'ordre de la liste avec, pour qu'elle reste
     croissante. Les deux sont exclusifs : celui qu'on garde allumé en pratique
-    est le Contremaître, qui rachète des structures en continu, alors que le
+    est le Contremaître, qui achète des structures en continu, alors que le
     travail de l'Ingénieur est fini une fois les 73 améliorations achetées.
     Le plus utile doit donc être le plus cher. Total de l'automatisation
     inchangé (31 540) : c'est un échange, pas une hausse. */
@@ -1219,7 +1222,7 @@ const AUTOS=[
   ds:{fr:"Achète les améliorations dès qu'elles sont payables — met le Contremaître en pause",en:"Buys upgrades as soon as they are affordable — pauses the Foreman"}},
  {id:"contre",ico:"🏗️", max:1, c0:150, cg:1,
   nm:{fr:"Contremaître",en:"Foreman"}, nmd:{fr:"le Contremaître",en:"the Foreman"},
-  ds:{fr:"Rachète chaque seconde la structure que tu lui désignes — met l'Ingénieur en pause",en:"Rebuys the structure you assign it, every second — pauses the Engineer"}},
+  ds:{fr:"Achète chaque seconde la structure que tu lui désignes — met l'Ingénieur en pause",en:"Buys the structure you assign it, every second — pauses the Engineer"}},
  {id:"sonde", ico:"📡", max:1, c0:200, cg:1,
   nm:{fr:"Sonde de récupération",en:"Recovery probe"},
   ds:{fr:"Ramasse les anomalies à ta place",en:"Collects anomalies for you"}},

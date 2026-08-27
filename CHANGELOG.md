@@ -17,6 +17,19 @@ restent valides**.
 
 ---
 
+## 2.35.3 — Le Contremaître achète, sur deux lignes
+
+- 🏗️ Dans les réglages de l'automatisation, **« Le Contremaître rachète » devient
+  « achète »** — il n'y a pas de rachat, c'est un achat de plus, chaque seconde.
+  Même correction sur la description de sa carte.
+- ↩️ La ligne d'état passe sur **deux lignes** : le prix visé, puis « il manque…
+  ». Sur petit écran la coupure tombait à un endroit variable selon le nombre
+  affiché ; elle est maintenant toujours au même endroit.
+
+Aucun champ de sauvegarde touché.
+
+---
+
 ## 2.35.2 — Une case pour ne plus être rappelé
 
 - ☑️ La fenêtre d'installation gagne une case **« Ne plus me le rappeler sur cet
