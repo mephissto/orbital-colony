@@ -83,8 +83,8 @@ La clé connaît **trois valeurs**, et une seule ligne de code les sépare :
 | Valeur | Comment on y arrive | Ce qui reste affiché |
 |---|---|---|
 | *(absente)* | premier lancement | la fenêtre s'ouvre |
-| `no` | « Plus tard » | la pastille seule |
-| `never` | « Plus tard » avec la case cochée | rien du tout |
+| `no` | « Fermer » | la pastille seule |
+| `never` | « Fermer » avec la case cochée | rien du tout |
 | `ok` | installation acceptée (`appinstalled`) | rien du tout |
 
 La case **« Ne plus me le rappeler sur cet appareil »** (2.35.2) existe pour les

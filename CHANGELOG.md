@@ -20,13 +20,16 @@ restent valides**.
 ## 2.35.2 — Une case pour ne plus être rappelé
 
 - ☑️ La fenêtre d'installation gagne une case **« Ne plus me le rappeler sur cet
-  appareil »**. Cochée avant « Plus tard », elle retire aussi la **pastille 📲** :
+  appareil »**. Cochée avant « Fermer », elle retire aussi la **pastille 📲** :
   plus rien ne réapparaît pour qui veut jouer dans son navigateur.
 - 🧠 Le choix reste **par appareil** (`localStorage`, hors sauvegarde), qui compte
   désormais trois refus possibles : *plus tard* (pastille), *jamais* (rien), et
   *installé* (rien).
 - 🔁 La case est **décochée à chaque ouverture** : rouvrir la fenêtre depuis la
-  pastille ne doit pas transformer un « plus tard » en « jamais » par accident.
+  pastille ne doit pas transformer un refus temporaire en refus définitif par
+  accident.
+- 🏷️ Le bouton **« Plus tard » devient « Fermer »** : cocher « ne plus me le
+  rappeler » puis valider par « Plus tard » n'avait plus de sens.
 
 Aucun champ de sauvegarde touché.
 

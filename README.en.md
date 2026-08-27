@@ -80,8 +80,8 @@ The key has **three values**, and a single line of code separates them:
 | Value | How you get there | What stays on screen |
 |---|---|---|
 | *(absent)* | first launch | the dialog opens |
-| `no` | "Later" | the pill only |
-| `never` | "Later" with the box ticked | nothing at all |
+| `no` | "Close" | the pill only |
+| `never` | "Close" with the box ticked | nothing at all |
 | `ok` | install accepted (`appinstalled`) | nothing at all |
 
 The **"Don't remind me on this device"** box (2.35.2) is there for players who
