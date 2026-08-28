@@ -2,26 +2,29 @@
 
 [🇫🇷 Français](README.md) · 🇬🇧 English
 
-A space idle game, bilingual FR / EN, installable as an app (PWA) and playable
-offline. The whole game fits in `index.html`: no dependency, no server, no data
-ever leaving your browser.
+A space idle game, bilingual EN / FR (English by default, French auto-detected),
+installable as an app (PWA) and playable offline. The whole game fits in
+`index.html`: no dependency, no server, no data ever leaving your browser.
 
 Free software under [GPL 3.0 or later](#licence).
 
-**Play online:** [orbital-colony.mephissto.fr](https://orbital-colony.mephissto.fr/) ·
-[mephissto.github.io/orbital-colony](https://mephissto.github.io/orbital-colony/)
+**Play online:** [orbital-colony.app](https://orbital-colony.app/)
+· development build: [dev.orbital-colony.app](https://dev.orbital-colony.app/)
 
 ---
 
 ## Contents
 
 - [Files and deployment](#files-and-deployment)
+- [The world of the game](#the-world-of-the-game)
+- [Menu, tutorial and about](#menu-tutorial-and-about)
 - [Game loop](#game-loop)
 - [Clicking](#clicking)
 - [Structures](#structures)
 - [Upgrades](#upgrades)
 - [Anomalies](#anomalies)
 - [The global multiplier](#the-global-multiplier)
+- [Challenges](#challenges)
 - [Prestige and antimatter](#prestige-and-antimatter)
 - [Research](#research)
 - [Automation](#automation)
@@ -51,7 +54,8 @@ Free software under [GPL 3.0 or later](#licence).
 | `ROADMAP.md` | what is planned next, and why |
 
 All files go **at the root of the repository**, flat. Installation requires
-HTTPS — GitHub Pages and Netlify provide it automatically.
+HTTPS — Cloudflare Pages, GitHub Pages and Netlify all provide it
+automatically.
 
 **Installing:** Chrome Android → ⋮ menu → "Install app"; Safari iOS → Share →
 "Add to Home Screen"; on desktop the install icon appears in the address bar.
@@ -97,6 +101,80 @@ or the manifest**, bump `CACHE` at the top of `sw.js` (`colonie-orbitale-v2` →
 
 ---
 
+## The world of the game
+
+The name is not decorative: it describes the loop.
+
+> You are not building on a world. You are building **around** one.
+>
+> The colony turns four hundred kilometres above a dead planet, anchored to an
+> asteroid captured into the same orbit. Nothing lands, nothing leaves:
+> everything you build stays suspended there, between the void and the gravity
+> well.
+>
+> And the orbit decays. Always. Every colony falls back in the end, and all that
+> survives is a handful of antimatter torn from its own descent — enough to
+> build the next one a little higher, a little faster.
+>
+> That is where the name comes from: **an orbital colony is never finished, it
+> is only falling more slowly than the last one.**
+
+This text is the `lore` key of the `T` dictionary, in French and English. It
+opens the tutorial and can be read again in the About panel. It also justifies
+prestige: restarting a cycle is not a genre convention, it is the orbit giving
+way.
+
+---
+
+## Menu, tutorial and about
+
+Up to 2.35 the top bar carried three buttons — Save, Export / Import, Reset.
+3.0.28 groups them behind **a single Menu button**: at five entries the bar no
+longer fitted on a phone, and Reset sat dangerously next to Save.
+
+The menu holds a what's-new summary (the `wn_d` key, three lines, to be
+rewritten at every notable version) then six entries: Save, Export / Import,
+Tutorial, Changelog, About, and Reset — the only irreversible action, hence the
+only red one, the only full-width one, and the last one.
+
+**Window stacking order**, to respect if another one is added:
+
+| Window | z-index |
+|---|---|
+| Menu | 82 |
+| Export / Import, Changelog, About | 84 |
+| Tutorial | 86 |
+| Install prompt (PWA) | 90 |
+| Confirmation (`demande()`) | 95 |
+
+Export opens **from** the menu: at 80 it opened behind it, visible but unusable,
+with the menu intercepting clicks.
+
+**Changelog** — the `LOG` table embeds the last eight versions summarised in one
+sentence, bilingual, with a link to the repository's full `CHANGELOG.md`. The
+full file is 37 KB per language and the game has to stay playable offline: the
+excerpt is the accepted trade-off, to be kept up to date at every release.
+
+**Tutorial** — five screens (`TUTO`): the lore, the asteroid, structures,
+upgrades and anomalies, the cycle. It opens **by itself on the first run** and
+can be replayed from the menu.
+
+Two delicate points:
+
+- It comes **before** the PWA install prompt. `tutoFerme()` calls `majPwa()`
+  only if the tutorial had opened automatically — two stacked dialogs on the
+  first launch is one too many.
+- A run already in progress does not trigger it. The `S.tuto` field does not
+  exist in pre-3.0.28 saves and reads 0 there, so `partieVierge()` also looks at
+  `totalOre`, `prestiges` and `clicks`, and the flag is set immediately so it
+  never comes back.
+
+**About** — the lore, then five rows: source code, Patreon, author, licence and
+version. The two outbound links are the `LIEN_CODE` and `LIEN_PATREON`
+constants, at the top of the block, and carry `rel="noopener noreferrer"`.
+
+---
+
 ## Game loop
 
 You mine **ore**, the only running resource. Ore buys **structures** that produce
@@ -127,13 +205,21 @@ terms, the whole multiplied by the global multiplier:
 click = ( strike + echo ) × click upgrades × Servo arms × active click buff
 
   strike = 1 × global multiplier
-  echo   = output/s × best resonator owned
+  echo   = output/s × max( best resonator owned , base echo 7 % )
 ```
 
+- **Base echo: 7 %** (3.0.28). Without it the echo only exists once the first
+  resonator is bought (200,000 ore), and the strike — a base of 1 that never
+  grows — drops off immediately: measured on a fresh run, the click stayed at
+  1–1.5 while output reached 246/s, i.e. **0.006 s of output per click** after an
+  hour. With the base echo the click is worth **~0.10 s of output** permanently,
+  from the first minute. It is applied **inside** the echo, not as a floor on the
+  result: a floor on the final value would hide the effect of click upgrades —
+  exactly the defect fixed in 2.30.0.
 - **Click upgrades** — **on the click's total value**, echo included: Ion hammer
-  ×1.5, Exoskeleton ×1.6, Capacitor ×1.8, Magnetic field ×2. In full: **×8.64**.
-  Each is worth exactly its ×N however far along you are, which is what the card
-  states as a single number.
+  ×1.4, Exoskeleton ×1.5, Capacitor ×1.6, Magnetic field ×1.7. In full:
+  **×5.71**. Each is worth exactly its ×N however far along you are, which is
+  what the card states as a single number.
 - **Servo-assisted arms** (research) — **+8 % per level on the whole click**,
   12 levels, i.e. **×2.52** at maximum. Up to 2.32.0 it was ×2 per level **on the
   strike alone**: measured, an advanced player restarting a cycle ended up with
@@ -141,33 +227,44 @@ click = ( strike + echo ) × click upgrades × Servo arms × active click buff
   8,675 antimatter for nothing. The price ladder has not moved by a single
   antimatter, which keeps the research consistent with the other seven (whose
   first levels all cost between 6 and 30).
-- **Resonators** — add a percentage of your output per second to every click:
-  v1 +2 %, v2 +5 %, v3 +10 %. Only the best one counts, they do not stack. Late
-  in the game this term dominates by far.
+- **Resonators** — replace the base echo with a higher percentage of your output
+  per second: v1 +9 %, v2 +12 %, v3 +15 %. Only the best one counts, they do not
+  stack.
 
-**The balance rule: a click must never exceed output/s.** With resonator v3 at
-40 % (up to 2.30.0) the click was already worth 0.40 s of output **before any
-click upgrade** — so no multiplier above ×2.5 could be added without breaking the
-rule. That is why the resonators dropped to 2/5/10 % at the same time as the
-multipliers moved to ×1.5–×2: without the Servo arms, the click **peaks at
-0.86 s of output** while staying 2.15× stronger than it originally was.
+**The balance rule: a click must never exceed output/s.** The click's ceiling is
+the product **best echo × click multipliers**. With resonator v3 at 40 % (up to
+2.30.0) the click was already worth 0.40 s of output **before any click upgrade**
+— so no multiplier above ×2.5 could be added without breaking the rule. That is
+why the resonators dropped to 2/5/10 % at the same time as the multipliers moved
+to ×1.5–×2.
+
+3.0.28 replays that same trade-off in the other direction: **the multipliers drop
+to ×1.4–×1.7 (×5.71 in full) so the echo can go up** (7 % base, resonators
+9/12/15 %). Click power thus moves towards the **early** game, where it was
+missing, without changing the ceiling at all: 0.15 × 5.71 = **0.86 s of output**,
+exactly the previous value.
 
 **The only thing allowed to cross that ceiling is the Servo arms research** — and
-only once all twelve levels are paid for: at 12/12 the click reaches **2.18 s of
+only once all twelve levels are paid for: at 12/12 the click reaches **2.16 s of
 output**. That overshoot is deliberate: a player who sank 8,675 antimatter into a
 research is entitled to see its effect.
 
-| Stage | Click upgrades | Servo | Output/s | Click | sec. of output/click |
-|---|---|---|---|---|---|
-| First minutes | 0 | 0/12 | 3 | 1 | 0.33 |
-| Exoskeleton | 2 | 1/12 | 485 | 3.6 | 0.01 |
-| Resonator v2 | 3 | 7/12 | 20.5M | 7.61M | 0.37 |
-| Magnetic field | 4 | 9/12 | 822M | 710M | 0.86 |
-| Resonator v3 | 4 | 11/12 | 80.6B | 162B | 2.01 |
-| Very advanced run | 4 | 12/12 | 407T | 887T | **2.18** |
+| Stage | Echo | Click upgrades | Servo | sec. of output/click |
+|---|---|---|---|---|
+| First minutes | 7 % base | 0 | 0/12 | 0.40 |
+| Exoskeleton | 7 % base | 2 | 1/12 | 0.16 |
+| Resonator v2 | 12 % | 3 | 7/12 | 0.69 |
+| Magnetic field | 12 % | 4 | 9/12 | 1.37 |
+| Resonator v3 | 15 % | 4 | 11/12 | 2.00 |
+| Very advanced run | 15 % | 4 | 12/12 | **2.16** |
+
+The dip to 0.16 s at the second stage is expected: the first two click upgrades
+land before the first resonator, and that is the one moment where the strike (the
+constant term) has already dropped off while the echo has not yet grown. Before
+3.0.28 that dip was 0.01 s.
 
 To watch if these values change: the **Mining satellites** click up to 10 times a
-second. At 2.18 s of output per click they therefore yield **21.8× passive
+second. At 2.16 s of output per click they therefore yield **21.6× passive
 output** — automatic clicking remains, as before, the main ore source of an
 advanced cycle.
 
@@ -200,6 +297,14 @@ Ten structures, each producing ore continuously.
 **Price of the n-th unit:** `base price × 1.15^(already owned)`, reduced by the
 Negotiation research. The **MAX** button works out how many you can buy at once,
 geometric sums included.
+
+The **×1 / ×10 / ×100 / MAX** row is **sticky**: it stays at the top of the tab
+while you scroll the list (3.0.28). It decides the price and quantity shown on
+*every* card, and with ten structures you had to scroll back up every time you
+changed your mind. Its anchor point is computed in JS because it differs per
+layout: on desktop `#panels` is the scroller and the row sticks to its top edge
+minus its padding, on mobile it is `<main>` and the row lands under the sticky
+tab header (the `--buyTop` CSS variable, updated by `syncHero()`).
 
 **Total output:**
 
@@ -238,12 +343,12 @@ units and multiplies that one structure's output:
 
 A fully upgraded structure produces **×1,440**.
 
-**Click upgrades** — on the whole click: Ion hammer ×1.5 (400), Exoskeleton ×1.6
-(35,000, from 50 clicks), Capacitor ×1.8 (5e6, from 250 clicks), Magnetic field
-×2 (2e9, from 600 clicks). In full: **×8.64**.
+**Click upgrades** — on the whole click: Ion hammer ×1.4 (400), Exoskeleton ×1.5
+(35,000, from 50 clicks), Capacitor ×1.6 (5e6, from 250 clicks), Magnetic field
+×1.7 (2e9, from 600 clicks). In full: **×5.71**.
 
-**Resonators** — v1 +2 % (2e5), v2 +5 % (4e8, requires v1), v3 +10 % (6e11,
-requires v2).
+**Resonators** — v1 +9 % (2e5), v2 +12 % (4e8, requires v1), v3 +15 % (6e11,
+requires v2). Below them, the base echo is already worth **7 %**.
 
 **Global upgrades** — Logistics network ×1.25 (5e4), Coordination AI ×1.5 (8e6),
 Quantum relay ×2 (1.2e9), Bio-engineering ×2.5 (3e11), Singularity engine ×4
@@ -340,6 +445,59 @@ multiplier = (1 + antimatter × bonus per unit)   ← antimatter
 ```
 
 The full breakdown is available as a tooltip on the Multiplier tile.
+
+---
+
+## Challenges
+
+Six special runs, opened when the header tile reads **"cycle #6 in progress"**.
+Each breaks **one** rule of the game for a whole cycle.
+
+Entering **banks the current cycle first** and credits the antimatter you had
+pending, then resets ore, structures and upgrades. Kept: antimatter, research,
+achievements, automations and the rewards of challenges already cleared. A
+permanent banner shows progress, with a **Leave** button and no penalty. Once
+beaten, a challenge is cleared **for good**.
+
+During a challenge, **only the ♻️ cycle restarter is suspended** — it would wipe
+your progress. Every other automation keeps working. Research cannot be bought;
+the tab is greyed out and says why.
+
+| Challenge | Broken rule | Permanent reward | coef |
+|---|---|---|---|
+| 📵 Radio silence | no anomaly appears | anomalies 20 % more frequent | 0.005 |
+| ⛓️ Hands tied | clicking yields nothing | output +25 % | 0.002 |
+| 📈 Inflation | prices ×1.35 instead of ×1.15 | −8 % on every price | 0.006 |
+| 🏚️ Dwarf colony | only 6 structures, but they produce ×4 | the last 4 produce ×2 | 0.0015 |
+| 💨 Containment leak | output −2 % every 2 min, floor at 20 % | antimatter gain +15 % | 0.015 |
+| 🕳️ The Void | antimatter no longer counts in the multiplier | antimatter exponent 1.50 → 1.55 | 0.005 |
+
+**The goal** is `coef × best cycle × handicap`, in ore mined during the cycle,
+and is **frozen when you enter**. It cannot be a hard-coded number: measured, two
+players at 10 and 24 cycles took 78 min and 1 min for the same amount of ore.
+
+**The handicap** answers "how much does this rule slow down THIS player". It is 1
+for five challenges out of six and is only computed for **The Void**, whose
+penalty depends entirely on progression: a player with 2 antimatter loses ×1.2, a
+player with 500,000 loses ×40,000,000. It is measured on the colony **still
+standing**, right before the reset.
+
+**Balance was measured, not estimated**: second-by-second simulation of a real
+save, anomalies, buffs and automations included, each challenge compared to an
+ordinary cycle aiming at the same goal. Between 2.4 and 3.8 h for an attentive
+player, or 2.5 to 5 times a normal cycle. The full table, and the two challenges
+that were *arithmetically impossible* before that measurement, are in
+[ROADMAP.md](ROADMAP.md).
+
+Two lessons from that work, worth keeping if a challenge is ever added:
+
+- For a **constant-factor** rule (no anomalies, no clicking, higher prices), the
+  coefficient only sets the **duration** — the difficulty ratio does not depend
+  on it.
+- For a rule that **compounds over time** (the leak, the crippled colony), the
+  ratio explodes with the goal: it is tuned by **bounding the rule**, not by the
+  coefficient. Without a floor, the leak bounded the cycle's total ore to
+  `output × 1485 s` — the challenge was not hard, it was over before it began.
 
 ---
 
@@ -803,9 +961,21 @@ category, its bilingual label and the function computing its value. It notably
 includes the **breakdown of anomalies by type**, invisible anywhere else in the
 game.
 
-**Language** — FR / EN selector at the top right; the default language follows
-the browser's and your choice is remembered. Changing language does not touch the
-run in progress.
+**Language** — dropdown at the top right: closed it shows only the code
+(**EN** / **FR**), open it lists the code and the name, each name written in its
+own language ("English", "Français") — the only way for someone who does not
+understand the displayed language to find their own. Your choice is remembered.
+
+A **flag** version existed in 3.0.28-dev.7, as SVGs drawn inside the file rather
+than emojis (Windows does not render flag emojis: 🇫🇷 shows as "FR" there, and
+elsewhere their look depends on the system font). It was dropped for a
+composition reason, not a technical one: two blocks of vivid colour in an
+otherwise monochrome toolbar drew far more attention than a language selector
+deserves.
+**English is the default**: page title, installed app name, document `lang` and
+description. The game switches to French automatically when the browser language
+starts with `fr` (`fr`, `fr-FR`, `fr-CA`…), and stays in English for every other
+one. Changing language does not touch the run in progress.
 
 ---
 
@@ -814,7 +984,7 @@ run in progress.
 The version number is defined at the top of the `<script>`:
 
 ```js
-const VERSION="2.21.1";
+const VERSION="3.0.28";
 ```
 
 It is shown next to the title on desktop, and in a tile of the **Statistics** tab

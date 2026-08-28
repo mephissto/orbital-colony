@@ -17,6 +17,93 @@ restent valides**.
 
 ---
 
+## 3.0.28 — Les défis
+
+Première des deux grandes étapes prévues pour allonger la partie. Six **défis**
+cassent chacun une règle du jeu pour un cycle entier, avec un objectif calculé
+sur ton meilleur cycle et une récompense définitive.
+
+### Les défis
+
+- 🎯 Nouvel onglet **Défis**, visible dès le premier cycle mais **grisé**, avec
+  le décompte des cycles restants. Il s'ouvre quand la tuile de l'en-tête
+  affiche « cycle n°6 en cours ».
+- Entrer **encaisse d'abord le cycle en cours** et crédite l'antimatière en
+  attente, puis remet minerai, structures et améliorations à zéro. Sont
+  conservés : antimatière, recherches, succès, automates et les récompenses des
+  défis déjà réussis.
+- Bandeau permanent en haut avec la progression et un bouton **Quitter**, sans
+  pénalité. Réussi une fois, un défi est validé **définitivement**.
+- Pendant un défi, **seul le relanceur de cycle ♻️ est suspendu** — il effacerait
+  ta progression. Tous les autres automates travaillent. Les recherches ne
+  s'achètent pas, l'onglet est grisé et explique pourquoi.
+
+| Défi | Règle cassée | Récompense permanente |
+|---|---|---|
+| 📵 Silence radio | aucune anomalie n'apparaît | anomalies +20 % plus fréquentes |
+| ⛓️ Mains liées | le clic ne rapporte rien | production +25 % |
+| 📈 Inflation | prix en ×1,35 au lieu de ×1,15 | −8 % sur tous les prix |
+| 🏚️ Colonie naine | 6 structures seulement, mais elles produisent ×4 | les 4 dernières produisent ×2 |
+| 💨 Fuite de confinement | production −2 % par tranche de 2 min, plancher 20 % | gain d'antimatière +15 % |
+| 🕳️ Le Vide | l'antimatière ne compte plus dans le multiplicateur | exposant antimatière 1,50 → 1,55 |
+
+Les six ont été équilibrés par **simulation seconde par seconde d'une vraie
+partie**, anomalies, bonus et automates compris, chaque défi comparé à un cycle
+ordinaire visant le même objectif : entre 2,4 et 3,8 h pour un joueur attentif,
+soit 2,5 à 5 fois un cycle normal. Deux d'entre eux étaient **arithmétiquement
+impossibles** avant cette mesure — la Fuite bornait le minerai total du cycle, et
+la Colonie naine ne pouvait pas approcher un record établi avec dix structures.
+Le détail est dans [ROADMAP.md](ROADMAP.md).
+
+### Le clic compte enfin en début de partie
+
+Un **écho de base de 7 %** apparaît avant tout résonateur : sans lui, le clic
+passait de 10 s de production à **0,006 s** en une heure sur une partie neuve. Il
+en vaut maintenant ~0,10 s en permanence.
+
+Les résonateurs montent à 9/12/15 % et les multiplicateurs de clic descendent à
+×1,4 / ×1,5 / ×1,6 / ×1,7 (×5,71 au total). Le plafond de fin de partie ne bouge
+pas d'un pouce — 0,15 × 5,71 = **0,86 s de production**, la valeur d'avant : la
+puissance du clic est simplement déplacée vers le début.
+
+### Un seul bouton, un menu
+
+- ⚙️ Les trois boutons du haut (Sauvegarder, Export/Import, Reset) sont regroupés
+  derrière une **roue crantée**. Le menu contient aussi un **tutoriel**, un
+  **changelog** embarqué et un **à propos** (code source, licence, Patreon).
+- 🎓 Le **tutoriel** s'ouvre tout seul à la première partie — cinq écrans, avec
+  flèches et glissement du doigt. Une partie déjà commencée ne le déclenche pas.
+- 🛰️ Un **lore** ouvre le tutoriel et justifie le nom du jeu : la colonie tourne
+  autour d'une planète morte, l'orbite se dégrade, et chaque colonie finit par
+  retomber. « Une colonie orbitale n'est jamais finie, elle est seulement en
+  train de tomber moins vite que la précédente. »
+- Toutes les fenêtres se ferment au clic à côté — sauf la confirmation, qu'on
+  n'annule pas d'un clic distrait.
+
+### Interface
+
+- 🏗️ Le **Contremaître** achète par lots de **×1, ×10 ou ×25**.
+- 📌 La rangée **×1 / ×10 / ×100 / MAX** reste collée en haut pendant qu'on fait
+  défiler les structures.
+- 🌐 **L'anglais devient la langue par défaut** : titre de la page, nom de
+  l'application installée, `lang` du document et description. Le français reste
+  détecté automatiquement. Le sélecteur devient un menu déroulant.
+- 📊 La tuile **Minerai** affiche `cycle · total`, la tuile **Antimatière**
+  affiche le cycle en cours et ce qui manque pour l'antimatière suivante.
+  L'onglet Recherche compte lui aussi le cycle **en cours** et non les cycles
+  terminés.
+- 🔴 Sur `dev.` le bandeau passe au rouge, avec une pastille **DEV** et un titre
+  préfixé — pour ne plus confondre les deux onglets.
+- 🔢 Le numéro de version reste affiché à toutes les largeurs.
+
+### Compatibilité
+
+Un seul champ ajouté (`tuto`), plus ceux des défis (`chal`, `chalDone`,
+`chalStart`, `chalBut`, `bestRun`, `autoQte`). **Toutes les sauvegardes 2.x
+restent valides** et ne déclenchent pas le tutoriel.
+
+---
+
 ## 2.35.3 — Le Contremaître achète, sur deux lignes
 
 - 🏗️ Dans les réglages de l'automatisation, **« Le Contremaître rachète » devient

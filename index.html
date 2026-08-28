@@ -1,28 +1,32 @@
 <!DOCTYPE html>
 <!--
-  Colonie Orbitale — un jeu incrémental de colonie spatiale.
+  Orbital Colony — a space colony incremental game.
   Copyright (C) 2026 Guilhem
 
-  Ce programme est un logiciel libre : vous pouvez le redistribuer ou le
-  modifier selon les termes de la GNU General Public License telle que publiée
-  par la Free Software Foundation, soit la version 3 de la Licence, soit (à
-  votre choix) toute version ultérieure.
+  This program is free software: you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option) any later
+  version.
 
-  Ce programme est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE
-  GARANTIE, sans même la garantie implicite de QUALITÉ MARCHANDE ou
-  d'ADÉQUATION À UN USAGE PARTICULIER. Voir la GNU General Public License pour
-  plus de détails.
+  This program is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-  Vous devriez avoir reçu une copie de la GNU General Public License avec ce
-  programme (fichier LICENSE). Sinon, voir <https://www.gnu.org/licenses/>.
+  You should have received a copy of the GNU General Public License along with
+  this program (LICENSE file). If not, see <https://www.gnu.org/licenses/>.
 
   SPDX-License-Identifier: GPL-3.0-or-later
+
+  Note — the source comments below are written in French, the language the
+  project is developed in. The game interface itself is fully bilingual
+  (English by default, French auto-detected); see README.en.md.
 -->
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Colonie Orbitale</title>
+<meta name="description" content="Space idle game: mine ore, build a colony, bend space-time. Free, offline, installable, no account.">
+<title>Orbital Colony</title>
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0icCIgY3g9IjM0JSIgY3k9IjI3JSIgcj0iNzglIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWRiMGQyIi8+PHN0b3Agb2Zmc2V0PSI0NSUiIHN0b3AtY29sb3I9IiM0YzVhNzIiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTUxYjI4Ii8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjEwIiBmaWxsPSIjMDcwYjE2Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMyIgcng9IjI5LjUiIHJ5PSI5LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E5N2JmZiIgc3Ryb2tlLXdpZHRoPSIzLjYiIG9wYWNpdHk9Ii42Ii8+PC9nPgo8Y2lyY2xlIGN4PSIzMiIgY3k9IjMxIiByPSIxNy41IiBmaWxsPSJ1cmwoI3ApIi8+CjxjaXJjbGUgY3g9IjI1LjUiIGN5PSIyNS41IiByPSI0LjIiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii41Ii8+CjxjaXJjbGUgY3g9IjM4LjUiIGN5PSIzNS41IiByPSIzLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40NSIvPgo8Y2lyY2xlIGN4PSIzNCIgY3k9IjIxIiByPSIyLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8cGF0aCBkPSJNMi41IDMzYTI5LjUgOS41IDAgMCAwIDU5IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRmZDhmZiIgc3Ryb2tlLXdpZHRoPSIzLjgiLz48L2c+Cjwvc3ZnPg==">
 <meta name="theme-color" content="#05070f">
 <link rel="manifest" href="manifest.webmanifest">
@@ -86,9 +90,28 @@ header{
 .logo{font-weight:700;letter-spacing:.14em;font-size:13px;color:var(--cyan);text-transform:uppercase;
   text-shadow:0 0 10px rgba(79,216,255,.3)}
 .spacer{flex:1}
+/* La version reste affichée à toutes les largeurs depuis la 3.0.28 : les trois
+   boutons de droite ont laissé place à une seule roue crantée, il y a de la
+   place. flex:none pour qu'elle ne se comprime jamais — c'est le nom du jeu qui
+   se tronque en « ◈ ORBI… », lui a des points de suspension pour ça. */
 .ver{font-size:10px;color:var(--dim);letter-spacing:.06em;opacity:.75;
-  font-variant-numeric:tabular-nums;align-self:center}
-@media (max-width:880px){.ver{display:none}}   /* trop étroit : la version reste dans les Stats */
+  font-variant-numeric:tabular-nums;align-self:center;flex:none;white-space:nowrap}
+@media (max-width:720px){.ver{font-size:9.5px;letter-spacing:.03em}}
+/* Bandeau de développement — voir estDev(). Le bandeau passe du bleu au rouge
+   pour qu'on ne confonde jamais l'onglet de dev avec celui de la prod : deux
+   onglets côte à côte, même jeu, même icône, ça arrive vite. La pastille DEV
+   reste visible sur téléphone, contrairement au numéro de version. */
+html.dev header{
+  background:linear-gradient(180deg,rgba(46,12,22,.96),rgba(38,10,20,.72));
+  border-bottom-color:rgba(255,107,138,.42)}
+html.dev .logo{color:var(--red);text-shadow:0 0 10px rgba(255,107,138,.32)}
+/* En PREMIER dans la barre, avant le logo : sur téléphone le logo est tronqué
+   avec des points de suspension quand la place manque, et tout ce qui le suit
+   peut disparaître. flex:none pour qu'elle ne se comprime jamais elle-même. */
+.devtag{display:none;font-size:9.5px;font-weight:700;letter-spacing:.12em;
+  padding:3px 7px;border-radius:6px;align-self:center;flex:none;
+  color:#2a0710;background:var(--red)}
+html.dev .devtag{display:inline-block}
 
 /* ---------- TUILES DE STATS (colonne de gauche) ---------- */
 .kpis{display:grid;grid-template-columns:1fr;gap:8px;width:100%}
@@ -106,7 +129,14 @@ header{
 .kpi .k{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
 .kpi .v{font-size:25px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums;
   color:var(--acc);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Une seule ligne, jamais deux : la tuile grandirait, et les quatre tuiles de
+   l'en-tête doivent garder la même hauteur. Sur téléphone, c'est l'INTITULÉ qui
+   saute (variante courte `sub_total_s`), pas le chiffre — mesuré, « cycle /
+   tot. : 4.20B / 569Qa » demande 135 px pour 104 disponibles à 390 px de large,
+   et 79 px seulement à 320 px. Aucun libellé n'y tient : restent les deux
+   nombres, la tuile étant déjà intitulée « Minerai ». */
 .kpi .sub{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .sub .nb{white-space:nowrap}
 .kpi .sub b{color:var(--txt);font-weight:600}
 /* Une couleur par unité, la même partout dans le jeu :
    minerai = doré, antimatière = violet, production = cyan.
@@ -124,6 +154,11 @@ header{
   .kpi .sub{font-size:10px}
 }
 .tools{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+/* Bouton d'icône seule, quelle que soit la largeur : la roue crantée se passe
+   d'étiquette. Elle reste à droite, à la place qu'occupaient les trois boutons
+   qu'elle remplace. */
+.hbtn.hico{padding:6px;width:30px;height:30px;justify-content:center;flex:none}
+@media (max-width:720px){.topbar .hbtn.hico{width:34px;height:34px;padding:7px}}
 .hbtn{
   background:var(--panel-2);border:1px solid var(--line);color:var(--dim);
   padding:6px 11px;border-radius:8px;cursor:pointer;font-size:12px;transition:.15s;
@@ -139,16 +174,45 @@ header{
   .topbar .hbtn span{display:none}
   .topbar .hbtn{padding:8px;justify-content:center;width:34px;height:34px}
   .ic{width:17px;height:17px}
-  .lang{padding:8px 9px}
   .tools{gap:6px}
   .topbar{flex-wrap:nowrap}
   .logo{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
-.langsw{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.lang{background:var(--panel-2);border:none;color:var(--dim);padding:6px 10px;cursor:pointer;
-  font-size:11px;font-weight:700;letter-spacing:.06em;transition:.15s}
-.lang:hover{color:#fff}
-.lang.on{background:var(--cyan);color:#04121c}
+/* Sélecteur de langue — menu déroulant. Fermé : le code de la langue (EN / FR).
+   Ouvert : le code ET le nom, écrit dans cette langue.
+   Une version à drapeaux a existé en 3.0.28-dev.7 : SVG dessinés à la main, pour
+   éviter les emojis drapeaux (absents sur Windows, où 🇫🇷 s'affiche « FR », et
+   au dessin variable ailleurs). Abandonnée quand même — deux drapeaux en
+   couleurs pleines dans une barre par ailleurs monochrome tiraient l'œil bien
+   plus que ne le mérite un sélecteur de langue. */
+.langsel{position:relative;flex:0 0 auto}
+.langcode{font-size:11px;font-weight:700;letter-spacing:.06em;flex:none}
+.langbtn{background:var(--panel-2);border:1px solid var(--line);color:var(--dim);
+  padding:6px 9px;border-radius:8px;cursor:pointer;transition:.15s;
+  display:inline-flex;align-items:center;gap:5px;line-height:1;height:30px}
+.langbtn:hover,.langsel.open .langbtn{color:#fff;border-color:var(--cyan)}
+.chev{width:12px;height:12px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;
+  stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.langsel.open .chev{transform:rotate(180deg)}
+.langmenu{position:absolute;top:calc(100% + 6px);right:0;z-index:60;
+  background:#0d1426;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  box-shadow:0 14px 34px rgba(0,0,0,.55);min-width:150px;
+  display:none}
+.langsel.open .langmenu{display:block}
+.langopt{display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;
+  color:var(--txt);padding:10px 13px;cursor:pointer;font-size:13px;text-align:left;
+  transition:.12s;white-space:nowrap}
+.langopt:hover{background:rgba(79,216,255,.12)}
+.langopt.on{background:rgba(79,216,255,.18);color:var(--cyan);font-weight:600}
+.langopt .langcode{color:var(--dim);width:20px}
+.langopt.on .langcode{color:var(--cyan)}
+.langopt .tick{margin-left:auto;width:13px;height:13px;flex:none;fill:none;
+  stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;
+  visibility:hidden}
+.langopt.on .tick{visibility:visible}
+@media (max-width:720px){
+  .langbtn{height:34px;padding:8px}
+}
 
 /* ---------- LAYOUT ---------- */
 main{flex:1;display:grid;min-height:0;position:relative;
@@ -318,6 +382,21 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
 /* ---------- CARDS ---------- */
 .buyrow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 .buyrow .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+/* La rangée « acheter par lot » reste collée en haut pendant qu'on fait défiler
+   les structures : c'est elle qui décide du prix et de la quantité affichés sur
+   TOUTES les cartes, et remonter la chercher à chaque changement d'avis était
+   pénible dès la troisième structure.
+   Les marges négatives compensent le padding du conteneur défilant, pour que le
+   fond couvre toute la largeur et que les cartes passent DESSOUS au lieu de
+   déborder sur les côtés. --buyTop vaut 0 sur ordinateur (c'est #panels qui
+   défile, la barre se colle à son bord haut) et, sur mobile où c'est <main> qui
+   défile, la hauteur occupée par l'en-tête collant des onglets — mesurée en JS
+   dans syncHero(), comme #stickyhead lui-même. */
+#buyRow{position:sticky;top:var(--buyTop,0px);z-index:12;
+  margin:-16px -16px 12px;padding:16px 16px 10px;
+  background:rgba(8,12,24,.94);backdrop-filter:blur(8px)}
+#buyRow::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;
+  background:linear-gradient(rgba(8,12,24,.85),rgba(8,12,24,0));pointer-events:none}
 .qty{padding:5px 13px;border-radius:7px;border:1px solid var(--line);background:var(--panel-2);
   color:var(--dim);cursor:pointer;font-size:12px}
 .qty.on{color:#04121c;background:var(--cyan);border-color:var(--cyan);font-weight:700}
@@ -327,7 +406,15 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
   padding:12px 14px;margin-bottom:9px}
 .setrow{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap}
 .setlbl{font-size:13.5px;font-weight:600;color:var(--txt);flex:1 1 200px;min-width:0}
-.setctl{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.setctl{display:flex;align-items:center;gap:8px;flex:0 0 auto;flex-wrap:wrap}
+/* Menu déroulant + trois quantités : ça ne tient pas sur une ligne de
+   téléphone. Le menu prend toute la largeur et les quantités passent dessous,
+   plutôt que de laisser le ×25 sortir de l'écran. */
+@media (max-width:640px){
+  #auGenCtl{flex:1 1 100%;justify-content:flex-start}
+  #auGenCtl .sel{flex:1 1 100%;width:auto}
+  #auGenCtl .qty{flex:1 1 0}
+}
 .setctl .unit{font-size:12px;color:var(--dim)}
 .setnow{font-size:12.5px;color:var(--dim);margin-top:10px;padding-top:9px;
   border-top:1px solid var(--line);line-height:1.5}
@@ -442,7 +529,7 @@ h3.sec:first-child{margin-top:0}
   .stt{padding:9px 10px}
   .stt .v{font-size:16px}
 }
-h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 /* sous-sections des améliorations acquises : elles suivent immédiatement le
    titre « Acquises », d'où le margin-top rétabli malgré la règle :first-child */
 #upOwn h3.upsec:first-child{margin-top:14px}
@@ -503,14 +590,185 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
 @keyframes slide{from{transform:translateX(50px);opacity:0}}
 
 /* modal */
-#modal{position:fixed;inset:0;z-index:80;background:rgba(2,4,10,.82);display:none;
+/* Ordre d'empilement des fenêtres : menu 82 < export/changelog/à propos 84 <
+   tutoriel 86 < invitation PWA 90 < confirmation 95. L'export s'ouvre DEPUIS le
+   menu et doit donc passer au-dessus de lui — à 80 il s'ouvrait derrière, et le
+   menu interceptait les clics : la fenêtre était visible mais inutilisable. */
+#modal{position:fixed;inset:0;z-index:84;background:rgba(2,4,10,.82);display:none;
   align-items:center;justify-content:center;padding:20px}
 #modal.on{display:flex}
-.mbox{max-width:520px;width:100%;background:#0b1120;border:1px solid var(--line);border-radius:14px;padding:22px}
-.mbox h2{margin:0 0 10px;font-size:18px;color:var(--cyan)}
+/* Une fenêtre plus haute que l'écran défile à l'intérieur : le lore et le
+   changelog dépassent sur un petit téléphone, et sans ceci les boutons du bas
+   sortaient de l'écran, sans moyen de fermer. */
+.mbox{max-width:520px;width:100%;background:#0b1120;border:1px solid var(--line);border-radius:14px;
+  padding:22px;max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain}
+.mbox::-webkit-scrollbar{width:8px}
+.mbox::-webkit-scrollbar-thumb{background:rgba(79,216,255,.25);border-radius:8px}
+.mbox h2{margin:0 0 10px;font-size:20px;font-weight:700;color:var(--cyan);text-wrap:balance}
+/* Action principale : une seule par fenêtre, accentuée, toujours la dernière
+   donc à droite — la place où le pouce revient. */
+.hbtn.prim{border-color:var(--cyan);color:#04121c;background:var(--cyan);font-weight:600}
+.hbtn.prim:hover{background:#7ce4ff;border-color:#7ce4ff}
 .mbox textarea{width:100%;height:120px;background:#060a15;border:1px solid var(--line);border-radius:8px;
   color:var(--txt);padding:9px;font-family:monospace;font-size:11px;resize:vertical}
-.mrow{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+/* Boutons de fenêtre : à droite et à leur largeur sur ordinateur, étalés sur
+   toute la largeur sur téléphone — une cible large vaut mieux qu'un bouton
+   compact quand on vise au pouce. */
+.mrow{display:flex;gap:9px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.mbox .mrow .hbtn{padding:10px 18px;font-size:13px;width:auto;height:auto}
+@media (max-width:640px){
+  .mbox .mrow{flex-wrap:nowrap}
+  .mbox .mrow .hbtn{flex:1 1 0;justify-content:center;padding:12px 10px}
+}
+/* Boîte de confirmation : z-index au-dessus du modal de sauvegarde et de
+   l'invitation à installer, c'est toujours elle qui doit répondre en dernier. */
+#ask{position:fixed;inset:0;z-index:95;background:rgba(2,4,10,.86);display:none;
+  align-items:center;justify-content:center;padding:20px}
+#ask.on{display:flex}
+.askbox{max-width:420px}
+#askTxt{margin:0;white-space:pre-line}
+/* Une puce par élément : avec un seul bloc et des retours à la ligne, le retrait
+   négatif ne s'applique qu'à la toute première ligne, pas à chaque puce. */
+#askTxt .puce{white-space:normal;padding-left:1.05em;text-indent:-1.05em;margin-top:4px}
+#askTxt .puce:first-child{margin-top:0}
+.askbox .mrow{justify-content:flex-end}
+
+/* ---------- menu, changelog, à propos, tutoriel ---------- */
+/* Quatre fenêtres bâties sur la même .mbox que les trois précédentes : même
+   titre en gras, même rangée de boutons en bas, action principale accentuée et
+   à droite. Elles se superposent (le menu reste ouvert derrière), d'où des
+   z-index croissants. */
+#menu,#chlog,#about,#tuto{position:fixed;inset:0;background:rgba(2,4,10,.86);display:none;
+  align-items:center;justify-content:center;padding:20px}
+#menu.on,#chlog.on,#about.on,#tuto.on{display:flex}
+#menu{z-index:82}#chlog{z-index:84}#about{z-index:84}#tuto{z-index:86}
+.menubox,.aboutbox{max-width:460px}
+.logbox{max-width:560px}
+.tutobox{max-width:440px}
+
+/* Résumé des nouveautés, en tête du menu : trois lignes, pas un changelog. */
+.whatsnew{border:1px solid rgba(79,216,255,.28);border-radius:11px;
+  background:rgba(79,216,255,.07);padding:11px 13px;margin-bottom:14px}
+.wnh{display:flex;align-items:baseline;gap:8px;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cyan);font-weight:700}
+.wnv{margin-left:auto;color:var(--dim);letter-spacing:.04em;font-weight:400;
+  text-transform:none;font-variant-numeric:tabular-nums}
+.wnd{font-size:12.5px;color:var(--txt);margin-top:6px;line-height:1.5}
+
+/* Grille de boutons du menu : deux colonnes partout — à une seule, la fenêtre
+   dépassait la hauteur d'un téléphone et Reset se retrouvait hors écran. */
+.mgrid{display:flex;flex-direction:column;gap:6px}
+.mgrid>.msec{margin-top:16px}
+.mgrid>.msec:first-child{margin-top:0}
+/* Un trait entre les groupes plutôt qu'un simple écart : à 14 px de gap seul,
+   trois blocs de boutons identiques se lisaient encore comme une seule liste. */
+.mgrp{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.msec{margin:0 0 10px}
+.mgrid>.msec+.mgrp{margin-bottom:4px}
+.mitem{display:flex;align-items:center;gap:10px;text-align:left;
+  background:var(--panel-2);border:1px solid var(--line);border-radius:11px;
+  color:var(--txt);padding:12px 13px;cursor:pointer;font-size:13px;transition:.15s;
+  font-family:inherit;text-decoration:none}
+.mitem:hover{border-color:var(--cyan);color:#fff;background:rgba(79,216,255,.1)}
+.mitem .mi{font-size:19px;line-height:1;flex:none}
+.mitem .ml{min-width:0}
+/* Reset : seule action irréversible de la fenêtre, donc seule à être rouge et
+   seule à occuper toute la largeur, en dernier. On ne la touche pas par erreur
+   en visant le bouton d'à côté. */
+/* Reset garde sa couleur d'alerte mais plus sa pleine largeur : il est de toute
+   façon protégé par une demande de confirmation. */
+.mitem.danger{border-color:rgba(255,107,138,.35);color:var(--red)}
+.mitem.danger:hover{border-color:var(--red);background:rgba(255,107,138,.12);color:#fff}
+
+/* Changelog : la liste défile, les boutons restent visibles en dessous. */
+.loglist{max-height:min(52vh,420px);overflow-y:auto;padding-right:4px;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding-top:10px;padding-bottom:10px}
+.loglist::-webkit-scrollbar{width:8px}
+.loglist::-webkit-scrollbar-thumb{background:rgba(79,216,255,.25);border-radius:8px}
+.logv{margin-top:13px}.logv:first-child{margin-top:0}
+.logvh{display:flex;align-items:baseline;gap:9px}
+.logvn{font-size:13px;font-weight:700;color:var(--cyan);font-variant-numeric:tabular-nums}
+.logvt{font-size:12.5px;color:var(--txt);font-weight:600}
+.logvd{font-size:12px;color:var(--dim);line-height:1.5;margin-top:3px}
+a.hbtn{text-decoration:none}
+
+/* À propos : le lore, puis les liens. */
+.lore{font-size:12.5px;line-height:1.6;color:var(--txt);
+  border-left:2px solid var(--violet);padding-left:12px;margin-bottom:15px}
+.lore p{margin:0 0 8px}.lore p:last-child{margin-bottom:0}
+.lore b{color:var(--violet)}
+.ablist{display:grid;gap:8px}
+.abrow{display:flex;align-items:center;gap:11px;padding:10px 12px;
+  border:1px solid var(--line);border-radius:11px;background:var(--panel-2);
+  color:var(--txt);text-decoration:none;font-size:12.5px;transition:.15s}
+a.abrow:hover{border-color:var(--cyan);background:rgba(79,216,255,.1)}
+.abrow .ai{font-size:18px;line-height:1;flex:none}
+.abrow .av{color:var(--txt);min-width:0}
+/* Flèche sortante : elle dit, sans un mot et dans les deux langues, que la ligne
+   quitte le jeu pour un site externe. Seules les lignes qui sont des liens en
+   portent une. */
+.abrow .aext{margin-left:auto;flex:none;width:14px;height:14px;fill:none;
+  stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;
+  color:var(--dim);transition:.15s}
+a.abrow:hover .aext{color:var(--cyan)}
+
+/* Tutoriel : un écran à la fois, hauteur figée pour que les boutons ne sautent
+   pas d'un écran à l'autre. */
+.tuico{font-size:34px;line-height:1;margin-bottom:8px}
+.tutxt{font-size:13px;line-height:1.6;color:var(--txt);min-height:118px}
+.tutxt b{color:var(--cyan)}
+.tutxt .lore{border-left-color:var(--violet);margin-bottom:0;font-size:12.5px}
+.tutxt .lore b{color:var(--violet)}
+/* Navigation du tutoriel : une flèche de chaque côté des points. Le bouton du
+   bas ne sert plus qu'à fermer — avancer et reculer se font ici, ou au doigt. */
+.tunav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px}
+.tuarr{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;
+  width:36px;height:36px;flex:none;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--txt);transition:.15s;padding:0}
+.tuarr svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+.tuarr:hover{border-color:var(--cyan);color:var(--cyan)}
+.tuarr[disabled]{opacity:.3;cursor:default;border-color:var(--line);color:var(--dim)}
+.tudots{display:flex;gap:6px;justify-content:center}
+.tudot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:.2s}
+.tudot.on{background:var(--cyan);transform:scale(1.25)}
+@media (max-width:640px){
+  .tutxt{min-height:150px}
+  .mitem{padding:12px 10px;font-size:12.5px;gap:8px}
+}
+
+/* --- les défis --- */
+/* Bandeau du défi en cours : masqué par défaut, affiché par majChalBar(). */
+#chalBar{display:none;padding:9px 14px 11px;border-bottom:1px solid rgba(169,123,255,.28);
+  background:rgba(169,123,255,.09)}
+#chalBar.on{display:block}
+.cbmain{display:flex;align-items:center;gap:11px}
+.cbico{font-size:20px;line-height:1;flex:0 0 auto}
+.cbtxt{flex:1 1 auto;min-width:0}
+.cbnm{font-size:13px;font-weight:600;color:var(--violet)}
+.cbgoal{font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums;margin-top:1px}
+.hbtn.cbquit{flex:0 0 auto;padding:6px 13px;font-size:12px;width:auto;height:auto}
+.cbbar{height:4px;border-radius:2px;background:rgba(169,123,255,.16);margin-top:8px;overflow:hidden}
+.cbbar i{display:block;height:100%;width:0;border-radius:2px;background:var(--violet);
+  transition:width .3s}
+#chalBar.win{border-bottom-color:rgba(87,230,164,.4);background:rgba(87,230,164,.09)}
+#chalBar.win .cbnm{color:var(--green)}
+#chalBar.win .cbbar i{background:var(--green)}
+/* Carte de défi : la règle cassée en rouge, la récompense en vert — le joueur
+   doit voir en un coup d'œil ce qu'il perd et ce qu'il gagne. */
+.chcard .rule{font-size:12px;color:var(--red);margin-top:3px;line-height:1.5}
+.chcard .rw{font-size:12px;color:var(--green);margin-top:2px;line-height:1.5}
+.chcard .goal{font-size:11.5px;color:var(--dim);margin-top:4px;font-variant-numeric:tabular-nums}
+.chcard.run{border-color:rgba(169,123,255,.5);background:rgba(169,123,255,.08)}
+.chtag{font-size:11px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+.chtag.go{color:var(--cyan)} .chtag.run{color:var(--violet)}
+.chtag.win{color:var(--green)} .chtag.lock{color:var(--dim)}
+/* Onglet inutilisable pendant un défi : on le grise sans l'interdire — on peut
+   toujours regarder ce qu'on possède, simplement rien n'y est actionnable. */
+.tab.chdim{opacity:.45}
+.chlock{border:1px solid rgba(169,123,255,.3);background:rgba(169,123,255,.08);
+  border-radius:10px;padding:9px 12px;margin:0 0 12px;font-size:12.5px;color:var(--violet)}
 
 /* --- invitation à installer la PWA --- */
 #pwa{position:fixed;inset:0;z-index:90;background:rgba(2,4,10,.88);display:none;
@@ -536,9 +794,6 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
    noir. Posé sur la case seule et pas sur :root, pour ne rien changer ailleurs. */
 .pwanev input{flex:0 0 auto;width:17px;height:17px;margin:0;cursor:pointer;
   color-scheme:dark;accent-color:var(--cyan)}
-.pwabox .mrow{gap:9px}
-.pwabox .hbtn{flex:1 1 0;justify-content:center;padding:11px 12px;font-size:13px}
-.hbtn.pwago{border-color:var(--cyan);color:#04121c;background:var(--cyan);font-weight:600}
 /* Pastille de rappel, si l'invitation a été refusée. Placée au-dessus de la
    zone des toasts, qui occupe toute la largeur en bas sur mobile : superposées,
    les deux se masquaient mutuellement. */
@@ -609,6 +864,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
   #stickyhead nav{border-bottom:none}
   nav{padding:6px 10px 0;gap:2px}
   #panels{padding:12px 10px}
+  #buyRow{margin:-12px -10px 12px;padding:12px 10px 9px}
   .card{grid-template-columns:32px minmax(0,1fr) auto;gap:9px;padding:10px 11px}
   .acard{grid-template-columns:32px minmax(0,1fr) auto;gap:8px}
   .acard .right{min-width:86px}
@@ -663,20 +919,15 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
 <div id="app">
 <header>
   <div class="topbar">
-    <div class="logo" data-i18n="logo">◈ Colonie Orbitale</div>
+    <span class="devtag" id="devTag">DEV</span>
+    <div class="logo" data-i18n="logo">◈ Orbital Colony</div>
     <span class="ver" id="verTag"></span>
     <div class="spacer"></div>
     <div class="tools">
-      <div class="langsw"><button class="lang" data-lang="fr">FR</button><button class="lang" data-lang="en">EN</button></div>
-      <button class="hbtn" id="bSave" data-i18n-title="save">
-        <svg class="ic" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-        <span data-i18n="save">Sauvegarder</span></button>
-      <button class="hbtn" id="bExport" data-i18n-title="export">
-        <svg class="ic" viewBox="0 0 24 24"><path d="M8 17V4m0 0L4 8m4-4 4 4"/><path d="M16 7v13m0 0 4-4m-4 4-4-4"/></svg>
-        <span data-i18n="export">Export / Import</span></button>
-      <button class="hbtn" id="bReset" data-i18n-title="reset">
-        <svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-        <span data-i18n="reset">Reset</span></button>
+      <div class="langsel" id="langSel"><button class="langbtn" id="langBtn" aria-haspopup="listbox" aria-expanded="false" data-i18n-title="lang_title"><span class="langcode" id="langFlag"></span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="langmenu" id="langMenu" role="listbox"></div></div>
+      <button class="hbtn hico" id="bMenu" data-i18n-title="menu">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.5 19.3a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.14 15a1.7 1.7 0 0 0-1.56-1H2.5a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1.1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.56 1h.08a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.56 1z"/></svg>
+      </button>
     </div>
   </div>
 </header>
@@ -740,12 +991,23 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
 
   <section id="right">
    <div id="stickyhead">
+    <!-- Bandeau du défi en cours, AU-DESSUS des onglets : il décrit la partie
+         entière, pas l'onglet courant. Dans #stickyhead, donc toujours visible
+         quel que soit l'onglet, et le bouton Quitter reste à portée. -->
+    <div id="chalBar">
+      <div class="cbmain"><span class="cbico" id="cbIco">🎯</span>
+        <div class="cbtxt"><div class="cbnm" id="cbNm"></div>
+          <div class="cbgoal" id="cbGoal"></div></div>
+        <button type="button" class="hbtn cbquit" id="cbQuit" data-i18n="ch_quit">Quitter</button></div>
+      <div class="cbbar"><i id="cbFill"></i></div>
+    </div>
     <div class="navwrap">
      <nav>
       <div class="tab on" data-p="gen"><span class="ti">⛏️</span><span data-i18n="tab_gen">Extraction</span></div>
       <div class="tab" data-p="up"><span class="ti">🔧</span><span data-i18n="tab_up">Améliorations</span><span class="badge hidden" id="bUp">0</span></div>
       <div class="tab" data-p="pr"><span class="ti">🔬</span><span data-i18n="tab_pr">Recherche</span></div>
       <div class="tab" data-p="au" id="tabAu" style="display:none"><span class="ti">⚙️</span><span data-i18n="tab_au">Automatisation</span></div>
+      <div class="tab" data-p="ch" id="tabCh" style="display:none"><span class="ti">🎯</span><span data-i18n="tab_ch">Défis</span></div>
       <div class="tab" data-p="ac"><span class="ti">🏆</span><span data-i18n="tab_ac">Succès</span></div>
       <div class="tab" data-p="st"><span class="ti">📊</span><span data-i18n="tab_st">Statistiques</span></div>
      </nav>
@@ -758,6 +1020,7 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
       <div class="panel" id="pUp"></div>
       <div class="panel" id="pPr"></div>
       <div class="panel" id="pAu"></div>
+      <div class="panel" id="pCh"></div>
       <div class="panel" id="pAc"></div>
       <div class="panel" id="pSt"></div>
     </div>
@@ -780,26 +1043,93 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
   <p class="hint pwawhy" data-i18n="pwa_why"></p>
   <label class="pwanev"><input type="checkbox" id="pwaNev"><span data-i18n="pwa_never">Ne plus me le rappeler</span></label>
   <div class="mrow">
-    <button class="hbtn pwago" id="pwaGo" data-i18n="pwa_install" style="display:none">Installer</button>
     <button class="hbtn" id="pwaNo" data-i18n="pwa_close">Fermer</button>
+    <button class="hbtn prim" id="pwaGo" data-i18n="pwa_install" style="display:none">Installer</button>
   </div>
 </div></div>
 <button type="button" id="pwaTab" data-i18n-title="pwa_title" title="Installe le jeu">📲</button>
+
+<!-- Confirmation interne au jeu. confirm() du navigateur est purement et
+     simplement ignoré dans une iframe sandboxée (page hébergée) : il renvoie
+     false sans rien afficher, et l'action ne partait jamais. -->
+<div id="ask"><div class="mbox askbox">
+  <h2 id="askTitre"></h2>
+  <p class="hint" id="askTxt"></p>
+  <div class="mrow">
+    <button class="hbtn" id="askNo" data-i18n="ask_no">Annuler</button>
+    <button class="hbtn prim" id="askOk" data-i18n="ask_ok">Confirmer</button>
+  </div>
+</div></div>
+
+<!-- Menu principal : les trois boutons de la barre d'outils (Sauvegarder,
+     Export/Import, Reset) y ont été regroupés en 3.0.28, avec l'aide et « à
+     propos ». Une barre à cinq boutons ne tenait plus sur téléphone, et Reset
+     y voisinait dangereusement avec Sauvegarder. -->
+<div id="menu"><div class="mbox menubox">
+  <div class="whatsnew">
+    <div class="wnh"><span data-i18n="wn_t">Nouveautés</span><span class="wnv" id="wnVer"></span></div>
+    <div class="wnd" data-i18n="wn_d" data-i18n-html></div>
+  </div>
+  <div class="mgrid" id="mGrid"></div>
+  <div class="mrow">
+    <button class="hbtn prim" id="menuClose" data-i18n="m_close">Fermer</button>
+  </div>
+</div></div>
+
+<!-- Changelog embarqué : seulement les dernières versions, résumées. Le fichier
+     CHANGELOG.md complet fait 37 Ko à lui seul et le jeu doit rester jouable
+     hors connexion — d'où un extrait dans le fichier et un lien vers le reste. -->
+<div id="chlog"><div class="mbox logbox">
+  <h2 data-i18n="log_t">Changelog</h2>
+  <p class="hint" data-i18n="log_hint"></p>
+  <div class="loglist" id="logList"></div>
+  <div class="mrow">
+    <a class="hbtn" id="logFull" target="_blank" rel="noopener noreferrer" data-i18n="log_full">Historique complet</a>
+    <button class="hbtn prim" id="logClose" data-i18n="m_close">Fermer</button>
+  </div>
+</div></div>
+
+<div id="about"><div class="mbox aboutbox">
+  <h2 data-i18n="ab_t">À propos</h2>
+  <div class="ablist" id="abList"></div>
+  <div class="mrow">
+    <button class="hbtn prim" id="abClose" data-i18n="m_close">Fermer</button>
+  </div>
+</div></div>
+
+<!-- Tutoriel : diaporama de cinq écrans, ouvert tout seul à la première partie
+     et relançable depuis le menu. Il passe AVANT l'invitation à installer la
+     PWA — deux fenêtres empilées au premier lancement, c'est une de trop. -->
+<div id="tuto"><div class="mbox tutobox">
+  <div class="tuico" id="tuIco"></div>
+  <h2 id="tuTitre"></h2>
+  <div class="tutxt" id="tuTxt"></div>
+  <div class="tunav">
+    <button class="tuarr" id="tuPrev" data-i18n-title="tu_prev" type="button">
+      <svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+    <div class="tudots" id="tuDots"></div>
+    <button class="tuarr" id="tuNext" data-i18n-title="tu_next" type="button">
+      <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+  <div class="mrow">
+    <button class="hbtn prim" id="tuClose" data-i18n="m_close">Fermer</button>
+  </div>
+</div></div>
 
 <div id="modal"><div class="mbox">
   <h2 id="mTitle" data-i18n="m_title">Sauvegarde</h2>
   <p class="hint" id="mHint" data-i18n="m_hint"></p>
   <textarea id="mText"></textarea>
   <div class="mrow">
-    <button class="hbtn" id="mImport" data-i18n="m_import">Importer</button>
     <button class="hbtn" id="mClose" data-i18n="m_close">Fermer</button>
+    <button class="hbtn prim" id="mImport" data-i18n="m_import">Importer</button>
   </div>
 </div></div>
 
 <script>
 "use strict";
 /* ============================================================
-   COLONIE ORBITALE — idle game (fichier unique, hors-ligne)
+   ORBITAL COLONY / COLONIE ORBITALE — idle game (fichier unique, hors-ligne)
    ============================================================ */
 
 /* Version du jeu — affichée dans la barre du haut (ordinateur) et en dernière
@@ -807,7 +1137,10 @@ h3.achsec,h3.upsec{display:flex;align-items:baseline;justify-content:space-betwe
      MAJEUR  refonte visible ou changement de règles du jeu
      MINEUR  nouvelle fonctionnalité, nouveau contenu, réglage d'équilibrage
      CORRECT correction de bug, retouche de texte ou de mise en page */
-const VERSION="2.35.3";
+/* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
+   pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
+   la sortie : une version publiée n'a jamais de suffixe. */
+const VERSION="3.0.28";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -838,24 +1171,60 @@ const T={
 fr:{
   logo:"◈ Colonie Orbitale", doc_title:"Colonie Orbitale — idle game spatial",
   save:"Sauvegarder", export:"Export / Import", reset:"Reset",
-  tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_au:"Automatisation", tab_ac:"Succès", tab_st:"Statistiques",
+  lang_title:"Langue",
+  menu:"Menu", menu_t:"Menu",
+  mg_game:"Ta partie", mg_learn:"Apprendre", mg_info:"Informations",
+  wn_t:"Nouveautés", 
+  wn_d:"Six <b>défis</b> qui cassent chacun une règle du jeu, ouverts au cycle n°6. Un <b>tutoriel</b> et un <b>menu</b> unique. Le <b>clic</b> compte enfin en début de partie.",
+  log_t:"Changelog", log_full:"Historique complet",
+  log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
+  ab_t:"À propos",
+  ab_code:"Code source",
+  ab_lic:"GPL 3.0 ou ultérieure",
+  ab_auth:"Créé par mephissto avec l'aide de Claude",
+  ab_patreon:"Soutenir",
+  tu_prev:"Écran précédent", tu_next:"Écran suivant",
+  m_tuto:"Tutoriel", m_log:"Changelog", m_about:"À propos",
+  /* Le lore justifie le nom du jeu ET la boucle de prestige : une colonie qui
+     retombe, et dont la chute finance la suivante. */
+  lore:"<p>Tu ne construis pas sur un monde. Tu construis <b>autour</b>.</p>"+
+       "<p>La colonie tourne à quatre cents kilomètres au-dessus d'une planète morte, accrochée à un astéroïde capturé dans la même orbite qu'elle. Rien ne se pose, rien ne repart : tout ce que tu bâtis reste suspendu là, entre le vide et la gravité.</p>"+
+       "<p>Et l'orbite se dégrade. Toujours. Chaque colonie finit par retomber, et il ne reste d'elle qu'une poignée d'antimatière arrachée à sa propre chute — de quoi bâtir la suivante un peu plus haut, un peu plus vite.</p>"+
+       "<p>C'est de là que vient le nom : <b>une colonie orbitale n'est jamais finie, elle est seulement en train de tomber moins vite que la précédente.</b></p>",
+  tu1_t:"Colonie Orbitale",
+  tu2_t:"L'astéroïde",
+  tu2_d:"Clique dessus. Chaque clic en arrache du <b>minerai</b>, la seule ressource courante du jeu.<br><br>Au début, cliquer est ta principale source de revenu. Plus tard, tes structures produiront bien davantage — mais un clic vaudra toujours une fraction de ta production, jamais zéro.",
+  tu3_t:"Les structures",
+  tu3_d:"Le minerai achète des <b>structures</b> qui extraient toutes seules, en continu. Chaque exemplaire acheté renchérit le suivant de 15 %.<br><br>La rangée <b>×1 / ×10 / ×100 / MAX</b> en haut de l'onglet achète par lots — elle reste visible pendant que tu fais défiler la liste.",
+  tu4_t:"Améliorations et anomalies",
+  tu4_d:"Les <b>améliorations</b> multiplient ta production : par structure, sur le clic, ou sur tout à la fois.<br><br>Une <b>anomalie</b> apparaît régulièrement à côté de la planète. Attrape-la : elle donne un bonus temporaire, du minerai d'un coup, ou une pluie de clics.",
+  tu5_t:"Le cycle",
+  tu5_d:"Quand la progression ralentit, <b>relance un cycle</b>. Tu perds tout — minerai, structures, améliorations — et tu gagnes de l'<b style=\"color:var(--violet)\">antimatière</b>.<br><br>Chaque unité donne <b>+2 % de production pour toujours</b>, et finance les <b>recherches</b> et les <b>automatisations</b>, qui, elles, ne se perdent jamais.<br><br>Au <b>cycle n°6</b> s'ouvrent les <b>défis</b> : six parties spéciales où une règle du jeu est cassée.",
+  tab_gen:"Extraction", tab_up:"Améliorations", tab_pr:"Recherche", tab_au:"Automatisation", tab_ch:"Défis", tab_ac:"Succès", tab_st:"Statistiques",
   nav_prev:"Onglets précédents", nav_next:"Onglets suivants",
   manual:"Foreuse manuelle", per_click:"par clic",
   kpi_ore:"Minerai", kpi_rate:"Production", kpi_am:"Antimatière", kpi_mult:"Multiplicateur",
-  sub_total:"total extrait : <b>{0}</b>",
+  sub_total:"cycle : <b>{0}</b> · total : <b>{1}</b>",
+  sub_total_s:"<span class=\"nb\"><b>{0}</b> · <b>{1}</b></span>",
+  sub_total_t:"minerai du cycle en cours / total extrait depuis le début",
   sub_click:"clic : <b>+{0}</b>",
-  sub_next:"<b>+{0}</b> prêt · cycle n°{1}",
-  sub_cycle:"cycle n°{0} en cours",
+  sub_next:"<b>+{0}</b> prêt · cycle #{1}{2}",
+  sub_next_s:"<b>+{0}</b> · #{1}{2}",
+  sub_cycle:"cycle #{0}{1}",
+  sub_cycle_s:"#{0}{1}",
+  sub_manque:" · <b>−{0}</b>",
+  sub_am_t:"il manque ce minerai pour gagner une antimatière de plus",
   f_am:"antimatière ×{0}", f_ach:"succès ×{0}", f_tech:"améliorations et recherches ×{0}",
   f_buff:"bonus temporaire ×{0}",
   mult_none:"aucun bonus pour l'instant", mult_simple:"tes bonus cumulés",
   mult_tip:"Détail du multiplicateur :",
   ms_struct:"Structures", ms_ach:"Succès", ms_cycles:"Cycles", ms_anom:"Prochaine anomalie",
   imminent:"imminente", anom_title:"Anomalie détectée !",
-  anom_word:"Anomalie ·", chip_now:"En vue !", chip_soon:"Imminente…",
+  anom_word:"Anomalie ·", chip_now:"En vue !", chip_soon:"Imminente…", chip_none:"silence radio",
   m_title:"Sauvegarde",
   m_hint:"Copie ce code pour sauvegarder ta partie, ou colle un code puis clique « Importer ».",
   m_import:"Importer", m_close:"Fermer", bad_code:"Code de sauvegarde invalide.",
+  ask_ok:"Confirmer", ask_no:"Annuler",
   pwa_title:"Installe le jeu",
   pwa_intro:"Colonie Orbitale s'installe comme une vraie application, en deux gestes et sans passer par un magasin d'applications.",
   pwa_and_h:"Android", pwa_and_d:"Menu ⋮ du navigateur → « Installer l'application » (ou « Ajouter à l'écran d'accueil »).",
@@ -878,9 +1247,11 @@ fr:{
   locked_ds:"Continue de progresser pour débloquer cette structure.",
   pr_head:"Cycle d'antimatière — tu repars de zéro, tu gardes un bonus permanent",
   pr_btn:"Lancer un nouveau cycle",
-  pr_info:"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne <b style=\"color:var(--violet)\">+{0} %</b> de production, le total étant amplifié à la <b style=\"color:var(--violet)\">puissance {3}</b><br>Bonus actuel : <b style=\"color:var(--green)\">×{1}</b> — cycles effectués : {2}",
+  pr_info:"antimatière au prochain cycle &nbsp;•&nbsp; chaque unité donne <b style=\"color:var(--violet)\">+{0} %</b> de production, le total étant amplifié à la <b style=\"color:var(--violet)\">puissance {3}</b><br>Bonus actuel : <b style=\"color:var(--green)\">×{1}</b> — cycle n°{2} en cours",
   pr_note:"Il faut extraire {0} de minerai sur ce cycle pour gagner 1 antimatière — il t'en manque {1}{2}",
-  pr_confirm:"Lancer un nouveau cycle ?\n\nTu perds minerai, générateurs et améliorations,\nmais tu gagnes {0} antimatière (bonus permanent).",
+  pr_ask_t:"Lancer un nouveau cycle ?",
+  pr_lose:"• Tu perds le minerai, les structures et les améliorations du cycle.",
+  pr_confirm:"• Tu gagnes <b style=\"color:var(--violet)\">{0} antimatière</b> — un bonus permanent.",
   res_title:"Laboratoire — {0} antimatière disponible",
   au_title:"Automatisation — {0} antimatière disponible",
   au_hint:"Les automates se paient en <b style=\"color:var(--violet)\">antimatière</b>, se gardent d'un cycle à l'autre, et chacun peut être <b>coupé</b> avec son interrupteur sans être remboursé.",
@@ -889,7 +1260,7 @@ fr:{
   au_sw:"Automates actifs", au_pause:"mise en pause par {0}", au_off_by:"coupé — {0} travaille",
   au_sw_hint:"Couper un automate ne rembourse rien et ne fait perdre aucun niveau. Le Contremaître et l'Ingénieur puisent dans le même minerai : un seul des deux peut travailler, et l'interrupteur de l'autre reste verrouillé tant que celui-là tourne.",
   au_gen:"Le Contremaître achète",
-  au_gen_hint:"Il n'achète que cette structure, une par seconde, dès qu'il a le minerai.",
+  au_gen_hint:"Il n'achète que cette structure, par lots de la quantité choisie, une fois par seconde et dès qu'il a le minerai. Le lot est acheté entier ou pas du tout.",
   au_gen_ready:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b>, disponible.",
   au_gen_wait:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b><br>il manque <b>{1}</b>{2}.",
   au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. Le cycle ne repart jamais pour moins de 10 % de ta réserve, même si tu saisis moins.",
@@ -898,12 +1269,42 @@ fr:{
   au_cyc_wait:"il manque <b style=\"color:var(--violet)\">{0}</b>{1}.",
   au_unit_am:"antimatière",
   au_off:"coupé",
-  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · un achat par seconde",
+  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · ×{1} par seconde",
   au_e_ing:"achète l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
   au_e_cycle:"relance à +{0} antimatière",
   t_auto:"{0} — niveau {1}", t_auto_on:"{0} : remis en marche", t_auto_off:"{0} : coupé",
   t_auto_excl:"{0} : remis en marche — {1} est mis en pause",
   t_auto_lock:"Coupe d'abord {0} pour libérer celui-ci.",
+  ch_hint:"Un défi casse <b>une règle du jeu</b> pour tout un cycle. Entrer encaisse d'abord le cycle en cours et te crédite l'antimatière en attente. L'objectif se calcule sur <b>ton meilleur cycle</b> et se fige au moment où tu entres. Réussi une fois, un défi est validé <b>définitivement</b> et sa récompense reste active en dehors.",
+  ch_soon:"🔒 Les <b>défis</b> s'ouvrent au <b>cycle n°{1}</b> — encore <b style=\"color:var(--cyan)\">{0} cycles</b>.<br>Chacun casse une règle du jeu pour un cycle entier, avec un objectif calculé sur ton meilleur cycle. Le réussir donne une <b style=\"color:var(--green)\">récompense définitive</b>, active même en dehors du défi.",
+  ch_soon1:"🔒 Les <b>défis</b> s'ouvrent au <b>cycle n°{1}</b> — <b style=\"color:var(--cyan)\">plus qu'un cycle</b> !<br>Chacun casse une règle du jeu pour un cycle entier, avec un objectif calculé sur ton meilleur cycle. Le réussir donne une <b style=\"color:var(--green)\">récompense définitive</b>, active même en dehors du défi.",
+  ch_head:"Réussis : {0}/{1}",
+  ch_goal:"Objectif : {0} minerai sur le cycle",
+  ch_prog:"{0} / {1} minerai",
+  ch_go:"DISPONIBLE", ch_running:"EN COURS", ch_won:"RÉUSSI", ch_locked:"VERROUILLÉ",
+  ch_quit:"Quitter",
+  ch_done_bar:"Objectif atteint — tu peux finir ton cycle tranquillement.",
+  ch_ask_t:"Entrer dans « {0} » ?",
+  ch_confirm:"Le cycle en cours est encaissé (<b style=\"color:var(--violet)\">+{0} antimatière</b>), puis la partie repart à zéro avec la règle du défi.",
+  ch_quit_t:"Quitter le défi ?",
+  ch_quit_t_win:"Terminer le défi ?",
+  ch_out_am:"• Le cycle est encaissé : <b style=\"color:var(--violet)\">+{0} antimatière</b>.",
+  ch_out_noam:"• Le cycle n'a pas produit assez pour rapporter de l'antimatière.",
+  ch_out_rw:"• Défi réussi — <b style=\"color:var(--green)\">{0}</b>",
+  ch_out_lost:"• Objectif non atteint (<b style=\"color:var(--gold)\">{0} minerai</b>) — le défi restera disponible.",
+  ch_out_cap:"• Grâce à la {0} (niveau {1}), tu repars avec <b style=\"color:var(--gold)\">{2} minerai</b>.",
+  ch_out_auto:"• Tes automates redémarrent aux mêmes niveaux.",
+  ch_quit_c:"Le cycle est encaissé normalement, sans pénalité. Le défi restera disponible.",
+  ch_none:"Aucun défi n'est encore accessible.",
+  t_chal_in:"Défi lancé : {0}", t_chal_out:"Défi quitté : {0}",
+  t_chal_out_am:"Défi quitté : {0} — +{1} antimatière",
+  t_chal_win:"🎯 Défi réussi : {0} !",
+  t_chal_no_pr:"Impossible pendant un défi — quitte-le d'abord.",
+  au_pause_chal:"en pause pendant le défi",
+  t_auto_chal:"Les automates sont en pause : un défi se relève à la main.",
+  t_chal_locked:"Indisponible pendant un défi.",
+  ch_lock_au:"⏸️ Pendant un défi, seul le <b>relanceur de cycle</b> est suspendu : il effacerait ta progression. Tous les autres automates travaillent normalement.",
+  ch_lock_pr:"⏸️ Pendant un défi, <b>aucune recherche ne s'achète</b> et le cycle ne peut pas être relancé ici. Tes niveaux déjà payés continuent d'agir normalement.",
   t_autocyc:"Cycle automatique : +{0} antimatière",
   res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
   lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
@@ -916,7 +1317,8 @@ fr:{
   t_welcome:"Bienvenue, commandant. Clique sur l'astéroïde.",
   t_nostorage:"Stockage indisponible ici : utilise « Export » pour garder ta partie.",
   t_away:"Absence de {0} → +{1} minerai", t_am:"+{0} antimatière !",
-  confirm_reset:"Effacer TOUTE la progression (y compris l'antimatière) ?",
+  reset_t:"Tout effacer ?",
+  confirm_reset:"Toute la progression est perdue, antimatière et recherches comprises. Cette action est définitive.",
   an_surge:"⚡ Surtension : production ×{0} pendant {1} s",
   an_echo:"✨ Écho quantique : clic ×{0} pendant {1} s",
   an_vein:"💎 Filon riche : +{0} minerai ({1} s de production)",
@@ -928,24 +1330,58 @@ fr:{
 en:{
   logo:"◈ Orbital Colony", doc_title:"Orbital Colony — space idle game",
   save:"Save", export:"Export / Import", reset:"Reset",
-  tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_au:"Automation", tab_ac:"Achievements", tab_st:"Statistics",
+  lang_title:"Language",
+  menu:"Menu", menu_t:"Menu",
+  mg_game:"Your game", mg_learn:"Learn", mg_info:"Information",
+  wn_t:"What's new",
+  wn_d:"Six <b>challenges</b>, each breaking one rule of the game, unlocked on cycle #6. A <b>tutorial</b> and a single <b>menu</b>. <b>Clicking</b> finally matters early on.",
+  log_t:"Changelog", log_full:"Full history",
+  log_hint:"The latest versions, in short. The full history lives in the repository.",
+  ab_t:"About",
+  ab_code:"Source code",
+  ab_lic:"GPL 3.0 or later",
+  ab_auth:"Created by mephissto with help from Claude",
+  ab_patreon:"Support",
+  tu_prev:"Previous screen", tu_next:"Next screen",
+  m_tuto:"Tutorial", m_log:"Changelog", m_about:"About",
+  lore:"<p>You are not building on a world. You are building <b>around</b> one.</p>"+
+       "<p>The colony turns four hundred kilometres above a dead planet, anchored to an asteroid captured into the same orbit. Nothing lands, nothing leaves: everything you build stays suspended there, between the void and the gravity well.</p>"+
+       "<p>And the orbit decays. Always. Every colony falls back in the end, and all that survives is a handful of antimatter torn from its own descent — enough to build the next one a little higher, a little faster.</p>"+
+       "<p>That is where the name comes from: <b>an orbital colony is never finished, it is only falling more slowly than the last one.</b></p>",
+  tu1_t:"Orbital Colony",
+  tu2_t:"The asteroid",
+  tu2_d:"Click it. Every click tears off <b>ore</b>, the game's only running resource.<br><br>Early on, clicking is your main income. Later your structures will produce far more — but a click will always be worth a fraction of your output, never zero.",
+  tu3_t:"Structures",
+  tu3_d:"Ore buys <b>structures</b> that mine on their own, continuously. Each unit bought makes the next one 15 % pricier.<br><br>The <b>×1 / ×10 / ×100 / MAX</b> row at the top of the tab buys in batches — it stays visible while you scroll the list.",
+  tu4_t:"Upgrades and anomalies",
+  tu4_d:"<b>Upgrades</b> multiply your output: per structure, on clicks, or on everything at once.<br><br>An <b>anomaly</b> appears next to the planet from time to time. Catch it: it grants a temporary buff, a lump of ore, or a shower of clicks.",
+  tu5_t:"The cycle",
+  tu5_d:"When progress slows down, <b>start a new cycle</b>. You lose everything — ore, structures, upgrades — and you gain <b style=\"color:var(--violet)\">antimatter</b>.<br><br>Each unit grants <b>+2 % output forever</b>, and funds <b>research</b> and <b>automation</b>, which are never lost.<br><br>On <b>cycle #6</b> the <b>challenges</b> open: six special runs where one rule of the game is broken.",
+  tab_gen:"Mining", tab_up:"Upgrades", tab_pr:"Research", tab_au:"Automation", tab_ch:"Challenges", tab_ac:"Achievements", tab_st:"Statistics",
   nav_prev:"Previous tabs", nav_next:"Next tabs",
   manual:"Manual drill", per_click:"per click",
   kpi_ore:"Ore", kpi_rate:"Output", kpi_am:"Antimatter", kpi_mult:"Multiplier",
-  sub_total:"total mined: <b>{0}</b>",
+  sub_total:"cycle: <b>{0}</b> · total: <b>{1}</b>",
+  sub_total_s:"<span class=\"nb\"><b>{0}</b> · <b>{1}</b></span>",
+  sub_total_t:"ore mined this cycle / total mined since the start",
   sub_click:"click: <b>+{0}</b>",
-  sub_next:"<b>+{0}</b> ready · cycle #{1}",
-  sub_cycle:"cycle #{0} in progress",
+  sub_next:"<b>+{0}</b> ready · cycle #{1}{2}",
+  sub_next_s:"<b>+{0}</b> · #{1}{2}",
+  sub_cycle:"cycle #{0}{1}",
+  sub_cycle_s:"#{0}{1}",
+  sub_manque:" · <b>−{0}</b>",
+  sub_am_t:"ore still missing to earn one more antimatter",
   f_am:"antimatter ×{0}", f_ach:"achievements ×{0}", f_tech:"upgrades and research ×{0}",
   f_buff:"temporary boost ×{0}",
   mult_none:"no bonus yet", mult_simple:"your bonuses combined",
   mult_tip:"Multiplier breakdown:",
   ms_struct:"Structures", ms_ach:"Achievements", ms_cycles:"Cycles", ms_anom:"Next anomaly",
   imminent:"imminent", anom_title:"Anomaly detected!",
-  anom_word:"Anomaly ·", chip_now:"Sighted!", chip_soon:"Imminent…",
+  anom_word:"Anomaly ·", chip_now:"Sighted!", chip_soon:"Imminent…", chip_none:"radio silence",
   m_title:"Save file",
   m_hint:"Copy this code to back up your game, or paste a code and click “Import”.",
   m_import:"Import", m_close:"Close", bad_code:"Invalid save code.",
+  ask_ok:"Confirm", ask_no:"Cancel",
   pwa_title:"Install the game",
   pwa_intro:"Orbital Colony installs like a real app, in two taps and without going through an app store.",
   pwa_and_h:"Android", pwa_and_d:"Browser ⋮ menu → \"Install app\" (or \"Add to Home screen\").",
@@ -968,9 +1404,11 @@ en:{
   locked_ds:"Keep progressing to unlock this structure.",
   pr_head:"Antimatter cycle — you start over, you keep a permanent bonus",
   pr_btn:"Start a new cycle",
-  pr_info:"antimatter on the next cycle &nbsp;•&nbsp; each unit grants <b style=\"color:var(--violet)\">+{0} %</b> output, the total raised to the <b style=\"color:var(--violet)\">power {3}</b><br>Current bonus: <b style=\"color:var(--green)\">×{1}</b> — cycles completed: {2}",
+  pr_info:"antimatter on the next cycle &nbsp;•&nbsp; each unit grants <b style=\"color:var(--violet)\">+{0} %</b> output, the total raised to the <b style=\"color:var(--violet)\">power {3}</b><br>Current bonus: <b style=\"color:var(--green)\">×{1}</b> — cycle #{2} in progress",
   pr_note:"You need to mine {0} ore this cycle to earn 1 antimatter — {1} to go{2}",
-  pr_confirm:"Start a new cycle?\n\nYou lose ore, structures and upgrades,\nbut you gain {0} antimatter (permanent bonus).",
+  pr_ask_t:"Start a new cycle?",
+  pr_lose:"• You lose this cycle's ore, structures and upgrades.",
+  pr_confirm:"• You gain <b style=\"color:var(--violet)\">{0} antimatter</b> — a permanent bonus.",
   res_title:"Laboratory — {0} antimatter available",
   au_title:"Automation — {0} antimatter available",
   au_hint:"Automations are paid in <b style=\"color:var(--violet)\">antimatter</b>, kept from one cycle to the next, and each one can be <b>switched off</b> without being refunded.",
@@ -979,7 +1417,7 @@ en:{
   au_sw:"Active automations", au_pause:"paused by {0}", au_off_by:"off — {0} is working",
   au_sw_hint:"Switching one off refunds nothing and loses no level. The Foreman and the Engineer draw on the same ore: only one of them can work, and the other's switch stays locked while it does.",
   au_gen:"The Foreman buys",
-  au_gen_hint:"It only ever buys that one structure, one per second, as soon as it has the ore.",
+  au_gen_hint:"It only ever buys that one structure, in batches of the chosen size, once a second and as soon as it has the ore. A batch is bought whole or not at all.",
   au_gen_ready:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b>, available.",
   au_gen_wait:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b><br><b>{1}</b> to go{2}.",
   au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. It never restarts for less than 10 % of your stock, even if you type less.",
@@ -988,12 +1426,42 @@ en:{
   au_cyc_wait:"<b style=\"color:var(--violet)\">{0}</b> to go{1}.",
   au_unit_am:"antimatter",
   au_off:"off",
-  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · one purchase per second",
+  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · ×{1} per second",
   au_e_ing:"buys the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
   au_e_cycle:"restarts at +{0} antimatter",
   t_auto:"{0} — level {1}", t_auto_on:"{0}: switched back on", t_auto_off:"{0}: switched off",
   t_auto_excl:"{0}: switched back on — {1} is paused",
   t_auto_lock:"Switch {0} off first to free this one.",
+  ch_hint:"A challenge breaks <b>one rule of the game</b> for a whole cycle. Entering banks the current cycle first and credits the antimatter you had pending. The goal is computed from <b>your best cycle</b> and frozen the moment you enter. Once beaten, a challenge is cleared <b>for good</b> and its reward stays active outside of it.",
+  ch_soon:"🔒 <b>Challenges</b> open on <b>cycle #{1}</b> — <b style=\"color:var(--cyan)\">{0} cycles</b> to go.<br>Each one breaks a rule of the game for a whole cycle, with a goal computed from your best cycle. Beating it grants a <b style=\"color:var(--green)\">permanent reward</b> that stays active outside the challenge.",
+  ch_soon1:"🔒 <b>Challenges</b> open on <b>cycle #{1}</b> — <b style=\"color:var(--cyan)\">one cycle to go</b>!<br>Each one breaks a rule of the game for a whole cycle, with a goal computed from your best cycle. Beating it grants a <b style=\"color:var(--green)\">permanent reward</b> that stays active outside the challenge.",
+  ch_head:"Cleared: {0}/{1}",
+  ch_goal:"Goal: {0} ore in the cycle",
+  ch_prog:"{0} / {1} ore",
+  ch_go:"AVAILABLE", ch_running:"RUNNING", ch_won:"CLEARED", ch_locked:"LOCKED",
+  ch_quit:"Leave",
+  ch_done_bar:"Goal reached — take your time finishing the cycle.",
+  ch_ask_t:"Enter \"{0}\"?",
+  ch_confirm:"The current cycle is banked (<b style=\"color:var(--violet)\">+{0} antimatter</b>), then the run restarts from scratch under the challenge rule.",
+  ch_quit_t:"Leave the challenge?",
+  ch_quit_t_win:"Finish the challenge?",
+  ch_out_am:"• The cycle is banked: <b style=\"color:var(--violet)\">+{0} antimatter</b>.",
+  ch_out_noam:"• The cycle did not produce enough to earn any antimatter.",
+  ch_out_rw:"• Challenge cleared — <b style=\"color:var(--green)\">{0}</b>",
+  ch_out_lost:"• Goal not reached (<b style=\"color:var(--gold)\">{0} ore</b>) — the challenge stays available.",
+  ch_out_cap:"• Thanks to the {0} (level {1}), you restart with <b style=\"color:var(--gold)\">{2} ore</b>.",
+  ch_out_auto:"• Your automations resume at the same levels.",
+  ch_quit_c:"The cycle is banked as usual, with no penalty. The challenge stays available.",
+  ch_none:"No challenge is available yet.",
+  t_chal_in:"Challenge started: {0}", t_chal_out:"Challenge left: {0}",
+  t_chal_out_am:"Challenge left: {0} — +{1} antimatter",
+  t_chal_win:"🎯 Challenge cleared: {0}!",
+  t_chal_no_pr:"Not while a challenge is running — leave it first.",
+  au_pause_chal:"paused during the challenge",
+  t_auto_chal:"Automations are paused: a challenge is meant to be played by hand.",
+  t_chal_locked:"Not available during a challenge.",
+  ch_lock_au:"⏸️ During a challenge only the <b>cycle restarter</b> is suspended: it would wipe your progress. Every other automation keeps working.",
+  ch_lock_pr:"⏸️ During a challenge <b>no research can be bought</b> and the cycle cannot be restarted here. The levels you already paid for keep working normally.",
   t_autocyc:"Auto cycle: +{0} antimatter",
   res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
   lvl:"lvl {0}/{1}", maxed:"maximum level reached",
@@ -1006,7 +1474,8 @@ en:{
   t_welcome:"Welcome, commander. Click the asteroid.",
   t_nostorage:"Storage unavailable here: use “Export” to keep your game.",
   t_away:"Away for {0} → +{1} ore", t_am:"+{0} antimatter!",
-  confirm_reset:"Erase ALL progress (including antimatter)?",
+  reset_t:"Erase everything?",
+  confirm_reset:"All progress is lost, antimatter and research included. This cannot be undone.",
   an_surge:"⚡ Power surge: output ×{0} for {1} s",
   an_echo:"✨ Quantum echo: clicks ×{0} for {1} s",
   an_vein:"💎 Rich vein: +{0} ore ({1} s of output)",
@@ -1072,6 +1541,9 @@ const GENS=[
   ds:{fr:"Toute une étoile au service de la colonie.",en:"A whole star serving the colony."}},
 ];
 const GROWTH=1.15;
+/* Inflation : le seul chiffre qui change, lu par genCost() et maxAffordable().
+   Défini plus bas que CHALS, donc chalRegle() existe au moment de l'appel. */
+const GROWTH_CHAL=1.35;
 
 /* ---------- données : améliorations ---------- */
 const UPS=[];
@@ -1097,35 +1569,38 @@ UPS.push(
     avec le résonateur v3 et une grosse production, pour 2 milliards de minerai.
     La 2.29.0 avait tenté un effet double (×N sur la frappe + points de
     résonance) : correct sur le papier, illisible sur une carte.
-    Barème : ×1,5 / ×1,6 / ×1,8 / ×2, soit ×8,64 au complet. Il va de pair avec
-    les résonateurs abaissés à 2/5/10 % — le multiplicateur seul ne peut pas
-    tenir la contrainte « un clic ne doit jamais dépasser la production », car
-    sans résonateur modifié le clic vaut déjà 0,40 s de production et tout
-    facteur au-dessus de ×2,5 la dépasse. Ensemble, le clic plafonne à
-    **0,86 s de production** tout en restant 2,15× plus fort qu'à l'origine, et
-    chaque amélioration garde son ×1,5 à ×2 exact jusqu'en fin de partie. */
- {id:"c1",ico:"🔨",cost:400,  kind:"click",mult:1.5,
-  nm:{fr:"Marteau ionique",en:"Ion hammer"},ds:{fr:"Clic ×1,5",en:"Click ×1.5"}},
- {id:"c2",ico:"🦾",cost:3.5e4,kind:"click",mult:1.6,req:S=>S.clicks>=50,
-  nm:{fr:"Exosquelette",en:"Exoskeleton"},ds:{fr:"Clic ×1,6",en:"Click ×1.6"}},
- {id:"c3",ico:"⚡",cost:5e6,  kind:"click",mult:1.8,req:S=>S.clicks>=250,
-  nm:{fr:"Condensateur",en:"Capacitor"},ds:{fr:"Clic ×1,8",en:"Click ×1.8"}},
- {id:"c4",ico:"🧲",cost:2e9,  kind:"click",mult:2,req:S=>S.clicks>=600,
-  nm:{fr:"Champ magnétique",en:"Magnetic field"},ds:{fr:"Clic ×2",en:"Click ×2"}},
-/* Résonateurs abaissés de 3/12/40 % à 2/5/10 % en 2.31.0. À 40 %, le clic valait
-   à lui seul 0,40 s de production AVANT toute amélioration de clic : plus aucun
-   multiplicateur intéressant ne pouvait s'ajouter sans que le clic dépasse la
-   production — et avec dix Satellites qui cliquent 10 fois par seconde, le clic
-   pesait déjà 80 % du minerai extrait d'un cycle. */
- {id:"r1",ico:"📡",cost:2e5,  kind:"reso",val:.02,
+    Barème : ×1,5 / ×1,6 / ×1,8 / ×2 (×8,64 au complet) en 2.30.0, abaissé à
+    ×1,4 / ×1,5 / ×1,6 / ×1,7 (×5,71) en 3.0.28. Le plafond du clic est le
+    produit « meilleur résonateur × multiplicateurs » : en rendant les
+    multiplicateurs moins forts on peut remonter d'autant l'écho de base et les
+    résonateurs, ce qui déplace la puissance du clic vers le DÉBUT de partie —
+    là où elle manquait — sans rien changer au plafond de fin de partie :
+    0,15 × 5,71 = **0,86 s de production**, exactement comme avant. */
+ {id:"c1",ico:"🔨",cost:400,  kind:"click",mult:1.4,
+  nm:{fr:"Marteau ionique",en:"Ion hammer"},ds:{fr:"Clic ×1,4",en:"Click ×1.4"}},
+ {id:"c2",ico:"🦾",cost:3.5e4,kind:"click",mult:1.5,req:S=>S.clicks>=50,
+  nm:{fr:"Exosquelette",en:"Exoskeleton"},ds:{fr:"Clic ×1,5",en:"Click ×1.5"}},
+ {id:"c3",ico:"⚡",cost:5e6,  kind:"click",mult:1.6,req:S=>S.clicks>=250,
+  nm:{fr:"Condensateur",en:"Capacitor"},ds:{fr:"Clic ×1,6",en:"Click ×1.6"}},
+ {id:"c4",ico:"🧲",cost:2e9,  kind:"click",mult:1.7,req:S=>S.clicks>=600,
+  nm:{fr:"Champ magnétique",en:"Magnetic field"},ds:{fr:"Clic ×1,7",en:"Click ×1.7"}},
+/* Résonateurs : 3/12/40 % → 2/5/10 % en 2.31.0, puis 9/12/15 % en 3.0.28 en même
+   temps qu'apparaissait un écho de base de 7 % : ils doivent rester au-dessus
+   de lui pour continuer d'apporter quelque chose, et les multiplicateurs de
+   clic abaissés laissent la place. À 40 %, le clic valait à lui seul 0,40 s de
+   production AVANT toute amélioration de clic : plus aucun multiplicateur
+   intéressant ne pouvait s'ajouter sans que le clic dépasse la production — et
+   avec dix Satellites qui cliquent 10 fois par seconde, le clic pesait déjà
+   80 % du minerai extrait d'un cycle. */
+ {id:"r1",ico:"📡",cost:2e5,  kind:"reso",val:.09,
   nm:{fr:"Résonateur v1",en:"Resonator v1"},
-  ds:{fr:"Le clic gagne +2 % de ta production/s",en:"Clicks gain +2 % of your output/s"}},
- {id:"r2",ico:"📡",cost:4e8,  kind:"reso",val:.05,req:S=>S.ups.r1,
+  ds:{fr:"Le clic gagne +9 % de ta production/s",en:"Clicks gain +9 % of your output/s"}},
+ {id:"r2",ico:"📡",cost:4e8,  kind:"reso",val:.12,req:S=>S.ups.r1,
   nm:{fr:"Résonateur v2",en:"Resonator v2"},
-  ds:{fr:"Le clic gagne +5 % de ta production/s",en:"Clicks gain +5 % of your output/s"}},
- {id:"r3",ico:"📡",cost:6e11, kind:"reso",val:.10,req:S=>S.ups.r2,
+  ds:{fr:"Le clic gagne +12 % de ta production/s",en:"Clicks gain +12 % of your output/s"}},
+ {id:"r3",ico:"📡",cost:6e11, kind:"reso",val:.15,req:S=>S.ups.r2,
   nm:{fr:"Résonateur v3",en:"Resonator v3"},
-  ds:{fr:"Le clic gagne +10 % de ta production/s",en:"Clicks gain +10 % of your output/s"}}
+  ds:{fr:"Le clic gagne +15 % de ta production/s",en:"Clicks gain +15 % of your output/s"}}
 );
 // globales
 UPS.push(
@@ -1242,10 +1717,14 @@ const alvl=id=>S.auto[id]||0;
    alors qu'il n'avait jamais été coupé par le joueur — juste suspendu. */
 const aOn=id=>alvl(id)>0&&!S.autoOff[id]&&!S.autoPause[id];
 const CONTRE_S=1;                   // délai entre deux achats du Contremaître
+/* Quantité achetée à chaque passage du Contremaître. En fin de partie, une
+   structure par seconde ne suit plus la production : à ×25 il rattrape. */
+const CONTRE_QTE=[1,10,25];
+const autoQte=()=>CONTRE_QTE.indexOf(S.autoQte)>=0?S.autoQte:1;
 const SONDE_S =2;                   // délai avant ramassage de la Sonde
 /* Structures déjà révélées : c'est la liste que voit le joueur dans Extraction,
    donc la seule qu'on puisse proposer sans rien dévoiler d'avance. */
-function genRev(){return GENS.slice(0,Math.max(1,Math.min(S.seen,GENS.length)))}
+function genRev(){const l=gensActives();return l.slice(0,Math.max(1,Math.min(S.seen,l.length)))}
 /* Cible du Contremaître. Tant que le joueur n'a rien choisi, on vise la
    dernière structure révélée : c'est la plus rentable au minerai dépensé, et ça
    évite qu'un automate acheté tard se mette à empiler des drones. Dès qu'il
@@ -1291,6 +1770,9 @@ function verrouille(a){
 }
 /* Texte d'état d'une ligne / d'une carte, partagé pour qu'ils ne divergent pas. */
 function etatTexte(a){
+  // seul le relanceur de cycle s'arrête pendant un défi : il remettrait `runOre`
+  // à zéro et effacerait la progression (voir runAutos)
+  if(a.id==="cycle"&&S.chal&&!S.autoOff[a.id])return t("au_pause_chal");
   const v=verrouille(a);
   if(v)return enPause(a)?txtPause(v):t("au_off_by",tr(v.nmd));
   return aOn(a.id)?autoEtat(a):t("au_off");
@@ -1312,6 +1794,13 @@ function normExclus(){
    manuelle. Si exactement l'un des deux est coupé pendant que l'autre tourne, on
    la relit comme une pause — sinon le joueur retrouverait un Contremaître
    « coupé à la main » qui ne se rallumerait plus jamais tout seul. */
+/* Sauvegarde d'avant les défis : aucun record de cycle n'a été tenu. Le total
+   extrait est dominé par le dernier cycle (croissance exponentielle), donc la
+   moitié en est une approximation basse et sans risque : au pire l'objectif du
+   premier défi est un peu doux, jamais infranchissable. */
+function migrerBest(d){
+  if(!S.bestRun)S.bestRun=Math.max(S.runOre||0,(S.totalOre||0)*0.5);
+}
 function migrerExclus(d){
   if(d.autoPause)return;
   const c=alvl("contre")>0&&!!S.autoOff.contre, i=alvl("ing")>0&&!!S.autoOff.ing;
@@ -1554,14 +2043,145 @@ const ACHS=[
   nm:{fr:"Roue libre",en:"Freewheel"},ds:{fr:"100 cycles relancés tout seuls",en:"100 cycles restarted on their own"}},
 ];
 
+/* ---------- les défis ----------
+   Chaque défi casse UNE règle du jeu, et une seule, en inversant un
+   interrupteur dans une fonction qui existe déjà (globalMult, clickVal,
+   genCost, le tirage des anomalies, amGain). Aucune économie nouvelle n'est
+   introduite : c'est ce qui rend les six défis tenables à équilibrer.
+   `regle` est la clé lue par ces fonctions, `bonus` celle lue une fois le défi
+   réussi — la récompense est permanente et active en dehors du défi.
+   `but` est un objectif en MINERAI EXTRAIT SUR LE CYCLE (S.runOre existe déjà,
+   et repart à zéro à chaque cycle : la barre de progression est gratuite).
+   `coef` s'applique au meilleur cycle du joueur. Les écarts entre défis sont
+   énormes — 0,4 pour Silence radio, 1e-10 pour Le Vide — parce que les règles
+   n'autorisent pas du tout la même production : Le Vide retire un facteur
+   plusieurs centaines au multiplicateur, et Colonie naine plafonne la
+   production à quatre structures. Le joueur ne voit jamais ce coefficient,
+   seulement un objectif en minerai, donc l'échelle n'a pas à être lisible.
+   ⚠️ Valeurs mesurées sur un profil médian, à confirmer en jouant : la cible
+   est une fraction du record du joueur, quantité qu'aucune simulation ne
+   reproduit fidèlement. */
+const CHALS=[
+ {id:"silence", ico:"📵", regle:"noanom", bonus:"anomfast", coef:0.005,
+  nm:{fr:"Silence radio",en:"Radio silence"},
+  ds:{fr:"Aucune anomalie n'apparaît de tout le cycle.",
+      en:"No anomaly appears for the whole cycle."},
+  rw:{fr:"Anomalies 20 % plus fréquentes, définitivement.",
+      en:"Anomalies 20 % more frequent, for good."}},
+ {id:"mains",   ico:"⛓️", regle:"noclick", bonus:"prod25", coef:0.002,
+  nm:{fr:"Mains liées",en:"Hands tied"},
+  ds:{fr:"Le clic ne rapporte rien : tout doit venir des structures.",
+      en:"Clicking yields nothing: everything must come from structures."},
+  rw:{fr:"Production +25 %, définitivement.",
+      en:"Output +25 %, for good."}},
+ {id:"inflation",ico:"📈", regle:"expensive", bonus:"cheap8", coef:0.006,
+  nm:{fr:"Inflation",en:"Inflation"},
+  ds:{fr:"Chaque structure achetée renchérit de 35 % au lieu de 15 %.",
+      en:"Each structure bought gets 35 % pricier instead of 15 %."},
+  rw:{fr:"−8 % sur tous les prix de structures, définitivement.",
+      en:"−8 % on every structure price, for good."}},
+ /* Pas de handicap ici : il mesurait la part de production des structures
+    conservées, ce qui suppose qu'on garde sa colonie. On la reconstruit, et le
+    ralentissement réel dépassait 100× là où le handicap annonçait 12×. La
+    compensation est désormais dans la règle (NAIN_MULT), pas dans l'objectif. */
+ {id:"naine",   ico:"🏚️", regle:"dwarf", bonus:"big2", coef:0.0015,
+  nm:{fr:"Colonie naine",en:"Dwarf colony"},
+  ds:{fr:"Seules les 6 premières structures existent, mais elles produisent ×4.",
+      en:"Only the first 6 structures exist, but they produce ×4."},
+  rw:{fr:"Les 4 dernières structures produisent ×2, définitivement.",
+      en:"The last 4 structures produce ×2, for good."}},
+ {id:"fuite",   ico:"💨", regle:"leak", bonus:"am15", coef:0.015,
+  nm:{fr:"Fuite de confinement",en:"Containment leak"},
+  ds:{fr:"La production perd 2 % par tranche de 2 min, jusqu'à 20 % au plus bas.",
+      en:"Output loses 2 % every 2 min, down to 20 % at the lowest."},
+  rw:{fr:"Gain d'antimatière +15 %, définitivement.",
+      en:"Antimatter gain +15 %, for good."}},
+ {id:"vide",    ico:"🕳️", regle:"void", bonus:"amexp", coef:0.005, hcap:()=>{
+    /* Le Vide retire l'antimatière du multiplicateur : le handicap, c'est
+       exactement ce qu'il retire. Un joueur à 2 antimatière perd ×1,2 ; un
+       joueur à 500 000 en perd ×40 000 000. Aucun coefficient fixe ne peut
+       couvrir un tel écart — mesuré, l'objectif se gagnait en 0 minute chez
+       l'un et en 1,1 h chez l'autre. */
+    return 1/Math.max(1e-12, amMult());
+  },
+  nm:{fr:"Le Vide",en:"The Void"},
+  ds:{fr:"L'antimatière ne compte plus dans le multiplicateur.",
+      en:"Antimatter no longer counts in the multiplier."},
+  rw:{fr:"Exposant de l'antimatière 1,50 → 1,55, définitivement.",
+      en:"Antimatter exponent 1.50 → 1.55, for good."}},
+];
+/* Colonie naine : la liste des structures qui existent réellement. Point unique,
+   lu par l'affichage, la liste du Contremaître et la visibilité des paliers. */
+const NAIN=6;
+const NAIN_MULT=4;                                // compensation, voir genMult
+const gensActives=()=>chalRegle("dwarf")?GENS.slice(0,NAIN):GENS;
+const DERN4=GENS.slice(-4).map(g=>g.id);          // récompense de Colonie naine
+/* Référence de difficulté : le meilleur cycle du joueur. Un objectif en valeur
+   fixe est arithmétiquement impossible à équilibrer — mesuré, deux joueurs à
+   10 et 24 cycles mettent 78 min et 1 min pour le même minerai, soit un écart
+   de 78×. Aucun nombre en dur ne peut être à la fois un défi pour l'un et
+   franchissable pour l'autre.
+   Le plancher évite un objectif nul sur une partie neuve. */
+const CHAL_MIN=1e7;
+/* Coefficients recalés en 3.0.28 sur une partie réelle simulée seconde par
+   seconde (anomalies, buffs, automates compris) : chacun vise ~3 h pour un
+   joueur attentif, soit 2 à 4 fois un cycle ordinaire visant le même objectif.
+   Les anciennes valeurs (0,4 à 0,02) donnaient 5 à 13 h à ce joueur-là, et
+   trois défis restaient hors d'atteinte sans rester devant l'écran.
+   Le rapport « fraction du meilleur cycle → temps » ne dépend pas de l'échelle
+   du joueur : le minerai croît exponentiellement, donc atteindre 0,5 % du
+   record prend la même PART du cycle pour un débutant et pour une colonie
+   avancée. C'est ce qui rend un coefficient unique légitime. */
+/* VARIANTE À L'ESSAI — mettre à true coupe AUSSI l'effet des recherches pendant
+   un défi (et pas seulement leur achat). Mesuré : ça retire un facteur 10 à 136
+   sur le multiplicateur, donc les coefficients devraient être divisés d'environ
+   50 pour que les objectifs restent atteignables. Interrupteur unique, pour
+   pouvoir comparer les deux builds en jouant plutôt qu'en théorisant. */
+const CHAL_NO_RES=false;
+const refCycle=()=>Math.max(S.bestRun||0,CHAL_MIN);
+/* Handicap : de combien CETTE règle ralentit CE joueur. Vaut 1 pour les défis
+   dont la pénalité ne dépend pas de l'avancement (plus de clic, plus
+   d'anomalies, prix majorés) et se calcule pour les deux autres. Sans lui, un
+   coefficient réglé pour un joueur maxé rend le défi trivial pour un débutant,
+   et l'inverse. */
+const chalHcap=c=>c.hcap?c.hcap():1;
+/* Objectif affiché sur une carte, avant d'entrer. */
+const chalBut=c=>Math.ceil(c.coef*refCycle()*chalHcap(c));
+/* Objectif du défi EN COURS : figé à l'entrée (S.chalBut). S'il fuyait devant
+   le joueur au fur et à mesure qu'il bat son record, il serait inatteignable
+   par construction. */
+const butActif=()=>S.chalBut||chalBut(chalCur()||CHALS[0]);
+const chalCur=()=>CHALS.find(c=>c.id===S.chal)||null;
+const chalFait=id=>!!S.chalDone[id];
+/* règle cassée actuellement active — un seul défi à la fois, donc pas de cumul */
+const chalRegle=k=>{const c=chalCur();return !!c&&c.regle===k};
+/* récompense acquise : le défi correspondant a été réussi une fois */
+const chalBonus=k=>CHALS.some(c=>c.bonus===k&&chalFait(c.id));
+/* CHAL_CYCLES est le NUMÉRO DE CYCLE affiché dans la tuile de l'en-tête, pas un
+   nombre de cycles terminés : les défis s'ouvrent quand elle indique « cycle
+   n°6 en cours », donc après 5 cycles bouclés. C'est ce que lit le joueur, et
+   faire compter au code autre chose que ce qu'affiche l'écran donnait un
+   décompte juste sous une phrase fausse.
+   L'onglet, lui, apparaît dès le premier cycle — grisé mais cliquable — avec le
+   décompte des cycles restants : un onglet qui surgit de nulle part n'annonce
+   rien, et un joueur qui ignore que les défis existent ne travaille pas vers
+   eux. */
+const CHAL_CYCLES=6;                                  // numéro du cycle qui les ouvre
+const CHAL_FAITS=CHAL_CYCLES-1;                       // cycles à terminer pour y arriver
+const chalOuvert=()=>S.prestiges>=CHAL_FAITS||!!S.chal||Object.keys(S.chalDone).length>0;
+const chalVisible=()=>S.prestiges>=1||chalOuvert();   // onglet visible, ouvert ou non
+const chalReste=()=>Math.max(0,CHAL_FAITS-S.prestiges);
+
 /* ---------- état ---------- */
 const NEW=()=>({
   ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
+  chal:null,chalDone:{},chalStart:0,chalBut:0,bestRun:0,
   gens:{},ups:{},res:{},achs:{},seen:1,
-  auto:{},autoOff:{},autoPause:{},autoMain:"",autoPart:30,autoGen:"",autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,chain:0,
+  auto:{},autoOff:{},autoPause:{},autoMain:"",autoPart:30,autoGen:"",autoQte:1,autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,chain:0,
   clicks:0,anoms:0,buffs:[],buy:1,
   started:Date.now(),lastTick:Date.now(),lastSave:Date.now(),
-  nextAnom:Date.now()+45000
+  nextAnom:Date.now()+45000,
+  tuto:0                        // 1 dès que le tutoriel a été vu ou passé
 });
 let S=NEW();
 
@@ -1574,36 +2194,65 @@ function writeSave(str){ if(storageOK){try{localStorage.setItem(KEY,str);return}
 function readSave(){ if(storageOK){try{const v=localStorage.getItem(KEY);if(v)return v}catch(e){}} return memSave; }
 
 /* ---------- calculs ---------- */
-function lvl(id){return S.res[id]||0}
+/* Point unique de lecture des niveaux de recherche : la variante « dure » les
+   ramène toutes à zéro pendant un défi, ce qui couvre d'un coup production,
+   clic, prix, anomalies, antimatière et capsule. */
+function lvl(id){return (S.chal&&CHAL_NO_RES)?0:(S.res[id]||0)}
 function amBonus(){return 0.02+0.015*lvl("reso")}            // par antimatière
 // Le bonus d'antimatière était linéaire (×(1+am·b)) alors que le coût des
 // structures est exponentiel : chaque cycle rapportait donc de moins en moins.
 // On élève le total à une puissance > 1 pour que le multiplicateur suive.
 const AM_EXP=1.5;
-function amMult(){return Math.pow(1+S.am*amBonus(),AM_EXP)}
+const AM_EXP_RW=1.55;                       // récompense du Vide
+const amExp=()=>chalBonus("amexp")?AM_EXP_RW:AM_EXP;
+function amMult(){return Math.pow(1+S.am*amBonus(),amExp())}
 function achMult(){return 1+Object.keys(S.achs).length*0.01}
 /* noBuff=true exclut la Surtension en cours : sert au filon et au bond, dont
    le gain représente X secondes/minutes de production DE BASE. Sans ça, une
    Surtension ×10 active au moment du tirage gonflait leur gain jusqu'à ×10,
    pour une anomalie censée ne "jamais donner un pouvoir que tu n'as pas déjà,
    seulement du temps d'avance" (voir README, section anomalies). */
+/* Fuite de confinement : −2 % par tranche de 2 min depuis l'entrée, avec un
+   PLANCHER à 20 %. Calculé à la volée sur chalStart plutôt que stocké, pour
+   rester juste après un rechargement de page ou un retour d'arrière-plan.
+   Sans plancher, la décroissance composée bornait le minerai total du défi à
+   « production × 1485 s » : simulé sur une vraie partie, le défi plafonnait à
+   5,58 T de minerai en 36 h, soit 0,000002 % du record du joueur. Ce n'était
+   pas un défi difficile, c'était un défi impossible, quel que soit l'objectif.
+   Avec le plancher, il redevient fini — mesuré 2,0× un cycle normal. */
+const FUITE_PAS=120000, FUITE_MIN=0.20;
+function fuiteMult(){
+  if(!chalRegle("leak")||!S.chalStart)return 1;
+  return Math.max(FUITE_MIN,Math.pow(0.98,Math.floor((Date.now()-S.chalStart)/FUITE_PAS)));
+}
 function globalMult(noBuff){
   let m=1;
-  m*=amMult();
+  /* Le Vide retire l'antimatière du multiplicateur — mais PAS les succès :
+     mesuré à 4,9× un cycle normal en retirant les deux, c'était le plus dur des
+     six et de loin. Les succès restent la récompense d'un travail déjà fait. */
+  if(!chalRegle("void")) m*=amMult();
   m*=achMult();
+  m*=fuiteMult();
   m*=Math.pow(1.3,lvl("mining"));
   UPS.forEach(u=>{if(u.kind==="glob"&&S.ups[u.id])m*=u.mult});
+  if(chalBonus("prod25"))m*=1.25;              // récompense de Mains liées
   if(!noBuff)S.buffs.forEach(b=>{if(b.k==="prod")m*=b.m});
   return m;
 }
 function genMult(id){
   let m=1;
   UPS.forEach(u=>{if(u.kind==="gen"&&u.target===id&&S.ups[u.id])m*=u.mult});
+  if(chalBonus("big2")&&DERN4.indexOf(id)>=0)m*=2;   // récompense de Colonie naine
+  /* Colonie naine : sans compensation, six structures ne peuvent pas approcher
+     un record établi avec dix — leur coût monte en 1,15^n quand leur production
+     monte linéairement. Simulé : plafond à 124 T en 36 h, 0,00004 % du record.
+     Le ×4 rend la colonie amputée capable de croître. */
+  if(chalRegle("dwarf"))m*=NAIN_MULT;
   return m;
 }
 function perSec(noBuff){
   let t=0;
-  GENS.forEach(g=>{t+=(S.gens[g.id]||0)*g.rate*genMult(g.id)});
+  gensActives().forEach(g=>{t+=(S.gens[g.id]||0)*g.rate*genMult(g.id)});
   return t*globalMult(noBuff);
 }
 /* auto = clic produit par les satellites. Ils ignorent le bonus de clic : sinon
@@ -1619,21 +2268,46 @@ function perSec(noBuff){
    invisible dès que l'écho domine, c'est-à-dire très vite : c'est ce qui a tué
    successivement les améliorations de clic (corrigé en 2.30.0) puis les Bras
    servo-assistés (corrigé en 2.32.0). */
+/* Écho de base, avant tout résonateur. Sans lui, la frappe (1 × multiplicateur
+   global) ne grandit pas avec la colonie et l'écho n'existe qu'une fois un
+   résonateur acheté : mesuré sur une partie neuve, le clic restait à 1–1,5
+   pendant que la production atteignait 246/s — il passait de 10 s de production
+   à 0,006 s en une heure, et cliquer ne servait visiblement plus à rien.
+   Il est appliqué DANS l'écho, pas comme plancher sur le résultat : un plancher
+   sur la valeur finale masquerait l'effet des améliorations de clic, le défaut
+   corrigé en 2.30.0.
+   Barème 3.0.28 : écho de base 7 %, résonateurs 9/12/15 %, multiplicateurs de
+   clic abaissés à ×5,71 au total. Le clic vaut ainsi ~0,07 s de production dès
+   la première minute au lieu de 0,006 s, et toujours 0,15 × 5,71 = 0,86 s au
+   complet — plafond de fin de partie strictement inchangé (2,16 s avec les
+   douze niveaux de Bras servo-assistés, seule exception admise à la règle
+   « un clic ne doit jamais dépasser une seconde de production »). */
+const ECHO_BASE=0.07;
 function clickVal(auto){
+  // Mains liées : le clic ne rapporte rien, y compris celui des satellites —
+  // qui sont de toute façon en pause pendant un défi.
+  if(chalRegle("noclick"))return 0;
   let m=1; UPS.forEach(u=>{if(u.kind==="click"&&S.ups[u.id])m*=u.mult});
   m*=Math.pow(RES.find(r=>r.id==="servo").clic,lvl("servo"));
   let reso=0; UPS.forEach(u=>{if(u.kind==="reso"&&S.ups[u.id])reso=Math.max(reso,u.val)});
   let bf=1; if(!auto)S.buffs.forEach(b=>{if(b.k==="click")bf*=b.m});
-  return (globalMult()+perSec()*reso)*m*bf;
+  return (globalMult()+perSec()*Math.max(reso,ECHO_BASE))*m*bf;
 }
-function costMult(){return Math.pow(0.96,lvl("nego"))}
+const croissance=()=>chalRegle("expensive")?GROWTH_CHAL:GROWTH;
+function costMult(){
+  let m=Math.pow(0.96,lvl("nego"));
+  if(chalBonus("cheap8"))m*=0.92;                 // récompense d'Inflation
+  return m;
+}
 function genCost(g,n){
   const o=S.gens[g.id]||0, b=g.base*costMult();
-  return b*Math.pow(GROWTH,o)*(Math.pow(GROWTH,n)-1)/(GROWTH-1);
+  const G=croissance();
+  return b*Math.pow(G,o)*(Math.pow(G,n)-1)/(G-1);
 }
 function maxAffordable(g){
-  const o=S.gens[g.id]||0, b=g.base*costMult()*Math.pow(GROWTH,o);
-  const n=Math.floor(Math.log(1+S.ore*(GROWTH-1)/b)/Math.log(GROWTH));
+  const G=croissance();
+  const o=S.gens[g.id]||0, b=g.base*costMult()*Math.pow(G,o);
+  const n=Math.floor(Math.log(1+S.ore*(G-1)/b)/Math.log(G));
   return Math.max(0,n);
 }
 /* Gain d'antimatière du cycle.
@@ -1662,7 +2336,9 @@ const AM_SEUIL=1e10;      // minerai pour la première antimatière
 const AM_EXPG=0.30;
 function amGain(){
   if(!(S.runOre>0))return 0;
-  return Math.max(0,Math.floor(Math.pow(S.runOre/AM_SEUIL,AM_EXPG)));
+  let g=Math.pow(S.runOre/AM_SEUIL,AM_EXPG);
+  if(chalBonus("am15"))g*=1.15;               // récompense de Fuite de confinement
+  return Math.max(0,Math.floor(g));
 }
 /* minerai nécessaire pour un gain donné — l'inverse exact de amGain() */
 const amMinerai=g=>AM_SEUIL*Math.pow(g,1/AM_EXPG)*(1+1e-9);  // marge d'arrondi
@@ -1715,14 +2391,23 @@ function toggleAuto(a){
   render();
 }
 function buyRes(r){
+  if(S.chal){ toast(t("t_chal_locked")); return }   // pas d'achat pendant un défi
   const l=lvl(r.id); if(l>=r.max)return;
   const c=resCost(r,l); if(S.am<c)return;
   S.am-=c; S.res[r.id]=l+1; toast(t("t_res",tr(r.nm),l+1),"violet"); render();
 }
-function doPrestige(muet){
-  const g=amGain(); if(g<1)return;
-  if(!muet&&!confirm(t("pr_confirm",fmt(g))))return;
-  S.am+=g; S.amTotal+=g; S.prestiges++;
+/* Encaisse le cycle en cours puis remet la partie à zéro.
+   `force` remet à zéro même quand le gain est nul : c'est ce qui permet
+   d'entrer dans un défi ou d'en sortir à n'importe quel moment, sans que le
+   joueur ait à attendre « le bon moment ». Un cycle qui ne rapporte rien ne
+   compte pas comme un cycle effectué — sinon entrer et sortir d'un défi
+   gonflerait le compteur et les succès qui en dépendent. */
+function finCycle(force){
+  const g=amGain();
+  if(g<1&&!force)return 0;
+  // record de minerai sur un cycle : c'est l'étalon des objectifs de défi
+  if(S.runOre>(S.bestRun||0))S.bestRun=S.runOre;
+  if(g>=1){ S.am+=g; S.amTotal+=g; S.prestiges++; }
   S.ore=0;S.runOre=0;S.gens={};S.ups={};S.buffs=[];
   // La Capsule offre du minerai, elle n'en extrait pas : il ne doit pas compter
   // dans le total du cycle. Sinon, au niveau maximum, chaque cycle démarrait
@@ -1730,7 +2415,111 @@ function doPrestige(muet){
   // d'avoir joué une seconde, et un cycle automatique à seuil bas en récoltait
   // une poignée à chaque image.
   const cap=lvl("capsule"); if(cap)S.ore+=1e4*Math.pow(25,cap);
-  toast(muet?t("t_autocyc",fmt(g)):t("t_am",fmt(g)),"violet"); save(); render();
+  return g;
+}
+/* demande(texte, siOui) — remplace confirm(). Asynchrone par nature : tout ce
+   qui suivait un confirm() doit passer dans le rappel. */
+let askCb=null;
+function demande(titre,txt,cb){
+  askCb=cb;
+  $("#askTitre").textContent=String(titre);
+  txt=String(txt);
+  /* Le corps porte du balisage : chaque valeur est teintée de la couleur de sa
+     ressource, les mêmes que les tuiles de l'en-tête (minerai doré, antimatière
+     violette). Les textes viennent tous du dictionnaire, jamais du joueur. */
+  const el=$("#askTxt"); el.textContent="";
+  if(txt.indexOf("•")===0)
+    txt.split("\n").forEach(l=>{
+      const d=document.createElement("div"); d.className="puce"; d.innerHTML=l;
+      el.appendChild(d);
+    });
+  else el.innerHTML=txt;
+  $("#ask").classList.add("on");
+}
+function askFin(ok){
+  const cb=askCb; askCb=null;
+  $("#ask").classList.remove("on");
+  if(ok&&cb)cb();
+}
+
+function doPrestige(muet){
+  // Pendant un défi, le seul moyen de terminer le cycle est de quitter le défi
+  // (ou de le réussir) : un prestige de plus remettrait `runOre` à zéro et
+  // effacerait la progression sans rien expliquer au joueur.
+  if(S.chal){ if(!muet)toast(t("t_chal_no_pr"),"violet"); return }
+  const g=amGain(); if(g<1)return;
+  const fait=()=>{
+    const n=amGain(); if(n<1)return;          // relu : le gain a pu bouger entre-temps
+    finCycle(false);
+    toast(muet?t("t_autocyc",fmt(n)):t("t_am",fmt(n)),"violet"); save(); render();
+  };
+  if(muet){fait();return}
+  // même présentation en liste que le bilan de sortie d'un défi : c'est la
+  // même opération, elle ne doit pas se raconter de deux façons différentes
+  const cap=lvl("capsule"), l=[t("pr_lose"),t("pr_confirm",fmt(g))];
+  if(cap)l.push(t("ch_out_cap",tr(RES.find(r=>r.id==="capsule").nm),cap,
+                  fmt(1e4*Math.pow(25,cap))));
+  demande(t("pr_ask_t"),l.join("\n"),fait);
+}
+
+/* ---------- entrer / quitter / réussir un défi ---------- */
+/* Entrer encaisse D'ABORD le cycle en cours et crédite l'antimatière en
+   attente, puis remet à zéro. Sans ça le joueur attend toujours « le bon
+   moment » et lancer un défi devient une corvée à planifier. */
+function entrerChal(c){
+  if(!chalOuvert()||S.chal||chalFait(c.id))return;
+  demande(t("ch_ask_t",tr(c.nm)),t("ch_confirm",fmt(amGain())),()=>{
+    if(S.chal||chalFait(c.id))return;   // relu : l'état a pu changer entre-temps
+    /* Le handicap se mesure sur la colonie ENCORE EN PLACE : finCycle() efface
+       les structures, et Colonie naine a besoin de les voir pour savoir ce que
+       la règle coûte à ce joueur-là. */
+    const h=chalHcap(c);
+    finCycle(true);                     // met aussi bestRun à jour
+    S.chal=c.id; S.chalStart=Date.now();
+    S.chalBut=Math.ceil(c.coef*refCycle()*h);
+    // en variante dure, la Capsule ne doit pas non plus amorcer le défi
+    if(CHAL_NO_RES)S.ore=0;
+    /* Mains liées démarre sinon à zéro revenu : sans clic, sans structure et
+       sans Capsule, la production reste nulle indéfiniment et le seul espoir
+       est le plancher d'une anomalie. Mesuré : 30 minutes à 0 minerai. On
+       amorce donc de quoi poser une vingtaine de Drones — l'équivalent de ce
+       que la première minute de clics aurait rapporté, négligeable devant
+       n'importe quel objectif. */
+    if(chalRegle("noclick"))S.ore=Math.max(S.ore,genCost(GENS[0],20));
+    toast(t("t_chal_in",tr(c.nm)),"violet"); save(); render();
+  });
+}
+/* Ce que le joueur emporte en quittant. Écrit noir sur blanc plutôt que
+   découvert après coup : sortir d'un défi est un moment où il faut savoir ce
+   qu'on gagne, sinon on hésite à en lancer un. */
+function bilanSortie(c){
+  const l=[], g=amGain(), cap=lvl("capsule");
+  l.push(g>=1?t("ch_out_am",fmt(g)):t("ch_out_noam"));
+  if(chalFait(c.id))l.push(t("ch_out_rw",tr(c.rw)));
+  else l.push(t("ch_out_lost",fmt(butActif())));
+  if(cap)l.push(t("ch_out_cap",tr(RES.find(r=>r.id==="capsule").nm),cap,
+                fmt(1e4*Math.pow(25,cap))));
+  return l.join("\n");
+}
+/* Quitter : nouvelle remise à zéro, aucune pénalité, et l'antimatière gagnée
+   pendant le défi est encaissée comme sur un cycle ordinaire — un défi n'est
+   jamais du temps perdu. Comme un défi ne se valide qu'une fois, il n'y a rien
+   à farmer. */
+function quitterChal(silencieux){
+  const c=chalCur(); if(!c)return;
+  const g=finCycle(true);
+  S.chal=null; S.chalStart=0; S.chalBut=0;
+  if(!silencieux)toast(g>=1?t("t_chal_out_am",tr(c.nm),fmt(g)):t("t_chal_out",tr(c.nm)),"violet");
+  save(); render();
+}
+/* Réussite : validée définitivement dès que l'objectif est atteint, mais on ne
+   met pas le joueur dehors — il finit son cycle quand il veut. */
+function checkChal(){
+  const c=chalCur(); if(!c||chalFait(c.id))return;
+  if(S.runOre<butActif())return;
+  S.chalDone[c.id]=1;
+  toast(t("t_chal_win",tr(c.nm)),"violet");
+  save();
 }
 
 /* ---------- buffs & anomalies ---------- */
@@ -1783,6 +2572,7 @@ function anomInterval(){
   let base=110000+Math.random()*130000;
   if(S.ups.a1)base*=0.7;
   base*=Math.pow(0.8,lvl("detec"));
+  if(chalBonus("anomfast"))base/=1.2;          // récompense de Silence radio
   return base;
 }
 /* L'anomalie apparaît toujours DANS la zone visible, jamais en haut d'une page
@@ -1866,7 +2656,17 @@ function syncHero(){
   syncHeaderH();
   const mobile=matchMedia("(max-width:880px)").matches;
   const sp=$("#herospacer");
-  if(!mobile){sp.style.height="";$("#panels").style.minHeight="";return}
+  if(!mobile){
+    sp.style.height=""; $("#panels").style.minHeight="";
+    /* Ordinateur : #panels défile. Sa marge intérieure haute décale le point
+       d'accrochage d'autant — on la retranche pour que le fond de la barre
+       affleure vraiment le haut de la zone visible, sans laisser passer une
+       bande de cartes au-dessus. Elle est lue plutôt qu'écrite en dur : elle
+       vaut 16px en général, 12px sur écran étroit. */
+    const pt=parseFloat(getComputedStyle($("#panels")).paddingTop)||0;
+    document.documentElement.style.setProperty("--buyTop",(-pt)+"px");
+    return;
+  }
   // hauteur minimale du panneau : un onglet presque vide ne doit pas faire
   // sauter la position de défilement quand on l'ouvre
   const minH=Math.max(0,$("main").clientHeight-$("#stickyhead").getBoundingClientRect().height)+"px";
@@ -1874,7 +2674,12 @@ function syncHero(){
   // la cale suit la hauteur réelle (elle ne varie qu'avec la rangée de badges)
   const h=$("#hero").getBoundingClientRect();
   sp.style.height=Math.round(h.height)+"px";
-  $("#stickyhead").style.top=Math.round(Math.max(0,h.bottom-$("main").getBoundingClientRect().top))+"px";
+  const hautCollant=Math.round(Math.max(0,h.bottom-$("main").getBoundingClientRect().top));
+  $("#stickyhead").style.top=hautCollant+"px";
+  // mobile : <main> défile ; la barre des lots se pose sous les onglets collants
+  const bt=(hautCollant+Math.round($("#stickyhead").getBoundingClientRect().height))+"px";
+  if(document.documentElement.style.getPropertyValue("--buyTop")!==bt)
+    document.documentElement.style.setProperty("--buyTop",bt);
 }
 addEventListener("resize",syncHero);
 // la hauteur de l'en-tête peut changer SANS défilement (bonus qui expire,
@@ -1970,7 +2775,7 @@ function getAutoCard(a){
 function autoEtat(a){
   const l=alvl(a.id);
   if(a.id==="clic")  return t("au_e_clic",l,l>1?"s":"");
-  if(a.id==="contre"){const g=autoGen();return t("au_e_contre",g?g.ico+" "+tr(g.nm):"—")}
+  if(a.id==="contre"){const g=autoGen();return t("au_e_contre",g?g.ico+" "+tr(g.nm):"—",autoQte())}
   if(a.id==="ing")   return t("au_e_ing");
   if(a.id==="sonde") return t("au_e_sonde",SONDE_S);
   return t("au_e_cycle",fmt(cycSeuil()));
@@ -2002,12 +2807,12 @@ function priceInfo(cost,cur,rate,unit){
 }
 
 /* ---------- squelette statique des onglets (reconstruit au changement de langue) ---------- */
-let QBTN=[], ACHNODES=[], ACHSECS=[], STROWS=[], SWROWS=[], CYCIN=null, GENSEL=null;
+let QBTN=[], QGEN=[], ACHNODES=[], ACHSECS=[], STROWS=[], SWROWS=[], CHNODES=[], CYCIN=null, GENSEL=null;
 function buildSkeleton(){
   /* --- Extraction --- */
   $("#pGen").innerHTML=
     '<p class="hint">'+t("gen_hint")+'</p>'+
-    '<div class="buyrow"><span class="lbl">'+t("buy_by")+'</span></div><div id="genList"></div>';
+    '<div class="buyrow" id="buyRow"><span class="lbl">'+t("buy_by")+'</span></div><div id="genList"></div>';
 
   const row=$("#pGen .buyrow");
   QBTN=[1,10,100,"max"].map(q=>{
@@ -2025,6 +2830,7 @@ function buildSkeleton(){
 
   /* --- Recherche --- */
   $("#pPr").innerHTML=
+    '<div class="chlock" id="prLock" style="display:none">'+t("ch_lock_pr")+'</div>'+
     '<div class="prestige-box">'+
       '<div class="hint" style="margin:0 0 6px">'+t("pr_head")+'</div>'+
       '<div class="big" id="prGain">+0</div>'+
@@ -2043,6 +2849,7 @@ function buildSkeleton(){
      liste ne bouge plus. En bas de page il fallait faire défiler tout l'onglet
      à chaque ajustement. */
   $("#pAu").innerHTML=
+    '<div class="chlock" id="auLock" style="display:none">'+t("ch_lock_au")+'</div>'+
     '<p class="hint">'+t("au_hint")+'</p>'+
     '<h3 class="sec" id="auSetT" style="display:none">'+t("au_set")+'</h3>'+
     '<div class="setbox" id="auSetSw" style="display:none">'+
@@ -2068,6 +2875,12 @@ function buildSkeleton(){
   GENSEL.className="sel"; GENSEL._sig=null;
   GENSEL.addEventListener("change",()=>{S.autoGen=GENSEL.value;render()});
   $("#auGenCtl").appendChild(GENSEL);
+  QGEN=CONTRE_QTE.map(q=>{
+    const b=document.createElement("button");
+    b.type="button"; b.className="qty"; b.textContent="×"+q; b._q=q;
+    bindAction(b,()=>{S.autoQte=q;render()});
+    $("#auGenCtl").appendChild(b); return b;
+  });
   /* Une ligne par automate, montrée seulement s'il est possédé : les
      interrupteurs remontent avec les réglages, la liste du bas ne sert plus
      qu'à l'achat et aux niveaux. */
@@ -2112,6 +2925,34 @@ function buildSkeleton(){
     ACHSECS.push({cat,h,idx});
   });
 
+  /* --- Défis ---
+     La liste est fixe (six défis) : on construit les cartes une fois pour
+     toutes et renderChals() ne fait plus que remplir du texte. Pas de
+     syncList ici, il n'y a rien à réordonner. */
+  $("#pCh").innerHTML='<div class="chlock" id="chLock" style="display:none"></div>'+
+    '<p class="hint" id="chHint">'+t("ch_hint")+'</p>'+
+    '<h3 class="sec chsec"><span id="chHeadT"></span><span class="secn" id="chHeadN"></span></h3>'+
+    '<div id="chList"></div>';
+  const cb=$("#chList"); CHNODES=[];
+  CHALS.forEach(c=>{
+    const d=document.createElement("div"); d.className="card chcard";
+    d.innerHTML='<div class="ico"></div>'+
+      '<div class="mid"><div class="nm"></div><div class="rule"></div>'+
+      '<div class="rw"></div><div class="goal"></div></div>'+
+      '<div class="right"><div class="chtag"></div></div>';
+    d.q={ico:d.querySelector(".ico"),nm:d.querySelector(".nm"),rule:d.querySelector(".rule"),
+         rw:d.querySelector(".rw"),goal:d.querySelector(".goal"),tag:d.querySelector(".chtag")};
+    bindAction(d,()=>entrerChal(c));
+    cb.appendChild(d); CHNODES.push({c,d});
+  });
+
+  /* buildMenu() reconstruit des éléments vides ; majMenu() les remplit. Il faut
+     l'appeler ICI et pas seulement depuis applyI18n() : setLang() fait
+     applyI18n() PUIS buildSkeleton(), donc la traduction précède la
+     reconstruction et les intitulés repartaient vides à chaque changement de
+     langue. */
+  buildMenu(); majMenu();
+
   /* --- Statistiques --- */
   $("#pSt").innerHTML='<div id="stSecs"></div>';
   const sb=$("#stSecs"); STROWS=[];
@@ -2136,9 +2977,48 @@ function buildSkeleton(){
 }
 
 /* ---------- changement de langue ---------- */
+/* Le nom d'une langue s'écrit toujours DANS cette langue — « Français » reste
+   « Français » quand l'interface est en anglais : c'est la seule façon pour un
+   joueur qui ne comprend pas la langue courante de retrouver la sienne. Le code
+   à deux lettres l'accompagne, et c'est lui seul qu'affiche le bouton fermé. */
+const LANGUES=[{id:"en",code:"EN",nm:"English"},{id:"fr",code:"FR",nm:"Français"}];
+const langDef=id=>LANGUES.find(l=>l.id===id)||LANGUES[0];
+function buildLangMenu(){
+  const m=$("#langMenu"); m.innerHTML="";
+  LANGUES.forEach(l=>{
+    const b=document.createElement("button");
+    b.className="langopt"; b.type="button"; b.setAttribute("role","option");
+    b.dataset.lang=l.id;
+    b.innerHTML='<span class="langcode">'+l.code+'</span><span>'+l.nm+'</span>'+
+      '<svg class="tick" viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6.5"/></svg>';
+    bindAction(b,()=>{ouvrirLang(false);setLang(l.id)});
+    m.appendChild(b);
+  });
+}
+function ouvrirLang(on){
+  const sel=$("#langSel");
+  cls(sel,"open",on);
+  $("#langBtn").setAttribute("aria-expanded",on?"true":"false");
+}
+function majLang(){
+  txt($("#langFlag"),langDef(LANG).code);
+  $$(".langopt").forEach(b=>{
+    const on=b.dataset.lang===LANG;
+    cls(b,"on",on); b.setAttribute("aria-selected",on?"true":"false");
+  });
+}
+/* Version de développement : reconnue au domaine, pas au numéro de version —
+   c'est l'adresse qui dit où l'on est. dev.orbital-colony.app est en dev,
+   orbital-colony.app ne l'est pas. Un fichier ouvert en local (hostname vide)
+   compte aussi : c'est du test, pas la prod. */
+const estDev=()=>{
+  const h=(location.hostname||"").toLowerCase();
+  return h===""||h.indexOf("dev.")===0;
+};
 function applyI18n(){
-  document.title=t("doc_title");
+  document.title=(estDev()?"DEV · ":"")+t("doc_title");
   txt($("#verTag"),"v"+VERSION);
+  cls(document.documentElement,"dev",estDev());
   document.documentElement.lang=LANG;
   const court=matchMedia("(max-width:560px)").matches;
   $$("[data-i18n]").forEach(e=>{
@@ -2149,7 +3029,8 @@ function applyI18n(){
     if(e.dataset.i18nHtml!==undefined)html(e,t(k)); else txt(e,t(k));
   });
   $$("[data-i18n-title]").forEach(e=>{const v=t(e.dataset.i18nTitle);if(e.title!==v)e.title=v});
-  $$(".lang").forEach(b=>cls(b,"on",b.dataset.lang===LANG));
+  majLang();
+  if($("#mGrid").children.length)majMenu();   // les fenêtres suivent la langue
 }
 function setLang(l){
   if(!T[l]||l===LANG)return;
@@ -2164,6 +3045,7 @@ function renderGens(){
   const rate=perSec(), list=[];
   let locked=0;
   GENS.forEach((g,i)=>{
+    if(chalRegle("dwarf")&&i>=NAIN)return;        // Colonie naine : elles n'existent pas
     const owned=S.gens[g.id]||0;
     if(owned>0||S.ore>=g.base*0.35)S.seen=Math.max(S.seen,i+2);
     if(i>=S.seen){
@@ -2201,8 +3083,20 @@ function renderGens(){
    et la redécouverte progressive disparaissait définitivement.
    Les paliers de structure, eux, ont en plus leur `req` (N exemplaires
    possédés) : ils réapparaissaient déjà au fil du cycle. */
-function upVisible(u){return (!u.req||u.req(S))&&S.runOre>=u.cost*0.08}
-function upBadge(){return UPS.filter(u=>!S.ups[u.id]&&(!u.req||u.req(S))&&S.ore>=u.cost).length}
+function upVisible(u){
+  // une amélioration qui vise une structure inexistante n'a rien à faire là
+  if(u.kind==="gen"&&chalRegle("dwarf")&&!gensActives().some(g=>g.id===u.target))return false;
+  if(u.req&&!u.req(S))return false;
+  /* ...ou simplement payable tout de suite. La Capsule de départ offre du
+     minerai à chaque nouveau cycle — 2,44 T au niveau maximum — alors que
+     `runOre` est encore à zéro : le joueur avait de quoi acheter dix
+     améliorations et l'onglet lui répondait « Rien de neuf pour l'instant ».
+     Cacher ce qu'on peut s'offrir n'est jamais la bonne réponse. */
+  return S.runOre>=u.cost*0.08 || S.ore>=u.cost;
+}
+/* Le badge compte EXACTEMENT ce que la liste affiche : il testait la condition
+   d'achat sans la condition de visibilité, et les deux pouvaient diverger. */
+function upBadge(){return UPS.filter(u=>!S.ups[u.id]&&upVisible(u)&&S.ore>=u.cost).length}
 
 /* en-têtes de catégorie réutilisés d'un rendu à l'autre, comme les cartes */
 const UPHEADS=new Map();
@@ -2257,7 +3151,11 @@ function renderUps(){
 function renderPrestige(){
   const g=amGain();
   txt($("#prGain"),"+"+fmt(g));
-  html($("#prInfo"),t("pr_info",(amBonus()*100).toFixed(1),mfmt(amMult()),S.prestiges,String(AM_EXP)));
+  /* Le NUMÉRO du cycle en cours, comme la tuile de l'en-tête et le seuil des
+     défis — pas le nombre de cycles terminés. Deux façons de compter dans la
+     même interface, c'est exactement ce qui avait rendu le déblocage des défis
+     illisible. */
+  html($("#prInfo"),t("pr_info",(amBonus()*100).toFixed(1),mfmt(amMult()),S.prestiges+1,String(amExp())));
   const note=$("#prNote");
   show(note,g<1);
   if(g<1){
@@ -2265,9 +3163,11 @@ function renderPrestige(){
     let d=""; if(r>0)d=(left/r>86400*60)?tm("far"):t("eta",fmtTime(left/r));
     txt(note,t("pr_note",fmt(need),fmt(left),d));
   }
-  const b=$("#prBtn"); if(b.disabled!==(g<1))b.disabled=(g<1);
+  // le bouton se désactive aussi pendant un défi : doPrestige() refuse de toute
+  // façon, mais un bouton actif qui ne fait rien est une promesse non tenue
+  const b=$("#prBtn"), off=(g<1||!!S.chal); if(b.disabled!==off)b.disabled=off;
 
-  html($("#resTitle"),t("res_title",'<b style="color:var(--violet)">'+fmt(S.am)+"</b>"));
+  html($("#resTitle"),t("res_title",'<b style=\"color:var(--violet)\">'+fmt(S.am)+"</b>"));
   syncList($("#resList"),RES.map(r=>{
     const l=lvl(r.id), maxed=l>=r.max, cost=resCost(r,l);
     const c=getCard("res:"+r.id,()=>buyRes(r));
@@ -2285,7 +3185,7 @@ function renderPrestige(){
 }
 
 function renderAuto(){
-  html($("#auTitle"),t("au_title",'<b style="color:var(--violet)">'+fmt(S.am)+"</b>"));
+  html($("#auTitle"),t("au_title",'<b style=\"color:var(--violet)\">'+fmt(S.am)+"</b>"));
   syncList($("#auList"),AUTOS.map(a=>{
     const l=alvl(a.id), maxed=l>=a.max, cost=autoCost(a,l), coupe=l>0&&!aOn(a.id);
     const c=getAutoCard(a);
@@ -2305,7 +3205,10 @@ function renderAuto(){
   const poss=SWROWS.filter(x=>alvl(x.a.id)>0);
   poss.forEach(({a,r})=>{
     const coupe=!aOn(a.id);
-    const pause=enPause(a), verrou=verrouille(a);
+    // le relanceur est le seul suspendu par un défi
+    const susp=a.id==="cycle"&&!!S.chal&&!S.autoOff[a.id];
+    const pause=susp?true:enPause(a);
+    const verrou=susp?true:verrouille(a);
     txt(r.q.ico,a.ico); txt(r.q.nm,tr(a.nm));
     txt(r.q.st,etatTexte(a));
     cls(r,"off",coupe&&!pause); cls(r,"pause",!!pause);
@@ -2335,7 +3238,8 @@ function renderAuto(){
     }
     const cible=autoGenId();
     if(GENSEL.value!==cible)GENSEL.value=cible;
-    const g=autoGen(), cout=genCost(g,1), manque=cout-S.ore;
+    QGEN.forEach(b=>cls(b,"on",autoQte()===b._q));
+    const g=autoGen(), n=autoQte(), cout=genCost(g,n), manque=cout-S.ore;
     if(manque<=0) html($("#auGenNow"),t("au_gen_ready",fmt(cout)));
     else{
       const r=perSec();
@@ -2376,6 +3280,46 @@ function renderAchs(){
   });
 }
 
+function renderChals(){
+  /* Avant le 6e cycle l'onglet est consultable mais vide : on remplace la liste
+     par le décompte, sinon le joueur verrait six cartes sur lesquelles cliquer
+     ne ferait rien. */
+  const ouvert=chalOuvert(), n=chalReste();
+  show($("#chLock"),!ouvert); show($("#chHint"),ouvert);
+  show($("#chList"),ouvert); show($(".chsec"),ouvert);
+  if(!ouvert){ html($("#chLock"),t(n===1?"ch_soon1":"ch_soon",n,CHAL_CYCLES)); return }
+  const faits=CHALS.filter(c=>chalFait(c.id)).length;
+  txt($("#chHeadT"),"🎯 "+t("tab_ch"));
+  html($("#chHeadN"),faits+"/"+CHALS.length);
+  cls($("#chHeadN"),"full",faits===CHALS.length);
+  CHNODES.forEach(({c,d})=>{
+    const gagne=chalFait(c.id), actif=S.chal===c.id, autre=!!S.chal&&!actif;
+    txt(d.q.ico,c.ico); txt(d.q.nm,tr(c.nm));
+    txt(d.q.rule,tr(c.ds)); txt(d.q.rw,"🏅 "+tr(c.rw));
+    txt(d.q.goal,t("ch_goal",fmt(actif?butActif():chalBut(c))));
+    const et=gagne?"win":actif?"run":autre?"lock":"go";
+    txt(d.q.tag,t(gagne?"ch_won":actif?"ch_running":autre?"ch_locked":"ch_go"));
+    d.q.tag.className="chtag "+et;
+    // un défi réussi ou déjà en cours, et tous les autres pendant un défi :
+    // rien n'est cliquable, la carte le montre au lieu de rater le clic
+    cls(d,"done",gagne); cls(d,"run",actif);
+    cls(d,"locked",autre&&!gagne);
+  });
+}
+/* Bandeau du défi en cours — mis à jour à chaque image comme l'en-tête, parce
+   que la barre de progression suit `runOre`. */
+function majChalBar(){
+  const c=chalCur(), bar=$("#chalBar");
+  if(!c){ cls(bar,"on",false); return }
+  const but=butActif(), gagne=chalFait(c.id), p=Math.min(1,S.runOre/but);
+  cls(bar,"on",true); cls(bar,"win",gagne);
+  txt($("#cbIco"),gagne?"🏅":c.ico);
+  txt($("#cbNm"),tr(c.nm));
+  txt($("#cbGoal"),gagne?t("ch_done_bar"):t("ch_prog",fmt(S.runOre),fmt(but)));
+  const w=(p*100).toFixed(1)+"%";
+  const f=$("#cbFill"); if(f._w!==w){f._w=w;f.style.width=w}
+}
+
 function renderStats(){
   STROWS.forEach(r=>txt(r.q,r.f()));
 }
@@ -2407,9 +3351,25 @@ function renderHeader(){
   txt($("#hRate"),fmt(rate)+"/s");
   txt($("#hAm"),fmt(S.am));
   txt($("#hMult"),"×"+fmt(globalMult()));
-  html($("#sOre"),t("sub_total",fmt(S.totalOre)));
+  /* Le minerai du cycle EN COURS d'abord, le total de la partie ensuite : le
+     premier dit où en est le cycle (et donc quand relancer), le second n'est
+     qu'un compteur de carrière. Ils vivent dans la même tuile parce qu'ils se
+     lisent l'un par rapport à l'autre. */
+  html($("#sOre"),tm("sub_total",fmt(S.runOre),fmt(S.totalOre)));
+  $("#sOre").title=t("sub_total_t");   // l'intitulé disparaît sur téléphone
   html($("#sRate"),t("sub_click",fmt(cv)));
-  html($("#sAm"),g>=1?t("sub_next",fmt(g),S.prestiges+1):t("sub_cycle",S.prestiges+1));
+  /* Ce qui manque pour l'antimatière SUIVANTE : c'est le seul chiffre qui dit
+     où en est vraiment le cycle. Le seuil est déjà connu du jeu (amMinerai),
+     on ne fait que le soustraire au minerai déjà extrait. */
+  const manque=Math.max(0,amMinerai(g+1)-S.runOre);
+  const mq=manque>0?t("sub_manque",fmt(manque)):"";
+  /* Variantes courtes sur écran étroit : mesuré, « cycle #5 · −5.67B » demande
+     94 px pour 79 disponibles à 320 px. C'est le mot « cycle » qui saute, pas
+     son numéro. Seul cas encore trop long : « +24 · #5 · −56.9T » sur un écran
+     de 320 px (96 px demandés), où la fin est coupée par des points de
+     suspension — l'infobulle donne le texte entier. */
+  html($("#sAm"),g>=1?tm("sub_next",fmt(g),S.prestiges+1,mq):tm("sub_cycle",S.prestiges+1,mq));
+  $("#sAm").title=t("sub_am_t");
   const full=[];
   if(m.am>1.0001)full.push(t("f_am",fmt(m.am)));
   if(m.ach>1.0001)full.push(t("f_ach",m.ach.toFixed(2)));
@@ -2424,12 +3384,16 @@ function renderHeader(){
   if(b._n!==S.buffs.length){b._n=S.buffs.length;b.textContent="";
     want.forEach(()=>{const d=document.createElement("div");d.className="buff";b.appendChild(d)})}
   want.forEach((v,i)=>txt(b.children[i],v));
+  // Silence radio : le compte à rebours tourne toujours en coulisses, mais
+  // l'annoncer serait mentir — rien ne sortira de tout le cycle.
+  const muetAnom=chalRegle("noanom");
   const resteAnom=(S.nextAnom-Date.now())/1000;
-  txt($("#anomChip .acv"), $("#anomaly").style.display==="block" ? t("chip_now")
+  txt($("#anomChip .acv"), muetAnom ? t("chip_none")
+    : $("#anomaly").style.display==="block" ? t("chip_now")
     : resteAnom<1 ? t("chip_soon") : fmtTime(resteAnom));
   // signal discret : l'anneau de la planète passe au doré quand une anomalie approche
-  cls(document.body,"anomsoon",
-      S.nextAnom-Date.now()<10000 || $("#anomaly").style.display==="block");
+  cls(document.body,"anomsoon", !muetAnom &&
+      (S.nextAnom-Date.now()<10000 || $("#anomaly").style.display==="block"));
 }
 
 let currentTab="gen";
@@ -2439,14 +3403,27 @@ function render(){
   else if(currentTab==="up")renderUps();
   else if(currentTab==="pr")renderPrestige();
   else if(currentTab==="au")renderAuto();
+  else if(currentTab==="ch")renderChals();
   else if(currentTab==="ac")renderAchs();
   else renderStats();
-  if(show($("#tabAu"),S.amTotal>0))majNavFade();   // l'onglet apparaît au premier cycle
+  majChalBar();
+  // Recherche est inutilisable pendant un défi (achats bloqués) : onglet grisé
+  // ET bandeau en tête de panneau, parce qu'un onglet grisé seul n'explique pas
+  // pourquoi. Automatisation reste pleinement utilisable — seul le relanceur de
+  // cycle est suspendu, ce que dit le bandeau, sans griser l'onglet.
+  const bloque=!!S.chal;
+  cls($$(".tab").find(x=>x.dataset.p==="pr"),"chdim",bloque);
+  show($("#auLock"),bloque&&alvl("cycle")>0); show($("#prLock"),bloque);
+  let nouv=show($("#tabAu"),S.amTotal>0);           // l'onglet apparaît au premier cycle
+  if(show($("#tabCh"),chalVisible()))nouv=true;     // celui des défis aussi, mais grisé
+  cls($("#tabCh"),"chdim",!chalOuvert());           // jusqu'au 6e cycle
+  if(nouv)majNavFade();
   const n=upBadge(), badge=$("#bUp");
   txt(badge,n); cls(badge,"hidden",n===0);
 }
-const TAB_ORDER=["gen","up","pr","au","ac","st"];
-const tabsVus=()=>TAB_ORDER.filter(p=>p!=="au"||S.amTotal>0);
+const TAB_ORDER=["gen","up","pr","au","ch","ac","st"];
+const tabsVus=()=>TAB_ORDER.filter(p=>
+  (p!=="au"||S.amTotal>0)&&(p!=="ch"||chalVisible()));
 function activerOnglet(p){
   const tab=$$(".tab").find(x=>x.dataset.p===p);
   if(!tab||currentTab===p)return;
@@ -2545,7 +3522,14 @@ bindAction($("#navArrR"),()=>scrollerNav(1));
     if(i>=0&&i<ord.length)activerOnglet(ord[i]);
   },{passive:true});
 })();
-$$(".lang").forEach(b=>bindAction(b,()=>setLang(b.dataset.lang)));
+buildLangMenu();
+bindAction($("#langBtn"),()=>ouvrirLang(!$("#langSel").classList.contains("open")));
+/* Fermer au clic ailleurs : en capture, pour que le menu se referme même quand
+   le clic atterrit sur un élément qui arrête la propagation. */
+addEventListener("pointerdown",e=>{
+  if(!$("#langSel").contains(e.target))ouvrirLang(false);
+},true);
+addEventListener("keydown",e=>{if(e.key==="Escape")ouvrirLang(false)});
 
 /* libellés d'onglets courts/longs selon la largeur */
 let rzT=null;
@@ -2600,16 +3584,23 @@ function runAutos(dt){
     if(autoAcc.contre>=CONTRE_S){
       autoAcc.contre=0;
       /* Une seule cible, celle choisie par le joueur. Pas d'arbitrage à faire
-         avec l'Ingénieur : ils ne tournent jamais en même temps. */
-      const g=autoGen(), c=g?genCost(g,1):Infinity;
-      if(c<=S.ore){ S.ore-=c; S.gens[g.id]=(S.gens[g.id]||0)+1; }
+         avec l'Ingénieur : ils ne tournent jamais en même temps.
+         La quantité suit le réglage : on achète le lot entier ou rien, comme le
+         bouton ×N du joueur — pas d'achat partiel qui viderait la réserve sans
+         atteindre le lot demandé. */
+      const g=autoGen(), n=autoQte(), c=g?genCost(g,n):Infinity;
+      if(c<=S.ore){ S.ore-=c; S.gens[g.id]=(S.gens[g.id]||0)+n; }
     }
   }
 
   if(aOn("sonde")&&$("#anomaly").style.display==="block"
      &&Date.now()-anomNee>=SONDE_S*1000){ S.asonde=(S.asonde||0)+1; collectAnom(true); }
 
-  if(aOn("cycle")){
+  // Le relanceur reste en pause pendant un défi : sinon il remettrait `runOre`
+  // à zéro dès le seuil atteint, effaçant la progression en boucle et sans rien
+  // dire. C'est le seul automate qui contourne le mécanisme du défi au lieu de
+  // le subir.
+  if(aOn("cycle")&&!S.chal){
     if(amGain()>=cycSeuil()){ S.acyc=(S.acyc||0)+1; doPrestige(true); }
   }
 }
@@ -2623,9 +3614,13 @@ function step(){
   creditElapsed(dt);
   runAutos(dt);
   if(now>=S.nextAnom&&$("#anomaly").style.display!=="block"){
-    spawnAnom(); S.nextAnom=now+anomInterval();
+    // Silence radio : le compte à rebours continue de tourner mais rien
+    // n'apparaît. Reprogrammer plutôt que geler `nextAnom` évite qu'une volée
+    // d'anomalies ne sorte d'un coup à la fin du défi.
+    if(!chalRegle("noanom"))spawnAnom();
+    S.nextAnom=now+anomInterval();
   }
-  acc+=dt; if(acc>=1){acc=0;checkAchs()}
+  acc+=dt; if(acc>=1){acc=0;checkAchs();checkChal()}
   uiAcc+=dt; if(uiAcc>=0.2){uiAcc=0;render()}
   if(now-S.lastSave>20000)save();
 }
@@ -2643,7 +3638,7 @@ function load(){
   const raw=readSave(); if(!raw)return false;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(raw))));
-    S=Object.assign(NEW(),d); migrerExclus(d); normExclus();
+    S=Object.assign(NEW(),d); migrerExclus(d); normExclus(); migrerBest(d);
     S.buffs=(S.buffs||[]).filter(b=>b.until>Date.now());
     // gains hors-ligne (même règle que le retour d'arrière-plan)
     const away=(Date.now()-(d.lastSave||Date.now()))/1000;
@@ -2653,24 +3648,218 @@ function load(){
     return true;
   }catch(e){return false}
 }
-bindAction($("#bSave"),()=>{save();toast(t("t_saved"))});
-bindAction($("#bReset"),()=>{
-  if(confirm(t("confirm_reset"))){
-    S=NEW(); save(); render(); toast(t("t_newgame"));
-  }
-});
-bindAction($("#bExport"),()=>{
-  save(); $("#mText").value=readSave()||""; $("#modal").classList.add("on"); $("#mText").select();
-});
 bindAction($("#mClose"),()=>$("#modal").classList.remove("on"));
+bindAction($("#askOk"),()=>askFin(true));
+bindAction($("#askNo"),()=>askFin(false));
 bindAction($("#mImport"),()=>{
   const v=$("#mText").value.trim(); if(!v)return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(v))));
-    S=Object.assign(NEW(),d); migrerExclus(d); normExclus(); S.lastTick=Date.now(); save(); render();
+    S=Object.assign(NEW(),d); migrerExclus(d); normExclus(); migrerBest(d);
+    S.lastTick=Date.now(); save(); render();
     $("#modal").classList.remove("on"); toast(t("t_imported"));
-  }catch(e){alert(t("bad_code"))}
+  }catch(e){toast(t("bad_code"),"red")}
 });
+/* ---------- menu, changelog, à propos, tutoriel ----------
+   Les liens sortants sont deux constantes : elles sont les seules choses de ce
+   fichier qui pointent hors du jeu, autant qu'elles soient trouvables. */
+const LIEN_CODE="https://github.com/mephissto/orbital-colony";
+const LIEN_PATREON="https://www.patreon.com/cw/mephissto";
+const LIEN_LOG=LIEN_CODE+"/blob/main/CHANGELOG.md";
+const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
+
+/* Extrait du changelog. Le fichier complet fait 37 Ko par langue et le jeu doit
+   rester jouable hors connexion : on embarque les huit dernières versions,
+   résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
+   livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
+const LOG=[
+ {v:"3.0.28", nm:{fr:"Les défis",en:"Challenges"},
+  d:{fr:"Six défis qui cassent chacun une règle du jeu, avec un objectif calculé sur ton meilleur cycle et une récompense définitive, équilibrés par simulation d'une vraie partie. Le clic vaut enfin quelque chose en début de partie. Un tutoriel s'ouvre à la première partie, et les boutons du haut sont regroupés derrière une roue crantée.",
+     en:"Six challenges, each breaking one rule of the game, with a goal computed from your best cycle and a permanent reward, balanced by simulating a real save. Clicking is finally worth something early on. A tutorial opens on the first run, and the top buttons are grouped behind a gear."}},
+ {v:"2.35.3", nm:{fr:"Le Contremaître achète, sur deux lignes",en:"The Foreman buys, on two lines"},
+  d:{fr:"Le manque de minerai passe à la ligne au lieu de casser la mise en page sur les écrans étroits.",
+     en:"The missing-ore line wraps instead of breaking the layout on narrow screens."}},
+ {v:"2.35.2", nm:{fr:"Une case pour ne plus être rappelé",en:"A box to stop being asked"},
+  d:{fr:"L'invitation à installer le jeu se refuse définitivement, pastille comprise.",
+     en:"The install prompt can now be refused for good, floating pill included."}},
+ {v:"2.35.0", nm:{fr:"Le jeu propose son installation",en:"The game offers to install itself"},
+  d:{fr:"Sur mobile, une fenêtre explique comment installer le jeu en application, avec les modes d'emploi Android et iOS.",
+     en:"On mobile, a dialog explains how to install the game as an app, with both Android and iOS instructions."}},
+ {v:"2.34.0", nm:{fr:"Contremaître et Ingénieur échangent leur prix",en:"Foreman and Engineer swap prices"},
+  d:{fr:"L'automate le plus utile en premier n'était pas le moins cher.",
+     en:"The automation you want first was not the cheapest one."}},
+ {v:"2.33.0", nm:{fr:"L'antimatière revient à son rythme d'avant",en:"Antimatter back to its former pace"},
+  d:{fr:"Le gain avait dérivé vers le haut au fil des réglages ; il retrouve sa courbe d'origine.",
+     en:"The gain had drifted upwards over successive tweaks; it is back on its original curve."}},
+ {v:"2.32.0", nm:{fr:"Les Bras servo-assistés servent enfin",en:"Servo-assisted arms finally matter"},
+  d:{fr:"Ils multipliaient une base qui ne grandit jamais : douze niveaux payés ne changeaient rien. Ils portent maintenant sur le clic entier.",
+     en:"They multiplied a base that never grows: twelve paid levels changed nothing. They now apply to the whole click."}},
+ {v:"2.31.0", nm:{fr:"Le clic ne dépasse plus la production",en:"A click no longer beats your output"},
+  d:{fr:"Un clic valait jusqu'à quatre secondes de production : les résonateurs sont redescendus.",
+     en:"A click was worth up to four seconds of output: the resonators were brought back down."}},
+];
+
+/* Trois groupes séparés : ta partie (ce qui la touche), l'apprentissage, puis
+   les informations. Reset ferme le groupe de la partie, seul sur sa ligne et en
+   rouge — on ne le vise pas par erreur en allant vers Sauvegarder. */
+/* Intitulés des trois groupes, dans le style des sections des onglets :
+   icône + titre en petites capitales cyan, souligné. */
+const MGRP=[{g:1,ico:"🎮",k:"mg_game"},{g:2,ico:"💡",k:"mg_learn"},{g:3,ico:"📖",k:"mg_info"}];
+const MENU=[
+ {id:"save",  g:1, ico:"💾", k:"save",    f:()=>{save();toast(t("t_saved"))}},
+ {id:"expo",  g:1, ico:"⇅",  k:"export",  f:ouvrirExport},
+ {id:"reset", g:1, ico:"🗑️", k:"reset",   danger:true, f:()=>{
+    // la confirmation se pose par-dessus le menu, comme les autres fenêtres :
+    // annuler doit ramener là d'où l'on vient
+    demande(t("reset_t"),t("confirm_reset"),()=>{
+      ferme("#menu"); S=NEW(); S.tuto=1; save(); render(); toast(t("t_newgame"));
+    });
+ }},
+ {id:"tuto",  g:2, ico:"🎓", k:"m_tuto",  f:()=>tutoOuvre(false)},
+ {id:"log",   g:3, ico:"📜", k:"m_log",   f:()=>ouvre("#chlog")},
+ {id:"about", g:3, ico:"ℹ️", k:"m_about", f:()=>ouvre("#about")},
+];
+const ouvre=sel=>$(sel).classList.add("on");
+const ferme=sel=>$(sel).classList.remove("on");
+function ouvrirExport(){
+  save(); $("#mText").value=readSave()||"";
+  ouvre("#modal"); $("#mText").select();
+}
+function buildMenu(){
+  const g=$("#mGrid"); g.innerHTML="";
+  let grp=null, num=0;
+  MENU.forEach(m=>{
+    if(m.g!==num){
+      num=m.g;
+      const h=document.createElement("h3"); h.className="sec msec";
+      h.dataset.g=num; g.appendChild(h);
+      grp=document.createElement("div"); grp.className="mgrp"; g.appendChild(grp);
+    }
+    const b=document.createElement("button");
+    b.className="mitem"+(m.danger?" danger":""); b.type="button";
+    b.dataset.m=m.id;                      // adressable par identité, pas par rang
+    b.innerHTML='<span class="mi">'+m.ico+'</span><span class="ml"></span>';
+    b.ql=b.querySelector(".ml"); b._k=m.k;
+    bindAction(b,m.f); grp.appendChild(b);
+  });
+  const l=$("#logList"); l.innerHTML="";
+  LOG.forEach(x=>{
+    const d=document.createElement("div"); d.className="logv";
+    d.innerHTML='<div class="logvh"><span class="logvn">'+x.v+'</span>'+
+                '<span class="logvt"></span></div><div class="logvd"></div>';
+    d.qt=d.querySelector(".logvt"); d.qd=d.querySelector(".logvd"); d._x=x;
+    l.appendChild(d);
+  });
+  const a=$("#abList"); a.innerHTML="";
+  const FLECHE='<svg class="aext" viewBox="0 0 24 24" aria-hidden="true">'+
+               '<path d="M7 17 17 7M9 7h8v8"/></svg>';
+  const lignes=[
+   {ico:"🛠️", v:"ab_code",    href:LIEN_CODE},
+   {ico:"💜", v:"ab_patreon", href:LIEN_PATREON},
+   {ico:"✍️", v:"ab_auth"},
+   {ico:"⚖️", v:"ab_lic",     href:LIEN_CODE+"/blob/main/LICENSE"},
+   {ico:"🔖", ver:true},
+  ];
+  lignes.forEach(x=>{
+    const e=document.createElement(x.href?"a":"div");
+    e.className="abrow";
+    if(x.href){e.href=x.href;e.target="_blank";e.rel="noopener noreferrer"}
+    e.innerHTML='<span class="ai">'+x.ico+'</span><span class="av"></span>'+(x.href?FLECHE:"");
+    e.qv=e.querySelector(".av"); e._x=x; a.appendChild(e);
+  });
+}
+/* Les textes des trois fenêtres suivent la langue : ils sont remplis au moment
+   où on les ouvre plutôt qu'à chaque image — rien n'y bouge autrement. */
+function majMenu(){
+  txt($("#wnVer"),"v"+VERSION);
+  $$("#mGrid .mitem").forEach(b=>txt(b.ql,t(b._k)));
+  $$("#mGrid .msec").forEach(h=>{
+    const x=MGRP.find(y=>String(y.g)===h.dataset.g);
+    if(x)txt(h,x.ico+" "+t(x.k));
+  });
+  $$("#logList .logv").forEach(d=>{txt(d.qt,tr(d._x.nm));txt(d.qd,tr(d._x.d))});
+  $("#logFull").href=(LANG==="fr")?LIEN_LOG:LIEN_LOG_EN;
+  $$("#abList .abrow").forEach(e=>{
+    if(e._x.ver)txt(e.qv,"v"+VERSION+(estDev()?" — DEV":""));
+    else txt(e.qv,t(e._x.v));
+  });
+}
+
+/* ---------- tutoriel ----------
+   Cinq écrans. Le premier pose le décor — il donne un sens à ce qu'on fait
+   avant d'expliquer comment on le fait. */
+const TUTO=[
+ {ico:"🛰️", t:"tu1_t", lore:true},
+ {ico:"⛏️", t:"tu2_t", d:"tu2_d"},
+ {ico:"🏗️", t:"tu3_t", d:"tu3_d"},
+ {ico:"⚡",  t:"tu4_t", d:"tu4_d"},
+ {ico:"♻️", t:"tu5_t", d:"tu5_d"},
+];
+let tuI=0, tuPremier=false;
+function tutoOuvre(premier){
+  tuPremier=!!premier; tuI=0; majTuto(); ouvre("#tuto");
+}
+function tutoVa(d){
+  const n=Math.min(TUTO.length-1,Math.max(0,tuI+d));
+  if(n===tuI)return; tuI=n; majTuto();
+}
+function majTuto(){
+  const e=TUTO[tuI];
+  txt($("#tuIco"),e.ico); txt($("#tuTitre"),t(e.t));
+  html($("#tuTxt"),e.lore?'<div class="lore">'+t("lore")+'</div>':t(e.d));
+  const d=$("#tuDots"); 
+  if(d.children.length!==TUTO.length){
+    d.innerHTML=""; TUTO.forEach(()=>{const i=document.createElement("i");i.className="tudot";d.appendChild(i)});
+  }
+  [...d.children].forEach((x,i)=>cls(x,"on",i===tuI));
+  $("#tuPrev").disabled=(tuI===0);
+  $("#tuNext").disabled=(tuI===TUTO.length-1);
+}
+function tutoFerme(){
+  ferme("#tuto");
+  S.tuto=1; save();
+  // L'invitation à installer prend le relais, mais seulement au tout premier
+  // lancement : deux fenêtres empilées d'entrée, c'est une de trop.
+  if(tuPremier){ tuPremier=false; setTimeout(majPwa,500); }
+}
+bindAction($("#bMenu"),()=>{majMenu();ouvre("#menu")});
+bindAction($("#menuClose"),()=>ferme("#menu"));
+bindAction($("#logClose"),()=>ferme("#chlog"));
+bindAction($("#abClose"),()=>ferme("#about"));
+bindAction($("#tuClose"),tutoFerme);
+bindAction($("#tuPrev"),()=>tutoVa(-1));
+bindAction($("#tuNext"),()=>tutoVa(1));
+/* Glissement du doigt : le même geste que dans n'importe quel diaporama. Seuil
+   à 45 px et trajet plutôt horizontal que vertical, sinon un défilement de la
+   fenêtre (le lore dépasse sur un petit écran) changerait d'écran au passage. */
+(function glisse(){
+  const z=$("#tuto"); let x0=null,y0=null;
+  z.addEventListener("touchstart",e=>{
+    const t0=e.changedTouches[0]; x0=t0.clientX; y0=t0.clientY;
+  },{passive:true});
+  z.addEventListener("touchend",e=>{
+    if(x0===null)return;
+    const t1=e.changedTouches[0], dx=t1.clientX-x0, dy=t1.clientY-y0;
+    x0=null;
+    if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.5)tutoVa(dx<0?1:-1);
+  },{passive:true});
+})();
+
+/* ---------- fermer une fenêtre en cliquant à côté ----------
+   Le fond sombre est la cible : `e.target===fond` ne se déclenche donc pas
+   quand le clic est parti d'un bouton à l'intérieur. La confirmation (#ask) en
+   est exclue à dessein — on n'annule pas une action irréversible par un clic
+   distrait — et l'invitation à installer garde son propre chemin de fermeture,
+   qui mémorise le refus. */
+[["#menu",()=>ferme("#menu")],
+ ["#chlog",()=>ferme("#chlog")],
+ ["#about",()=>ferme("#about")],
+ ["#modal",()=>ferme("#modal")],
+ ["#tuto",tutoFerme]].forEach(([sel,f])=>{
+  const z=$(sel);
+  z.addEventListener("click",e=>{ if(e.target===z)f() });
+});
+
 /* ---------- invitation à installer la PWA ----------
    Cible : un téléphone ou une tablette qui joue dans le navigateur. On écarte
    donc les ordinateurs (pointer:fine) et tout ce qui tourne déjà en mode
@@ -2697,8 +3886,19 @@ function pwaInstallee(){
 const pwaMobile=()=>matchMedia("(pointer:coarse)").matches&&matchMedia("(max-width:1024px)").matches;
 function pwaEligible(){return pwaMobile()&&!pwaInstallee()}
 function pwaPastille(on){ cls($("#pwaTab"),"on",on); cls(document.body,"pwatab",on) }
+/* Une fenêtre n'a qu'une action accentuée, et c'est la dernière à droite.
+   Ici « Installer » la porte quand il existe — mais il n'apparaît que sur les
+   navigateurs qui exposent `beforeinstallprompt`. Partout ailleurs, iOS en
+   tête, « Fermer » est le seul bouton de la fenêtre : il devient alors l'action
+   principale, sans quoi la fenêtre était la seule du jeu à n'avoir aucun bouton
+   coloré. */
+function majPwaBoutons(){
+  const install=getComputedStyle($("#pwaGo")).display!=="none";
+  cls($("#pwaNo"),"prim",!install);
+}
 function pwaOuvre(){
   $("#pwaNev").checked=false;                                // la case ne se souvient pas d'un refus précédent
+  majPwaBoutons();
   $("#pwa").classList.add("on"); pwaPastille(false);
 }
 function pwaFerme(){
@@ -2716,21 +3916,34 @@ function majPwa(){
   pwaOuvre();
 }
 window.addEventListener("beforeinstallprompt",e=>{
-  e.preventDefault(); pwaPrompt=e; show($("#pwaGo"),true);
+  e.preventDefault(); pwaPrompt=e; show($("#pwaGo"),true); majPwaBoutons();
 });
 window.addEventListener("appinstalled",()=>{
   pwaEcrit("ok"); $("#pwa").classList.remove("on"); pwaPastille(false);
 });
 bindAction($("#pwaNo"),pwaFerme);
+bindAction($("#cbQuit"),()=>{
+  const c=chalCur(); if(!c)return;
+  demande(t(chalFait(c.id)?"ch_quit_t_win":"ch_quit_t"),bilanSortie(c),()=>quitterChal());
+});
 bindAction($("#pwaTab"),pwaOuvre);
 bindAction($("#pwaGo"),()=>{
   if(!pwaPrompt)return;
-  const p=pwaPrompt; pwaPrompt=null; show($("#pwaGo"),false);
+  const p=pwaPrompt; pwaPrompt=null; show($("#pwaGo"),false); majPwaBoutons();
   p.prompt();
   p.userChoice.then(r=>{ if(r&&r.outcome==="accepted")pwaEcrit("ok"); else pwaFerme() });
 });
-// on laisse la première image se peindre : l'invitation ne doit pas précéder le jeu
-setTimeout(majPwa,1800);
+/* Premier lancement : le tutoriel d'abord, l'invitation à installer ensuite —
+   c'est tutoFerme() qui la déclenche. Une partie déjà commencée (importée, ou
+   d'une version antérieure au tutoriel) ne le redéclenche pas : `tuto` vaut 0
+   dans ces sauvegardes-là, on regarde donc aussi si quelque chose a déjà été
+   joué. On laisse la première image se peindre dans les deux cas : rien ne doit
+   précéder le jeu à l'écran. */
+const partieVierge=()=>!S.tuto&&!S.totalOre&&!S.prestiges&&!S.clicks;
+setTimeout(()=>{
+  if(partieVierge())tutoOuvre(true);
+  else{ if(!S.tuto)S.tuto=1; majPwa(); }
+},1800);
 matchMedia("(display-mode: standalone)").addEventListener?.("change",majPwa);
 
 window.addEventListener("beforeunload",save);

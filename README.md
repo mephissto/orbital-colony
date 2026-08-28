@@ -2,26 +2,30 @@
 
 🇫🇷 Français · [🇬🇧 English](README.en.md)
 
-Idle game spatial, bilingue FR / EN, installable en application (PWA) et jouable
-hors connexion. Tout le jeu tient dans `index.html` : aucune dépendance, aucun
-serveur, aucune donnée qui sort de ton navigateur.
+Idle game spatial, bilingue EN / FR (anglais par défaut, français détecté
+automatiquement), installable en application (PWA) et jouable hors connexion.
+Tout le jeu tient dans `index.html` : aucune dépendance, aucun serveur, aucune
+donnée qui sort de ton navigateur.
 
 Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
 
-**Jouer en ligne :** [orbital-colony.mephissto.fr](https://orbital-colony.mephissto.fr/) ·
-[mephissto.github.io/orbital-colony](https://mephissto.github.io/orbital-colony/)
+**Jouer en ligne :** [orbital-colony.app](https://orbital-colony.app/)
+· version de développement : [dev.orbital-colony.app](https://dev.orbital-colony.app/)
 
 ---
 
 ## Sommaire
 
 - [Fichiers et déploiement](#fichiers-et-déploiement)
+- [Le monde du jeu](#le-monde-du-jeu)
+- [Menu, tutoriel et à propos](#menu-tutoriel-et-à-propos)
 - [Boucle de jeu](#boucle-de-jeu)
 - [Le clic](#le-clic)
 - [Les structures](#les-structures)
 - [Les améliorations](#les-améliorations)
 - [Les anomalies](#les-anomalies)
 - [Le multiplicateur global](#le-multiplicateur-global)
+- [Les défis](#les-défis)
 - [Le prestige et l'antimatière](#le-prestige-et-lantimatière)
 - [Les recherches](#les-recherches)
 - [L'automatisation](#lautomatisation)
@@ -51,7 +55,8 @@ Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
 | `ROADMAP.md` | ce qui est prévu pour la suite, et pourquoi |
 
 Tous les fichiers vont **à la racine du dépôt**, à plat. L'installation exige
-HTTPS — GitHub Pages et Netlify le fournissent automatiquement.
+HTTPS — Cloudflare Pages, GitHub Pages et Netlify le fournissent
+automatiquement.
 
 **Installer :** Chrome Android → menu ⋮ → « Installer l'application » ; Safari
 iOS → Partager → « Sur l'écran d'accueil » ; sur ordinateur, l'icône
@@ -100,6 +105,81 @@ tu modifies **les icônes ou le manifeste**, incrémente `CACHE` en haut de
 
 ---
 
+## Le monde du jeu
+
+Le nom du jeu n'est pas décoratif : il décrit la boucle.
+
+> Tu ne construis pas sur un monde. Tu construis **autour**.
+>
+> La colonie tourne à quatre cents kilomètres au-dessus d'une planète morte,
+> accrochée à un astéroïde capturé dans la même orbite qu'elle. Rien ne se pose,
+> rien ne repart : tout ce que tu bâtis reste suspendu là, entre le vide et la
+> gravité.
+>
+> Et l'orbite se dégrade. Toujours. Chaque colonie finit par retomber, et il ne
+> reste d'elle qu'une poignée d'antimatière arrachée à sa propre chute — de quoi
+> bâtir la suivante un peu plus haut, un peu plus vite.
+>
+> C'est de là que vient le nom : **une colonie orbitale n'est jamais finie, elle
+> est seulement en train de tomber moins vite que la précédente.**
+
+Ce texte est la clé `lore` du dictionnaire `T`, en français et en anglais. Il
+ouvre le tutoriel et se relit dans « À propos ». Il justifie aussi le prestige :
+relancer un cycle n'est pas une convention de genre, c'est l'orbite qui cède.
+
+---
+
+## Menu, tutoriel et à propos
+
+Jusqu'à la 2.35 la barre du haut portait trois boutons — Sauvegarder,
+Export / Import, Reset. La 3.0.28 les regroupe derrière **un seul bouton Menu** :
+à cinq entrées la barre ne tenait plus sur téléphone, et Reset y voisinait
+dangereusement avec Sauvegarder.
+
+Le menu contient un résumé des nouveautés (clé `wn_d`, trois lignes, à réécrire
+à chaque version notable) puis six entrées : Sauvegarder, Export / Import,
+Tutoriel, Changelog, À propos, et Reset — seule action irréversible, donc seule
+en rouge, seule sur toute la largeur, et en dernier.
+
+**Ordre d'empilement des fenêtres**, à respecter si on en ajoute une :
+
+| Fenêtre | z-index |
+|---|---|
+| Menu | 82 |
+| Export / Import, Changelog, À propos | 84 |
+| Tutoriel | 86 |
+| Invitation à installer (PWA) | 90 |
+| Confirmation (`demande()`) | 95 |
+
+L'export s'ouvre **depuis** le menu : à 80 il s'ouvrait derrière lui, visible
+mais inutilisable, le menu interceptant les clics.
+
+**Changelog** — le tableau `LOG` embarque les huit dernières versions résumées
+en une phrase, bilingues, et un lien mène au `CHANGELOG.md` complet du dépôt.
+Le fichier complet fait 37 Ko par langue et le jeu doit rester jouable hors
+connexion : l'extrait est la contrepartie assumée, à tenir à jour à chaque
+livraison.
+
+**Tutoriel** — cinq écrans (`TUTO`) : le lore, l'astéroïde, les structures, les
+améliorations et anomalies, le cycle. Il s'ouvre **tout seul à la première
+partie** et se relance depuis le menu.
+
+Deux points délicats :
+
+- Il passe **avant** l'invitation à installer la PWA. `tutoFerme()` appelle
+  `majPwa()` seulement si le tutoriel avait été ouvert automatiquement — deux
+  fenêtres empilées au premier lancement, c'est une de trop.
+- Une partie déjà commencée ne le déclenche pas. Le champ `S.tuto` n'existe pas
+  dans les sauvegardes antérieures à la 3.0.28 et y vaut donc 0 : `partieVierge()`
+  regarde aussi `totalOre`, `prestiges` et `clicks`, et le drapeau est posé
+  immédiatement pour ne plus jamais y revenir.
+
+**À propos** — le lore, puis cinq lignes : code source, Patreon, auteur, licence
+et version. Les deux liens sortants sont les constantes `LIEN_CODE` et
+`LIEN_PATREON`, en tête du bloc, et portent `rel="noopener noreferrer"`.
+
+---
+
 ## Boucle de jeu
 
 Tu extrais du **minerai**, la seule ressource courante. Le minerai sert à
@@ -132,12 +212,21 @@ est la somme de deux termes, le tout multiplié par le multiplicateur global :
 clic = ( frappe + écho ) × améliorations de clic × Bras servo × bonus de clic
 
   frappe = 1 × multiplicateur global
-  écho   = production/s × meilleur résonateur possédé
+  écho   = production/s × max( meilleur résonateur possédé , écho de base 7 % )
 ```
 
+- **Écho de base : 7 %** (3.0.28). Sans lui, l'écho n'existe qu'une fois le
+  premier résonateur acheté (200 000 de minerai) et la frappe, une base de 1 qui
+  ne grandit jamais, décroche immédiatement : mesuré sur une partie neuve, le
+  clic restait à 1–1,5 pendant que la production atteignait 246/s, soit **0,006 s
+  de production par clic** au bout d'une heure. Avec l'écho de base le clic vaut
+  **~0,10 s de production** en permanence dès la première minute. Il est appliqué
+  **dans** l'écho et non comme plancher sur le résultat : un plancher sur la
+  valeur finale masquerait l'effet des améliorations de clic, exactement le
+  défaut corrigé en 2.30.0.
 - **Améliorations de clic** — **sur la valeur totale du clic**, écho compris :
-  Marteau ionique ×1,5, Exosquelette ×1,6, Condensateur ×1,8, Champ magnétique
-  ×2. Au complet : **×8,64**. Chacune vaut exactement son ×N quel que soit ton
+  Marteau ionique ×1,4, Exosquelette ×1,5, Condensateur ×1,6, Champ magnétique
+  ×1,7. Au complet : **×5,71**. Chacune vaut exactement son ×N quel que soit ton
   avancement, ce que la carte annonce en un seul nombre.
 - **Bras servo-assistés** (recherche) — **+8 % par niveau sur le clic entier**,
   12 niveaux, soit **×2,52** au maximum. Jusqu'à la 2.32.0 c'était ×2 par niveau
@@ -146,35 +235,46 @@ clic = ( frappe + écho ) × améliorations de clic × Bras servo × bonus de cl
   12 niveaux — 8 675 antimatière pour rien. Le barème de prix n'a pas bougé d'un
   antimatière, ce qui garde la recherche cohérente avec les sept autres (dont les
   premiers niveaux coûtent tous entre 6 et 30).
-- **Résonateurs** — ajoutent un pourcentage de ta production par seconde à
-  chaque clic : v1 +2 %, v2 +5 %, v3 +10 %. Seul le meilleur compte, ils ne se
-  cumulent pas entre eux. En fin de partie c'est ce terme qui domine largement.
+- **Résonateurs** — remplacent l'écho de base par un pourcentage plus élevé de ta
+  production par seconde : v1 +9 %, v2 +12 %, v3 +15 %. Seul le meilleur compte,
+  ils ne se cumulent pas entre eux.
 
 **La règle d'équilibrage : un clic ne doit jamais dépasser la production/s.**
+Le plafond du clic est le produit **meilleur écho × multiplicateurs de clic**.
 Avec le résonateur v3 à 40 % (jusqu'à la 2.30.0), le clic valait déjà 0,40 s de
 production **avant toute amélioration de clic** — donc aucun multiplicateur
 au-dessus de ×2,5 ne pouvait s'y ajouter sans casser la règle. C'est pourquoi les
-résonateurs sont descendus à 2/5/10 % en même temps que les multiplicateurs sont
-passés à ×1,5–×2 : sans les Bras servo, le clic **plafonne à 0,86 s de
-production** tout en restant 2,15× plus fort qu'à l'origine.
+résonateurs sont descendus à 2/5/10 % en même temps que les multiplicateurs
+passaient à ×1,5–×2.
+
+La 3.0.28 rejoue ce même arbitrage dans l'autre sens : **les multiplicateurs sont
+abaissés à ×1,4–×1,7 (×5,71 au total) pour pouvoir remonter l'écho** (base 7 %,
+résonateurs 9/12/15 %). La puissance du clic se déplace ainsi vers le **début**
+de partie, là où elle manquait, sans rien changer au plafond : 0,15 × 5,71 =
+**0,86 s de production**, exactement la valeur d'avant.
 
 **La seule chose autorisée à franchir ce plafond, ce sont les Bras servo** — et
-seulement au prix des douze niveaux payés : à 12/12 le clic atteint **2,18 s de
+seulement au prix des douze niveaux payés : à 12/12 le clic atteint **2,16 s de
 production**. C'est un dépassement assumé, un joueur qui a investi 8 675
 antimatière dans une recherche a le droit d'en voir l'effet.
 
-| Étape | Amél. de clic | Servo | Production/s | Clic | sec. de prod./clic |
-|---|---|---|---|---|---|
-| Premières minutes | 0 | 0/12 | 3 | 1 | 0,33 |
-| Exosquelette | 2 | 1/12 | 485 | 3,6 | 0,01 |
-| Résonateur v2 | 3 | 7/12 | 20,5M | 7,61M | 0,37 |
-| Champ magnétique | 4 | 9/12 | 822M | 710M | 0,86 |
-| Résonateur v3 | 4 | 11/12 | 80,6B | 162B | 2,01 |
-| Partie très avancée | 4 | 12/12 | 407T | 887T | **2,18** |
+| Étape | Écho | Amél. de clic | Servo | sec. de prod./clic |
+|---|---|---|---|---|
+| Premières minutes | base 7 % | 0 | 0/12 | 0,40 |
+| Exosquelette | base 7 % | 2 | 1/12 | 0,16 |
+| Résonateur v2 | 12 % | 3 | 7/12 | 0,69 |
+| Champ magnétique | 12 % | 4 | 9/12 | 1,37 |
+| Résonateur v3 | 15 % | 4 | 11/12 | 2,00 |
+| Partie très avancée | 15 % | 4 | 12/12 | **2,16** |
+
+Le creux à 0,16 s au deuxième palier est normal : les deux premières
+améliorations de clic arrivent avant le premier résonateur, et c'est le seul
+moment où la frappe (le terme constant) a déjà décroché sans que l'écho ait
+grandi. Avant la 3.0.28 ce creux valait 0,01 s.
 
 À surveiller si ces valeurs bougent : les **Satellites d'extraction** cliquent
-jusqu'à 10 fois par seconde. À 2,18 s de production par clic, ils rapportent donc
-**21,8 fois la production passive** — le clic automatique reste, comme avant, la
+jusqu'à 10 fois par seconde. À 2,16 s de production par clic, ils rapportent donc
+**21,6 fois la production passive** — le clic automatique reste, comme avant, la
 première source de minerai d'un cycle avancé.
 
 **Historique de ce calcul.** Jusqu'à la 2.28.0, les améliorations de clic ne
@@ -207,6 +307,16 @@ Dix structures, chacune produisant du minerai en continu.
 **Prix du n-ième exemplaire :** `prix de base × 1,15^(déjà possédés)`, réduit
 par la recherche Négociation. Le bouton **MAX** calcule combien tu peux en
 acheter d'un coup, sommes géométriques comprises.
+
+La rangée **×1 / ×10 / ×100 / MAX** est **collante** : elle reste en haut de
+l'onglet pendant qu'on fait défiler la liste (3.0.28). C'est elle qui décide du
+prix et de la quantité affichés sur *toutes* les cartes, et avec dix structures
+il fallait remonter la chercher à chaque changement d'avis. Son point
+d'accrochage est calculé en JS parce qu'il n'est pas le même selon la mise en
+page : sur ordinateur c'est `#panels` qui défile et la barre se colle à son bord
+haut moins sa marge intérieure, sur mobile c'est `<main>` et elle se pose sous
+l'en-tête collant des onglets (variable CSS `--buyTop`, mise à jour par
+`syncHero()`).
 
 **Production totale :**
 
@@ -245,11 +355,12 @@ nombre d'exemplaires et multiplie la production de cette seule structure :
 
 Une structure entièrement améliorée produit **×1 440**.
 
-**Améliorations de clic** — sur le clic entier : Marteau ionique ×1,5 (400),
-Exosquelette ×1,6 (35 000, dès 50 clics), Condensateur ×1,8 (5e6, dès 250 clics),
-Champ magnétique ×2 (2e9, dès 600 clics). Au complet : **×8,64**.
+**Améliorations de clic** — sur le clic entier : Marteau ionique ×1,4 (400),
+Exosquelette ×1,5 (35 000, dès 50 clics), Condensateur ×1,6 (5e6, dès 250 clics),
+Champ magnétique ×1,7 (2e9, dès 600 clics). Au complet : **×5,71**.
 
-**Résonateurs** — v1 +2 % (2e5), v2 +5 % (4e8, exige v1), v3 +10 % (6e11, exige v2).
+**Résonateurs** — v1 +9 % (2e5), v2 +12 % (4e8, exige v1), v3 +15 % (6e11, exige
+v2). En dessous, l'écho de base vaut déjà **7 %**.
 
 **Améliorations globales** — Réseau logistique ×1,25 (5e4), IA de coordination
 ×1,5 (8e6), Relais quantique ×2 (1,2e9), Bio-ingénierie ×2,5 (3e11), Moteur à
@@ -349,6 +460,59 @@ multiplicateur = (1 + antimatière × bonus par unité)   ← antimatière
 ```
 
 Le détail complet est disponible en infobulle sur la tuile Multiplicateur.
+
+---
+
+## Les défis
+
+Six parties spéciales, ouvertes quand la tuile de l'en-tête affiche **« cycle
+n°6 en cours »**. Chacune casse **une** règle du jeu pour un cycle entier.
+
+Entrer **encaisse d'abord le cycle en cours** et crédite l'antimatière en
+attente, puis remet à zéro minerai, structures et améliorations. Sont conservés :
+antimatière, recherches, succès, automates et les récompenses des défis déjà
+réussis. Un bandeau permanent montre la progression, avec un bouton **Quitter**
+sans pénalité. Réussi une fois, un défi est validé **définitivement**.
+
+Pendant un défi, **seul le relanceur de cycle ♻️ est suspendu** — il effacerait la
+progression. Tous les autres automates travaillent. Les recherches ne s'achètent
+pas ; l'onglet est grisé et dit pourquoi.
+
+| Défi | Règle cassée | Récompense permanente | coef |
+|---|---|---|---|
+| 📵 Silence radio | aucune anomalie n'apparaît | anomalies +20 % plus fréquentes | 0,005 |
+| ⛓️ Mains liées | le clic ne rapporte rien | production +25 % | 0,002 |
+| 📈 Inflation | prix en ×1,35 au lieu de ×1,15 | −8 % sur tous les prix | 0,006 |
+| 🏚️ Colonie naine | 6 structures seulement, mais elles produisent ×4 | les 4 dernières produisent ×2 | 0,0015 |
+| 💨 Fuite de confinement | production −2 % par tranche de 2 min, plancher 20 % | gain d'antimatière +15 % | 0,015 |
+| 🕳️ Le Vide | l'antimatière ne compte plus dans le multiplicateur | exposant antimatière 1,50 → 1,55 | 0,005 |
+
+**L'objectif** vaut `coef × meilleur cycle × handicap`, en minerai extrait sur le
+cycle, et se **fige à l'entrée**. Il ne peut pas être un nombre en dur : mesuré,
+deux joueurs à 10 et 24 cycles mettaient 78 min et 1 min pour le même minerai.
+
+**Le handicap** répond à « de combien cette règle ralentit CE joueur ». Il vaut 1
+pour cinq défis sur six et n'est calculé que pour **Le Vide**, dont la pénalité
+dépend entièrement de l'avancement : un joueur à 2 antimatière y perd ×1,2, un
+joueur à 500 000 en perd ×40 000 000. Il se mesure sur la colonie **encore en
+place**, juste avant la remise à zéro.
+
+**L'équilibrage a été mesuré, pas estimé** : simulation seconde par seconde d'une
+vraie sauvegarde, anomalies, bonus et automates compris, chaque défi comparé à un
+cycle ordinaire visant le même objectif. Entre 2,4 et 3,8 h pour un joueur
+attentif, soit 2,5 à 5 fois un cycle normal. Le tableau complet et les deux
+défis qui étaient *arithmétiquement impossibles* avant cette mesure sont dans
+[ROADMAP.md](ROADMAP.md).
+
+Deux leçons de ce travail, à garder si on ajoute un défi :
+
+- Pour une règle à **facteur constant** (plus d'anomalies, plus de clic, prix
+  majorés), le coefficient ne règle que la **durée** — le rapport de difficulté
+  n'en dépend pas.
+- Pour une règle qui **compose dans le temps** (la fuite, la colonie amputée), le
+  rapport explose avec l'objectif : elle se règle en **bornant la règle**, pas au
+  coefficient. Sans plancher, la fuite bornait le minerai total du cycle à
+  `production × 1485 s` — le défi n'était pas dur, il était fini d'avance.
 
 ---
 
@@ -838,8 +1002,22 @@ catégorie, son intitulé bilingue et la fonction qui calcule sa valeur. On y
 trouve notamment le **détail des anomalies par type**, invisible ailleurs dans
 le jeu.
 
-**Langue** — sélecteur FR / EN en haut à droite ; la langue par défaut suit celle
-du navigateur et ton choix est mémorisé. Changer de langue ne touche pas à la
+**Langue** — menu déroulant en haut à droite : fermé il n'affiche que le code
+(**EN** / **FR**), ouvert il liste le code et le nom, chaque nom écrit dans sa
+propre langue (« English », « Français ») — c'est la seule façon pour quelqu'un
+qui ne comprend pas la langue affichée de retrouver la sienne. Ton choix est
+mémorisé.
+
+Une version à **drapeaux** a existé en 3.0.28-dev.7, en SVG dessinés dans le
+fichier plutôt qu'en emojis (Windows ne rend pas les emojis drapeaux : 🇫🇷 s'y
+affiche « FR », et ailleurs leur dessin dépend de la police du système). Elle a
+été abandonnée pour une raison de composition, pas de technique : deux aplats de
+couleur vive dans une barre d'outils par ailleurs monochrome attiraient le regard
+bien plus que ne le mérite un sélecteur de langue.
+**L'anglais est la langue par défaut** : titre de la page, nom de l'application
+installée, `lang` du document et description. Le jeu bascule automatiquement en
+français si la langue du navigateur commence par `fr` (`fr`, `fr-FR`, `fr-CA`…),
+et reste en anglais pour toutes les autres. Changer de langue ne touche pas à la
 partie en cours.
 
 ---
@@ -849,7 +1027,7 @@ partie en cours.
 Le numéro de version est défini en haut du `<script>` :
 
 ```js
-const VERSION="2.21.1";
+const VERSION="3.0.28";
 ```
 
 Il s'affiche à côté du titre sur ordinateur, et dans une tuile de l'onglet

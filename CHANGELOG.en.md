@@ -16,6 +16,91 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.0.28 — Challenges
+
+The first of the two big steps planned to lengthen the game. Six **challenges**
+each break one rule of the game for a whole cycle, with a goal computed from your
+best cycle and a permanent reward.
+
+### The challenges
+
+- 🎯 New **Challenges** tab, visible from the first cycle but **greyed out**,
+  with the remaining-cycle countdown. It opens when the header tile reads
+  "cycle #6 in progress".
+- Entering **banks the current cycle first** and credits the antimatter you had
+  pending, then resets ore, structures and upgrades. Kept: antimatter, research,
+  achievements, automations and the rewards of challenges already cleared.
+- A permanent banner shows progress and a **Leave** button, with no penalty.
+  Once beaten, a challenge is cleared **for good**.
+- During a challenge, **only the ♻️ cycle restarter is suspended** — it would
+  wipe your progress. Every other automation keeps working. Research cannot be
+  bought; the tab is greyed out and says why.
+
+| Challenge | Broken rule | Permanent reward |
+|---|---|---|
+| 📵 Radio silence | no anomaly appears | anomalies 20 % more frequent |
+| ⛓️ Hands tied | clicking yields nothing | output +25 % |
+| 📈 Inflation | prices ×1.35 instead of ×1.15 | −8 % on every price |
+| 🏚️ Dwarf colony | only 6 structures, but they produce ×4 | the last 4 produce ×2 |
+| 💨 Containment leak | output −2 % every 2 min, floor at 20 % | antimatter gain +15 % |
+| 🕳️ The Void | antimatter no longer counts in the multiplier | antimatter exponent 1.50 → 1.55 |
+
+All six were balanced by **second-by-second simulation of a real save**,
+anomalies, buffs and automations included, each challenge compared to an ordinary
+cycle aiming at the same goal: between 2.4 and 3.8 h for an attentive player, or
+2.5 to 5 times a normal cycle. Two of them were **arithmetically impossible**
+before that measurement — the leak bounded the cycle's total ore, and the dwarf
+colony could not approach a record set with ten structures. Details in
+[ROADMAP.md](ROADMAP.md).
+
+### Clicking finally matters early on
+
+A **7 % base echo** now exists before any resonator: without it, a click went
+from 10 s of output down to **0.006 s** within an hour on a fresh run. It is now
+worth ~0.10 s permanently.
+
+Resonators rise to 9/12/15 % and the click multipliers drop to ×1.4 / ×1.5 /
+×1.6 / ×1.7 (×5.71 in full). The late-game ceiling does not move at all —
+0.15 × 5.71 = **0.86 s of output**, the previous value: click power is simply
+moved towards the early game.
+
+### One button, one menu
+
+- ⚙️ The three top buttons (Save, Export/Import, Reset) are grouped behind a
+  **gear**. The menu also holds a **tutorial**, an embedded **changelog** and an
+  **about** panel (source code, licence, Patreon).
+- 🎓 The **tutorial** opens by itself on the first run — five screens, with arrows
+  and swipe. A run already in progress does not trigger it.
+- 🛰️ A **lore** opens the tutorial and justifies the game's name: the colony
+  turns around a dead planet, the orbit decays, and every colony falls back in
+  the end. "An orbital colony is never finished, it is only falling more slowly
+  than the last one."
+- Every window closes on a click outside — except the confirmation, which is not
+  cancelled by a stray click.
+
+### Interface
+
+- 🏗️ The **Foreman** buys in batches of **×1, ×10 or ×25**.
+- 📌 The **×1 / ×10 / ×100 / MAX** row stays stuck at the top while you scroll the
+  structures.
+- 🌐 **English becomes the default language**: page title, installed app name,
+  document `lang` and description. French is still auto-detected. The selector
+  becomes a dropdown.
+- 📊 The **Ore** tile shows `cycle · total`, the **Antimatter** tile shows the
+  current cycle and what is still missing for the next antimatter. The Research
+  tab now counts the **current** cycle rather than completed ones.
+- 🔴 On `dev.` the header turns red, with a **DEV** pill and a prefixed title — so
+  the two tabs can no longer be confused.
+- 🔢 The version number stays visible at every width.
+
+### Compatibility
+
+One field added (`tuto`), plus the challenge ones (`chal`, `chalDone`,
+`chalStart`, `chalBut`, `bestRun`, `autoQte`). **Every 2.x save is still valid**
+and does not trigger the tutorial.
+
+---
+
 ## 2.35.3 — The Foreman buys, on two lines
 
 - 🏗️ In the automation settings, **"The Foreman rebuys" becomes "buys"** — nothing
