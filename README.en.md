@@ -788,10 +788,10 @@ offline gains apply.
 
 ## Achievements
 
-**71 achievements**, each granting **+1 % output** — so **+71 %** in full. They
+**78 achievements**, each granting **+1 % output** — so **+78 %** in full. They
 are **never lost** on prestige.
 
-The tab sorts them into **eight categories** (the `ACHCATS` array, whose order is
+The tab sorts them into **nine categories** (the `ACHCATS` array, whose order is
 the display order; each achievement's `c` field says which section it belongs
 to). Each section heading shows its progress, and turns gold once the category is
 complete.
@@ -806,6 +806,7 @@ complete.
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
 | ♻️ Cycles and antimatter | 8 | number of cycles, antimatter held |
 | ⚙️ Automation | 8 | buying and using the automations |
+| 🎯 Challenges | 7 | one per challenge beaten, plus one for all six |
 
 The two ladders in the Clicking category are deliberately separate: the **number**
 of clicks (which the Mining satellites push up by 10/s, so 1,000,000 in about

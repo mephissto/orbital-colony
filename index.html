@@ -1140,7 +1140,7 @@ a.abrow:hover .aext{color:var(--cyan)}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.0.28";
+const VERSION="3.1.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1175,7 +1175,7 @@ fr:{
   menu:"Menu", menu_t:"Menu",
   mg_game:"Ta partie", mg_learn:"Apprendre", mg_info:"Informations",
   wn_t:"Nouveautés", 
-  wn_d:"Six <b>défis</b> qui cassent chacun une règle du jeu, ouverts au cycle n°6. Un <b>tutoriel</b> et un <b>menu</b> unique. Le <b>clic</b> compte enfin en début de partie.",
+  wn_d:"Sept <b>succès</b> de plus pour les défis. Six <b>défis</b> qui cassent chacun une règle du jeu, ouverts au cycle n°6. Un <b>tutoriel</b> et un <b>menu</b> unique.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_t:"À propos",
@@ -1334,7 +1334,7 @@ en:{
   menu:"Menu", menu_t:"Menu",
   mg_game:"Your game", mg_learn:"Learn", mg_info:"Information",
   wn_t:"What's new",
-  wn_d:"Six <b>challenges</b>, each breaking one rule of the game, unlocked on cycle #6. A <b>tutorial</b> and a single <b>menu</b>. <b>Clicking</b> finally matters early on.",
+  wn_d:"Seven more <b>achievements</b> for the challenges. Six <b>challenges</b>, each breaking one rule of the game, unlocked on cycle #6. A <b>tutorial</b> and a single <b>menu</b>.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_t:"About",
@@ -1888,6 +1888,7 @@ const ACHCATS=[
  {id:"anom",  ico:"✦",  nm:{fr:"Anomalies",en:"Anomalies"}},
  {id:"cycle", ico:"♻️", nm:{fr:"Cycles et antimatière",en:"Cycles and antimatter"}},
  {id:"auto",  ico:"⚙️", nm:{fr:"Automatisation",en:"Automation"}},
+ {id:"chal",  ico:"🎯", nm:{fr:"Défis",en:"Challenges"}},
 ];
 const ACHS=[
  {id:"a_click1",c:"clic",f:S=>S.clicks>=1,
@@ -2042,6 +2043,18 @@ const ACHS=[
  {id:"a_acyc100",c:"auto",f:S=>(S.acyc||0)>=100,
   nm:{fr:"Roue libre",en:"Freewheel"},ds:{fr:"100 cycles relancés tout seuls",en:"100 cycles restarted on their own"}},
 ];
+/* Un succès par défi, plus un pour les six. Ils sont construits à partir de
+   CHALS, qui reste l'unique source de vérité : ajouter un défi ajoutera son
+   succès, et il ne peut pas y avoir de décalage entre les deux listes.
+   Placés APRÈS la déclaration de CHALS — d'où le push plutôt qu'un littéral. */
+const ACH_CHAL=[
+ {id:"silence",  nm:{fr:"Vide sidéral",en:"Dead air"}},
+ {id:"mains",    nm:{fr:"Sans les mains",en:"No hands"}},
+ {id:"inflation",nm:{fr:"Krach évité",en:"Crash averted"}},
+ {id:"naine",    nm:{fr:"Petit mais costaud",en:"Small but mighty"}},
+ {id:"fuite",    nm:{fr:"Colmatage",en:"Patched up"}},
+ {id:"vide",     nm:{fr:"Ex nihilo",en:"Ex nihilo"}},
+];
 
 /* ---------- les défis ----------
    Chaque défi casse UNE règle du jeu, et une seule, en inversant un
@@ -2112,6 +2125,15 @@ const CHALS=[
 ];
 /* Colonie naine : la liste des structures qui existent réellement. Point unique,
    lu par l'affichage, la liste du Contremaître et la visibilité des paliers. */
+/* Les succès des défis : ils ont besoin de CHALS, donc ils sont ajoutés ici. */
+ACH_CHAL.forEach(x=>{
+  const c=CHALS.find(y=>y.id===x.id);
+  ACHS.push({id:"a_ch_"+x.id, c:"chal", f:S=>!!S.chalDone[x.id], nm:x.nm,
+    ds:{fr:"Réussir "+c.nm.fr, en:"Beat "+c.nm.en}});
+});
+ACHS.push({id:"a_ch_all", c:"chal", f:S=>CHALS.every(c=>!!S.chalDone[c.id]),
+  nm:{fr:"Briseur de règles",en:"Rule breaker"},
+  ds:{fr:"Réussir les six défis",en:"Beat all six challenges"}});
 const NAIN=6;
 const NAIN_MULT=4;                                // compensation, voir genMult
 const gensActives=()=>chalRegle("dwarf")?GENS.slice(0,NAIN):GENS;
@@ -3673,6 +3695,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.1.0", nm:{fr:"Les succès des défis",en:"Challenge achievements"},
+  d:{fr:"Sept succès de plus, une nouvelle catégorie : un par défi réussi, plus un pour les six. Ils sont construits depuis la liste des défis, donc les deux ne peuvent pas se désynchroniser.",
+     en:"Seven more achievements in a new category: one per challenge beaten, plus one for all six. They are built from the challenge list, so the two cannot drift apart."}},
  {v:"3.0.28", nm:{fr:"Les défis",en:"Challenges"},
   d:{fr:"Six défis qui cassent chacun une règle du jeu, avec un objectif calculé sur ton meilleur cycle et une récompense définitive, équilibrés par simulation d'une vraie partie. Le clic vaut enfin quelque chose en début de partie. Un tutoriel s'ouvre à la première partie, et les boutons du haut sont regroupés derrière une roue crantée.",
      en:"Six challenges, each breaking one rule of the game, with a goal computed from your best cycle and a permanent reward, balanced by simulating a real save. Clicking is finally worth something early on. A tutorial opens on the first run, and the top buttons are grouped behind a gear."}},

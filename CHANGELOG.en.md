@@ -16,6 +16,21 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.1.0 — Challenge achievements
+
+- 🎯 **Seven more achievements**, in a new **"Challenges" category**: one per
+  challenge beaten (*Dead air*, *No hands*, *Crash averted*, *Small but mighty*,
+  *Patched up*, *Ex nihilo*) and a last one for all six, *Rule breaker*.
+- They are **built from the challenge list** rather than copied beside it: adding
+  a challenge will add its achievement, and the two lists cannot drift apart.
+- The achievement bonus therefore goes from **+71 %** to **+78 %** output in
+  full.
+
+No save field touched: challenge achievements are derived from `chalDone`, which
+has existed since 3.0.28.
+
+---
+
 ## 3.0.28 — Challenges
 
 The first of the two big steps planned to lengthen the game. Six **challenges**

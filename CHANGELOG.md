@@ -17,6 +17,23 @@ restent valides**.
 
 ---
 
+## 3.1.0 — Les succès des défis
+
+- 🎯 **Sept succès de plus**, dans une **nouvelle catégorie « Défis »** : un par
+  défi réussi (*Vide sidéral*, *Sans les mains*, *Krach évité*, *Petit mais
+  costaud*, *Colmatage*, *Ex nihilo*) et un dernier pour les six, *Briseur de
+  règles*.
+- Ils sont **construits à partir de la liste des défis**, pas recopiés à côté :
+  ajouter un défi ajoutera son succès, et les deux listes ne peuvent pas se
+  désynchroniser.
+- Le bonus des succès passe donc de **+71 %** à **+78 %** de production au
+  complet.
+
+Aucun champ de sauvegarde touché : les succès des défis se déduisent de
+`chalDone`, qui existe depuis la 3.0.28.
+
+---
+
 ## 3.0.28 — Les défis
 
 Première des deux grandes étapes prévues pour allonger la partie. Six **défis**

@@ -819,10 +819,10 @@ hors-ligne habituels s'appliquent.
 
 ## Les succès
 
-**71 succès**, chacun donnant **+1 % de production** — soit **+71 %** au
+**78 succès**, chacun donnant **+1 % de production** — soit **+78 %** au
 complet. Ils ne sont **jamais perdus** au prestige.
 
-L'onglet les range en **huit catégories** (tableau `ACHCATS`, dont l'ordre est
+L'onglet les range en **neuf catégories** (tableau `ACHCATS`, dont l'ordre est
 celui de l'affichage ; le champ `c` de chaque succès dit à quelle section il
 appartient). Chaque intitulé de section affiche sa progression, et passe en doré
 une fois la catégorie complète.
@@ -837,6 +837,7 @@ une fois la catégorie complète.
 | ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
 | ♻️ Cycles et antimatière | 8 | nombre de cycles, antimatière possédée |
 | ⚙️ Automatisation | 8 | achat et usage des automates |
+| 🎯 Défis | 7 | un par défi réussi, plus un pour les six |
 
 Les deux échelles de la catégorie Clics sont volontairement séparées : le
 **nombre** de clics (que les Satellites d'extraction font grimper de 10/s, soit
