@@ -16,6 +16,25 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.1.1 — The menu opens on touch
+
+- 🐛 **On a phone, the gear opened nothing.** After a tap the browser synthesises
+  a `click` and places it on whatever is under the finger at that moment — that
+  is, on the backdrop of the window that had just opened. The "click outside to
+  close" behaviour (3.0.0-dev.17) took it for a real click and closed the window
+  right away. **Menu, changelog, about, export and tutorial were all affected.**
+- Closing on an outside click now requires **both the press and the release** to
+  happen on the backdrop. Welcome side effect: dragging from inside a window and
+  releasing on the backdrop no longer closes it.
+- With a mouse the bug did not exist — `bindAction` acts on `pointerdown` there,
+  and a `click`'s target is the common ancestor of mousedown and mouseup, never
+  the backdrop. The whole test suite drove these windows with a mouse: it is now
+  doubled with a **touch** test.
+
+No save field touched.
+
+---
+
 ## 3.1.0 — Challenge achievements
 
 - 🎯 **Seven more achievements**, in a new **"Challenges" category**: one per

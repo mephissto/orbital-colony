@@ -1140,7 +1140,7 @@ a.abrow:hover .aext{color:var(--cyan)}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.1.0";
+const VERSION="3.1.1";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -3695,6 +3695,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.1.1", nm:{fr:"Le menu s'ouvre au doigt",en:"The menu opens on touch"},
+  d:{fr:"Sur téléphone, la roue crantée n'ouvrait rien : le clic fantôme que le navigateur synthétise après un appui atterrissait sur le fond de la fenêtre à peine ouverte et la refermait aussitôt. Toutes les fenêtres du menu étaient touchées.",
+     en:"On a phone, the gear opened nothing: the ghost click the browser synthesises after a tap landed on the backdrop of the window that had just opened and closed it again. Every window in the menu was affected."}},
  {v:"3.1.0", nm:{fr:"Les succès des défis",en:"Challenge achievements"},
   d:{fr:"Sept succès de plus, une nouvelle catégorie : un par défi réussi, plus un pour les six. Ils sont construits depuis la liste des défis, donc les deux ne peuvent pas se désynchroniser.",
      en:"Seven more achievements in a new category: one per challenge beaten, plus one for all six. They are built from the challenge list, so the two cannot drift apart."}},
@@ -3876,13 +3879,32 @@ bindAction($("#tuNext"),()=>tutoVa(1));
    est exclue à dessein — on n'annule pas une action irréversible par un clic
    distrait — et l'invitation à installer garde son propre chemin de fermeture,
    qui mémorise le refus. */
+/* On exige que le geste ENTIER se soit passé sur le fond : appui ET relâchement.
+   Le seul `click` ne suffisait pas, et le bug était sérieux au doigt.
+   Au tactile, le navigateur synthétise un `click` APRÈS le `pointerup` et le
+   replace sur l'élément qui se trouve alors sous le doigt. Or `bindAction`
+   agit sur le `pointerup` : la fenêtre venait de s'ouvrir, son fond couvrait
+   tout l'écran, et ce clic fantôme atterrissait dessus — la fenêtre se
+   refermait dans la foulée. Au doigt, le menu ne s'ouvrait donc jamais.
+   À la souris le problème n'existait pas : `bindAction` agit sur le
+   `pointerdown`, et la cible d'un `click` est l'ancêtre commun du mousedown et
+   du mouseup, donc <body>, jamais le fond. D'où un bug invisible sur toute la
+   suite de tests, qui pilotait ces fenêtres à la souris.
+   Vérifier l'appui règle aussi un cas plus discret : glisser depuis l'intérieur
+   de la fenêtre et relâcher sur le fond ne la ferme plus. */
 [["#menu",()=>ferme("#menu")],
  ["#chlog",()=>ferme("#chlog")],
  ["#about",()=>ferme("#about")],
  ["#modal",()=>ferme("#modal")],
  ["#tuto",tutoFerme]].forEach(([sel,f])=>{
   const z=$(sel);
-  z.addEventListener("click",e=>{ if(e.target===z)f() });
+  let depuisLeFond=false;
+  z.addEventListener("pointerdown",e=>{ depuisLeFond=(e.target===z) });
+  z.addEventListener("click",e=>{
+    const ok=depuisLeFond&&e.target===z;
+    depuisLeFond=false;
+    if(ok)f();
+  });
 });
 
 /* ---------- invitation à installer la PWA ----------

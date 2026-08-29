@@ -17,6 +17,26 @@ restent valides**.
 
 ---
 
+## 3.1.1 — Le menu s'ouvre au doigt
+
+- 🐛 **Sur téléphone, la roue crantée n'ouvrait rien.** Après un appui, le
+  navigateur synthétise un `click` et le place sur l'élément qui se trouve alors
+  sous le doigt — c'est-à-dire, la fenêtre venant de s'ouvrir, sur son fond. Le
+  « clic à côté pour fermer » (3.0.0-dev.17) le prenait pour un vrai clic et
+  refermait la fenêtre dans la foulée. **Menu, changelog, à propos, export et
+  tutoriel étaient tous touchés.**
+- Fermer au clic à côté exige désormais que **l'appui ET le relâchement** aient
+  eu lieu sur le fond. Effet de bord bienvenu : glisser depuis l'intérieur d'une
+  fenêtre et relâcher sur le fond ne la ferme plus.
+- À la souris le bug n'existait pas — `bindAction` y agit sur le `pointerdown`,
+  et la cible d'un `click` est l'ancêtre commun du mousedown et du mouseup, donc
+  jamais le fond. Toute la suite de tests pilotait ces fenêtres à la souris :
+  elle est désormais doublée d'un test **au doigt**.
+
+Aucun champ de sauvegarde touché.
+
+---
+
 ## 3.1.0 — Les succès des défis
 
 - 🎯 **Sept succès de plus**, dans une **nouvelle catégorie « Défis »** : un par
