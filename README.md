@@ -192,8 +192,8 @@ Deux points délicats :
   regarde aussi `totalOre`, `prestiges` et `clicks`, et le drapeau est posé
   immédiatement pour ne plus jamais y revenir.
 
-Les liens sortants sont les constantes `LIEN_CODE`, `LIEN_AUTEUR` et
-`LIEN_KOFI`, en tête du bloc, et portent `rel="noopener noreferrer"`.
+Les liens sortants sont les constantes `LIEN_CODE`, `LIEN_AUTEUR`, `LIEN_KOFI`
+et `LIEN_MARQUE`, en tête du bloc, et portent `rel="noopener noreferrer"`.
 
 ---
 

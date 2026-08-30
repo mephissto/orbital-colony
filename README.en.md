@@ -187,8 +187,9 @@ Two delicate points:
   `totalOre`, `prestiges` and `clicks`, and the flag is set immediately so it
   never comes back.
 
-The outbound links are the `LIEN_CODE`, `LIEN_AUTEUR` and `LIEN_KOFI`
-constants, at the top of the block, and carry `rel="noopener noreferrer"`.
+The outbound links are the `LIEN_CODE`, `LIEN_AUTEUR`, `LIEN_KOFI` and
+`LIEN_MARQUE` constants, at the top of the block, and carry
+`rel="noopener noreferrer"`.
 
 ---
 

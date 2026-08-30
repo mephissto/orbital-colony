@@ -26,10 +26,13 @@ export/import. No released version has ever renamed or removed a field: **every
 - 📐 **Icons are centred in a square box.** `text-align:center` was not enough:
   emoji (💾 🗑️ 🎓) and text symbols (⇅) share neither width nor side bearings,
   and the column drifted from row to row. The chevron gets the same treatment.
-- ↗ **Links that leave the game say so.** *Source code* and *GPL 3.0* in the
-  footer carry an outgoing arrow, and "Support the game" swaps its chevron for
-  the same one. The dotted rule stays under the label alone: running it under
-  the arrow made it look like a character of the text.
+- ↗ **Links that leave the game say so.** *Brand kit*, *Source code* and
+  *GPL 3.0* in the footer carry an outgoing arrow, and "Support the game" swaps
+  its chevron for the same one. The dotted rule stays under the label alone:
+  running it under the arrow made it look like a character of the text.
+- 🎨 **A link to the brand kit** opens the footer, before the source code:
+  [brand.orbital-colony.app](https://brand.orbital-colony.app/) — the game's
+  logo, palette and wallpapers. It shortens to "Brand" on a small screen.
 
 No save field touched.
 

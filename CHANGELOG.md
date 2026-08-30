@@ -28,10 +28,14 @@ restent valides**.
   ne suffisait pas : les émojis (💾 🗑️ 🎓) et les symboles texte (⇅) n'ont ni la
   même chasse ni les mêmes approches, et la colonne partait en biais d'une
   ligne à l'autre. Le chevron reçoit le même traitement.
-- ↗ **Les liens qui quittent le jeu le disent.** *Code source* et *GPL 3.0* du
-  pied de page portent une flèche sortante, et « Soutenir le jeu » remplace son
-  chevron par la même. Le pointillé reste sous le libellé seul : passer sous la
-  flèche la faisait ressembler à un caractère du texte.
+- ↗ **Les liens qui quittent le jeu le disent.** *Kit de marque*, *Code source*
+  et *GPL 3.0* du pied de page portent une flèche sortante, et « Soutenir le
+  jeu » remplace son chevron par la même. Le pointillé reste sous le libellé
+  seul : passer sous la flèche la faisait ressembler à un caractère du texte.
+- 🎨 **Un lien vers le kit de marque** ouvre le pied de page, avant le code
+  source : [brand.orbital-colony.app](https://brand.orbital-colony.app/) — le
+  logo, la palette et les fonds d'écran du jeu. Sur petit écran il se raccourcit
+  en « Marque ».
 
 Aucun champ de sauvegarde touché.
 
