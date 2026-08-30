@@ -1,0 +1,4 @@
+# Ajoute un bouton « Sponsor » en haut du dépôt et un encart dans la colonne
+# de droite. Rien à voir avec GitHub Sponsors : le champ ko_fi mène droit à
+# la page Ko-fi. https://ko-fi.com/mephissto
+ko_fi: mephissto
