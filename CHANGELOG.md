@@ -17,6 +17,26 @@ restent valides**.
 
 ---
 
+## 3.2.3 — Le menu au cordeau
+
+- ☕ **« Soutenir le jeu » devient une ligne comme les autres** : icône, titre,
+  explication en dessous. La mention « gratuit, sans publicité, sans compte »
+  quitte la même ligne que le titre pour prendre la place qu'elle a partout
+  ailleurs dans le menu, sans tiret devant. La ligne garde son violet — celui
+  de l'antimatière — mais à peine posé : 7 % d'opacité, 16 % au survol.
+- 📐 **Les icônes sont centrées dans une boîte carrée.** Un `text-align:center`
+  ne suffisait pas : les émojis (💾 🗑️ 🎓) et les symboles texte (⇅) n'ont ni la
+  même chasse ni les mêmes approches, et la colonne partait en biais d'une
+  ligne à l'autre. Le chevron reçoit le même traitement.
+- ↗ **Les liens qui quittent le jeu le disent.** *Code source* et *GPL 3.0* du
+  pied de page portent une flèche sortante, et « Soutenir le jeu » remplace son
+  chevron par la même. Le pointillé reste sous le libellé seul : passer sous la
+  flèche la faisait ressembler à un caractère du texte.
+
+Aucun champ de sauvegarde touché.
+
+---
+
 ## 3.2.2 — Ko-fi remplace Patreon
 
 - ☕ **Le bouton « Soutenir le jeu » mène désormais à Ko-fi.** Patreon prenait

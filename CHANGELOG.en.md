@@ -16,6 +16,25 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.2.3 — The menu, squared up
+
+- ☕ **"Support the game" becomes a row like the others**: icon, title,
+  explanation underneath. The "free, no ads, no account" line leaves the title's
+  row and takes the place it has everywhere else in the menu, with no leading
+  dash. The row keeps its violet — antimatter's colour — but barely: 7 %
+  opacity, 16 % on hover.
+- 📐 **Icons are centred in a square box.** `text-align:center` was not enough:
+  emoji (💾 🗑️ 🎓) and text symbols (⇅) share neither width nor side bearings,
+  and the column drifted from row to row. The chevron gets the same treatment.
+- ↗ **Links that leave the game say so.** *Source code* and *GPL 3.0* in the
+  footer carry an outgoing arrow, and "Support the game" swaps its chevron for
+  the same one. The dotted rule stays under the label alone: running it under
+  the arrow made it look like a character of the text.
+
+No save field touched.
+
+---
+
 ## 3.2.2 — Ko-fi replaces Patreon
 
 - ☕ **The "Support the game" button now goes to Ko-fi.** Patreon took a 10 %

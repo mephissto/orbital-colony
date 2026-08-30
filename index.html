@@ -671,22 +671,31 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
   background:#0d1426;border:0;color:var(--txt);padding:13px 14px;cursor:pointer;
   font-size:13.5px;transition:.15s;font-family:inherit;text-decoration:none}
 .mitem:hover{background:rgba(79,216,255,.1);color:#fff}
-.mitem .mi{font-size:18px;line-height:1;flex:none;width:22px;text-align:center}
+/* Icône et chevron : chacun dans une boîte carrée, centré en flex. Avec un
+   simple text-align, les émojis (💾 🗑️) et les symboles texte (⇅) n'ont ni la
+   même chasse ni le même approche, et la colonne partait en biais. */
+.mitem .mi{font-size:18px;line-height:1;flex:none;width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center}
 .mitem .ml{min-width:0}
 .mitem .ms{display:block;font-size:11px;color:var(--dim);margin-top:2px}
-.mitem .chev{margin-left:auto;color:var(--dim);font-size:15px;padding-left:6px;flex:none}
+.mitem .chev{margin-left:auto;color:var(--dim);font-size:15px;flex:none;
+  width:18px;height:18px;display:flex;align-items:center;justify-content:center}
+/* Une entrée qui quitte le jeu le dit : flèche sortante au lieu du chevron. */
+.mitem .chev.ext{font-size:13px}
 .mitem.danger{color:var(--red)}
 .mitem.danger:hover{background:rgba(255,107,138,.12);color:#fff}
 
-/* Soutenir : une seule voie, Ko-fi. Le violet ne sert qu'à l'antimatière dans
-   le jeu, il attire donc l'œil sans crier. La mention « gratuit, sans
-   publicité » justifie le bouton au lieu de quémander. */
-.don{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:14px;
-  border:1px solid rgba(169,123,255,.45);background:rgba(169,123,255,.1);
-  color:var(--violet);border-radius:10px;padding:11px 12px;font-size:12.5px;
-  text-decoration:none;transition:.15s}
-.don:hover{border-color:var(--violet);background:rgba(169,123,255,.18)}
-.don .sub{color:var(--dim);font-weight:400;margin-left:auto;text-align:right}
+/* Soutenir : une ligne comme les autres, dans son propre groupe. Le violet ne
+   sert qu'à l'antimatière dans le jeu, il attire donc l'œil sans crier, et la
+   mention « gratuit, sans publicité » passe en explication comme partout
+   ailleurs — elle justifie l'entrée au lieu de quémander. */
+/* Le fond du groupe ne sert qu'à dessiner le filet d'un pixel entre deux
+   lignes ; celui-ci n'en a qu'une, donc on le laisse transparent — sinon il
+   transparaissait sous la ligne et donnait un aplat violet permanent. */
+.mgrp.don{margin-top:14px;border-color:rgba(169,123,255,.30);background:none}
+.mgrp.don .mitem{background:rgba(169,123,255,.07);color:var(--violet)}
+.mgrp.don .mitem:hover{background:rgba(169,123,255,.16);color:#fff}
+.mgrp.don .mitem .chev{color:var(--violet)}
 
 /* Pied de page : l'auteur et la version sur une ligne, les liens obligatoires
    (code source, licence) en dessous. Ils remplacent la fenêtre « À propos »,
@@ -700,6 +709,13 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .pied a{color:var(--dim);text-decoration:none;
   border-bottom:1px dotted rgba(132,148,184,.5)}
 .pied a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
+/* Code source et licence sortent du jeu : flèche montante à droite. Elle est
+   posée sur l'ancre, le pointillé sur le libellé — sinon le trait passait sous
+   la flèche et la faisait ressembler à un caractère du texte. */
+.pied .liens a{border-bottom:0}
+.pied .liens a .lbl{border-bottom:1px dotted rgba(132,148,184,.5)}
+.pied .liens a:hover .lbl{border-bottom-color:var(--cyan)}
+.pied .liens a .ext{font-style:normal;margin-left:3px;font-size:.92em;opacity:.75}
 
 /* Changelog : la liste défile, les boutons restent visibles en dessous. */
 .loglist{max-height:min(52vh,420px);overflow-y:auto;padding-right:4px;
@@ -1078,16 +1094,22 @@ a.hbtn{text-decoration:none}
     <div class="wnd" data-i18n="wn_d" data-i18n-html></div>
   </div>
   <div class="mgrid" id="mGrid"></div>
-  <a class="don" id="mKofi" target="_blank" rel="noopener noreferrer">
-    <span>☕</span><b data-i18n="don_t">Soutenir le jeu</b>
-    <span class="sub" data-i18n="don_sub" data-i18n-s="don_sub_s"></span></a>
+  <div class="mgrp don">
+    <a class="mitem" id="mKofi" target="_blank" rel="noopener noreferrer">
+      <span class="mi">☕</span>
+      <span class="ml"><span class="mt" data-i18n="don_t">Soutenir le jeu</span>
+        <span class="ms" data-i18n="don_sub" data-i18n-s="don_sub_s"></span></span>
+      <span class="chev ext">↗</span></a>
+  </div>
   <div class="pied">
     <div class="h"><span id="piedPar"></span>
       <span class="ver" id="piedVer"></span></div>
     <div class="liens">
-      <a id="piedCode" target="_blank" rel="noopener noreferrer" data-i18n="ab_code">Code source</a>
+      <a id="piedCode" target="_blank" rel="noopener noreferrer"><span class="lbl"
+        data-i18n="ab_code">Code source</span><i class="ext">↗</i></a>
       <span> · </span>
-      <a id="piedLic" target="_blank" rel="noopener noreferrer" data-i18n="ab_lic">GPL 3.0</a>
+      <a id="piedLic" target="_blank" rel="noopener noreferrer"><span class="lbl"
+        data-i18n="ab_lic">GPL 3.0</span><i class="ext">↗</i></a>
     </div>
   </div>
   <div class="mrow">
@@ -1152,7 +1174,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.2.2";
+const VERSION="3.2.3";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1195,11 +1217,11 @@ fr:{
   ms_tuto:"cinq écrans, deux minutes",
   ms_log:"ce qui a changé, version par version",
   don_t:"Soutenir le jeu",
-  don_sub:"— gratuit, sans publicité, sans compte",
-  don_sub_s:"— gratuit, sans pub",
+  don_sub:"gratuit, sans publicité, sans compte",
+  don_sub_s:"gratuit, sans pub",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le bouton <b>Soutenir le jeu</b> mène désormais à <b>Ko-fi</b> : un don ponctuel, sans compte à créer, et sans commission sur la plateforme.",
+  wn_d:"Le bouton <b>Soutenir le jeu</b> devient une ligne comme les autres, avec son explication en dessous. Les icônes du menu sont enfin alignées, et les liens qui sortent du jeu portent une <b>flèche</b>.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_code:"Code source",
@@ -1363,11 +1385,11 @@ en:{
   ms_tuto:"five screens, two minutes",
   ms_log:"what changed, version by version",
   don_t:"Support the game",
-  don_sub:"— free, no ads, no account",
-  don_sub_s:"— free, no ads",
+  don_sub:"free, no ads, no account",
+  don_sub_s:"free, no ads",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The <b>Support the game</b> button now goes to <b>Ko-fi</b>: a one-off tip, no account to create, and no platform cut.",
+  wn_d:"The <b>Support the game</b> button becomes a row like the others, with its explanation underneath. The menu icons are finally aligned, and links that leave the game carry an <b>arrow</b>.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_code:"Source code",
@@ -3726,6 +3748,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.2.3", nm:{fr:"Le menu au cordeau",en:"The menu, squared up"},
+  d:{fr:"« Soutenir le jeu » devient une ligne comme les autres, la mention « gratuit, sans publicité » passant en explication, sur un violet à peine posé. Les icônes sont centrées dans une boîte carrée — les émojis et les symboles texte n'ont pas la même chasse, la colonne partait en biais. Les liens qui quittent le jeu portent une flèche sortante.",
+     en:"\"Support the game\" becomes a row like the others, with \"free, no ads\" moving into the explanation line, on a barely-there violet. Icons are centred in a square box — emoji and text symbols have different widths, and the column was drifting. Links that leave the game carry an outgoing arrow."}},
  {v:"3.2.2", nm:{fr:"Ko-fi remplace Patreon",en:"Ko-fi replaces Patreon"},
   d:{fr:"Le bouton « Soutenir le jeu » mène à Ko-fi. Patreon prenait 10 % et imposait un abonnement mensuel ; Ko-fi ne prend rien sur un don ponctuel, et le visiteur n'a pas de compte à créer.",
      en:"The \"Support the game\" button now goes to Ko-fi. Patreon took 10 % and required a monthly subscription; Ko-fi takes nothing on a one-off tip, and visitors need no account."}},
