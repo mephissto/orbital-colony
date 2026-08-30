@@ -638,11 +638,11 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
    titre en gras, même rangée de boutons en bas, action principale accentuée et
    à droite. Elles se superposent (le menu reste ouvert derrière), d'où des
    z-index croissants. */
-#menu,#chlog,#about,#tuto{position:fixed;inset:0;background:rgba(2,4,10,.86);display:none;
+#menu,#chlog,#tuto{position:fixed;inset:0;background:rgba(2,4,10,.86);display:none;
   align-items:center;justify-content:center;padding:20px}
-#menu.on,#chlog.on,#about.on,#tuto.on{display:flex}
-#menu{z-index:82}#chlog{z-index:84}#about{z-index:84}#tuto{z-index:86}
-.menubox,.aboutbox{max-width:460px}
+#menu.on,#chlog.on,#tuto.on{display:flex}
+#menu{z-index:82}#chlog{z-index:84}#tuto{z-index:86}
+.menubox{max-width:460px}
 .logbox{max-width:560px}
 .tutobox{max-width:440px}
 
@@ -660,25 +660,46 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .mgrid{display:flex;flex-direction:column;gap:6px}
 .mgrid>.msec{margin-top:16px}
 .mgrid>.msec:first-child{margin-top:0}
-/* Un trait entre les groupes plutôt qu'un simple écart : à 14 px de gap seul,
-   trois blocs de boutons identiques se lisaient encore comme une seule liste. */
-.mgrp{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .msec{margin:0 0 10px}
-.mgrid>.msec+.mgrp{margin-bottom:4px}
-.mitem{display:flex;align-items:center;gap:10px;text-align:left;
-  background:var(--panel-2);border:1px solid var(--line);border-radius:11px;
-  color:var(--txt);padding:12px 13px;cursor:pointer;font-size:13px;transition:.15s;
-  font-family:inherit;text-decoration:none}
-.mitem:hover{border-color:var(--cyan);color:#fff;background:rgba(79,216,255,.1)}
-.mitem .mi{font-size:19px;line-height:1;flex:none}
+/* Une entrée par ligne, pleine largeur : la cible tactile occupe toute la
+   largeur de la fenêtre, et il reste la place d'expliquer ce que fait chaque
+   entrée — ce qu'une grille à deux colonnes n'offrait pas. Les lignes sont
+   collées, le fond du groupe faisant office de séparateur d'un pixel. */
+.mgrp{display:flex;flex-direction:column;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.mitem{display:flex;align-items:center;gap:12px;text-align:left;width:100%;
+  background:#0d1426;border:0;color:var(--txt);padding:13px 14px;cursor:pointer;
+  font-size:13.5px;transition:.15s;font-family:inherit;text-decoration:none}
+.mitem:hover{background:rgba(79,216,255,.1);color:#fff}
+.mitem .mi{font-size:18px;line-height:1;flex:none;width:22px;text-align:center}
 .mitem .ml{min-width:0}
-/* Reset : seule action irréversible de la fenêtre, donc seule à être rouge et
-   seule à occuper toute la largeur, en dernier. On ne la touche pas par erreur
-   en visant le bouton d'à côté. */
-/* Reset garde sa couleur d'alerte mais plus sa pleine largeur : il est de toute
-   façon protégé par une demande de confirmation. */
-.mitem.danger{border-color:rgba(255,107,138,.35);color:var(--red)}
-.mitem.danger:hover{border-color:var(--red);background:rgba(255,107,138,.12);color:#fff}
+.mitem .ms{display:block;font-size:11px;color:var(--dim);margin-top:2px}
+.mitem .chev{margin-left:auto;color:var(--dim);font-size:15px;padding-left:6px;flex:none}
+.mitem.danger{color:var(--red)}
+.mitem.danger:hover{background:rgba(255,107,138,.12);color:#fff}
+
+/* Soutenir : le violet ne sert qu'à l'antimatière dans le jeu, il attire donc
+   l'œil sans crier. La mention « gratuit, sans publicité » justifie le bouton
+   au lieu de quémander. */
+.don{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  border:1px solid rgba(169,123,255,.45);background:rgba(169,123,255,.1);
+  color:var(--violet);border-radius:10px;padding:11px 12px;font-size:12.5px;
+  margin-top:14px;text-decoration:none;transition:.15s}
+.don:hover{border-color:var(--violet);background:rgba(169,123,255,.18)}
+.don .sub{color:var(--dim);font-weight:400}
+
+/* Pied de page : l'auteur et la version sur une ligne, les liens obligatoires
+   (code source, licence) en dessous. Ils remplacent la fenêtre « À propos »,
+   supprimée en 3.2.0 — quatre lignes ne méritaient pas une fenêtre à elles. */
+.pied{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--dim);line-height:1.6}
+.pied .h{display:flex;align-items:baseline;gap:10px}
+.pied .h b{color:var(--txt);font-weight:600}
+.pied .h .ver{margin-left:auto;flex:none;font-variant-numeric:tabular-nums}
+.pied .liens{margin-top:5px}
+.pied a{color:var(--dim);text-decoration:none;
+  border-bottom:1px dotted rgba(132,148,184,.5)}
+.pied a:hover{color:var(--cyan);border-bottom-color:var(--cyan)}
 
 /* Changelog : la liste défile, les boutons restent visibles en dessous. */
 .loglist{max-height:min(52vh,420px);overflow-y:auto;padding-right:4px;
@@ -693,25 +714,11 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .logvd{font-size:12px;color:var(--dim);line-height:1.5;margin-top:3px}
 a.hbtn{text-decoration:none}
 
-/* À propos : le lore, puis les liens. */
+/* Le lore ne vit plus que dans le tutoriel. */
 .lore{font-size:12.5px;line-height:1.6;color:var(--txt);
   border-left:2px solid var(--violet);padding-left:12px;margin-bottom:15px}
 .lore p{margin:0 0 8px}.lore p:last-child{margin-bottom:0}
 .lore b{color:var(--violet)}
-.ablist{display:grid;gap:8px}
-.abrow{display:flex;align-items:center;gap:11px;padding:10px 12px;
-  border:1px solid var(--line);border-radius:11px;background:var(--panel-2);
-  color:var(--txt);text-decoration:none;font-size:12.5px;transition:.15s}
-a.abrow:hover{border-color:var(--cyan);background:rgba(79,216,255,.1)}
-.abrow .ai{font-size:18px;line-height:1;flex:none}
-.abrow .av{color:var(--txt);min-width:0}
-/* Flèche sortante : elle dit, sans un mot et dans les deux langues, que la ligne
-   quitte le jeu pour un site externe. Seules les lignes qui sont des liens en
-   portent une. */
-.abrow .aext{margin-left:auto;flex:none;width:14px;height:14px;fill:none;
-  stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;
-  color:var(--dim);transition:.15s}
-a.abrow:hover .aext{color:var(--cyan)}
 
 /* Tutoriel : un écran à la fois, hauteur figée pour que les boutons ne sautent
    pas d'un écran à l'autre. */
@@ -1071,6 +1078,18 @@ a.abrow:hover .aext{color:var(--cyan)}
     <div class="wnd" data-i18n="wn_d" data-i18n-html></div>
   </div>
   <div class="mgrid" id="mGrid"></div>
+  <a class="don" id="mDon" target="_blank" rel="noopener noreferrer">
+    <span>💜</span><b data-i18n="don_t">Soutenir le jeu</b>
+    <span class="sub" data-i18n="don_sub"></span></a>
+  <div class="pied">
+    <div class="h"><span id="piedPar"></span>
+      <span class="ver" id="piedVer"></span></div>
+    <div class="liens">
+      <a id="piedCode" target="_blank" rel="noopener noreferrer" data-i18n="ab_code">Code source</a>
+      <span> · </span>
+      <a id="piedLic" target="_blank" rel="noopener noreferrer" data-i18n="ab_lic">GPL 3.0</a>
+    </div>
+  </div>
   <div class="mrow">
     <button class="hbtn prim" id="menuClose" data-i18n="m_close">Fermer</button>
   </div>
@@ -1089,13 +1108,6 @@ a.abrow:hover .aext{color:var(--cyan)}
   </div>
 </div></div>
 
-<div id="about"><div class="mbox aboutbox">
-  <h2 data-i18n="ab_t">À propos</h2>
-  <div class="ablist" id="abList"></div>
-  <div class="mrow">
-    <button class="hbtn prim" id="abClose" data-i18n="m_close">Fermer</button>
-  </div>
-</div></div>
 
 <!-- Tutoriel : diaporama de cinq écrans, ouvert tout seul à la première partie
      et relançable depuis le menu. Il passe AVANT l'invitation à installer la
@@ -1140,7 +1152,7 @@ a.abrow:hover .aext{color:var(--cyan)}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.1.1";
+const VERSION="3.2.1";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1173,18 +1185,27 @@ fr:{
   save:"Sauvegarder", export:"Export / Import", reset:"Reset",
   lang_title:"Langue",
   menu:"Menu", menu_t:"Menu",
-  mg_game:"Ta partie", mg_learn:"Apprendre", mg_info:"Informations",
+  mg_game:"Ta partie", mg_jeu:"Le jeu",
+  ms_save:"le jeu le fait déjà tout seul, toutes les 20 s",
+  ms_save_s:"le jeu le fait déjà toutes les 20 s",
+  ms_expo:"un code à copier pour changer d'appareil",
+  ms_expo_s:"un code pour changer d'appareil",
+  ms_reset:"efface la partie, définitivement",
+  ms_reset_s:"efface tout, définitivement",
+  ms_tuto:"cinq écrans, deux minutes",
+  ms_log:"ce qui a changé, version par version",
+  don_t:"Soutenir le jeu",
+  don_sub:"— gratuit, sans publicité, sans compte",
+  don_sub_s:"— gratuit, sans pub",
+  pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Sept <b>succès</b> de plus pour les défis. Six <b>défis</b> qui cassent chacun une règle du jeu, ouverts au cycle n°6. Un <b>tutoriel</b> et un <b>menu</b> unique.",
+  wn_d:"Le <b>menu</b> passe en liste, avec une explication sous chaque entrée. Sept <b>succès</b> de plus pour les défis, qui cassent chacun une règle du jeu.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
-  ab_t:"À propos",
   ab_code:"Code source",
   ab_lic:"GPL 3.0 ou ultérieure",
-  ab_auth:"Créé par mephissto avec l'aide de Claude",
-  ab_patreon:"Soutenir",
   tu_prev:"Écran précédent", tu_next:"Écran suivant",
-  m_tuto:"Tutoriel", m_log:"Changelog", m_about:"À propos",
+  m_tuto:"Tutoriel", m_log:"Changelog",
   /* Le lore justifie le nom du jeu ET la boucle de prestige : une colonie qui
      retombe, et dont la chute finance la suivante. */
   lore:"<p>Tu ne construis pas sur un monde. Tu construis <b>autour</b>.</p>"+
@@ -1332,18 +1353,27 @@ en:{
   save:"Save", export:"Export / Import", reset:"Reset",
   lang_title:"Language",
   menu:"Menu", menu_t:"Menu",
-  mg_game:"Your game", mg_learn:"Learn", mg_info:"Information",
+  mg_game:"Your game", mg_jeu:"The game",
+  ms_save:"the game already does it on its own, every 20 s",
+  ms_save_s:"the game already does it every 20 s",
+  ms_expo:"a code to copy when changing device",
+  ms_expo_s:"a code to change device",
+  ms_reset:"erases the run, for good",
+  ms_reset_s:"erases everything, for good",
+  ms_tuto:"five screens, two minutes",
+  ms_log:"what changed, version by version",
+  don_t:"Support the game",
+  don_sub:"— free, no ads, no account",
+  don_sub_s:"— free, no ads",
+  pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"Seven more <b>achievements</b> for the challenges. Six <b>challenges</b>, each breaking one rule of the game, unlocked on cycle #6. A <b>tutorial</b> and a single <b>menu</b>.",
+  wn_d:"The <b>menu</b> becomes a list, with a line explaining each entry. Seven more <b>achievements</b> for the challenges, which each break one rule of the game.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
-  ab_t:"About",
   ab_code:"Source code",
   ab_lic:"GPL 3.0 or later",
-  ab_auth:"Created by mephissto with help from Claude",
-  ab_patreon:"Support",
   tu_prev:"Previous screen", tu_next:"Next screen",
-  m_tuto:"Tutorial", m_log:"Changelog", m_about:"About",
+  m_tuto:"Tutorial", m_log:"Changelog",
   lore:"<p>You are not building on a world. You are building <b>around</b> one.</p>"+
        "<p>The colony turns four hundred kilometres above a dead planet, anchored to an asteroid captured into the same orbit. Nothing lands, nothing leaves: everything you build stays suspended there, between the void and the gravity well.</p>"+
        "<p>And the orbit decays. Always. Every colony falls back in the end, and all that survives is a handful of antimatter torn from its own descent — enough to build the next one a little higher, a little faster.</p>"+
@@ -3687,6 +3717,7 @@ bindAction($("#mImport"),()=>{
    fichier qui pointent hors du jeu, autant qu'elles soient trouvables. */
 const LIEN_CODE="https://github.com/mephissto/orbital-colony";
 const LIEN_PATREON="https://www.patreon.com/cw/mephissto";
+const LIEN_AUTEUR="https://github.com/mephissto";
 const LIEN_LOG=LIEN_CODE+"/blob/main/CHANGELOG.md";
 const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
 
@@ -3695,6 +3726,12 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.2.1", nm:{fr:"Le nom de l'auteur est cliquable",en:"The author's name is a link"},
+  d:{fr:"Dans le pied de page du menu, « mephissto » mène désormais à son GitHub.",
+     en:"In the menu footer, \"mephissto\" now links to their GitHub."}},
+ {v:"3.2.0", nm:{fr:"Le menu passe en liste",en:"The menu becomes a list"},
+  d:{fr:"Une entrée par ligne, pleine largeur, avec une explication sous chacune. La fenêtre « À propos » disparaît : l'auteur, la version, le code source et la licence tiennent dans le pied de page, et « Soutenir le jeu » y gagne un vrai bouton.",
+     en:"One entry per row, full width, each with a line explaining it. The About window is gone: author, version, source code and licence fit in the footer, and \"Support the game\" gets a real button."}},
  {v:"3.1.1", nm:{fr:"Le menu s'ouvre au doigt",en:"The menu opens on touch"},
   d:{fr:"Sur téléphone, la roue crantée n'ouvrait rien : le clic fantôme que le navigateur synthétise après un appui atterrissait sur le fond de la fenêtre à peine ouverte et la refermait aussitôt. Toutes les fenêtres du menu étaient touchées.",
      en:"On a phone, the gear opened nothing: the ghost click the browser synthesises after a tap landed on the backdrop of the window that had just opened and closed it again. Every window in the menu was affected."}},
@@ -3732,20 +3769,19 @@ const LOG=[
    rouge — on ne le vise pas par erreur en allant vers Sauvegarder. */
 /* Intitulés des trois groupes, dans le style des sections des onglets :
    icône + titre en petites capitales cyan, souligné. */
-const MGRP=[{g:1,ico:"🎮",k:"mg_game"},{g:2,ico:"💡",k:"mg_learn"},{g:3,ico:"📖",k:"mg_info"}];
+const MGRP=[{g:1,ico:"🎮",k:"mg_game"},{g:2,ico:"📖",k:"mg_jeu"}];
 const MENU=[
- {id:"save",  g:1, ico:"💾", k:"save",    f:()=>{save();toast(t("t_saved"))}},
- {id:"expo",  g:1, ico:"⇅",  k:"export",  f:ouvrirExport},
- {id:"reset", g:1, ico:"🗑️", k:"reset",   danger:true, f:()=>{
+ {id:"save", g:1, ico:"💾", k:"save",   sub:"ms_save", f:()=>{save();toast(t("t_saved"))}},
+ {id:"expo", g:1, ico:"⇅",  k:"export", sub:"ms_expo", f:ouvrirExport},
+ {id:"reset",g:1, ico:"🗑️", k:"reset",  sub:"ms_reset", danger:true, f:()=>{
     // la confirmation se pose par-dessus le menu, comme les autres fenêtres :
     // annuler doit ramener là d'où l'on vient
     demande(t("reset_t"),t("confirm_reset"),()=>{
       ferme("#menu"); S=NEW(); S.tuto=1; save(); render(); toast(t("t_newgame"));
     });
  }},
- {id:"tuto",  g:2, ico:"🎓", k:"m_tuto",  f:()=>tutoOuvre(false)},
- {id:"log",   g:3, ico:"📜", k:"m_log",   f:()=>ouvre("#chlog")},
- {id:"about", g:3, ico:"ℹ️", k:"m_about", f:()=>ouvre("#about")},
+ {id:"tuto", g:2, ico:"🎓", k:"m_tuto", sub:"ms_tuto", f:()=>tutoOuvre(false)},
+ {id:"log",  g:2, ico:"📜", k:"m_log",  sub:"ms_log",  f:()=>ouvre("#chlog")},
 ];
 const ouvre=sel=>$(sel).classList.add("on");
 const ferme=sel=>$(sel).classList.remove("on");
@@ -3766,8 +3802,11 @@ function buildMenu(){
     const b=document.createElement("button");
     b.className="mitem"+(m.danger?" danger":""); b.type="button";
     b.dataset.m=m.id;                      // adressable par identité, pas par rang
-    b.innerHTML='<span class="mi">'+m.ico+'</span><span class="ml"></span>';
-    b.ql=b.querySelector(".ml"); b._k=m.k;
+    b.innerHTML='<span class="mi">'+m.ico+'</span>'+
+                '<span class="ml"><span class="mt"></span><span class="ms"></span></span>'+
+                '<span class="chev">\u203a</span>';
+    b.ql=b.querySelector(".mt"); b.qs=b.querySelector(".ms");
+    b._k=m.k; b._s=m.sub;
     bindAction(b,m.f); grp.appendChild(b);
   });
   const l=$("#logList"); l.innerHTML="";
@@ -3778,39 +3817,25 @@ function buildMenu(){
     d.qt=d.querySelector(".logvt"); d.qd=d.querySelector(".logvd"); d._x=x;
     l.appendChild(d);
   });
-  const a=$("#abList"); a.innerHTML="";
-  const FLECHE='<svg class="aext" viewBox="0 0 24 24" aria-hidden="true">'+
-               '<path d="M7 17 17 7M9 7h8v8"/></svg>';
-  const lignes=[
-   {ico:"🛠️", v:"ab_code",    href:LIEN_CODE},
-   {ico:"💜", v:"ab_patreon", href:LIEN_PATREON},
-   {ico:"✍️", v:"ab_auth"},
-   {ico:"⚖️", v:"ab_lic",     href:LIEN_CODE+"/blob/main/LICENSE"},
-   {ico:"🔖", ver:true},
-  ];
-  lignes.forEach(x=>{
-    const e=document.createElement(x.href?"a":"div");
-    e.className="abrow";
-    if(x.href){e.href=x.href;e.target="_blank";e.rel="noopener noreferrer"}
-    e.innerHTML='<span class="ai">'+x.ico+'</span><span class="av"></span>'+(x.href?FLECHE:"");
-    e.qv=e.querySelector(".av"); e._x=x; a.appendChild(e);
-  });
 }
-/* Les textes des trois fenêtres suivent la langue : ils sont remplis au moment
+/* Les textes des deux fenêtres suivent la langue : ils sont remplis au moment
    où on les ouvre plutôt qu'à chaque image — rien n'y bouge autrement. */
 function majMenu(){
   txt($("#wnVer"),"v"+VERSION);
-  $$("#mGrid .mitem").forEach(b=>txt(b.ql,t(b._k)));
+  $$("#mGrid .mitem").forEach(b=>{ txt(b.ql,t(b._k)); txt(b.qs,tm(b._s)) });
   $$("#mGrid .msec").forEach(h=>{
     const x=MGRP.find(y=>String(y.g)===h.dataset.g);
     if(x)txt(h,x.ico+" "+t(x.k));
   });
   $$("#logList .logv").forEach(d=>{txt(d.qt,tr(d._x.nm));txt(d.qd,tr(d._x.d))});
   $("#logFull").href=(LANG==="fr")?LIEN_LOG:LIEN_LOG_EN;
-  $$("#abList .abrow").forEach(e=>{
-    if(e._x.ver)txt(e.qv,"v"+VERSION+(estDev()?" — DEV":""));
-    else txt(e.qv,t(e._x.v));
-  });
+  // le pied de page : ce qui restait d'« À propos »
+  $("#mDon").href=LIEN_PATREON;
+  html($("#piedPar"),t("pied_par",
+    '<a href="'+LIEN_AUTEUR+'" target="_blank" rel="noopener noreferrer"><b>mephissto</b></a>'));
+  $("#piedCode").href=LIEN_CODE;
+  $("#piedLic").href=LIEN_CODE+"/blob/main/LICENSE";
+  txt($("#piedVer"),"v"+VERSION+(estDev()?" — DEV":""));
 }
 
 /* ---------- tutoriel ----------
@@ -3853,7 +3878,6 @@ function tutoFerme(){
 bindAction($("#bMenu"),()=>{majMenu();ouvre("#menu")});
 bindAction($("#menuClose"),()=>ferme("#menu"));
 bindAction($("#logClose"),()=>ferme("#chlog"));
-bindAction($("#abClose"),()=>ferme("#about"));
 bindAction($("#tuClose"),tutoFerme);
 bindAction($("#tuPrev"),()=>tutoVa(-1));
 bindAction($("#tuNext"),()=>tutoVa(1));
@@ -3894,7 +3918,6 @@ bindAction($("#tuNext"),()=>tutoVa(1));
    de la fenêtre et relâcher sur le fond ne la ferme plus. */
 [["#menu",()=>ferme("#menu")],
  ["#chlog",()=>ferme("#chlog")],
- ["#about",()=>ferme("#about")],
  ["#modal",()=>ferme("#modal")],
  ["#tuto",tutoFerme]].forEach(([sel,f])=>{
   const z=$(sel);

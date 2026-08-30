@@ -17,6 +17,24 @@ restent valides**.
 
 ---
 
+## 3.2.0 — Le menu passe en liste
+
+- 📋 **Une entrée par ligne, pleine largeur**, avec une explication sous chacune :
+  « le jeu le fait déjà tout seul, toutes les 20 s » sous *Sauvegarder*, « un code
+  à copier pour changer d'appareil » sous *Export / Import*, « efface la partie,
+  définitivement » sous *Reset*. La grille à deux colonnes offrait une cible
+  tactile deux fois plus petite et aucune place pour expliquer.
+- 💜 **Un bouton « Soutenir le jeu »**, avec la mention « gratuit, sans publicité,
+  sans compte » qui justifie sa présence.
+- ℹ️ **La fenêtre « À propos » disparaît.** Elle ne contenait plus que quatre
+  lignes : l'auteur et la version tiennent maintenant sur une ligne de pied de
+  page, le code source et la licence juste en dessous. Une fenêtre de moins.
+- 🎯 Deux groupes au lieu de trois : **Ta partie** et **Le jeu**.
+
+Aucun champ de sauvegarde touché.
+
+---
+
 ## 3.1.1 — Le menu s'ouvre au doigt
 
 - 🐛 **Sur téléphone, la roue crantée n'ouvrait rien.** Après un appui, le

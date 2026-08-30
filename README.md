@@ -18,7 +18,7 @@ Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
 
 - [Fichiers et déploiement](#fichiers-et-déploiement)
 - [Le monde du jeu](#le-monde-du-jeu)
-- [Menu, tutoriel et à propos](#menu-tutoriel-et-à-propos)
+- [Menu et tutoriel](#menu-et-tutoriel)
 - [Boucle de jeu](#boucle-de-jeu)
 - [Le clic](#le-clic)
 - [Les structures](#les-structures)
@@ -124,12 +124,12 @@ Le nom du jeu n'est pas décoratif : il décrit la boucle.
 > est seulement en train de tomber moins vite que la précédente.**
 
 Ce texte est la clé `lore` du dictionnaire `T`, en français et en anglais. Il
-ouvre le tutoriel et se relit dans « À propos ». Il justifie aussi le prestige :
+ouvre le tutoriel. Il justifie aussi le prestige :
 relancer un cycle n'est pas une convention de genre, c'est l'orbite qui cède.
 
 ---
 
-## Menu, tutoriel et à propos
+## Menu et tutoriel
 
 Jusqu'à la 2.35 la barre du haut portait trois boutons — Sauvegarder,
 Export / Import, Reset. La 3.0.28 les regroupe derrière **un seul bouton Menu** :
@@ -137,16 +137,27 @@ Export / Import, Reset. La 3.0.28 les regroupe derrière **un seul bouton Menu**
 dangereusement avec Sauvegarder.
 
 Le menu contient un résumé des nouveautés (clé `wn_d`, trois lignes, à réécrire
-à chaque version notable) puis six entrées : Sauvegarder, Export / Import,
-Tutoriel, Changelog, À propos, et Reset — seule action irréversible, donc seule
-en rouge, seule sur toute la largeur, et en dernier.
+à chaque version notable) puis **cinq entrées en liste**, une par ligne et pleine
+largeur : Sauvegarder, Export / Import, Reset, Tutoriel, Changelog. Chacune porte
+un **sous-titre** qui dit ce qu'elle fait — « le jeu le fait déjà tout seul,
+toutes les 20 s » sous Sauvegarder répond à la seule question que pose ce bouton.
+Les sous-titres ont une variante courte (`_s`) sur écran étroit.
+
+En dessous, un bouton **💜 Soutenir le jeu** et un **pied de page** : l'auteur et
+la version sur une ligne, le code source et la licence en dessous.
+
+La grille à deux colonnes a tenu de la 3.0.0 à la 3.1.1. Elle a été abandonnée
+pour trois raisons : la cible tactile ne faisait que la moitié de la largeur, il
+n'y avait pas la place d'expliquer une entrée, et **la fenêtre « À propos » ne
+contenait plus que quatre lignes** — elles tiennent dans le pied de page, ce qui
+supprime une fenêtre entière.
 
 **Ordre d'empilement des fenêtres**, à respecter si on en ajoute une :
 
 | Fenêtre | z-index |
 |---|---|
 | Menu | 82 |
-| Export / Import, Changelog, À propos | 84 |
+| Export / Import, Changelog | 84 |
 | Tutoriel | 86 |
 | Invitation à installer (PWA) | 90 |
 | Confirmation (`demande()`) | 95 |
@@ -154,15 +165,22 @@ en rouge, seule sur toute la largeur, et en dernier.
 L'export s'ouvre **depuis** le menu : à 80 il s'ouvrait derrière lui, visible
 mais inutilisable, le menu interceptant les clics.
 
-**Changelog** — le tableau `LOG` embarque les huit dernières versions résumées
-en une phrase, bilingues, et un lien mène au `CHANGELOG.md` complet du dépôt.
-Le fichier complet fait 37 Ko par langue et le jeu doit rester jouable hors
-connexion : l'extrait est la contrepartie assumée, à tenir à jour à chaque
-livraison.
+**Fermer au clic à côté** exige que l'appui **et** le relâchement aient eu lieu
+sur le fond. Le seul clic ne suffit pas : au tactile, le navigateur synthétise un
+`click` après le `pointerup` et le replace sur l'élément alors sous le doigt —
+donc sur le fond de la fenêtre qui vient de s'ouvrir, qui se refermait aussitôt
+(corrigé en 3.1.1). La confirmation `demande()` est exclue de ce mécanisme : on
+n'annule pas une action irréversible d'un clic distrait.
+
+**Changelog** — le tableau `LOG` embarque les dernières versions résumées en une
+phrase, bilingues, et un lien mène au `CHANGELOG.md` complet du dépôt. Le fichier
+complet fait 37 Ko par langue et le jeu doit rester jouable hors connexion :
+l'extrait est la contrepartie assumée, à tenir à jour à chaque livraison.
 
 **Tutoriel** — cinq écrans (`TUTO`) : le lore, l'astéroïde, les structures, les
 améliorations et anomalies, le cycle. Il s'ouvre **tout seul à la première
-partie** et se relance depuis le menu.
+partie** et se relance depuis le menu. Flèches de part et d'autre des points, et
+glissement du doigt dans les deux sens.
 
 Deux points délicats :
 
@@ -170,13 +188,12 @@ Deux points délicats :
   `majPwa()` seulement si le tutoriel avait été ouvert automatiquement — deux
   fenêtres empilées au premier lancement, c'est une de trop.
 - Une partie déjà commencée ne le déclenche pas. Le champ `S.tuto` n'existe pas
-  dans les sauvegardes antérieures à la 3.0.28 et y vaut donc 0 : `partieVierge()`
+  dans les sauvegardes antérieures à la 3.0.0 et y vaut donc 0 : `partieVierge()`
   regarde aussi `totalOre`, `prestiges` et `clicks`, et le drapeau est posé
   immédiatement pour ne plus jamais y revenir.
 
-**À propos** — le lore, puis cinq lignes : code source, Patreon, auteur, licence
-et version. Les deux liens sortants sont les constantes `LIEN_CODE` et
-`LIEN_PATREON`, en tête du bloc, et portent `rel="noopener noreferrer"`.
+Les deux liens sortants sont les constantes `LIEN_CODE` et `LIEN_PATREON`, en
+tête du bloc, et portent `rel="noopener noreferrer"`.
 
 ---
 

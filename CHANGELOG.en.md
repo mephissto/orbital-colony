@@ -16,6 +16,23 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.2.0 — The menu becomes a list
+
+- 📋 **One entry per row, full width**, each with a line explaining it: "the game
+  already does it on its own, every 20 s" under *Save*, "a code to copy when
+  changing device" under *Export / Import*, "erases the run, for good" under
+  *Reset*. The two-column grid gave a touch target half as wide and no room to
+  explain anything.
+- 💜 **A "Support the game" button**, with the "free, no ads, no account" line
+  that justifies its presence.
+- ℹ️ **The About window is gone.** It held only four lines: author and version now
+  sit on one footer line, source code and licence just below. One window fewer.
+- 🎯 Two groups instead of three: **Your game** and **The game**.
+
+No save field touched.
+
+---
+
 ## 3.1.1 — The menu opens on touch
 
 - 🐛 **On a phone, the gear opened nothing.** After a tap the browser synthesises

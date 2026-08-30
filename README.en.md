@@ -17,7 +17,7 @@ Free software under [GPL 3.0 or later](#licence).
 
 - [Files and deployment](#files-and-deployment)
 - [The world of the game](#the-world-of-the-game)
-- [Menu, tutorial and about](#menu-tutorial-and-about)
+- [Menu and tutorial](#menu-and-tutorial)
 - [Game loop](#game-loop)
 - [Clicking](#clicking)
 - [Structures](#structures)
@@ -120,29 +120,39 @@ The name is not decorative: it describes the loop.
 > is only falling more slowly than the last one.**
 
 This text is the `lore` key of the `T` dictionary, in French and English. It
-opens the tutorial and can be read again in the About panel. It also justifies
+opens the tutorial. It also justifies
 prestige: restarting a cycle is not a genre convention, it is the orbit giving
 way.
 
 ---
 
-## Menu, tutorial and about
+## Menu and tutorial
 
 Up to 2.35 the top bar carried three buttons — Save, Export / Import, Reset.
 3.0.28 groups them behind **a single Menu button**: at five entries the bar no
 longer fitted on a phone, and Reset sat dangerously next to Save.
 
 The menu holds a what's-new summary (the `wn_d` key, three lines, to be
-rewritten at every notable version) then six entries: Save, Export / Import,
-Tutorial, Changelog, About, and Reset — the only irreversible action, hence the
-only red one, the only full-width one, and the last one.
+rewritten at every notable version) then **five entries as a list**, one per row
+and full width: Save, Export / Import, Reset, Tutorial, Changelog. Each carries a
+**subtitle** saying what it does — "the game already does it on its own, every
+20 s" under Save answers the only question that button raises. Subtitles have a
+short variant (`_s`) on narrow screens.
+
+Below them, a **💜 Support the game** button and a **footer**: author and version
+on one line, source code and licence underneath.
+
+The two-column grid lasted from 3.0.0 to 3.1.1. It was dropped for three reasons:
+the touch target was only half the width, there was no room to explain an entry,
+and **the About window held only four lines** — they fit in the footer, which
+removes a whole window.
 
 **Window stacking order**, to respect if another one is added:
 
 | Window | z-index |
 |---|---|
 | Menu | 82 |
-| Export / Import, Changelog, About | 84 |
+| Export / Import, Changelog | 84 |
 | Tutorial | 86 |
 | Install prompt (PWA) | 90 |
 | Confirmation (`demande()`) | 95 |
@@ -150,14 +160,22 @@ only red one, the only full-width one, and the last one.
 Export opens **from** the menu: at 80 it opened behind it, visible but unusable,
 with the menu intercepting clicks.
 
-**Changelog** — the `LOG` table embeds the last eight versions summarised in one
+**Closing on an outside click** requires both the press **and** the release to
+happen on the backdrop. A click alone is not enough: on touch the browser
+synthesises a `click` after `pointerup` and places it on whatever is under the
+finger then — that is, on the backdrop of the window that just opened, which
+closed again immediately (fixed in 3.1.1). The `demande()` confirmation is
+excluded from this: an irreversible action is not cancelled by a stray click.
+
+**Changelog** — the `LOG` table embeds the latest versions summarised in one
 sentence, bilingual, with a link to the repository's full `CHANGELOG.md`. The
 full file is 37 KB per language and the game has to stay playable offline: the
 excerpt is the accepted trade-off, to be kept up to date at every release.
 
 **Tutorial** — five screens (`TUTO`): the lore, the asteroid, structures,
 upgrades and anomalies, the cycle. It opens **by itself on the first run** and
-can be replayed from the menu.
+can be replayed from the menu. Arrows on either side of the dots, and swiping in
+both directions.
 
 Two delicate points:
 
@@ -165,13 +183,12 @@ Two delicate points:
   only if the tutorial had opened automatically — two stacked dialogs on the
   first launch is one too many.
 - A run already in progress does not trigger it. The `S.tuto` field does not
-  exist in pre-3.0.28 saves and reads 0 there, so `partieVierge()` also looks at
+  exist in pre-3.0.0 saves and reads 0 there, so `partieVierge()` also looks at
   `totalOre`, `prestiges` and `clicks`, and the flag is set immediately so it
   never comes back.
 
-**About** — the lore, then five rows: source code, Patreon, author, licence and
-version. The two outbound links are the `LIEN_CODE` and `LIEN_PATREON`
-constants, at the top of the block, and carry `rel="noopener noreferrer"`.
+The two outbound links are the `LIEN_CODE` and `LIEN_PATREON` constants, at the
+top of the block, and carry `rel="noopener noreferrer"`.
 
 ---
 
