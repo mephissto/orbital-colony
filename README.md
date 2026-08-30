@@ -143,7 +143,7 @@ un **sous-titre** qui dit ce qu'elle fait — « le jeu le fait déjà tout seul
 toutes les 20 s » sous Sauvegarder répond à la seule question que pose ce bouton.
 Les sous-titres ont une variante courte (`_s`) sur écran étroit.
 
-En dessous, un bouton **💜 Soutenir le jeu** et un **pied de page** : l'auteur et
+En dessous, un bouton **☕ Soutenir le jeu** (vers Ko-fi) et un **pied de page** : l'auteur et
 la version sur une ligne, le code source et la licence en dessous.
 
 La grille à deux colonnes a tenu de la 3.0.0 à la 3.1.1. Elle a été abandonnée
@@ -192,8 +192,8 @@ Deux points délicats :
   regarde aussi `totalOre`, `prestiges` et `clicks`, et le drapeau est posé
   immédiatement pour ne plus jamais y revenir.
 
-Les deux liens sortants sont les constantes `LIEN_CODE` et `LIEN_PATREON`, en
-tête du bloc, et portent `rel="noopener noreferrer"`.
+Les liens sortants sont les constantes `LIEN_CODE`, `LIEN_AUTEUR` et
+`LIEN_KOFI`, en tête du bloc, et portent `rel="noopener noreferrer"`.
 
 ---
 

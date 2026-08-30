@@ -16,6 +16,33 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.2.2 — Ko-fi replaces Patreon
+
+- ☕ **The "Support the game" button now goes to Ko-fi.** Patreon took a 10 %
+  cut, required a monthly subscription, and made visitors create an account.
+  Ko-fi takes **nothing** on a one-off tip — only the payment processor's fees
+  remain — and the money lands directly in the author's own account instead of
+  passing through the platform.
+- 🔗 The `LIEN_PATREON` constant becomes `LIEN_KOFI`. It is the only outbound
+  link in the menu that changed; source code, licence and the author's GitHub
+  are untouched.
+- The button keeps its shape, its violet colour and its "free, no ads, no
+  account" line: nothing else moves on screen.
+
+No save field touched.
+
+---
+
+## 3.2.1 — The author's name is a link
+
+- 🔗 In the menu footer, **"mephissto" now links to their GitHub**. The name had
+  been shown in bold since 3.2.0 without being a link — which looked like an
+  oversight, and was one.
+
+No save field touched.
+
+---
+
 ## 3.2.0 — The menu becomes a list
 
 - 📋 **One entry per row, full width**, each with a line explaining it: "the game

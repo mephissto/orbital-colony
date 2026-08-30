@@ -17,6 +17,33 @@ restent valides**.
 
 ---
 
+## 3.2.2 — Ko-fi remplace Patreon
+
+- ☕ **Le bouton « Soutenir le jeu » mène désormais à Ko-fi.** Patreon prenait
+  10 % de commission, imposait un abonnement mensuel, et exigeait du visiteur
+  qu'il se crée un compte. Ko-fi ne prend **rien** sur un don ponctuel — seuls
+  restent les frais du processeur de paiement — et l'argent arrive directement
+  sur le compte de l'auteur au lieu de transiter par la plateforme.
+- 🔗 La constante `LIEN_PATREON` devient `LIEN_KOFI`. C'est le seul lien sortant
+  du menu à avoir changé ; le code source, la licence et le GitHub de l'auteur
+  sont inchangés.
+- Le bouton garde sa forme, sa couleur violette et sa mention « gratuit, sans
+  publicité, sans compte » : rien d'autre ne bouge à l'écran.
+
+Aucun champ de sauvegarde touché.
+
+---
+
+## 3.2.1 — Le nom de l'auteur est cliquable
+
+- 🔗 Dans le pied de page du menu, **« mephissto » mène à son GitHub**. Le nom
+  y était affiché en gras depuis la 3.2.0 sans être un lien — ce qui ressemblait
+  à un oubli, et en était un.
+
+Aucun champ de sauvegarde touché.
+
+---
+
 ## 3.2.0 — Le menu passe en liste
 
 - 📋 **Une entrée par ligne, pleine largeur**, avec une explication sous chacune :

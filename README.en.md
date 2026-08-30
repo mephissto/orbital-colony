@@ -139,7 +139,7 @@ and full width: Save, Export / Import, Reset, Tutorial, Changelog. Each carries 
 20 s" under Save answers the only question that button raises. Subtitles have a
 short variant (`_s`) on narrow screens.
 
-Below them, a **💜 Support the game** button and a **footer**: author and version
+Below them, a **☕ Support the game** button (to Ko-fi) and a **footer**: author and version
 on one line, source code and licence underneath.
 
 The two-column grid lasted from 3.0.0 to 3.1.1. It was dropped for three reasons:
@@ -187,8 +187,8 @@ Two delicate points:
   `totalOre`, `prestiges` and `clicks`, and the flag is set immediately so it
   never comes back.
 
-The two outbound links are the `LIEN_CODE` and `LIEN_PATREON` constants, at the
-top of the block, and carry `rel="noopener noreferrer"`.
+The outbound links are the `LIEN_CODE`, `LIEN_AUTEUR` and `LIEN_KOFI`
+constants, at the top of the block, and carry `rel="noopener noreferrer"`.
 
 ---
 

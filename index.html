@@ -678,15 +678,15 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .mitem.danger{color:var(--red)}
 .mitem.danger:hover{background:rgba(255,107,138,.12);color:#fff}
 
-/* Soutenir : le violet ne sert qu'à l'antimatière dans le jeu, il attire donc
-   l'œil sans crier. La mention « gratuit, sans publicité » justifie le bouton
-   au lieu de quémander. */
-.don{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+/* Soutenir : une seule voie, Ko-fi. Le violet ne sert qu'à l'antimatière dans
+   le jeu, il attire donc l'œil sans crier. La mention « gratuit, sans
+   publicité » justifie le bouton au lieu de quémander. */
+.don{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:14px;
   border:1px solid rgba(169,123,255,.45);background:rgba(169,123,255,.1);
   color:var(--violet);border-radius:10px;padding:11px 12px;font-size:12.5px;
-  margin-top:14px;text-decoration:none;transition:.15s}
+  text-decoration:none;transition:.15s}
 .don:hover{border-color:var(--violet);background:rgba(169,123,255,.18)}
-.don .sub{color:var(--dim);font-weight:400}
+.don .sub{color:var(--dim);font-weight:400;margin-left:auto;text-align:right}
 
 /* Pied de page : l'auteur et la version sur une ligne, les liens obligatoires
    (code source, licence) en dessous. Ils remplacent la fenêtre « À propos »,
@@ -1078,9 +1078,9 @@ a.hbtn{text-decoration:none}
     <div class="wnd" data-i18n="wn_d" data-i18n-html></div>
   </div>
   <div class="mgrid" id="mGrid"></div>
-  <a class="don" id="mDon" target="_blank" rel="noopener noreferrer">
-    <span>💜</span><b data-i18n="don_t">Soutenir le jeu</b>
-    <span class="sub" data-i18n="don_sub"></span></a>
+  <a class="don" id="mKofi" target="_blank" rel="noopener noreferrer">
+    <span>☕</span><b data-i18n="don_t">Soutenir le jeu</b>
+    <span class="sub" data-i18n="don_sub" data-i18n-s="don_sub_s"></span></a>
   <div class="pied">
     <div class="h"><span id="piedPar"></span>
       <span class="ver" id="piedVer"></span></div>
@@ -1152,7 +1152,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.2.1";
+const VERSION="3.2.2";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1199,7 +1199,7 @@ fr:{
   don_sub_s:"— gratuit, sans pub",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le <b>menu</b> passe en liste, avec une explication sous chaque entrée. Sept <b>succès</b> de plus pour les défis, qui cassent chacun une règle du jeu.",
+  wn_d:"Le bouton <b>Soutenir le jeu</b> mène désormais à <b>Ko-fi</b> : un don ponctuel, sans compte à créer, et sans commission sur la plateforme.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_code:"Code source",
@@ -1367,7 +1367,7 @@ en:{
   don_sub_s:"— free, no ads",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The <b>menu</b> becomes a list, with a line explaining each entry. Seven more <b>achievements</b> for the challenges, which each break one rule of the game.",
+  wn_d:"The <b>Support the game</b> button now goes to <b>Ko-fi</b>: a one-off tip, no account to create, and no platform cut.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_code:"Source code",
@@ -3716,7 +3716,7 @@ bindAction($("#mImport"),()=>{
    Les liens sortants sont deux constantes : elles sont les seules choses de ce
    fichier qui pointent hors du jeu, autant qu'elles soient trouvables. */
 const LIEN_CODE="https://github.com/mephissto/orbital-colony";
-const LIEN_PATREON="https://www.patreon.com/cw/mephissto";
+const LIEN_KOFI="https://ko-fi.com/mephissto";
 const LIEN_AUTEUR="https://github.com/mephissto";
 const LIEN_LOG=LIEN_CODE+"/blob/main/CHANGELOG.md";
 const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
@@ -3726,6 +3726,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.2.2", nm:{fr:"Ko-fi remplace Patreon",en:"Ko-fi replaces Patreon"},
+  d:{fr:"Le bouton « Soutenir le jeu » mène à Ko-fi. Patreon prenait 10 % et imposait un abonnement mensuel ; Ko-fi ne prend rien sur un don ponctuel, et le visiteur n'a pas de compte à créer.",
+     en:"The \"Support the game\" button now goes to Ko-fi. Patreon took 10 % and required a monthly subscription; Ko-fi takes nothing on a one-off tip, and visitors need no account."}},
  {v:"3.2.1", nm:{fr:"Le nom de l'auteur est cliquable",en:"The author's name is a link"},
   d:{fr:"Dans le pied de page du menu, « mephissto » mène désormais à son GitHub.",
      en:"In the menu footer, \"mephissto\" now links to their GitHub."}},
@@ -3830,7 +3833,7 @@ function majMenu(){
   $$("#logList .logv").forEach(d=>{txt(d.qt,tr(d._x.nm));txt(d.qd,tr(d._x.d))});
   $("#logFull").href=(LANG==="fr")?LIEN_LOG:LIEN_LOG_EN;
   // le pied de page : ce qui restait d'« À propos »
-  $("#mDon").href=LIEN_PATREON;
+  $("#mKofi").href=LIEN_KOFI;
   html($("#piedPar"),t("pied_par",
     '<a href="'+LIEN_AUTEUR+'" target="_blank" rel="noopener noreferrer"><b>mephissto</b></a>'));
   $("#piedCode").href=LIEN_CODE;
