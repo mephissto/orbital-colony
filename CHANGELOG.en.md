@@ -33,6 +33,11 @@ export/import. No released version has ever renamed or removed a field: **every
 - 🎨 **A link to the brand kit** opens the footer, before the source code:
   [brand.orbital-colony.app](https://brand.orbital-colony.app/) — the game's
   logo, palette and wallpapers. It shortens to "Brand" on a small screen.
+- 🌍 **Language detection walks the full preference list.** It only looked at
+  `navigator.language`, the first choice: a browser set to `nl-BE` then `fr-BE`
+  got English although French was available and wanted. It now walks
+  `navigator.languages` in order and keeps the first language the game knows.
+  As a side effect, `fry` (Frisian) no longer passes for French.
 
 No save field touched.
 

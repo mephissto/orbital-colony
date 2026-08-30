@@ -1545,8 +1545,22 @@ en:{
 const LKEY="colonie_orbitale_lang";
 function readLang(){try{return localStorage.getItem(LKEY)}catch(e){return null}}
 function writeLang(l){try{localStorage.setItem(LKEY,l)}catch(e){}}
+/* La langue du visiteur, prise dans l'ordre de ses réglages : on retient la
+   première que le jeu connaît. navigator.language seul ne donne que son premier
+   choix — un navigateur réglé sur nl-BE puis fr-BE tombait sur l'anglais alors
+   que le français était disponible et voulu. La liste des langues connues, ce
+   sont les clés de T : ajouter une traduction suffit à l'étendre. */
+function detecteLang(){
+  const p=(navigator.languages&&navigator.languages.length)
+          ? navigator.languages : [navigator.language||""];
+  for(let i=0;i<p.length;i++){
+    const c=String(p[i]).toLowerCase().split("-")[0];
+    if(T[c])return c;
+  }
+  return "en";
+}
 let LANG=readLang();
-if(!T[LANG])LANG=((navigator.language||"en").toLowerCase().indexOf("fr")===0)?"fr":"en";
+if(!T[LANG])LANG=detecteLang();
 
 /* t("clé", param0, param1…) → chaîne d'interface ; tr({fr,en}) → texte de données */
 function t(k){
@@ -3755,8 +3769,8 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
  {v:"3.2.3", nm:{fr:"Le menu au cordeau",en:"The menu, squared up"},
-  d:{fr:"« Soutenir le jeu » devient une ligne comme les autres, la mention « gratuit, sans publicité » passant en explication, sur un violet à peine posé. Les icônes sont centrées dans une boîte carrée — les émojis et les symboles texte n'ont pas la même chasse, la colonne partait en biais. Les liens qui quittent le jeu portent une flèche sortante, et le pied de page gagne un lien vers le kit de marque.",
-     en:"\"Support the game\" becomes a row like the others, with \"free, no ads\" moving into the explanation line, on a barely-there violet. Icons are centred in a square box — emoji and text symbols have different widths, and the column was drifting. Links that leave the game carry an outgoing arrow, and the footer gains a link to the brand kit."}},
+  d:{fr:"« Soutenir le jeu » devient une ligne comme les autres, la mention « gratuit, sans publicité » passant en explication, sur un violet à peine posé. Les icônes sont centrées dans une boîte carrée — les émojis et les symboles texte n'ont pas la même chasse, la colonne partait en biais. Les liens qui quittent le jeu portent une flèche sortante, et le pied de page gagne un lien vers le kit de marque. La détection de langue suit désormais toute la liste des préférences du navigateur.",
+     en:"\"Support the game\" becomes a row like the others, with \"free, no ads\" moving into the explanation line, on a barely-there violet. Icons are centred in a square box — emoji and text symbols have different widths, and the column was drifting. Links that leave the game carry an outgoing arrow, and the footer gains a link to the brand kit. Language detection now walks the full browser preference list."}},
  {v:"3.2.2", nm:{fr:"Ko-fi remplace Patreon",en:"Ko-fi replaces Patreon"},
   d:{fr:"Le bouton « Soutenir le jeu » mène à Ko-fi. Patreon prenait 10 % et imposait un abonnement mensuel ; Ko-fi ne prend rien sur un don ponctuel, et le visiteur n'a pas de compte à créer.",
      en:"The \"Support the game\" button now goes to Ko-fi. Patreon took 10 % and required a monthly subscription; Ko-fi takes nothing on a one-off tip, and visitors need no account."}},

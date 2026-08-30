@@ -36,6 +36,12 @@ restent valides**.
   source : [brand.orbital-colony.app](https://brand.orbital-colony.app/) — le
   logo, la palette et les fonds d'écran du jeu. Sur petit écran il se raccourcit
   en « Marque ».
+- 🌍 **La détection de langue suit toute la liste des préférences.** Elle ne
+  regardait que `navigator.language`, c'est-à-dire le premier choix : un
+  navigateur réglé sur `nl-BE` puis `fr-BE` recevait l'anglais alors que le
+  français était disponible et voulu. Elle parcourt maintenant
+  `navigator.languages` dans l'ordre et retient la première langue connue du
+  jeu. Au passage, `fry` (frison) ne passe plus pour du français.
 
 Aucun champ de sauvegarde touché.
 
