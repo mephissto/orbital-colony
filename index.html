@@ -1177,7 +1177,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.2.3";
+const VERSION="3.3.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1224,7 +1224,7 @@ fr:{
   don_sub_s:"gratuit, sans pub",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le bouton <b>Soutenir le jeu</b> devient une ligne comme les autres, avec son explication en dessous. Les icônes du menu sont enfin alignées, et les liens qui sortent du jeu portent une <b>flèche</b>.",
+  wn_d:"Le <b>clic</b> est rééquilibré vers le début de partie : l'écho de base passe de 7 à 10 %, les résonateurs à 12/13,5/15 %, et les deux premières améliorations coûtent moins cher. Le plafond de fin de partie ne bouge pas.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_marque:"Kit de marque", ab_marque_s:"Marque",
@@ -1393,7 +1393,7 @@ en:{
   don_sub_s:"free, no ads",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The <b>Support the game</b> button becomes a row like the others, with its explanation underneath. The menu icons are finally aligned, and links that leave the game carry an <b>arrow</b>.",
+  wn_d:"<b>Clicking</b> is rebalanced toward the early game: the base echo goes from 7 to 10 %, resonators to 12/13.5/15 %, and the first two upgrades cost less. The end-game ceiling does not move.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_marque:"Brand kit", ab_marque_s:"Brand",
@@ -1646,15 +1646,23 @@ UPS.push(
     multiplicateurs moins forts on peut remonter d'autant l'écho de base et les
     résonateurs, ce qui déplace la puissance du clic vers le DÉBUT de partie —
     là où elle manquait — sans rien changer au plafond de fin de partie :
-    0,15 × 5,71 = **0,86 s de production**, exactement comme avant. */
- {id:"c1",ico:"🔨",cost:400,  kind:"click",mult:1.4,
-  nm:{fr:"Marteau ionique",en:"Ion hammer"},ds:{fr:"Clic ×1,4",en:"Click ×1.4"}},
- {id:"c2",ico:"🦾",cost:3.5e4,kind:"click",mult:1.5,req:S=>S.clicks>=50,
-  nm:{fr:"Exosquelette",en:"Exoskeleton"},ds:{fr:"Clic ×1,5",en:"Click ×1.5"}},
- {id:"c3",ico:"⚡",cost:5e6,  kind:"click",mult:1.6,req:S=>S.clicks>=250,
-  nm:{fr:"Condensateur",en:"Capacitor"},ds:{fr:"Clic ×1,6",en:"Click ×1.6"}},
- {id:"c4",ico:"🧲",cost:2e9,  kind:"click",mult:1.7,req:S=>S.clicks>=600,
-  nm:{fr:"Champ magnétique",en:"Magnetic field"},ds:{fr:"Clic ×1,7",en:"Click ×1.7"}},
+    0,15 × 5,71 = **0,86 s de production**, exactement comme avant.
+
+    3.3.0 remet le curseur sur le début sans toucher au plafond. Le cumul reste
+    ×5,71, mais resserré (1,45/1,52/1,58/1,64 au lieu de 1,4/1,5/1,6/1,7) : à
+    produit constant, monter la première oblige à baisser la dernière, et la
+    moyenne géométrique des quatre — 1,546 — est le plafond indépassable de c1
+    si l'on veut garder l'ordre croissant. Les coûts de c1 et c2 baissent
+    (400→250, 35 k→18 k), ce qui déplace la courbe plus tôt sans rien coûter au
+    plafond. */
+ {id:"c1",ico:"🔨",cost:250,  kind:"click",mult:1.45,
+  nm:{fr:"Marteau ionique",en:"Ion hammer"},ds:{fr:"Clic ×1,45",en:"Click ×1.45"}},
+ {id:"c2",ico:"🦾",cost:1.8e4,kind:"click",mult:1.52,req:S=>S.clicks>=50,
+  nm:{fr:"Exosquelette",en:"Exoskeleton"},ds:{fr:"Clic ×1,52",en:"Click ×1.52"}},
+ {id:"c3",ico:"⚡",cost:5e6,  kind:"click",mult:1.58,req:S=>S.clicks>=250,
+  nm:{fr:"Condensateur",en:"Capacitor"},ds:{fr:"Clic ×1,58",en:"Click ×1.58"}},
+ {id:"c4",ico:"🧲",cost:2e9,  kind:"click",mult:1.64,req:S=>S.clicks>=600,
+  nm:{fr:"Champ magnétique",en:"Magnetic field"},ds:{fr:"Clic ×1,64",en:"Click ×1.64"}},
 /* Résonateurs : 3/12/40 % → 2/5/10 % en 2.31.0, puis 9/12/15 % en 3.0.28 en même
    temps qu'apparaissait un écho de base de 7 % : ils doivent rester au-dessus
    de lui pour continuer d'apporter quelque chose, et les multiplicateurs de
@@ -1662,13 +1670,18 @@ UPS.push(
    production AVANT toute amélioration de clic : plus aucun multiplicateur
    intéressant ne pouvait s'ajouter sans que le clic dépasse la production — et
    avec dix Satellites qui cliquent 10 fois par seconde, le clic pesait déjà
-   80 % du minerai extrait d'un cycle. */
- {id:"r1",ico:"📡",cost:2e5,  kind:"reso",val:.09,
+   80 % du minerai extrait d'un cycle.
+
+   3.3.0 : 12/13,5/15 %, et l'écho de base passe à 10 %. L'écho ne peut jamais
+   dépasser le premier résonateur — le jeu prend le maximum des deux — donc
+   remonter l'écho impose de remonter r1 avec lui, sinon r1 devient un achat
+   sans effet. r3 reste à 15 % : c'est lui qui fixe le plafond. */
+ {id:"r1",ico:"📡",cost:2e5,  kind:"reso",val:.12,
   nm:{fr:"Résonateur v1",en:"Resonator v1"},
-  ds:{fr:"Le clic gagne +9 % de ta production/s",en:"Clicks gain +9 % of your output/s"}},
- {id:"r2",ico:"📡",cost:4e8,  kind:"reso",val:.12,req:S=>S.ups.r1,
-  nm:{fr:"Résonateur v2",en:"Resonator v2"},
   ds:{fr:"Le clic gagne +12 % de ta production/s",en:"Clicks gain +12 % of your output/s"}},
+ {id:"r2",ico:"📡",cost:4e8,  kind:"reso",val:.135,req:S=>S.ups.r1,
+  nm:{fr:"Résonateur v2",en:"Resonator v2"},
+  ds:{fr:"Le clic gagne +13,5 % de ta production/s",en:"Clicks gain +13.5 % of your output/s"}},
  {id:"r3",ico:"📡",cost:6e11, kind:"reso",val:.15,req:S=>S.ups.r2,
   nm:{fr:"Résonateur v3",en:"Resonator v3"},
   ds:{fr:"Le clic gagne +15 % de ta production/s",en:"Clicks gain +15 % of your output/s"}}
@@ -2375,7 +2388,7 @@ function perSec(noBuff){
    complet — plafond de fin de partie strictement inchangé (2,16 s avec les
    douze niveaux de Bras servo-assistés, seule exception admise à la règle
    « un clic ne doit jamais dépasser une seconde de production »). */
-const ECHO_BASE=0.07;
+const ECHO_BASE=0.10;
 function clickVal(auto){
   // Mains liées : le clic ne rapporte rien, y compris celui des satellites —
   // qui sont de toute façon en pause pendant un défi.
@@ -3768,6 +3781,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.3.0", nm:{fr:"Le clic, revu par le bas",en:"Clicking, fixed from the bottom"},
+  d:{fr:"L'écho de base passe de 7 à 10 %, les résonateurs de 9/12/15 à 12/13,5/15 %, et les améliorations de clic sont resserrées à cumul constant. Le Marteau ionique coûte 250 au lieu de 400, l'Exosquelette 18 000 au lieu de 35 000. Un clic vaut +43 % au départ et +46 % au palier des 18 k ; à partir du Résonateur v3, rien ne change.",
+     en:"The base echo goes from 7 to 10 %, resonators from 9/12/15 to 12/13.5/15 %, and the click upgrades are tightened at constant total. The Ion hammer costs 250 instead of 400, the Exoskeleton 18,000 instead of 35,000. A click is worth +43 % at the start and +46 % at the 18k tier; from Resonator v3 on, nothing changes."}},
  {v:"3.2.3", nm:{fr:"Le menu au cordeau",en:"The menu, squared up"},
   d:{fr:"« Soutenir le jeu » devient une ligne comme les autres, la mention « gratuit, sans publicité » passant en explication, sur un violet à peine posé. Les icônes sont centrées dans une boîte carrée — les émojis et les symboles texte n'ont pas la même chasse, la colonne partait en biais. Les liens qui quittent le jeu portent une flèche sortante, et le pied de page gagne un lien vers le kit de marque. La détection de langue suit désormais toute la liste des préférences du navigateur.",
      en:"\"Support the game\" becomes a row like the others, with \"free, no ads\" moving into the explanation line, on a barely-there violet. Icons are centred in a square box — emoji and text symbols have different widths, and the column was drifting. Links that leave the game carry an outgoing arrow, and the footer gains a link to the brand kit. Language detection now walks the full browser preference list."}},

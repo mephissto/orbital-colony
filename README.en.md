@@ -223,10 +223,10 @@ terms, the whole multiplied by the global multiplier:
 click = ( strike + echo ) × click upgrades × Servo arms × active click buff
 
   strike = 1 × global multiplier
-  echo   = output/s × max( best resonator owned , base echo 7 % )
+  echo   = output/s × max( best resonator owned , base echo 10 % )
 ```
 
-- **Base echo: 7 %** (3.0.28). Without it the echo only exists once the first
+- **Base echo: 10 %** (7 % in 3.0.28, raised in 3.3.0). Without it the echo only exists once the first
   resonator is bought (200,000 ore), and the strike — a base of 1 that never
   grows — drops off immediately: measured on a fresh run, the click stayed at
   1–1.5 while output reached 246/s, i.e. **0.006 s of output per click** after an
@@ -235,7 +235,7 @@ click = ( strike + echo ) × click upgrades × Servo arms × active click buff
   result: a floor on the final value would hide the effect of click upgrades —
   exactly the defect fixed in 2.30.0.
 - **Click upgrades** — **on the click's total value**, echo included: Ion hammer
-  ×1.4, Exoskeleton ×1.5, Capacitor ×1.6, Magnetic field ×1.7. In full:
+  ×1.45, Exoskeleton ×1.52, Capacitor ×1.58, Magnetic field ×1.64. In full:
   **×5.71**. Each is worth exactly its ×N however far along you are, which is
   what the card states as a single number.
 - **Servo-assisted arms** (research) — **+8 % per level on the whole click**,
@@ -246,7 +246,7 @@ click = ( strike + echo ) × click upgrades × Servo arms × active click buff
   antimatter, which keeps the research consistent with the other seven (whose
   first levels all cost between 6 and 30).
 - **Resonators** — replace the base echo with a higher percentage of your output
-  per second: v1 +9 %, v2 +12 %, v3 +15 %. Only the best one counts, they do not
+  per second: v1 +12 %, v2 +13.5 %, v3 +15 %. Only the best one counts, they do not
   stack.
 
 **The balance rule: a click must never exceed output/s.** The click's ceiling is
@@ -257,10 +257,40 @@ why the resonators dropped to 2/5/10 % at the same time as the multipliers moved
 to ×1.5–×2.
 
 3.0.28 replays that same trade-off in the other direction: **the multipliers drop
-to ×1.4–×1.7 (×5.71 in full) so the echo can go up** (7 % base, resonators
-9/12/15 %). Click power thus moves towards the **early** game, where it was
-missing, without changing the ceiling at all: 0.15 × 5.71 = **0.86 s of output**,
-exactly the previous value.
+(×5.71 in full) so the echo can go up**. Click power thus moves towards the
+**early** game, where it was missing, without changing the ceiling at all:
+0.15 × 5.71 = **0.86 s of output**, exactly the previous value.
+
+3.3.0 pushes that same slider one notch further, still at a constant ceiling.
+Three constraints govern the setting:
+
+1. **The echo can never exceed the first resonator**, since the game takes the
+   maximum of the two. Raising the echo to 10 % without touching v1 (9 %) would
+   have made v1 *strictly useless*, which is why the resonators move to
+   12/13.5/15 %.
+2. **v3 sets the ceiling** and therefore stays at 15 %.
+3. **At a constant total, raising the first upgrade forces the last one down.**
+   The geometric mean of the four is 1.546: that is the highest the Ion hammer
+   can go without becoming stronger than the Magnetic field. Hence the tightening
+   to 1.45/1.52/1.58/1.64.
+
+The fourth lever carries no such constraint: **lowering the costs**. The Ion
+hammer goes from 400 to 250, the Exoskeleton from 35,000 to 18,000. The player
+reaches the same multipliers earlier, which moves the curve without touching a
+single balance value.
+
+Measured result, in seconds of output per click:
+
+| Stage | 3.2.3 | 3.3.0 |
+|---|---|---|
+| start, no upgrade | 0.070 | **0.100** |
+| Ion hammer | 0.102 | **0.145** |
+| + Resonator v1 | 0.131 | **0.174** |
+| + Exoskeleton | 0.199 | **0.265** |
+| + Capacitor, v2 | 0.382 | **0.470** |
+| + Magnetic field, v2 | 0.650 | **0.771** |
+| + Resonator v3 | 0.857 | 0.857 |
+| servo 12/12 | 2.158 | 2.157 |
 
 **The only thing allowed to cross that ceiling is the Servo arms research** — and
 only once all twelve levels are paid for: at 12/12 the click reaches **2.16 s of
@@ -269,14 +299,14 @@ research is entitled to see its effect.
 
 | Stage | Echo | Click upgrades | Servo | sec. of output/click |
 |---|---|---|---|---|
-| First minutes | 7 % base | 0 | 0/12 | 0.40 |
-| Exoskeleton | 7 % base | 2 | 1/12 | 0.16 |
-| Resonator v2 | 12 % | 3 | 7/12 | 0.69 |
-| Magnetic field | 12 % | 4 | 9/12 | 1.37 |
+| First minutes | 10 % base | 0 | 0/12 | 0.10 |
+| Exoskeleton | 10 % base | 2 | 1/12 | 0.24 |
+| Resonator v2 | 13.5 % | 3 | 7/12 | 0.75 |
+| Magnetic field | 13.5 % | 4 | 9/12 | 1.54 |
 | Resonator v3 | 15 % | 4 | 11/12 | 2.00 |
 | Very advanced run | 15 % | 4 | 12/12 | **2.16** |
 
-The dip to 0.16 s at the second stage is expected: the first two click upgrades
+The dip at the second stage is expected: the first two click upgrades
 land before the first resonator, and that is the one moment where the strike (the
 constant term) has already dropped off while the echo has not yet grown. Before
 3.0.28 that dip was 0.01 s.
@@ -361,11 +391,11 @@ units and multiplies that one structure's output:
 
 A fully upgraded structure produces **×1,440**.
 
-**Click upgrades** — on the whole click: Ion hammer ×1.4 (400), Exoskeleton ×1.5
-(35,000, from 50 clicks), Capacitor ×1.6 (5e6, from 250 clicks), Magnetic field
-×1.7 (2e9, from 600 clicks). In full: **×5.71**.
+**Click upgrades** — on the whole click: Ion hammer ×1.45 (250), Exoskeleton
+×1.52 (18,000, from 50 clicks), Capacitor ×1.58 (5e6, from 250 clicks), Magnetic
+field ×1.64 (2e9, from 600 clicks). In full: **×5.71**.
 
-**Resonators** — v1 +9 % (2e5), v2 +12 % (4e8, requires v1), v3 +15 % (6e11,
+**Resonators** — v1 +12 % (2e5), v2 +13.5 % (4e8, requires v1), v3 +15 % (6e11,
 requires v2). Below them, the base echo is already worth **7 %**.
 
 **Global upgrades** — Logistics network ×1.25 (5e4), Coordination AI ×1.5 (8e6),

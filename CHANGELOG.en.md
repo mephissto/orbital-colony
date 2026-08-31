@@ -16,6 +16,48 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.3.0 — Clicking, fixed from the bottom
+
+Clicking took off too late. Between the first minute and buying the Capacitor —
+a good chunk of the early game — it stayed under 0.2 seconds of output while
+passive production kept climbing. This version moves the power towards the start
+**without touching the end-game ceiling**, measured identical to the thousandth.
+
+- 📈 **The base echo goes from 7 to 10 %.** It is what gives a click any value
+  before a resonator is bought.
+- 📡 **Resonators go from 9/12/15 % to 12/13.5/15 %.** This was not optional: the
+  game keeps the **maximum** of the echo and the best resonator, so a 10 % echo
+  would have made Resonator v1 (9 %) strictly useless. v3 stays at 15 % — it is
+  what sets the ceiling.
+- 🔨 **Click multipliers are tightened**, at a constant total:
+  1.45 / 1.52 / 1.58 / 1.64 instead of 1.4 / 1.5 / 1.6 / 1.7, still **×5.71** in
+  full. At a constant product, raising the first forces the last one down; the
+  geometric mean of the four, **1.546**, is the highest the Ion hammer can go
+  without becoming stronger than the Magnetic field.
+- 💰 **The Ion hammer costs 250 instead of 400, the Exoskeleton 18,000 instead of
+  35,000.** This is the one lever with no trade-off: the player reaches the same
+  multipliers earlier, and no balance value moves at all.
+
+Measured in the game, in seconds of output per click:
+
+| Stage | 3.2.3 | 3.3.0 | |
+|---|---|---|---|
+| start, no upgrade | 0.075 | **0.105** | +40 % |
+| Ion hammer | 0.105 | **0.152** | +45 % |
+| + Resonator v1 | 0.133 | **0.181** | +36 % |
+| + Exoskeleton | 0.199 | **0.275** | +38 % |
+| + Capacitor, v2 | 0.420 | **0.488** | +16 % |
+| + Magnetic field, v2 | 0.714 | **0.800** | +12 % |
+| + Resonator v3 | 0.885 | 0.885 | — |
+| servo 12/12 | 2.229 | 2.229 | — |
+
+The balance rule holds: a click never exceeds one second of output, except
+through the twelve Servo arm levels — a deliberate overshoot since 2.32.0.
+
+No save field touched.
+
+---
+
 ## 3.2.3 — The menu, squared up
 
 - ☕ **"Support the game" becomes a row like the others**: icon, title,

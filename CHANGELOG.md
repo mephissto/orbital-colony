@@ -17,6 +17,50 @@ restent valides**.
 
 ---
 
+## 3.3.0 — Le clic, revu par le bas
+
+Le clic décollait trop tard. Entre la première minute et l'achat du Condensateur
+— soit une bonne partie du début de partie — il restait sous 0,2 seconde de
+production, pendant que la production passive, elle, montait. Cette version
+déplace la puissance vers le début **sans toucher au plafond de fin de partie**,
+mesuré identique au millième près.
+
+- 📈 **L'écho de base passe de 7 à 10 %.** C'est lui qui donne au clic une valeur
+  avant tout achat de résonateur.
+- 📡 **Les résonateurs passent de 9/12/15 % à 12/13,5/15 %.** Ce n'était pas
+  optionnel : le jeu retient le **maximum** entre l'écho et le meilleur
+  résonateur, donc un écho à 10 % aurait rendu le Résonateur v1 (9 %) strictement
+  inutile. Le v3 reste à 15 %, c'est lui qui fixe le plafond.
+- 🔨 **Les multiplicateurs de clic sont resserrés**, à cumul constant :
+  1,45 / 1,52 / 1,58 / 1,64 au lieu de 1,4 / 1,5 / 1,6 / 1,7, toujours **×5,71**
+  au total. À produit constant, monter la première oblige à baisser la dernière ;
+  la moyenne géométrique des quatre, **1,546**, est la valeur maximale que peut
+  prendre le Marteau ionique sans devenir plus fort que le Champ magnétique.
+- 💰 **Le Marteau ionique coûte 250 au lieu de 400, l'Exosquelette 18 000 au lieu
+  de 35 000.** C'est le seul levier sans contrepartie : le joueur atteint les
+  mêmes multiplicateurs plus tôt, sans qu'aucune valeur d'équilibre ne bouge.
+
+Mesuré sur le jeu, en secondes de production par clic :
+
+| Étape | 3.2.3 | 3.3.0 | |
+|---|---|---|---|
+| départ, aucune amélioration | 0,075 | **0,105** | +40 % |
+| Marteau ionique | 0,105 | **0,152** | +45 % |
+| + Résonateur v1 | 0,133 | **0,181** | +36 % |
+| + Exosquelette | 0,199 | **0,275** | +38 % |
+| + Condensateur, v2 | 0,420 | **0,488** | +16 % |
+| + Champ magnétique, v2 | 0,714 | **0,800** | +12 % |
+| + Résonateur v3 | 0,885 | 0,885 | — |
+| servo 12/12 | 2,229 | 2,229 | — |
+
+La règle d'équilibrage est respectée : un clic ne dépasse jamais une seconde de
+production, sauf par les douze niveaux de Bras servo, dépassement assumé depuis
+la 2.32.0.
+
+Aucun champ de sauvegarde touché.
+
+---
+
 ## 3.2.3 — Le menu au cordeau
 
 - ☕ **« Soutenir le jeu » devient une ligne comme les autres** : icône, titre,
