@@ -16,6 +16,56 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.3.1 — A tip, and a counter repaired
+
+### The antimatter "X missing" figure was wrong
+
+For anyone who has completed **Containment leak**, the antimatter tile announced
+a remaining-ore figure unrelated to reality: "−2.41 Qi" on a late save when
+12.4 Qa were actually missing, while the gain itself climbed two or three points
+per second. The player watched a counter race upward under a number claiming the
+opposite.
+
+That challenge's reward (×1.15 on the gain) was applied in one direction only:
+`amGain()` counted it, its inverse `amMinerai()` did not undo it. So the game
+answered "how much ore for the next antimatter?" with the ore for a gain **1.15
+times larger**. The gap is not 15 %: the gain's exponent being 0.30, it is
+`1.15^(1/0.30)`, i.e. **×4.9** on the threshold — and up to a factor of 80 on
+what is left to mine, since that is a difference between two large numbers.
+
+- 🧮 **The coefficient now lives in a single function**, `amCoef()`, called from
+  both sides. It can no longer be forgotten on one of them.
+- 🧪 **A test checks the round trip**: for eleven gains between 1 and 999,999,
+  with and without the reward, the ore returned gives back exactly the gain
+  asked for, and one millionth below it gives back exactly the previous one.
+
+The **gain itself was never wrong**: `amGain()` was correct, and so was the
+antimatter actually credited. Nothing to make up on saves in progress — this was
+a display fault.
+
+### A tip, not a donation
+
+**Donation** vocabulary has been replaced everywhere by **tip** vocabulary. This
+is not a stylistic nicety: a donation implies a cause and a collection, a tip
+thanks someone for work already delivered. The second is exactly what happens
+here, and it is also what payment processors' terms ask for.
+
+- ☕ **"Support the game" becomes "Leave a tip".** The explanation under the
+  label goes from "free, no ads, no account" to "if you enjoyed it — the game
+  stays free either way": the game being free is still stated, but this time as
+  the reason there is nothing to buy.
+- 🚫 **Nothing is promised in return, and nothing ever was.** Nothing unlocks,
+  nothing is reserved, nothing is sold. That was already true; it is now
+  written down.
+- 📄 **The Ko-fi page is reworded in the same spirit** — the About text, the
+  thank-you message and the pinned post no longer talk about "paying for the
+  domain and the hosting". An announced earmark makes it a collection; a tip
+  has no earmark.
+
+No game rule, no balance value and no save field touched.
+
+---
+
 ## 3.3.0 — Clicking, fixed from the bottom
 
 Clicking took off too late. Between the first minute and buying the Capacitor —

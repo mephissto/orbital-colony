@@ -1177,7 +1177,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.3.0";
+const VERSION="3.3.1";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1219,12 +1219,12 @@ fr:{
   ms_reset_s:"efface tout, définitivement",
   ms_tuto:"cinq écrans, deux minutes",
   ms_log:"ce qui a changé, version par version",
-  don_t:"Soutenir le jeu",
-  don_sub:"gratuit, sans publicité, sans compte",
-  don_sub_s:"gratuit, sans pub",
+  don_t:"Laisser un pourboire",
+  don_sub:"si le jeu t'a plu — il reste gratuit dans tous les cas",
+  don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le <b>clic</b> est rééquilibré vers le début de partie : l'écho de base passe de 7 à 10 %, les résonateurs à 12/13,5/15 %, et les deux premières améliorations coûtent moins cher. Le plafond de fin de partie ne bouge pas.",
+  wn_d:"Sur la tuile d'antimatière, le <b>« il manque X »</b> ignorait la récompense de Fuite de confinement et annonçait jusqu'à 80 fois trop de minerai. Le bouton du menu, lui, devient <b>« Laisser un pourboire »</b> : ce qui est proposé est un pourboire pour un travail déjà fait, pas un don à une cause.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_marque:"Kit de marque", ab_marque_s:"Marque",
@@ -1388,12 +1388,12 @@ en:{
   ms_reset_s:"erases everything, for good",
   ms_tuto:"five screens, two minutes",
   ms_log:"what changed, version by version",
-  don_t:"Support the game",
-  don_sub:"free, no ads, no account",
-  don_sub_s:"free, no ads",
+  don_t:"Leave a tip",
+  don_sub:"if you enjoyed it — the game stays free either way",
+  don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"<b>Clicking</b> is rebalanced toward the early game: the base echo goes from 7 to 10 %, resonators to 12/13.5/15 %, and the first two upgrades cost less. The end-game ceiling does not move.",
+  wn_d:"On the antimatter tile, the <b>\"X missing\"</b> figure ignored the Containment leak reward and could claim up to 80 times too much ore. And the menu button becomes <b>\"Leave a tip\"</b>: what is offered is a tip for work already done, not a donation to a cause.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_marque:"Brand kit", ab_marque_s:"Brand",
@@ -2440,14 +2440,19 @@ const AM_SEUIL=1e10;      // minerai pour la première antimatière
    joueur tout équipé retrouve le rendement d'origine (×0,96), et maxer les
    recherches repasse de 4 cycles à 7. */
 const AM_EXPG=0.30;
+/* Récompense de Fuite de confinement. Isolée dans sa propre fonction parce
+   qu'elle doit apparaître des DEUX côtés : dans le gain et dans son inverse.
+   Elle ne l'était pas, et amMinerai() renvoyait le minerai d'un gain 1,15 fois
+   plus grand — d'où un « il manque X » surévalué d'un facteur ~80 en fin de
+   partie, sur une tuile où le gain, lui, montait à vue d'œil. */
+const amCoef=()=>chalBonus("am15")?1.15:1;
 function amGain(){
   if(!(S.runOre>0))return 0;
-  let g=Math.pow(S.runOre/AM_SEUIL,AM_EXPG);
-  if(chalBonus("am15"))g*=1.15;               // récompense de Fuite de confinement
+  const g=Math.pow(S.runOre/AM_SEUIL,AM_EXPG)*amCoef();
   return Math.max(0,Math.floor(g));
 }
 /* minerai nécessaire pour un gain donné — l'inverse exact de amGain() */
-const amMinerai=g=>AM_SEUIL*Math.pow(g,1/AM_EXPG)*(1+1e-9);  // marge d'arrondi
+const amMinerai=g=>AM_SEUIL*Math.pow(g/amCoef(),1/AM_EXPG)*(1+1e-9);  // marge d'arrondi
 
 /* ---------- actions ---------- */
 function gain(n){S.ore+=n;S.totalOre+=n;S.runOre+=n}
@@ -3781,6 +3786,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.3.1", nm:{fr:"Un pourboire, et un compteur réparé",en:"A tip, and a counter repaired"},
+  d:{fr:"Le « il manque X » de la tuile d'antimatière ne défaisait pas la récompense de Fuite de confinement : il annonçait le minerai d'un gain 1,15 fois plus grand, soit jusqu'à 80 fois trop en fin de partie, pendant que le gain, lui, montait de plusieurs points par seconde. Par ailleurs « Soutenir le jeu » devient « Laisser un pourboire » : ce qui est proposé est un pourboire volontaire pour un travail déjà livré, sans contrepartie et sans rien à débloquer.",
+     en:"The \"X missing\" figure on the antimatter tile did not undo the Containment leak reward: it announced the ore for a gain 1.15 times larger — up to 80 times too much in the late game — while the gain itself climbed several points per second. Separately, \"Support the game\" becomes \"Leave a tip\": what is offered is a voluntary tip for work already delivered, with nothing in return and nothing to unlock."}},
  {v:"3.3.0", nm:{fr:"Le clic, revu par le bas",en:"Clicking, fixed from the bottom"},
   d:{fr:"L'écho de base passe de 7 à 10 %, les résonateurs de 9/12/15 à 12/13,5/15 %, et les améliorations de clic sont resserrées à cumul constant. Le Marteau ionique coûte 250 au lieu de 400, l'Exosquelette 18 000 au lieu de 35 000. Un clic vaut +43 % au départ et +46 % au palier des 18 k ; à partir du Résonateur v3, rien ne change.",
      en:"The base echo goes from 7 to 10 %, resonators from 9/12/15 to 12/13.5/15 %, and the click upgrades are tightened at constant total. The Ion hammer costs 250 instead of 400, the Exoskeleton 18,000 instead of 35,000. A click is worth +43 % at the start and +46 % at the 18k tier; from Resonator v3 on, nothing changes."}},

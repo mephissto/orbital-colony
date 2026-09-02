@@ -17,6 +17,58 @@ restent valides**.
 
 ---
 
+## 3.3.1 — Un pourboire, et un compteur réparé
+
+### Le « il manque X » de l'antimatière était faux
+
+Pour qui a terminé **Fuite de confinement**, la tuile d'antimatière annonçait un
+minerai restant sans rapport avec la réalité : « −2,41 Qi » sur une partie
+avancée alors qu'il en manquait 12,4 Qa, pendant que le gain, lui, montait de
+deux ou trois points par seconde. Le joueur voyait donc un compteur grimper à
+vue d'œil sous un chiffre qui prétendait l'inverse.
+
+La récompense de ce défi (×1,15 sur le gain) n'était appliquée que dans un
+sens : `amGain()` la comptait, son inverse `amMinerai()` ne la défaisait pas. Le
+jeu répondait donc à la question « combien de minerai pour l'antimatière
+suivante ? » par le minerai d'un gain **1,15 fois plus grand**. L'écart n'est
+pas de 15 % : l'exposant du gain étant 0,30, il vaut `1,15^(1/0,30)`, soit
+**×4,9** sur le seuil — et jusqu'à un facteur 80 sur ce qu'il reste à extraire,
+puisque c'est une différence entre deux grands nombres.
+
+- 🧮 **Le coefficient vit désormais dans une seule fonction**, `amCoef()`,
+  appelée des deux côtés. Il ne peut plus être oublié d'un côté.
+- 🧪 **Un test vérifie l'aller-retour** : pour onze gains entre 1 et 999 999,
+  avec et sans la récompense, le minerai renvoyé redonne exactement le gain
+  demandé, et un millionième en dessous redonne exactement le gain précédent.
+
+Le **gain lui-même n'a jamais été faux** : `amGain()` était juste, et
+l'antimatière effectivement créditée aussi. Rien à rattraper sur les parties en
+cours, c'était un défaut d'affichage.
+
+### Un pourboire, pas un don
+
+Le vocabulaire du **don** a été remplacé partout par celui du **pourboire**. Ce
+n'est pas une nuance de style : un don appelle une cause et une collecte, un
+pourboire remercie un travail déjà livré. Le second décrit exactement ce qui se
+passe ici, et c'est aussi ce que demandent les conditions d'utilisation des
+processeurs de paiement.
+
+- ☕ **« Soutenir le jeu » devient « Laisser un pourboire ».** L'explication sous
+  le libellé passe de « gratuit, sans publicité, sans compte » à « si le jeu t'a
+  plu — il reste gratuit dans tous les cas » : la gratuité est rappelée, mais
+  cette fois comme la raison pour laquelle il n'y a rien à acheter.
+- 🚫 **Aucune contrepartie n'est promise, et aucune ne l'était.** Rien ne se
+  débloque, rien n'est réservé, rien n'est vendu. C'était déjà vrai ; c'est
+  maintenant écrit.
+- 📄 **La page Ko-fi est reformulée dans le même esprit** — la présentation, le
+  message de remerciement et le billet épinglé ne parlent plus de « payer le
+  domaine et l'hébergement ». Une affectation annoncée, c'est une collecte ;
+  un pourboire n'a pas d'affectation.
+
+Aucune règle de jeu, aucun équilibrage, aucun champ de sauvegarde touché.
+
+---
+
 ## 3.3.0 — Le clic, revu par le bas
 
 Le clic décollait trop tard. Entre la première minute et l'achat du Condensateur

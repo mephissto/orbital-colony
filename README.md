@@ -143,7 +143,7 @@ un **sous-titre** qui dit ce qu'elle fait — « le jeu le fait déjà tout seul
 toutes les 20 s » sous Sauvegarder répond à la seule question que pose ce bouton.
 Les sous-titres ont une variante courte (`_s`) sur écran étroit.
 
-En dessous, un bouton **☕ Soutenir le jeu** (vers Ko-fi) et un **pied de page** : l'auteur et
+En dessous, une ligne **☕ Laisser un pourboire** (vers Ko-fi) et un **pied de page** : l'auteur et
 la version sur une ligne, le code source et la licence en dessous.
 
 La grille à deux colonnes a tenu de la 3.0.0 à la 3.1.1. Elle a été abandonnée
