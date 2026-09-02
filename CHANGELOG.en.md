@@ -16,6 +16,31 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.3.3 — The scroll indicator
+
+On a phone a grey line appeared at the right edge while scrolling the Extraction
+tab — cut at the buy row, cut again at the tabs, then vanishing under the planet
+band. At a glance it made those two bars look like they had a different
+background from the rest.
+
+The indicator belongs to the **scrolling container**, not to the flow: it is
+painted beneath that container's descendants. And `#hero` (fixed), `#stickyhead`
+and `#buyRow` (sticky) all run edge to edge so that cards pass under them — which
+means they also cover the right edge, where the indicator is drawn. No `z-index`
+raises it above them: it is not in the stacking tree. And the opposite — pulling
+the bars 8 px in from the right — would open a gap for the cards to show through.
+
+- 📱 **The indicator is hidden below 880 px** (`scrollbar-width:none` and
+  `::-webkit-scrollbar{display:none}` on `main` and `body`). On a touch screen,
+  position is read from the list, not from a 3 px line.
+- 🖥 **Desktop is untouched**: there `#panels` is the scroller, with its 9 px cyan
+  bar, and a classic scrollbar keeps its own width — so the sticky bars stop
+  before it.
+
+No game rule, no balance value and no save field touched.
+
+---
+
 ## 3.3.2 — The structure count
 
 Two achievements turn on the **total** number of structures — *A thousand parts*

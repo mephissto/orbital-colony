@@ -366,6 +366,13 @@ practice you own none of those anyway, since entering a challenge goes through
 `finCycle()`, which empties `S.gens` — but the count follows the state, not the
 display.
 
+Below 880 px the **scroll indicator is hidden** (`main`, `body`). It belongs to
+the container, not to the flow, so it is painted *under* `#hero`, `#stickyhead`
+and `#buyRow` — all of which run edge to edge so cards can pass beneath them. The
+line ended up cut twice, then swallowed by the planet band (3.3.3). Desktop is
+unchanged: `#panels` is the scroller there, and its classic 9 px bar keeps its
+own width.
+
 Below 560 px the row becomes **unbreakable**: the label shortens to "Lots of",
 the word *structures* drops, the buttons tighten, and if space still runs out it
 is the label that gets clipped — the four buttons make it guessable, while a

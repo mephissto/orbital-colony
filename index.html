@@ -927,6 +927,19 @@ a.hbtn{text-decoration:none}
   .tab .badge{min-width:14px;font-size:9.5px;padding:0 3px}
   body{overflow:auto}
   #panels{overflow:visible}
+  /* L'indicateur de défilement appartient au conteneur, pas au flux : il est
+     peint SOUS les descendants, donc sous l'en-tête fixe et sous les deux
+     barres collantes qui vont d'un bord à l'autre. Résultat sur téléphone :
+     un trait gris coupé au niveau de la rangée d'achat, coupé encore au niveau
+     des onglets, et qui disparaît sous le bandeau de la planète — comme si les
+     barres avaient un fond différent à cet endroit. Aucun ordre de peinture ne
+     le remonte au-dessus, et l'inverse (rentrer les barres de 8 px à droite)
+     ouvrirait une brèche où passeraient les cartes. On le masque donc : sur un
+     écran tactile, la position se lit à la liste, pas à un trait de 3 px. */
+  main{scrollbar-width:none}
+  main::-webkit-scrollbar{display:none}
+  body{scrollbar-width:none}
+  body::-webkit-scrollbar{display:none}
 }
 
 /* mise en page « bureau » sur un écran bas (téléphone en paysage) :
@@ -1195,7 +1208,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.3.2";
+const VERSION="3.3.3";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1242,7 +1255,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"La rangée d'achat affiche désormais le <b>total des structures</b>, à droite : c'est le compte exact des succès « Mille pièces » et « Mégastructure », qu'il fallait jusqu'ici faire à la main sur dix cartes. Sur téléphone, elle se resserre pour tenir sur une seule ligne.",
+  wn_d:"Sur téléphone, <b>l'indicateur de défilement</b> passait derrière la rangée d'achat, derrière les onglets et sous le bandeau de la planète : un trait gris coupé en trois, qui donnait aux barres l'air d'avoir un fond différent. Il est masqué.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_marque:"Kit de marque", ab_marque_s:"Marque",
@@ -1413,7 +1426,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The buy row now shows the <b>total structure count</b> on its right: the exact figure the \"A thousand parts\" and \"Megastructure\" achievements count, which until now had to be added up across ten cards by hand. On a phone the row tightens to stay on one line.",
+  wn_d:"On a phone, the <b>scroll indicator</b> ran behind the buy row, behind the tabs and under the planet band: a grey line cut into three pieces, which made those bars look like they had a different background. It is now hidden.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_marque:"Brand kit", ab_marque_s:"Brand",
@@ -3832,6 +3845,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.3.3", nm:{fr:"L'indicateur de défilement",en:"The scroll indicator"},
+  d:{fr:"Sur téléphone, il appartient au conteneur et non au flux : il était donc peint sous l'en-tête fixe et sous les deux barres collantes, qui vont d'un bord à l'autre. Un trait gris coupé au niveau de la rangée d'achat, coupé encore au niveau des onglets, puis disparaissant sous le bandeau de la planète — au point de faire croire que les barres avaient un fond différent à cet endroit. Rien ne permet de le remonter au-dessus : il est masqué.",
+     en:"On a phone it belongs to the container, not to the flow, so it was painted beneath the fixed header and beneath the two sticky bars, which run edge to edge. A grey line cut at the buy row, cut again at the tabs, then vanishing under the planet band — enough to make those bars look like they had a different background there. Nothing can raise it above them: it is now hidden."}},
  {v:"3.3.2", nm:{fr:"Le compte des structures",en:"The structure count"},
   d:{fr:"La rangée d'achat porte le total des structures à son extrémité droite : c'est le compte des succès « Mille pièces » (1 000) et « Mégastructure » (2 500), qu'il fallait jusqu'ici faire à la main sur dix cartes. Sous 560 px la rangée devient insécable : le libellé se raccourcit en « Par », le mot « structures » tombe et les boutons se resserrent, pour ne jamais passer sur deux lignes.",
      en:"The buy row carries the total structure count at its right end: the figure the \"A thousand parts\" (1,000) and \"Megastructure\" (2,500) achievements count, which until now meant adding up ten cards by hand. Below 560 px the row becomes unbreakable: the label shortens to \"Lots of\", the word \"structures\" drops and the buttons tighten, so it never falls to two lines."}},

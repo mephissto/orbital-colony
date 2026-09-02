@@ -375,6 +375,13 @@ ne reflète pas toujours l'état (*Colonie naine* en masque quatre). En pratique
 on n'en possède alors aucune, puisque entrer dans un défi passe par `finCycle()`
 qui vide `S.gens` — mais le compte suit l'état, pas l'affichage.
 
+Sous 880 px, l'**indicateur de défilement est masqué** (`main`, `body`).
+Il appartient au conteneur et non au flux, donc il est peint *sous* `#hero`,
+`#stickyhead` et `#buyRow` — qui vont tous d'un bord à l'autre pour que les
+cartes passent dessous. Le trait se retrouvait coupé deux fois puis avalé par le
+bandeau de la planète (3.3.3). Sur ordinateur rien ne change : c'est `#panels`
+qui défile, et sa barre classique de 9 px retient sa propre largeur.
+
 Sous 560 px la rangée devient **insécable** : le libellé se raccourcit en
 « Par », le mot *structures* tombe, les boutons se resserrent, et si la place
 manque encore c'est le libellé qui est rogné — les quatre boutons le rendent

@@ -17,6 +17,32 @@ restent valides**.
 
 ---
 
+## 3.3.3 — L'indicateur de défilement
+
+Sur téléphone, un trait gris apparaissait au bord droit pendant qu'on faisait
+défiler l'onglet Extraction — coupé au niveau de la rangée d'achat, coupé encore
+au niveau des onglets, puis disparaissant sous le bandeau de la planète. De loin,
+l'effet donnait aux deux barres l'air d'avoir un fond différent du reste.
+
+L'indicateur appartient au **conteneur défilant**, pas au flux : il est peint
+sous les descendants de ce conteneur. Or `#hero` (fixe), `#stickyhead` et
+`#buyRow` (collantes) vont tous d'un bord à l'autre pour que les cartes passent
+dessous — ils recouvrent donc aussi le bord droit, là où l'indicateur se dessine.
+Aucun `z-index` ne le remonte au-dessus : il n'est pas dans l'arbre d'empilement.
+Et l'inverse — rentrer les barres de 8 px à droite — ouvrirait une brèche par où
+passeraient les cartes.
+
+- 📱 **L'indicateur est masqué sous 880 px** (`scrollbar-width:none` et
+  `::-webkit-scrollbar{display:none}` sur `main` et `body`). Sur un écran
+  tactile, la position se lit à la liste, pas à un trait de 3 px.
+- 🖥 **L'ordinateur ne bouge pas** : là c'est `#panels` qui défile, avec sa barre
+  cyan de 9 px, et une barre classique retient sa largeur — les barres collantes
+  s'arrêtent donc avant elle.
+
+Aucune règle de jeu, aucun équilibrage, aucun champ de sauvegarde touché.
+
+---
+
 ## 3.3.2 — Le compte des structures
 
 Deux succès se jouent sur le **total** des structures — *Mille pièces* (1 000) et
