@@ -17,6 +17,30 @@ restent valides**.
 
 ---
 
+## 3.3.2 — Le compte des structures
+
+Deux succès se jouent sur le **total** des structures — *Mille pièces* (1 000) et
+*Mégastructure* (2 500) — et ce total n'était écrit nulle part. Il fallait
+additionner dix cartes à la main pour savoir où on en était.
+
+- 🏗️ **La rangée d'achat le porte à son extrémité droite**, toutes catégories
+  confondues. La somme est lue dans `S.gens` et non sur les cartes affichées : le
+  compte suit l'état de la partie, pas ce que la liste montre à cet instant.
+- 🔢 **Écrit avec ses séparateurs de milliers**, pas via `fmt()` : « 1 002 » et
+  non « 1.00K », puisque le seuil se joue à l'unité près.
+- 📱 **Sous 560 px la rangée devient insécable.** Le libellé se raccourcit en
+  « Par », le mot *structures* tombe, les boutons se resserrent — et si la place
+  manque encore, c'est le libellé qui est rogné : les quatre boutons le rendent
+  devinable, alors qu'une deuxième ligne coûterait 21 px de hauteur à chaque
+  défilement, sur une barre qui reste collée en haut de l'onglet.
+- 🧪 **Un test de plus** (`t_buyrow`, 33 au total) : la somme, le changement de
+  langue, le passage à chaud d'une largeur à l'autre, l'indifférence au défi
+  *Colonie naine*, et une seule ligne à 1200, 880, 560, 414, 390, 360 et 320 px.
+
+Aucune règle de jeu, aucun équilibrage, aucun champ de sauvegarde touché.
+
+---
+
 ## 3.3.1 — Un pourboire, et un compteur réparé
 
 ### Le « il manque X » de l'antimatière était faux

@@ -354,6 +354,23 @@ layout: on desktop `#panels` is the scroller and the row sticks to its top edge
 minus its padding, on mobile it is `<main>` and the row lands under the sticky
 tab header (the `--buyTop` CSS variable, updated by `syncHero()`).
 
+At its right end sits the **total number of structures owned**, all kinds
+together: the figure the *A thousand parts* (1,000) and *Megastructure* (2,500)
+achievements count, which until then meant adding up ten cards by hand. It is
+written with thousands separators rather than through `fmt()`, which would show
+"1.00K" where the threshold is decided to the unit (3.3.2).
+
+The sum is read from `S.gens`, not from the rendered cards: the visible list
+does not always mirror the state (*Dwarf colony* hides four of them). In
+practice you own none of those anyway, since entering a challenge goes through
+`finCycle()`, which empties `S.gens` — but the count follows the state, not the
+display.
+
+Below 560 px the row becomes **unbreakable**: the label shortens to "Lots of",
+the word *structures* drops, the buttons tighten, and if space still runs out it
+is the label that gets clipped — the four buttons make it guessable, while a
+second line would cost 21 px of height on every scroll.
+
 **Total output:**
 
 ```

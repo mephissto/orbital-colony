@@ -16,6 +16,30 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.3.2 — The structure count
+
+Two achievements turn on the **total** number of structures — *A thousand parts*
+(1,000) and *Megastructure* (2,500) — and that total was written nowhere. You
+had to add up ten cards by hand to know where you stood.
+
+- 🏗️ **The buy row now carries it at its right end**, all kinds together. The
+  sum is read from `S.gens`, not from the rendered cards: the count follows the
+  state of the run, not what the list happens to show.
+- 🔢 **Written with thousands separators**, not through `fmt()`: "1,002" rather
+  than "1.00K", since the threshold is decided to the unit.
+- 📱 **Below 560 px the row becomes unbreakable.** The label shortens to "Lots
+  of", the word *structures* drops, the buttons tighten — and if space still runs
+  out it is the label that gets clipped: the four buttons make it guessable,
+  while a second line would cost 21 px of height on every scroll, on a bar that
+  stays stuck to the top of the tab.
+- 🧪 **One more test** (`t_buyrow`, 33 in all): the sum, the language switch, a
+  live resize either way, indifference to the *Dwarf colony* challenge, and a
+  single line at 1200, 880, 560, 414, 390, 360 and 320 px.
+
+No game rule, no balance value and no save field touched.
+
+---
+
 ## 3.3.1 — A tip, and a counter repaired
 
 ### The antimatter "X missing" figure was wrong

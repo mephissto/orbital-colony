@@ -364,6 +364,22 @@ haut moins sa marge intérieure, sur mobile c'est `<main>` et elle se pose sous
 l'en-tête collant des onglets (variable CSS `--buyTop`, mise à jour par
 `syncHero()`).
 
+À son extrémité droite, le **total des structures** possédées, toutes
+catégories confondues : c'est le compte des succès *Mille pièces* (1 000) et
+*Mégastructure* (2 500), qu'il fallait jusque-là faire à la main sur dix cartes.
+Il est écrit avec ses séparateurs de milliers et non via `fmt()`, qui rendrait
+« 1.00K » là où le seuil se joue à l'unité (3.3.2).
+
+La somme est lue dans `S.gens`, pas sur les cartes affichées : la liste visible
+ne reflète pas toujours l'état (*Colonie naine* en masque quatre). En pratique
+on n'en possède alors aucune, puisque entrer dans un défi passe par `finCycle()`
+qui vide `S.gens` — mais le compte suit l'état, pas l'affichage.
+
+Sous 560 px la rangée devient **insécable** : le libellé se raccourcit en
+« Par », le mot *structures* tombe, les boutons se resserrent, et si la place
+manque encore c'est le libellé qui est rogné — les quatre boutons le rendent
+devinable, une deuxième ligne coûterait 21 px de hauteur à chaque défilement.
+
 **Production totale :**
 
 ```

@@ -382,6 +382,24 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
 /* ---------- CARDS ---------- */
 .buyrow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 .buyrow .lbl{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+/* Le total des structures, poussé à droite de la même rangée. C'est le compte
+   exact des succès « Mille pièces » et « Mégastructure » — jusqu'ici il fallait
+   additionner les dix cartes à la main. Chiffres tabulaires pour qu'il ne
+   sautille pas d'un rendu à l'autre, nowrap pour qu'il ne casse jamais la
+   rangée en deux lignes. */
+.buyrow .tot{margin-left:auto;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--dim);white-space:nowrap}
+.buyrow .tot b{color:var(--txt);font-weight:600;font-variant-numeric:tabular-nums}
+/* Sous 560 px la rangée devient insécable : elle est COLLÉE en haut de l'onglet,
+   une deuxième ligne mangerait 21 px de hauteur utile à chaque défilement. Tout
+   se resserre, et si l'espace manque quand même c'est le libellé qui cède —
+   c'est le seul élément que les quatre boutons rendent devinable. */
+@media (max-width:560px){
+  .buyrow{gap:6px;flex-wrap:nowrap}
+  .buyrow .lbl{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .buyrow .qty{flex:none;padding:5px 10px}
+  .buyrow .tot{flex:none;font-size:10px}
+}
 /* La rangée « acheter par lot » reste collée en haut pendant qu'on fait défiler
    les structures : c'est elle qui décide du prix et de la quantité affichés sur
    TOUTES les cartes, et remonter la chercher à chaque changement d'avis était
@@ -1177,7 +1195,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.3.1";
+const VERSION="3.3.2";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1224,7 +1242,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Sur la tuile d'antimatière, le <b>« il manque X »</b> ignorait la récompense de Fuite de confinement et annonçait jusqu'à 80 fois trop de minerai. Le bouton du menu, lui, devient <b>« Laisser un pourboire »</b> : ce qui est proposé est un pourboire pour un travail déjà fait, pas un don à une cause.",
+  wn_d:"La rangée d'achat affiche désormais le <b>total des structures</b>, à droite : c'est le compte exact des succès « Mille pièces » et « Mégastructure », qu'il fallait jusqu'ici faire à la main sur dix cartes. Sur téléphone, elle se resserre pour tenir sur une seule ligne.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_marque:"Kit de marque", ab_marque_s:"Marque",
@@ -1280,7 +1298,9 @@ fr:{
   pwa_install:"Installer", pwa_close:"Fermer",
   pwa_never:"Ne plus me le rappeler sur cet appareil",
   gen_hint:"Chaque structure produit du minerai en continu. Le prix monte de 15 % à chaque exemplaire acheté.",
-  buy_by:"Acheter par",
+  buy_by:"Acheter par", buy_by_s:"Par",
+  u_struct:"structures",
+  buy_tot_t:"Structures possédées, toutes catégories confondues — c'est le compte des succès « Mille pièces » (1 000) et « Mégastructure » (2 500).",
   up_hint:"Achats <b>uniques et permanents</b>, payés en minerai. À droite : le prix, puis ce qu'il te manque et le temps qu'il faut pour l'obtenir à ta production actuelle. La barre montre ta progression vers le prix.",
   up_avail:"À acheter ({0})", up_owned:"Déjà acquises ({0})", acquired:"Acquise",
   up_none_nm:"Rien de neuf pour l'instant",
@@ -1393,7 +1413,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"On the antimatter tile, the <b>\"X missing\"</b> figure ignored the Containment leak reward and could claim up to 80 times too much ore. And the menu button becomes <b>\"Leave a tip\"</b>: what is offered is a tip for work already done, not a donation to a cause.",
+  wn_d:"The buy row now shows the <b>total structure count</b> on its right: the exact figure the \"A thousand parts\" and \"Megastructure\" achievements count, which until now had to be added up across ten cards by hand. On a phone the row tightens to stay on one line.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_marque:"Brand kit", ab_marque_s:"Brand",
@@ -1447,7 +1467,9 @@ en:{
   pwa_install:"Install", pwa_close:"Close",
   pwa_never:"Don't remind me on this device",
   gen_hint:"Each structure produces ore continuously. The price rises 15 % with every unit bought.",
-  buy_by:"Buy in lots of",
+  buy_by:"Buy in lots of", buy_by_s:"Lots of",
+  u_struct:"structures",
+  buy_tot_t:"Structures owned, all kinds together — the figure the \"A thousand parts\" (1,000) and \"Megastructure\" (2,500) achievements count.",
   up_hint:"<b>One-off, permanent</b> purchases paid in ore. On the right: the price, then what you are still missing and how long it takes at your current output. The bar shows your progress towards the price.",
   up_avail:"Available ({0})", up_owned:"Already owned ({0})", acquired:"Owned",
   up_none_nm:"Nothing new right now",
@@ -1571,7 +1593,18 @@ function t(k){
 function tr(o){return (o&&typeof o==="object")?(o[LANG]!=null?o[LANG]:o.fr):o}
 /* tm() = t(), mais bascule sur la variante courte "clé_s" quand l'écran est étroit */
 let ETROIT=matchMedia("(max-width:880px)").matches;
-addEventListener("resize",()=>{ETROIT=matchMedia("(max-width:880px)").matches});
+/* Le même seuil que les variantes courtes d'applyI18n(), mis en cache : il est
+   relu à chaque rendu de l'onglet Extraction, et interroger matchMedia() vingt
+   fois par seconde n'apporte rien. */
+let COURT=matchMedia("(max-width:560px)").matches;
+addEventListener("resize",()=>{ETROIT=matchMedia("(max-width:880px)").matches;
+                               COURT=matchMedia("(max-width:560px)").matches});
+/* Un entier avec ses séparateurs de milliers. fmt() passerait 1002 à « 1.00K »,
+   or les seuils des succès sont à l'unité près : ici on veut « 1 002 ». */
+const nfmt=n=>Math.floor(n).toLocaleString(LANG==="fr"?"fr-FR":"en-US");
+/* Libellé long ou court selon la largeur, pour le texte construit hors
+   d'applyI18n() — buildSkeleton() s'exécute après lui. */
+const tc=(k,ks)=>t(COURT?ks:k);
 function tm(k){
   const a=[].slice.call(arguments);
   if(ETROIT&&T[LANG][k+"_s"]!=null)a[0]=k+"_s";
@@ -2923,7 +2956,8 @@ function buildSkeleton(){
   /* --- Extraction --- */
   $("#pGen").innerHTML=
     '<p class="hint">'+t("gen_hint")+'</p>'+
-    '<div class="buyrow" id="buyRow"><span class="lbl">'+t("buy_by")+'</span></div><div id="genList"></div>';
+    '<div class="buyrow" id="buyRow"><span class="lbl" data-i18n="buy_by" data-i18n-s="buy_by_s">'+
+      tc("buy_by","buy_by_s")+'</span></div><div id="genList"></div>';
 
   const row=$("#pGen .buyrow");
   QBTN=[1,10,100,"max"].map(q=>{
@@ -2932,6 +2966,11 @@ function buildSkeleton(){
     bindAction(b,()=>{S.buy=q;render()});
     row.appendChild(b); return b;
   });
+  /* Le total des structures ferme la rangée, à l'opposé du libellé. */
+  const tot=document.createElement("span");
+  tot.className="tot"; tot.id="buyTot";
+  tot.dataset.i18nTitle="buy_tot_t"; tot.title=t("buy_tot_t");
+  row.appendChild(tot);
 
   /* --- Améliorations --- */
   $("#pUp").innerHTML=
@@ -3153,6 +3192,13 @@ function setLang(l){
 /* ---------- rendu des onglets ---------- */
 function renderGens(){
   QBTN.forEach(b=>cls(b,"on",S.buy===b._q));
+  /* La somme est lue dans S.gens, pas sur les cartes affichées : c'est ce que
+     comptent les succès, et la liste visible ne les reflète pas toujours
+     (« Colonie naine » en masque quatre). En pratique on n'en possède alors
+     aucune — entrer dans un défi passe par finCycle(), qui vide S.gens — mais
+     la règle reste : le compte suit l'état, pas l'affichage. */
+  const nStruct=GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0);
+  html($("#buyTot"),'🏗️ <b>'+nfmt(nStruct)+"</b>"+(COURT?"":" "+t("u_struct")));
   const rate=perSec(), list=[];
   let locked=0;
   GENS.forEach((g,i)=>{
@@ -3786,6 +3832,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.3.2", nm:{fr:"Le compte des structures",en:"The structure count"},
+  d:{fr:"La rangée d'achat porte le total des structures à son extrémité droite : c'est le compte des succès « Mille pièces » (1 000) et « Mégastructure » (2 500), qu'il fallait jusqu'ici faire à la main sur dix cartes. Sous 560 px la rangée devient insécable : le libellé se raccourcit en « Par », le mot « structures » tombe et les boutons se resserrent, pour ne jamais passer sur deux lignes.",
+     en:"The buy row carries the total structure count at its right end: the figure the \"A thousand parts\" (1,000) and \"Megastructure\" (2,500) achievements count, which until now meant adding up ten cards by hand. Below 560 px the row becomes unbreakable: the label shortens to \"Lots of\", the word \"structures\" drops and the buttons tighten, so it never falls to two lines."}},
  {v:"3.3.1", nm:{fr:"Un pourboire, et un compteur réparé",en:"A tip, and a counter repaired"},
   d:{fr:"Le « il manque X » de la tuile d'antimatière ne défaisait pas la récompense de Fuite de confinement : il annonçait le minerai d'un gain 1,15 fois plus grand, soit jusqu'à 80 fois trop en fin de partie, pendant que le gain, lui, montait de plusieurs points par seconde. Par ailleurs « Soutenir le jeu » devient « Laisser un pourboire » : ce qui est proposé est un pourboire volontaire pour un travail déjà livré, sans contrepartie et sans rien à débloquer.",
      en:"The \"X missing\" figure on the antimatter tile did not undo the Containment leak reward: it announced the ore for a gain 1.15 times larger — up to 80 times too much in the late game — while the gain itself climbed several points per second. Separately, \"Support the game\" becomes \"Leave a tip\": what is offered is a voluntary tip for work already delivered, with nothing in return and nothing to unlock."}},
