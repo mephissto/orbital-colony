@@ -477,8 +477,8 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
 .swst{font-size:11.5px;color:var(--dim);flex:1 1 auto;text-align:right;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Sur écran étroit l'état passe sous le nom plutôt que de disparaître : c'est
-   justement lui qui explique « mise en pause par… », l'info la plus utile de la
-   ligne. L'interrupteur reste sur la première ligne grâce à order. */
+   justement lui qui dit ce que l'automate est en train de faire, l'info la plus
+   utile de la ligne. L'interrupteur reste sur la première ligne grâce à order. */
 @media(max-width:520px){
   .swrow{flex-wrap:wrap;gap:8px}
   .swico{order:0} .swnm{order:1;flex:1 1 auto} .sw{order:2}
@@ -486,14 +486,15 @@ nav.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 
 }
 .sw{width:46px;height:26px;border-radius:13px;border:1px solid var(--line);
   background:var(--panel-2);position:relative;transition:background-color .18s,border-color .18s;
-  flex:0 0 auto;align-self:center}
+  flex:0 0 auto;align-self:center;cursor:pointer}
 .sw i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
   background:var(--dim);transition:left .18s, background-color .18s}
 .sw.on{background:rgba(79,216,255,.18);border-color:var(--cyan)}
 .sw.on i{left:23px;background:var(--cyan)}
-/* En pause par exclusivité : le curseur reste à droite — l'automate est bien
-   armé, c'est le jeu qui l'a suspendu, pas le joueur qui l'a coupé — mais tout
-   est grisé pour qu'on ne le confonde pas avec un automate qui travaille. */
+/* Suspendu par un défi (le seul cas depuis la 3.4.0, pour le Cycle automatique) :
+   le curseur reste à droite — l'automate est bien armé, c'est le jeu qui l'a
+   suspendu, pas le joueur qui l'a coupé — mais tout est grisé pour qu'on ne le
+   confonde pas avec un automate qui travaille. */
 .sw.pause{background:var(--panel-2);border-color:var(--line)}
 .sw.pause i{background:var(--dim)}
 .sw.lock{cursor:not-allowed}
@@ -1208,7 +1209,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.3.3";
+const VERSION="3.4.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1255,7 +1256,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Sur téléphone, <b>l'indicateur de défilement</b> passait derrière la rangée d'achat, derrière les onglets et sous le bandeau de la planète : un trait gris coupé en trois, qui donnait aux barres l'air d'avoir un fond différent. Il est masqué.",
+  wn_d:"<b>L'Ingénieur et le Contremaître tournent enfin ensemble.</b> Ils ne sont plus exclusifs : chaque seconde l'Ingénieur achète l'amélioration la moins chère payable, et le Contremaître achète une structure avec ce qui reste. Plus de mise en pause, plus d'interrupteur inerte.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_marque:"Kit de marque", ab_marque_s:"Marque",
@@ -1337,10 +1338,10 @@ fr:{
   au_hint:"Les automates se paient en <b style=\"color:var(--violet)\">antimatière</b>, se gardent d'un cycle à l'autre, et chacun peut être <b>coupé</b> avec son interrupteur sans être remboursé.",
   au_set:"Réglages",
   au_cyc:"Relancer le cycle à partir de",
-  au_sw:"Automates actifs", au_pause:"mise en pause par {0}", au_off_by:"coupé — {0} travaille",
-  au_sw_hint:"Couper un automate ne rembourse rien et ne fait perdre aucun niveau. Le Contremaître et l'Ingénieur puisent dans le même minerai : un seul des deux peut travailler, et l'interrupteur de l'autre reste verrouillé tant que celui-là tourne.",
+  au_sw:"Automates actifs",
+  au_sw_hint:"Couper un automate ne rembourse rien et ne fait perdre aucun niveau.<br><b>L'Ingénieur et le Contremaître dépensent le même minerai, chacun son tour, chaque seconde :</b> l'Ingénieur passe d'abord et prend l'amélioration la moins chère qu'il peut payer ; le Contremaître achète ensuite sa structure avec ce qui reste. Quand il n'y a plus une seule amélioration à acheter — la fin de chaque cycle — tout le minerai va aux structures. Pour donner la main à l'Ingénieur, coupe le Contremaître.",
   au_gen:"Le Contremaître achète",
-  au_gen_hint:"Il n'achète que cette structure, par lots de la quantité choisie, une fois par seconde et dès qu'il a le minerai. Le lot est acheté entier ou pas du tout.",
+  au_gen_hint:"Il n'achète que cette structure, par lots de la quantité choisie, une fois par seconde et dès qu'il a le minerai — celui que l'Ingénieur lui laisse. Le lot est acheté entier ou pas du tout.",
   au_gen_ready:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b>, disponible.",
   au_gen_wait:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b><br>il manque <b>{1}</b>{2}.",
   au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. Le cycle ne repart jamais pour moins de 10 % de ta réserve, même si tu saisis moins.",
@@ -1349,12 +1350,10 @@ fr:{
   au_cyc_wait:"il manque <b style=\"color:var(--violet)\">{0}</b>{1}.",
   au_unit_am:"antimatière",
   au_off:"coupé",
-  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · ×{1} par seconde",
-  au_e_ing:"achète l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
+  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · ×{1} par seconde, sur le reste",
+  au_e_ing:"se sert en premier · l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
   au_e_cycle:"relance à +{0} antimatière",
   t_auto:"{0} — niveau {1}", t_auto_on:"{0} : remis en marche", t_auto_off:"{0} : coupé",
-  t_auto_excl:"{0} : remis en marche — {1} est mis en pause",
-  t_auto_lock:"Coupe d'abord {0} pour libérer celui-ci.",
   ch_hint:"Un défi casse <b>une règle du jeu</b> pour tout un cycle. Entrer encaisse d'abord le cycle en cours et te crédite l'antimatière en attente. L'objectif se calcule sur <b>ton meilleur cycle</b> et se fige au moment où tu entres. Réussi une fois, un défi est validé <b>définitivement</b> et sa récompense reste active en dehors.",
   ch_soon:"🔒 Les <b>défis</b> s'ouvrent au <b>cycle n°{1}</b> — encore <b style=\"color:var(--cyan)\">{0} cycles</b>.<br>Chacun casse une règle du jeu pour un cycle entier, avec un objectif calculé sur ton meilleur cycle. Le réussir donne une <b style=\"color:var(--green)\">récompense définitive</b>, active même en dehors du défi.",
   ch_soon1:"🔒 Les <b>défis</b> s'ouvrent au <b>cycle n°{1}</b> — <b style=\"color:var(--cyan)\">plus qu'un cycle</b> !<br>Chacun casse une règle du jeu pour un cycle entier, avec un objectif calculé sur ton meilleur cycle. Le réussir donne une <b style=\"color:var(--green)\">récompense définitive</b>, active même en dehors du défi.",
@@ -1426,7 +1425,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"On a phone, the <b>scroll indicator</b> ran behind the buy row, behind the tabs and under the planet band: a grey line cut into three pieces, which made those bars look like they had a different background. It is now hidden.",
+  wn_d:"<b>The Engineer and the Foreman finally run together.</b> They are no longer exclusive: every second the Engineer buys the cheapest affordable upgrade, and the Foreman buys a structure with whatever is left. No more pausing, no more inert switch.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_marque:"Brand kit", ab_marque_s:"Brand",
@@ -1506,10 +1505,10 @@ en:{
   au_hint:"Automations are paid in <b style=\"color:var(--violet)\">antimatter</b>, kept from one cycle to the next, and each one can be <b>switched off</b> without being refunded.",
   au_set:"Settings",
   au_cyc:"Restart the cycle from",
-  au_sw:"Active automations", au_pause:"paused by {0}", au_off_by:"off — {0} is working",
-  au_sw_hint:"Switching one off refunds nothing and loses no level. The Foreman and the Engineer draw on the same ore: only one of them can work, and the other's switch stays locked while it does.",
+  au_sw:"Active automations",
+  au_sw_hint:"Switching one off refunds nothing and loses no level.<br><b>The Engineer and the Foreman spend the same ore, each in turn, every second:</b> the Engineer goes first and takes the cheapest upgrade it can afford; the Foreman then buys its structure with what is left. Once there is not a single upgrade left to buy — the end of every cycle — all the ore goes to structures. To give the Engineer a free hand, switch the Foreman off.",
   au_gen:"The Foreman buys",
-  au_gen_hint:"It only ever buys that one structure, in batches of the chosen size, once a second and as soon as it has the ore. A batch is bought whole or not at all.",
+  au_gen_hint:"It only ever buys that one structure, in batches of the chosen size, once a second and as soon as it has the ore — the ore the Engineer leaves it. A batch is bought whole or not at all.",
   au_gen_ready:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b>, available.",
   au_gen_wait:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b><br><b>{1}</b> to go{2}.",
   au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. It never restarts for less than 10 % of your stock, even if you type less.",
@@ -1518,12 +1517,10 @@ en:{
   au_cyc_wait:"<b style=\"color:var(--violet)\">{0}</b> to go{1}.",
   au_unit_am:"antimatter",
   au_off:"off",
-  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · ×{1} per second",
-  au_e_ing:"buys the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
+  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · ×{1} per second, on what is left",
+  au_e_ing:"served first · the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
   au_e_cycle:"restarts at +{0} antimatter",
   t_auto:"{0} — level {1}", t_auto_on:"{0}: switched back on", t_auto_off:"{0}: switched off",
-  t_auto_excl:"{0}: switched back on — {1} is paused",
-  t_auto_lock:"Switch {0} off first to free this one.",
   ch_hint:"A challenge breaks <b>one rule of the game</b> for a whole cycle. Entering banks the current cycle first and credits the antimatter you had pending. The goal is computed from <b>your best cycle</b> and frozen the moment you enter. Once beaten, a challenge is cleared <b>for good</b> and its reward stays active outside of it.",
   ch_soon:"🔒 <b>Challenges</b> open on <b>cycle #{1}</b> — <b style=\"color:var(--cyan)\">{0} cycles</b> to go.<br>Each one breaks a rule of the game for a whole cycle, with a goal computed from your best cycle. Beating it grants a <b style=\"color:var(--green)\">permanent reward</b> that stays active outside the challenge.",
   ch_soon1:"🔒 <b>Challenges</b> open on <b>cycle #{1}</b> — <b style=\"color:var(--cyan)\">one cycle to go</b>!<br>Each one breaks a rule of the game for a whole cycle, with a goal computed from your best cycle. Beating it grants a <b style=\"color:var(--green)\">permanent reward</b> that stays active outside the challenge.",
@@ -1817,17 +1814,20 @@ const AUTOS=[
   ds:{fr:"Un satellite en orbite par niveau, chacun frappe une fois par seconde",
       en:"One orbiting satellite per level, each strikes once a second"}},
  /* Prix échangés en 2.34.0, et l'ordre de la liste avec, pour qu'elle reste
-    croissante. Les deux sont exclusifs : celui qu'on garde allumé en pratique
-    est le Contremaître, qui achète des structures en continu, alors que le
-    travail de l'Ingénieur est fini une fois les 73 améliorations achetées.
-    Le plus utile doit donc être le plus cher. Total de l'automatisation
-    inchangé (31 540) : c'est un échange, pas une hausse. */
+    croissante. Celui qu'on garde allumé le plus longtemps est le Contremaître,
+    qui achète des structures en continu, alors que le travail de l'Ingénieur
+    est fini une fois les 73 améliorations du cycle achetées. Le plus utile doit
+    donc être le plus cher. Total de l'automatisation inchangé (31 540) : c'est
+    un échange, pas une hausse.
+    Depuis la 3.4.0 ils tournent ensemble, par priorité — voir plus bas. */
  {id:"ing",   ico:"⬆️", max:1, c0:100, cg:1,
   nm:{fr:"Ingénieur",en:"Engineer"}, nmd:{fr:"l'Ingénieur",en:"the Engineer"},
-  ds:{fr:"Achète les améliorations dès qu'elles sont payables — met le Contremaître en pause",en:"Buys upgrades as soon as they are affordable — pauses the Foreman"}},
+  ds:{fr:"Achète l'amélioration la moins chère dès que tu peux la payer. Il se sert avant le Contremaître",
+      en:"Buys the cheapest upgrade the moment you can afford it. It takes its share before the Foreman"}},
  {id:"contre",ico:"🏗️", max:1, c0:150, cg:1,
   nm:{fr:"Contremaître",en:"Foreman"}, nmd:{fr:"le Contremaître",en:"the Foreman"},
-  ds:{fr:"Achète chaque seconde la structure que tu lui désignes — met l'Ingénieur en pause",en:"Buys the structure you assign it, every second — pauses the Engineer"}},
+  ds:{fr:"Achète une fois par seconde la structure que tu choisis, avec le minerai que l'Ingénieur laisse",
+      en:"Buys the structure you pick, once a second, with the ore the Engineer leaves behind"}},
  {id:"sonde", ico:"📡", max:1, c0:200, cg:1,
   nm:{fr:"Sonde de récupération",en:"Recovery probe"},
   ds:{fr:"Ramasse les anomalies à ta place",en:"Collects anomalies for you"}},
@@ -1837,15 +1837,11 @@ const AUTOS=[
 ];
 const autoCost=(a,l)=>Math.ceil(a.c0*Math.pow(a.cg,l));
 const alvl=id=>S.auto[id]||0;
-/* Trois états par automate, et il faut les distinguer :
-   - actif ;
-   - **coupé à la main** (`S.autoOff`) : une intention du joueur, elle survit à
-     tout et rien ne la lève automatiquement ;
-   - **mis en pause** par son exclusif (`S.autoPause`) : un état dérivé, qui se
-     lève tout seul dès que l'autre s'arrête.
-   Sans cette séparation, couper l'Ingénieur laissait le Contremaître éteint
-   alors qu'il n'avait jamais été coupé par le joueur — juste suspendu. */
-const aOn=id=>alvl(id)>0&&!S.autoOff[id]&&!S.autoPause[id];
+/* Deux états par automate depuis la 3.4.0 : actif, ou **coupé à la main**
+   (`S.autoOff`) — une intention du joueur, que rien ne lève automatiquement.
+   Le troisième état, « mis en pause par son exclusif » (`S.autoPause`), a
+   disparu avec l'exclusivité elle-même. */
+const aOn=id=>alvl(id)>0&&!S.autoOff[id];
 const CONTRE_S=1;                   // délai entre deux achats du Contremaître
 /* Quantité achetée à chaque passage du Contremaître. En fin de partie, une
    structure par seconde ne suit plus la production : à ×25 il rattrape. */
@@ -1877,65 +1873,45 @@ function prochaineUp(){
   });
   return c;
 }
-/* Contremaître et Ingénieur puisent dans le même minerai, et deux tentatives
-   d'arbitrage automatique ont été écartées : réserver le prix exact de la
-   prochaine amélioration bloquait le Contremaître à zéro achat, et lui laisser
-   la moitié du stock marchait sur le papier mais restait illisible — on voit
-   les structures ralentir sans savoir pourquoi.
-   Ils sont donc **exclusifs** : allumer l'un coupe l'autre, l'interrupteur le
-   montre, et c'est le joueur qui décide lequel travaille. Rien d'implicite. */
-const EXCLUS={contre:"ing", ing:"contre"};
-function autreAuto(id){return AUTOS.find(a=>a.id===EXCLUS[id])}
-/* Coupé par l'exclusivité plutôt qu'à la main : renvoie l'automate responsable
-   (pour le nommer dans l'interface), ou null si ce n'est pas le cas. */
-function enPause(a){return S.autoPause[a.id]?autreAuto(a.id):null}
-/* Verrou : tant que l'un des deux travaille, l'interrupteur de l'autre est
-   **inerte**, qu'il ait été suspendu ou coupé à la main. Il faut d'abord couper
-   celui qui tourne. Un clic de plus, mais plus aucune ambiguïté sur qui prend la
-   main — et surtout on ne peut jamais croire avoir rallumé un automate qui, en
-   réalité, ne démarrera pas. Renvoie l'automate responsable, ou null. */
-function verrouille(a){
-  const o=autreAuto(a.id);
-  return (o&&alvl(a.id)>0&&!aOn(a.id)&&aOn(o.id))?o:null;
-}
+/* Contremaître et Ingénieur puisent dans le même minerai. Ils ont été
+   **exclusifs** de la 2.25.0 à la 3.3.3 — allumer l'un mettait l'autre en pause
+   — parce que deux arbitrages automatiques avaient échoué : réserver le prix
+   exact de la prochaine amélioration bloquait le Contremaître à zéro achat, et
+   lui laisser la moitié du stock donnait de bons chiffres mais restait
+   illisible (on voit les structures ralentir sans savoir pourquoi).
+
+   La 3.4.0 les fait tourner ensemble par **priorité**, pas par partage :
+   chaque seconde l'Ingénieur passe d'abord ; s'il ne reste aucune amélioration
+   disponible, ou qu'aucune n'est payable, le Contremaître achète avec ce qui
+   reste. C'est l'ordre des blocs dans runAutos() qui l'applique — il n'y a ni
+   réserve, ni pourcentage, ni état supplémentaire à tenir.
+
+   Pourquoi ça n'affame pas l'Ingénieur : le prix d'une structure monte de 15 %
+   à chaque exemplaire acheté, donc le Contremaître relève son propre plancher
+   jusqu'à ce que le minerai dépasse l'amélioration en attente. Le retard est
+   borné, jamais définitif. Mesuré sur 30 minutes, dans le pire cas (cible bon
+   marché, lots de 1) : 15 améliorations comme l'Ingénieur seul, plus 38 lots de
+   structures, la dernière amélioration tombant à 1 548 s au lieu de 353 s.
+   Le joueur qui veut aller plus vite coupe le Contremaître — un interrupteur,
+   pas une règle cachée. */
 /* Texte d'état d'une ligne / d'une carte, partagé pour qu'ils ne divergent pas. */
 function etatTexte(a){
   // seul le relanceur de cycle s'arrête pendant un défi : il remettrait `runOre`
   // à zéro et effacerait la progression (voir runAutos)
   if(a.id==="cycle"&&S.chal&&!S.autoOff[a.id])return t("au_pause_chal");
-  const v=verrouille(a);
-  if(v)return enPause(a)?txtPause(v):t("au_off_by",tr(v.nmd));
   return aOn(a.id)?autoEtat(a):t("au_off");
 }
-function txtPause(o){return t("au_pause",tr(o.nmd))}
-/* Rattrape une sauvegarde d'avant la 2.25.0 où les deux pouvaient tourner
-   ensemble : l'Ingénieur garde la main, son travail étant fini une fois les
-   73 améliorations achetées. */
-/* Recalcule les pauses à partir des seules intentions du joueur. Idempotent,
-   appelé après chaque changement, au chargement et à l'import. `S.autoMain`
-   retient lequel des deux a pris la main en dernier : c'est lui qui travaille
-   quand le joueur veut les deux allumés. */
-function normExclus(){
-  const veut=id=>alvl(id)>0&&!S.autoOff[id];
-  S.autoPause={};
-  if(veut("contre")&&veut("ing"))S.autoPause[S.autoMain==="contre"?"ing":"contre"]=1;
-}
-/* Sauvegarde d'avant la 2.26.0 : la pause y était écrite comme une coupure
-   manuelle. Si exactement l'un des deux est coupé pendant que l'autre tourne, on
-   la relit comme une pause — sinon le joueur retrouverait un Contremaître
-   « coupé à la main » qui ne se rallumerait plus jamais tout seul. */
+/* Une sauvegarde d'avant la 3.4.0 peut porter une pause d'exclusivité. Elle
+   n'a plus de sens : on l'efface au chargement, et l'automate suspendu repart
+   tout seul. Une coupure manuelle (`autoOff`), elle, reste une intention du
+   joueur et n'est pas touchée. */
+function purgePauses(){ S.autoPause={}; S.autoMain=""; }
 /* Sauvegarde d'avant les défis : aucun record de cycle n'a été tenu. Le total
    extrait est dominé par le dernier cycle (croissance exponentielle), donc la
    moitié en est une approximation basse et sans risque : au pire l'objectif du
    premier défi est un peu doux, jamais infranchissable. */
 function migrerBest(d){
   if(!S.bestRun)S.bestRun=Math.max(S.runOre||0,(S.totalOre||0)*0.5);
-}
-function migrerExclus(d){
-  if(d.autoPause)return;
-  const c=alvl("contre")>0&&!!S.autoOff.contre, i=alvl("ing")>0&&!!S.autoOff.ing;
-  if(c&&!i&&alvl("ing")>0){delete S.autoOff.contre; S.autoMain="ing"}
-  else if(i&&!c&&alvl("contre")>0){delete S.autoOff.ing; S.autoMain="contre"}
 }
 /* `S.autoPart` (plafond de dépense en %) a disparu de l'interface en 2.24.0 :
    la réserve de l'Ingénieur règle le partage du minerai toute seule. Le champ
@@ -2329,6 +2305,8 @@ const NEW=()=>({
   ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
   chal:null,chalDone:{},chalStart:0,chalBut:0,bestRun:0,
   gens:{},ups:{},res:{},achs:{},seen:1,
+  /* autoPause / autoMain : vidés depuis la 3.4.0 (l'exclusivité a disparu),
+     gardés comme autoPart pour que les exports restent symétriques. */
   auto:{},autoOff:{},autoPause:{},autoMain:"",autoPart:30,autoGen:"",autoQte:1,autoCyc:50,acyc:0,asonde:0,anomK:{},fastAnom:0,chain:0,
   clicks:0,anoms:0,buffs:[],buy:1,
   started:Date.now(),lastTick:Date.now(),lastSave:Date.now(),
@@ -2523,28 +2501,14 @@ function buyAuto(a){
   const l=alvl(a.id); if(l>=a.max)return;
   const c=autoCost(a,l); if(S.am<c)return;
   S.am-=c; S.auto[a.id]=l+1;
-  // un automate qu'on vient de payer démarre allumé : c'est lui qui prend la main
-  delete S.autoOff[a.id]; S.autoMain=a.id; normExclus();
+  delete S.autoOff[a.id];              // un automate qu'on vient de payer démarre allumé
   toast(t("t_auto",tr(a.nm),l+1),"violet");
-  const o=autreAuto(a.id);
-  if(o&&S.autoPause[o.id])toast(t("t_auto_excl",tr(a.nm),tr(o.nm)));
   render();
 }
 function toggleAuto(a){
   if(alvl(a.id)<1)return;
-  const v=verrouille(a);
-  if(v){ toast(t("t_auto_lock",tr(v.nmd))); return }   // interrupteur inerte
-  const o=autreAuto(a.id);
-  if(aOn(a.id)){                       // il travaille : le joueur le coupe
-    S.autoOff[a.id]=1;
-    // il rend la main à son exclusif, qui n'était que suspendu
-    if(S.autoMain===a.id&&o)S.autoMain=o.id;
-    normExclus();
-    toast(t("t_auto_off",tr(a.nm)));
-  }else{                               // libre et coupé : le joueur le rallume
-    delete S.autoOff[a.id]; S.autoMain=a.id; normExclus();
-    toast(t("t_auto_on",tr(a.nm)));
-  }
+  if(aOn(a.id)){ S.autoOff[a.id]=1;      toast(t("t_auto_off",tr(a.nm))) }
+  else         { delete S.autoOff[a.id]; toast(t("t_auto_on",tr(a.nm))) }
   render();
 }
 function buyRes(r){
@@ -3375,16 +3339,14 @@ function renderAuto(){
   const poss=SWROWS.filter(x=>alvl(x.a.id)>0);
   poss.forEach(({a,r})=>{
     const coupe=!aOn(a.id);
-    // le relanceur est le seul suspendu par un défi
+    // le relanceur de cycle est désormais le seul automate qu'un défi suspend
     const susp=a.id==="cycle"&&!!S.chal&&!S.autoOff[a.id];
-    const pause=susp?true:enPause(a);
-    const verrou=susp?true:verrouille(a);
     txt(r.q.ico,a.ico); txt(r.q.nm,tr(a.nm));
     txt(r.q.st,etatTexte(a));
-    cls(r,"off",coupe&&!pause); cls(r,"pause",!!pause);
-    // curseur à droite = il repartira dès que l'autre s'arrête ; grisé+inerte = verrouillé
-    cls(r.q.sw,"on",!coupe||!!pause);
-    cls(r.q.sw,"pause",!!verrou); cls(r.q.sw,"lock",!!verrou);
+    cls(r,"off",coupe&&!susp); cls(r,"pause",susp);
+    // curseur à droite mais grisé : armé, suspendu par le défi, pas coupé
+    cls(r.q.sw,"on",!coupe||susp);
+    cls(r.q.sw,"pause",susp); cls(r.q.sw,"lock",susp);
   });
   syncList($("#auSwList"),poss.map(x=>x.r));
 
@@ -3740,6 +3702,9 @@ function runAutos(dt){
     if(n>0){ autoAcc.clic-=n; gain(clickVal(true)*n); S.clicks+=n; }
   }
 
+  /* L'Ingénieur passe AVANT le Contremaître, et c'est tout l'arbitrage : ce
+     bloc-ci prélève d'abord, celui d'en dessous achète avec le reste. Les
+     inverser rendrait l'Ingénieur famélique. */
   if(aOn("ing")){
     autoAcc.ing+=d;
     if(autoAcc.ing>=1){
@@ -3753,8 +3718,9 @@ function runAutos(dt){
     autoAcc.contre+=d;
     if(autoAcc.contre>=CONTRE_S){
       autoAcc.contre=0;
-      /* Une seule cible, celle choisie par le joueur. Pas d'arbitrage à faire
-         avec l'Ingénieur : ils ne tournent jamais en même temps.
+      /* Une seule cible, celle choisie par le joueur, et achetée avec le
+         minerai que l'Ingénieur vient de laisser : la priorité est déjà jouée
+         au-dessus, il n'y a rien à arbitrer ici.
          La quantité suit le réglage : on achète le lot entier ou rien, comme le
          bouton ×N du joueur — pas d'achat partiel qui viderait la réserve sans
          atteindre le lot demandé. */
@@ -3808,7 +3774,7 @@ function load(){
   const raw=readSave(); if(!raw)return false;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(raw))));
-    S=Object.assign(NEW(),d); migrerExclus(d); normExclus(); migrerBest(d);
+    S=Object.assign(NEW(),d); purgePauses(); migrerBest(d);
     S.buffs=(S.buffs||[]).filter(b=>b.until>Date.now());
     // gains hors-ligne (même règle que le retour d'arrière-plan)
     const away=(Date.now()-(d.lastSave||Date.now()))/1000;
@@ -3825,7 +3791,7 @@ bindAction($("#mImport"),()=>{
   const v=$("#mText").value.trim(); if(!v)return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(v))));
-    S=Object.assign(NEW(),d); migrerExclus(d); normExclus(); migrerBest(d);
+    S=Object.assign(NEW(),d); purgePauses(); migrerBest(d);
     S.lastTick=Date.now(); save(); render();
     $("#modal").classList.remove("on"); toast(t("t_imported"));
   }catch(e){toast(t("bad_code"),"red")}
@@ -3845,6 +3811,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.4.0", nm:{fr:"Les deux automates ensemble",en:"Both automations at once"},
+  d:{fr:"L'Ingénieur et le Contremaître ne sont plus exclusifs : la règle devient une priorité. Chaque seconde l'Ingénieur achète l'amélioration la moins chère payable ; s'il n'en reste aucune, ou qu'aucune n'est payable, le Contremaître achète une structure avec ce qui reste. Le prix d'une structure montant de 15 % à chaque exemplaire, le Contremaître relève son propre plancher et ne peut pas affamer l'Ingénieur. La mise en pause, l'interrupteur inerte et le « qui a la main » disparaissent : deux interrupteurs indépendants.",
+     en:"The Engineer and the Foreman are no longer exclusive: the rule becomes a priority. Every second the Engineer buys the cheapest affordable upgrade; if none is left, or none is affordable, the Foreman buys a structure with what remains. Since a structure's price climbs 15 % per unit, the Foreman raises its own floor and cannot starve the Engineer. Pausing, the inert switch and the \"who has control\" state are gone: two independent switches."}},
  {v:"3.3.3", nm:{fr:"L'indicateur de défilement",en:"The scroll indicator"},
   d:{fr:"Sur téléphone, il appartient au conteneur et non au flux : il était donc peint sous l'en-tête fixe et sous les deux barres collantes, qui vont d'un bord à l'autre. Un trait gris coupé au niveau de la rangée d'achat, coupé encore au niveau des onglets, puis disparaissant sous le bandeau de la planète — au point de faire croire que les barres avaient un fond différent à cet endroit. Rien ne permet de le remonter au-dessus : il est masqué.",
      en:"On a phone it belongs to the container, not to the flow, so it was painted beneath the fixed header and beneath the two sticky bars, which run edge to edge. A grey line cut at the buy row, cut again at the tabs, then vanishing under the planet band — enough to make those bars look like they had a different background there. Nothing can raise it above them: it is now hidden."}},

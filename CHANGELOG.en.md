@@ -16,6 +16,74 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.4.0 — Both automations at once
+
+The Engineer and the Foreman had been **mutually exclusive** since 2.25.0:
+switching one on paused the other, and the second one's switch was inert while
+the first was running. It answered a real problem — they draw on the same ore —
+but it meant flipping switches twice per cycle, and late in a cycle, once there
+is no upgrade left to buy, it served no purpose at all.
+
+The rule becomes a **priority**, not a share:
+
+- ⬆️ **Every second the Engineer goes first** and buys the cheapest affordable
+  upgrade.
+- 🏗️ **The Foreman then buys** with whatever is left — and it buys all the time,
+  since there is no reserve to respect.
+- ♻️ **When no upgrade is left**, the Engineer does nothing and everything goes
+  to structures. That is most of a late cycle.
+
+It is not a rule written down somewhere: it is **the order of the two blocks in
+`runAutos()`**. The first takes its cut, the second spends the balance.
+
+### Why it cannot starve the Engineer
+
+A structure's price climbs **15 % per unit bought**. The Foreman therefore raises
+its own floor with every purchase, until the ore passes the pending upgrade. The
+delay is bounded, never permanent.
+
+Measured over 30 simulated minutes, from a cycle 5 rebuilt by hand for 10 minutes
+(145 structures, 5,710/s, 19 upgrades available):
+
+| Rule | Upgrades | Structures | Final output |
+|---|---:|---:|---:|
+| Foreman only | 0 | 165 | 5,722/s |
+| Engineer only | 15 | 145 | 29,480/s |
+| Engineer then Foreman, by hand | 15 | 145 | 29,480/s |
+| reserve the next upgrade's exact price | 15 | 145 | 29,480/s |
+| purse fed at 30 % of the flow | 15 | 175 | 29,970/s |
+| **priority to upgrades** | **16** | **185** | **35,010/s** |
+
+In the worst case — a cheap target, lots of 1 — priority yields the same 15
+upgrades as Engineer-only **and** 38 lots of structures, with the last upgrade
+landing at 1,548 s instead of 353 s. That is the rule's only cost, and whoever
+wants to go faster switches the Foreman off.
+
+### What goes away
+
+- 📖 **The wording says who spends what.** The note under the switches spells
+  the rule out in full, each card states its place in the order ("it takes its
+  share before the Foreman" / "with the ore the Engineer leaves behind"), and so
+  does each row's state ("served first" / "×1 per second, on what is left").
+- 🔌 **The two switches are independent.** No more "paused by the other one", no
+  more `not-allowed` cursor, no more extra click to hand control back.
+- 🧹 **Six functions, two read fields and four translation keys fewer** —
+  `EXCLUS`, `autreAuto()`, `enPause()`, `verrouille()`, `txtPause()`,
+  `normExclus()`, `migrerExclus()`, `S.autoPause`, `S.autoMain`, `au_pause`,
+  `au_off_by`, `t_auto_excl`, `t_auto_lock`. An automation now has only two
+  states: active, or switched off by hand.
+- 💾 **Saves from before 3.4.0 open normally**: `purgePauses()` clears the
+  exclusivity pause on load and the suspended automation restarts on its own. A
+  manual switch-off, being the player's intent, is left alone. `S.autoPause` and
+  `S.autoMain` stay in the state, emptied, so earlier exports remain symmetric.
+- 🧪 **`t_lock` becomes `t_prio`** and `t_cases`, which only tested the
+  exclusivity state machine, is gone: its two still-valid cases moved into
+  `t_prio`. 32 tests in all.
+
+No balance value, no price and no save field touched.
+
+---
+
 ## 3.3.3 — The scroll indicator
 
 On a phone a grey line appeared at the right edge while scrolling the Extraction

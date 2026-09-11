@@ -766,8 +766,8 @@ suffit de le rallumer.
 | ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 400 | 400 |
 
 **Pourquoi le Contremaître coûte plus cher que l'Ingénieur** (150 contre 100,
-échangés en 2.34.0) : les deux sont exclusifs, et celui qu'on garde allumé en
-pratique est le Contremaître, qui achète des structures en continu. Le travail
+échangés en 2.34.0) : celui qu'on garde allumé le plus longtemps est le
+Contremaître, qui achète des structures en continu. Le travail
 de l'Ingénieur, lui, est **fini** une fois les 73 améliorations achetées — passé
 ce point il n'a plus rien à faire. Le plus utile devait donc être le plus cher.
 Le total de l'automatisation est inchangé : c'est un échange, pas une hausse.
@@ -799,7 +799,8 @@ est ce qu'on revient consulter.
 **Automates actifs** — une ligne par automate possédé : icône, nom, état courant
 et son interrupteur. Le couper ne rembourse rien et ne fait perdre aucun niveau.
 Sous 520 px de large l'état passe **sous** le nom au lieu de disparaître : c'est
-lui qui porte le « mise en pause par… », l'information la plus utile de la ligne.
+lui qui dit ce que l'automate est en train de faire, l'information la plus utile
+de la ligne.
 
 **Le Contremaître achète** — menu déroulant listant les structures **déjà
 révélées** (`genRev()`, borné par `S.seen` : rien ne se dévoile d'avance), avec
@@ -808,57 +809,75 @@ rien choisi, `autoGenId()` vise la **dernière structure révélée** ; dès qu'
 choisit, `S.autoGen` est écrit et ne bouge plus tout seul. La ligne affichée
 donne le prix visé, le minerai qu'il reste à posséder et une estimation de temps.
 
-**Le Contremaître et l'Ingénieur sont exclusifs.** Ils puisent dans le même
-minerai : allumer l'un met l'autre **en pause**, l'interrupteur le montre, et
-c'est le joueur qui décide lequel travaille. **Un seul des deux peut tourner à la
-fois, et l'interrupteur de l'autre est inerte** (`verrouille()`, curseur
-`not-allowed`) : pour rendre la main au Contremaître il faut d'abord couper
-l'Ingénieur. Un clic de plus, mais on ne peut jamais croire avoir rallumé un
-automate qui, en réalité, ne démarrera pas.
+**Le Contremaître et l'Ingénieur tournent ensemble, par priorité** (3.4.0).
+Ils puisent dans le même minerai, et l'arbitrage tient en une phrase : **chaque
+seconde l'Ingénieur passe d'abord** ; s'il ne reste aucune amélioration
+disponible, ou qu'aucune n'est payable, le Contremaître achète une structure
+avec ce qui reste. Ce n'est pas une règle écrite quelque part : c'est **l'ordre
+des deux blocs dans `runAutos()`**. Le premier prélève, le second dépense le
+solde. Les inverser rendrait l'Ingénieur famélique.
 
-Un automate a donc **trois états**, et les distinguer est ce qui fait marcher
-l'ensemble :
+Il n'y a ni réserve, ni pourcentage, ni état supplémentaire à tenir — et
+**la priorité ne peut pas affamer l'Ingénieur** : le prix d'une structure monte
+de 15 % à chaque exemplaire acheté, donc le Contremaître relève son propre
+plancher jusqu'à ce que le minerai dépasse l'amélioration en attente. Le retard
+est borné, jamais définitif.
+
+Mesuré sur 30 minutes simulées, en repartant d'un cycle 5 reconstruit 10 minutes
+à la main (145 structures, 5 710 /s, 19 améliorations disponibles) :
+
+| Règle | Améliorations | Structures | Production finale |
+|---|---:|---:|---:|
+| Contremaître seul | 0 | 165 | 5 722 /s |
+| Ingénieur seul | 15 | 145 | 29 480 /s |
+| Ingénieur puis Contremaître, à la main | 15 | 145 | 29 480 /s |
+| réserver le prix exact de la prochaine amélioration | 15 | 145 | 29 480 /s |
+| cagnotte alimentée à 30 % du flux | 15 | 175 | 29 970 /s |
+| **priorité aux améliorations** | **16** | **185** | **35 010 /s** |
+
+Dans le pire cas — cible bon marché, lots de 1, de quoi affamer l'Ingénieur si
+c'était possible — la priorité donne les **mêmes 15 améliorations** que
+l'Ingénieur seul, **plus 38 lots de structures**, la dernière amélioration
+tombant à 1 548 s au lieu de 353 s. C'est le seul coût de la règle, et le joueur
+qui veut aller plus vite coupe le Contremaître : un interrupteur, pas un
+arbitrage caché.
+
+Un automate n'a donc plus que **deux états** :
 
 | État | Champ | Levée |
 |---|---|---|
 | actif | — | — |
 | **coupé à la main** | `S.autoOff` | jamais automatiquement : c'est une intention du joueur |
-| **mis en pause** par son exclusif | `S.autoPause` | dès que l'autre s'arrête, quelle qu'en soit la raison |
 
-`S.autoMain` retient lequel des deux a pris la main en dernier, `normExclus()`
-recalcule les pauses à partir des seules intentions du joueur (idempotent, appelé
-après chaque changement, au chargement et à l'import), et `buyAuto()` donne la
-main à celui qu'on vient de payer. Concrètement : couper l'Ingénieur **rend la
-main au Contremaître** s'il n'avait été que suspendu, mais ne ressuscite pas un
-Contremaître que le joueur avait délibérément coupé. `migrerExclus()` relit une
-sauvegarde d'avant la 2.26.0, où la pause était écrite comme une coupure
-manuelle. Une ligne coupée par l'exclusivité affiche
-« mise en pause par *l'autre automate* » plutôt que « coupé » — `enPause()`
-renvoie l'automate responsable, `txtPause()` le nomme via son champ `nmd` (nom
-avec article) — et **son interrupteur garde le curseur à droite, simplement
-grisé** : l'automate est armé, c'est le jeu qui l'a
-suspendu — le distinguer visuellement d'un automate qu'on a coupé soi-même évite
-de croire qu'on l'a éteint par erreur. Les deux cartes le disent aussi dans leur
-description (« met l'Ingénieur en pause » / « met le Contremaître en pause »).
+### Ce qui a disparu en 3.4.0
 
-Deux arbitrages **automatiques** ont été essayés puis abandonnés, parce qu'aucun
-n'était lisible en jouant :
+De la 2.25.0 à la 3.3.3, les deux étaient **exclusifs** : allumer l'un mettait
+l'autre en pause (`S.autoPause`), `S.autoMain` retenait qui avait la main,
+`normExclus()` recalculait les pauses, et l'interrupteur de celui qui ne
+travaillait pas était **inerte** (`verrouille()`, curseur `not-allowed`). Tout
+cela est supprimé — six fonctions, deux champs lus, deux clés de traduction
+(`au_pause`, `au_off_by`, `t_auto_excl`, `t_auto_lock`).
 
-| Règle | Structures | Améliorations | Production finale |
-|---|---|---|---|
-| aucune (cible Drone) | 33 | 13 | 37 515 /s |
-| moitié du stock au Contremaître (2.24.0) | 31 | 15 | 56 267 /s |
-| réserver le prix exact de la prochaine amélioration | 0 | 15 | 56 198 /s |
+L'exclusivité existait parce que deux arbitrages automatiques avaient échoué
+avant elle, et ils restent instructifs :
 
-Mesures sur 30 minutes simulées en milieu de partie. Réserver le prix exact
-bloquait le Contremaître à zéro achat : le stock ne dépasse jamais durablement le
-prix de l'amélioration suivante, puisque l'Ingénieur l'achète dès qu'il
-l'atteint. La moitié du stock donnait de meilleurs chiffres, mais le joueur
-voyait ses structures ralentir sans comprendre pourquoi — un arbitrage invisible
-vaut moins qu'un interrupteur explicite. Le plafond de dépense en %
-(`S.autoPart`), qui jouait ce rôle jusqu'à la 2.23.0, a disparu de l'interface
-en 2.24.0 ; le champ reste dans l'état pour que les sauvegardes et les exports
-antérieurs restent symétriques.
+- **réserver le prix exact de la prochaine amélioration** bloquait le
+  Contremaître à zéro achat — le stock ne dépasse jamais durablement ce prix,
+  puisque l'Ingénieur l'achète dès qu'il l'atteint ;
+- **laisser la moitié du stock au Contremaître** donnait de meilleurs chiffres,
+  mais le joueur voyait ses structures ralentir sans comprendre pourquoi.
+
+La priorité échappe aux deux : elle ne réserve rien, donc ne bloque personne, et
+elle s'énonce en une phrase que les deux cartes portent (« il se sert avant le
+Contremaître » / « avec le minerai que l'Ingénieur laisse »), et l'encart sous
+les interrupteurs la déroule en toutes lettres.
+
+`S.autoPause` et `S.autoMain` restent dans l'état, vidés, pour que les
+sauvegardes et les exports antérieurs restent symétriques ; `purgePauses()` les
+efface au chargement, et un automate qui n'était que suspendu repart tout seul.
+Une coupure manuelle, elle, est une intention du joueur et n'est pas touchée.
+Même sort pour le plafond de dépense en % (`S.autoPart`), retiré de l'interface
+en 2.24.0 et jamais relu depuis.
 
 **Relancer le cycle à partir de** — un **seuil saisi à la main**, en antimatière
 (`S.autoCyc`, 50 par défaut). `cycSeuil()` applique un **plancher à 10 % de

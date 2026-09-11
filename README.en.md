@@ -744,8 +744,8 @@ on.
 | ♻️ Auto cycle | starts a new cycle at the chosen threshold | 1 | 400 | 400 |
 
 **Why the Foreman costs more than the Engineer** (150 against 100, swapped in
-2.34.0): the two are mutually exclusive, and the one you actually keep switched
-on is the Foreman, which buys structures continuously. The Engineer's job, by
+2.34.0): the one you keep switched on longest is the Foreman, which buys
+structures continuously. The Engineer's job, by
 contrast, is **finished** once all 73 upgrades are bought — past that point it
 has nothing left to do. The more useful one therefore had to be the more
 expensive. The automation total is unchanged: this is a swap, not a rise.
@@ -774,7 +774,8 @@ for buying and levels, whereas the panel is what you come back to.
 **Active automations** — one row per owned automation: icon, name, current state
 and its switch. Switching one off refunds nothing and loses no level. Under
 520 px wide the state moves **below** the name instead of disappearing: it is the
-one carrying "paused by…", the most useful information on the row.
+one carrying what the automation is actually doing right now, the most useful
+information on the row.
 
 **The Foreman buys** — a dropdown listing the structures **already revealed**
 (`genRev()`, bounded by `S.seen`: nothing is disclosed early), with their icon.
@@ -783,54 +784,71 @@ It only ever buys that one, one per second. Until the player picks one,
 `S.autoGen` is written and no longer moves on its own. The line shown gives the
 target price, the ore still to own and a time estimate.
 
-**The Foreman and the Engineer are mutually exclusive.** They draw on the same
-ore: switching one on **pauses** the other, the switch shows it, and the player
-decides which one works. **Only one of the two can run at a time, and the other's
-switch is inert** (`verrouille()`, `not-allowed` cursor): to hand control back to
-the Foreman you must switch the Engineer off first. One extra click, but you can
-never believe you switched an automation back on when it will not actually run.
+**The Foreman and the Engineer run together, by priority** (3.4.0). They draw on
+the same ore, and the arbitration fits in one sentence: **every second the
+Engineer goes first**; if no upgrade is left, or none is affordable, the Foreman
+buys a structure with what remains. It is not a rule written down somewhere: it
+is **the order of the two blocks in `runAutos()`**. The first takes its cut, the
+second spends the balance. Swapping them would starve the Engineer.
 
-An automation therefore has **three states**, and telling them apart is what
-makes the whole thing work:
+There is no reserve, no percentage, no extra state to keep — and **priority
+cannot starve the Engineer**: a structure's price climbs 15 % per unit bought, so
+the Foreman raises its own floor until the ore passes the pending upgrade. The
+delay is bounded, never permanent.
+
+Measured over 30 simulated minutes, starting from a cycle 5 rebuilt by hand for
+10 minutes (145 structures, 5,710/s, 19 upgrades available):
+
+| Rule | Upgrades | Structures | Final output |
+|---|---:|---:|---:|
+| Foreman only | 0 | 165 | 5,722/s |
+| Engineer only | 15 | 145 | 29,480/s |
+| Engineer then Foreman, by hand | 15 | 145 | 29,480/s |
+| reserve the next upgrade's exact price | 15 | 145 | 29,480/s |
+| purse fed at 30 % of the flow | 15 | 175 | 29,970/s |
+| **priority to upgrades** | **16** | **185** | **35,010/s** |
+
+In the worst case — a cheap target, lots of 1, everything needed to starve the
+Engineer if that were possible — priority yields the **same 15 upgrades** as
+Engineer-only, **plus 38 lots of structures**, with the last upgrade landing at
+1,548 s instead of 353 s. That is the rule's only cost, and a player who wants to
+go faster switches the Foreman off: a switch, not a hidden arbitration.
+
+An automation therefore has only **two states**:
 
 | State | Field | Cleared |
 |---|---|---|
 | active | — | — |
 | **switched off by hand** | `S.autoOff` | never automatically: it is the player's intent |
-| **paused** by its exclusive partner | `S.autoPause` | as soon as the other stops, for any reason |
 
-`S.autoMain` remembers which of the two took over last, `normExclus()` recomputes
-the pauses from the player's intents alone (idempotent, called after every
-change, on load and on import), and `buyAuto()` hands control to the one you just
-paid for. Concretely: switching the Engineer off **hands control back to the
-Foreman** if it had only been suspended, but does not revive a Foreman the player
-deliberately switched off. `migrerExclus()` reads back a save from before 2.26.0,
-where the pause was written as a manual switch-off. A row
-paused by exclusivity reads "paused by *the other automation*" rather than
-"switched off" — `enPause()` returns the automation responsible, `txtPause()`
-names it via its `nmd` field (name with article) — and **its switch keeps the
-knob on the right, merely greyed out**: the automation
-is armed, the game suspended it — telling that apart from one you switched off
-yourself avoids thinking you turned it off by mistake. Both cards say so in their
-description too ("pauses the Engineer" / "pauses the Foreman").
+### What went away in 3.4.0
 
-Two **automatic** arbitration rules were tried then dropped, because neither was
-legible while playing:
+From 2.25.0 to 3.3.3 the two were **mutually exclusive**: switching one on paused
+the other (`S.autoPause`), `S.autoMain` remembered who had control,
+`normExclus()` recomputed the pauses, and the switch of whichever was not working
+was **inert** (`verrouille()`, `not-allowed` cursor). All of it is gone — six
+functions, two read fields, four translation keys (`au_pause`, `au_off_by`,
+`t_auto_excl`, `t_auto_lock`).
 
-| Rule | Structures | Upgrades | Final output |
-|---|---|---|---|
-| none (Drone target) | 33 | 13 | 37,515 /s |
-| half the stock to the Foreman (2.24.0) | 31 | 15 | 56,267 /s |
-| reserve the next upgrade's exact price | 0 | 15 | 56,198 /s |
+Exclusivity existed because two automatic arbitrations had failed before it, and
+they are still instructive:
 
-Measured over 30 simulated minutes in mid-game. Reserving the exact price pinned
-the Foreman at zero purchases: the stock never durably exceeds the next upgrade's
-price, since the Engineer buys it the moment it is reached. Half the stock gave
-better figures, but the player saw structures slow down without understanding
-why — an invisible arbitration is worth less than an explicit switch. The %
-spending cap (`S.autoPart`), which played that role up to 2.23.0, disappeared
-from the UI in 2.24.0; the field stays in the state so earlier saves and exports
-remain symmetric.
+- **reserving the next upgrade's exact price** pinned the Foreman at zero
+  purchases — the stock never durably exceeds that price, since the Engineer
+  buys it the moment it is reached;
+- **leaving half the stock to the Foreman** gave better figures, but the player
+  saw structures slow down without understanding why.
+
+Priority escapes both: it reserves nothing, so it blocks nobody, and it states
+itself in one line that both cards carry ("it takes its share before the
+Foreman" / "with the ore the Engineer leaves behind"), and the note under the
+switches spells it out in full.
+
+`S.autoPause` and `S.autoMain` stay in the state, emptied, so earlier saves and
+exports remain symmetric; `purgePauses()` clears them on load, and an automation
+that was merely suspended restarts on its own. A manual switch-off, being the
+player's intent, is left alone. Same treatment for the % spending cap
+(`S.autoPart`), removed from the UI in 2.24.0 and never read since.
 
 **Restart the cycle from** — a **threshold typed by hand**, in antimatter
 (`S.autoCyc`, 50 by default). `cycSeuil()` applies a **floor at 10 % of the

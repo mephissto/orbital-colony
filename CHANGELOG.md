@@ -17,6 +17,77 @@ restent valides**.
 
 ---
 
+## 3.4.0 — Les deux automates ensemble
+
+L'Ingénieur et le Contremaître étaient **exclusifs** depuis la 2.25.0 : allumer
+l'un mettait l'autre en pause, et l'interrupteur du second était inerte tant que
+le premier tournait. C'était la réponse à un vrai problème — ils puisent dans le
+même minerai — mais elle demandait de basculer deux fois par cycle, et en fin de
+cycle, quand il n'y a plus d'amélioration à acheter, elle ne servait plus à rien.
+
+La règle devient une **priorité**, pas un partage :
+
+- ⬆️ **Chaque seconde, l'Ingénieur passe d'abord** et achète l'amélioration la
+  moins chère payable.
+- 🏗️ **Le Contremaître achète ensuite**, avec ce qui reste — et il achète tout
+  le temps, puisqu'il n'y a aucune réserve à respecter.
+- ♻️ **Quand il ne reste plus d'amélioration**, l'Ingénieur ne fait rien et tout
+  va aux structures. C'est le cas de la plus grande partie d'un cycle avancé.
+
+Ce n'est pas une règle écrite quelque part : c'est **l'ordre des deux blocs dans
+`runAutos()`**. Le premier prélève, le second dépense le solde.
+
+### Pourquoi ça n'affame pas l'Ingénieur
+
+Le prix d'une structure monte de **15 % à chaque exemplaire acheté**. Le
+Contremaître relève donc son propre plancher à chaque achat, jusqu'à ce que le
+minerai dépasse l'amélioration en attente. Le retard est borné, jamais définitif.
+
+Mesuré sur 30 minutes simulées, depuis un cycle 5 reconstruit 10 minutes à la
+main (145 structures, 5 710 /s, 19 améliorations disponibles) :
+
+| Règle | Améliorations | Structures | Production finale |
+|---|---:|---:|---:|
+| Contremaître seul | 0 | 165 | 5 722 /s |
+| Ingénieur seul | 15 | 145 | 29 480 /s |
+| Ingénieur puis Contremaître, à la main | 15 | 145 | 29 480 /s |
+| réserver le prix exact de la prochaine amélioration | 15 | 145 | 29 480 /s |
+| cagnotte alimentée à 30 % du flux | 15 | 175 | 29 970 /s |
+| **priorité aux améliorations** | **16** | **185** | **35 010 /s** |
+
+Dans le pire cas — cible bon marché, lots de 1 — la priorité donne les mêmes
+15 améliorations que l'Ingénieur seul **et** 38 lots de structures, la dernière
+amélioration tombant à 1 548 s au lieu de 353 s. C'est le seul coût de la règle,
+et qui veut aller plus vite coupe le Contremaître.
+
+### Ce qui disparaît
+
+- 📖 **Les textes disent qui dépense quoi.** L'encart sous les interrupteurs
+  déroule la règle en toutes lettres, chaque carte dit sa place dans l'ordre
+  (« il se sert avant le Contremaître » / « avec le minerai que l'Ingénieur
+  laisse »), et l'état de chaque ligne aussi (« se sert en premier » /
+  « ×1 par seconde, sur le reste »).
+- 🔌 **Les deux interrupteurs sont indépendants.** Plus de « mise en pause par
+  l'autre », plus de curseur `not-allowed`, plus de clic supplémentaire pour
+  rendre la main.
+- 🧹 **Six fonctions, deux champs lus et quatre clés de traduction en moins** —
+  `EXCLUS`, `autreAuto()`, `enPause()`, `verrouille()`, `txtPause()`,
+  `normExclus()`, `migrerExclus()`, `S.autoPause`, `S.autoMain`, `au_pause`,
+  `au_off_by`, `t_auto_excl`, `t_auto_lock`. Un automate n'a plus que deux
+  états : actif, ou coupé à la main.
+- 💾 **Les sauvegardes d'avant la 3.4.0 s'ouvrent normalement** :
+  `purgePauses()` efface la pause d'exclusivité au chargement et l'automate
+  suspendu repart tout seul. Une coupure manuelle, elle, reste une intention du
+  joueur et n'est pas touchée. `S.autoPause` et `S.autoMain` restent dans l'état,
+  vidés, pour que les exports antérieurs restent symétriques.
+- 🧪 **`t_lock` devient `t_prio`** et `t_cases`, qui ne testait que la machine à
+  états de l'exclusivité, disparaît : ses deux cas encore valables sont repris
+  dans `t_prio`. 32 tests au total.
+
+Aucune valeur d'équilibrage, aucun prix, aucun champ de sauvegarde touché.
+
+---
+
 ## 3.3.3 — L'indicateur de défilement
 
 Sur téléphone, un trait gris apparaissait au bord droit pendant qu'on faisait
