@@ -949,6 +949,39 @@ surtensions, 25 échos et 5 bonds temporels. Les cinq seuils (200 / 200 / 25 /
 demande 500 anomalies. Le comptage par type utilise la clé `k` de chaque entrée
 de `ANOMS` et le compteur `S.anomK`.
 
+### L'avancement, sur la carte
+
+Un succès non obtenu porte une **barre et deux nombres** — « 37 / 100 ». Avant
+la 3.5.0, les seuls compteurs vivaient dans l'onglet Statistiques, et il fallait
+faire soi-même le rapprochement entre « Roue libre : 100 cycles relancés » et la
+tuile « Cycles relancés seuls ».
+
+Un succès chiffré déclare sa **mesure** (`v`) et sa **cible** (`n`) plutôt qu'un
+prédicat : `f` en est déduit (`ACHS.forEach(a=>{if(!a.f)a.f=S=>a.v(S)>=a.n})`).
+Le seuil n'existe donc qu'à un seul endroit, et la barre ne peut pas dire autre
+chose que la condition réelle — c'est exactement le défaut qui avait faussé le
+« il manque X » de l'antimatière jusqu'en 3.3.0. Les huit succès binaires
+(Réflexe éclair, Résonance parfaite, un par défi) gardent leur `f` : il n'y a
+rien à doser.
+
+L'avancement se lit **par palier**, pas depuis zéro. Les succès chiffrés vont
+par familles — six paliers de minerai, six de puissance de clic, cinq de
+production — et deux succès appartiennent à la même famille si leur fonction `v`
+**s'écrit pareil** (`String(a.v)`). Rien à déclarer en plus, donc aucune famille
+ne peut être oubliée ; le jeu n'étant jamais minifié, le texte d'une fonction est
+stable. Chaque succès reçoit ainsi son palier précédent `n0`.
+
+L'échelle passe en **logarithmique quand un palier vaut cent fois le précédent**
+— c'est-à-dire pour les seules familles qui montent de mille en mille. Sur « 1 Sx
+de puissance de clic », une barre linéaire resterait collée à zéro pendant tout
+le palier puis sauterait à plein. Partout ailleurs — clics, anomalies, cycles,
+antimatière, structures — elle reste linéaire, parce que c'est ainsi qu'on compte
+ces choses-là. Les deux nombres exacts sont écrits à côté : la barre donne le
+ressenti, le texte donne la mesure, et c'est lui qui fait foi.
+
+Une carte déjà décrochée n'affiche pas de barre : elle ne dirait plus que
+« 100 % ».
+
 Les huit succès d'automatisation vont du premier achat (Délégation) aux
 Satellites d'extraction au niveau 10, et à tous les automates au maximum
 (Colonie autonome).

@@ -17,6 +17,39 @@ restent valides**.
 
 ---
 
+## 3.5.0 — L'avancement des succès
+
+Un succès encore à décrocher porte désormais une **barre et deux nombres** —
+« 37 / 100 ». Il fallait jusqu'ici ouvrir les statistiques et rapprocher soi-même
+le compteur du succès : « Roue libre : 100 cycles relancés » d'un côté, la tuile
+« Cycles relancés seuls » de l'autre.
+
+- 🎯 **Le seuil n'existe plus qu'à un endroit.** Un succès chiffré déclare sa
+  **mesure** (`v`) et sa **cible** (`n`) ; le prédicat de déblocage en est
+  déduit. La barre ne peut donc pas dire autre chose que la condition réelle —
+  c'est exactement le défaut qui avait faussé le « il manque X » de
+  l'antimatière jusqu'en 3.3.0. Les huit succès binaires gardent leur prédicat :
+  il n'y a rien à doser.
+- 📊 **L'avancement se lit par palier**, pas depuis zéro. Deux succès sont de la
+  même famille si leur fonction `v` s'écrit pareil — rien à déclarer en plus,
+  donc aucune famille ne peut être oubliée.
+- 📈 **Échelle logarithmique quand un palier vaut cent fois le précédent**, donc
+  pour les seules familles qui montent de mille en mille : minerai, production,
+  puissance de clic. Une barre linéaire y resterait collée à zéro pendant tout
+  le palier puis sauterait à plein. Ailleurs elle reste linéaire. Les deux
+  nombres exacts sont écrits à côté, et c'est le texte qui fait foi.
+- 🏆 **Une carte déjà décrochée n'affiche pas de barre** : elle ne dirait plus
+  que « 100 % ».
+- 🧪 **Un test de plus** (`t_achprog`, 33 au total) : 631 états balayés où le
+  prédicat, la mesure et une barre pleine doivent toujours dire la même chose,
+  les bornes 0–100 % même à ∞, et ce que la carte affiche.
+
+Les 70 prédicats convertis ont été comparés un à un aux anciens sur 139 états,
+de la partie vierge au tout-maxé, paliers et juste-en-dessous compris : **aucun
+écart**. Aucun succès ne se débloque plus tôt ni plus tard qu'avant.
+
+---
+
 ## 3.4.0 — Les deux automates ensemble
 
 L'Ingénieur et le Contremaître étaient **exclusifs** depuis la 2.25.0 : allumer

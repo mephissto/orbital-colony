@@ -918,6 +918,38 @@ and 5 time leaps. The five thresholds (200 / 200 / 25 / 25 / 5) therefore unlock
 at roughly the same moment as "Eye of the void", which asks for 500 anomalies.
 Counting by type uses the `k` key of each `ANOMS` entry and the `S.anomK` counter.
 
+### Progress, on the card
+
+An achievement not yet earned carries a **bar and two figures** — "37 / 100".
+Before 3.5.0 the only counters lived in the Statistics tab, and you had to make
+the connection yourself between "Freewheel: 100 cycles restarted" and the
+"Cycles restarted alone" tile.
+
+A numeric achievement declares its **measure** (`v`) and its **target** (`n`)
+rather than a predicate: `f` is derived from them
+(`ACHS.forEach(a=>{if(!a.f)a.f=S=>a.v(S)>=a.n})`). The threshold therefore exists
+in one place only, and the bar cannot say anything other than the real condition
+— exactly the flaw that skewed the antimatter "X missing" figure up to 3.3.0. The
+eight binary achievements (Quick reflex, Perfect resonance, one per challenge)
+keep their `f`: there is nothing to meter.
+
+Progress reads **per tier**, not from zero. Numeric achievements come in families
+— six ore tiers, six click-power tiers, five output tiers — and two achievements
+belong to the same family if their `v` function **reads the same**
+(`String(a.v)`). Nothing extra to declare, so no family can be forgotten; the
+game is never minified, so a function's source text is stable. Each achievement
+thus gets its previous tier, `n0`.
+
+The scale turns **logarithmic when a tier is a hundred times the previous one** —
+that is, only for the families that climb by factors of a thousand. On "1 Sx of
+click power", a linear bar would sit at zero for the whole tier then jump to
+full. Everywhere else — clicks, anomalies, cycles, antimatter, structures — it
+stays linear, because that is how those things are counted. The two exact figures
+sit beside it: the bar gives the feel, the text gives the measure, and the text is
+what counts.
+
+A card already earned shows no bar: it would only ever read "100 %".
+
 The eight automation achievements run from the first purchase (Delegation) to the
 Mining satellites at level 10, and to every automation maxed out (Self-running
 colony). Two of them are about **use** rather than purchase: 50 anomalies

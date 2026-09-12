@@ -559,6 +559,13 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .ach.got{opacity:1;border-color:rgba(255,196,92,.45);background:rgba(255,196,92,.07)}
 .ach .an{font-size:13px;font-weight:600}
 .ach .ad{font-size:11px;color:var(--dim);margin-top:2px}
+/* Avancement d'un succès non obtenu : la barre prend la place qui reste, le
+   compte exact tient à droite sur une seule ligne. Chiffres tabulaires, sinon
+   un compteur qui monte fait tressauter toute la colonne de cartes. */
+.ach .ap{display:flex;align-items:center;gap:9px;margin-top:7px}
+.ach .ap .bar{flex:1 1 auto;margin-top:0;max-width:none}
+.ach .ap .apn{flex:none;font-size:10.5px;color:var(--dim);white-space:nowrap;
+  font-variant-numeric:tabular-nums}
 
 /* anomaly */
 #anomaly{position:fixed;width:62px;height:62px;cursor:pointer;z-index:42;display:none;
@@ -1209,7 +1216,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.4.0";
+const VERSION="3.5.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1256,7 +1263,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"<b>L'Ingénieur et le Contremaître tournent enfin ensemble.</b> Ils ne sont plus exclusifs : chaque seconde l'Ingénieur achète l'amélioration la moins chère payable, et le Contremaître achète une structure avec ce qui reste. Plus de mise en pause, plus d'interrupteur inerte.",
+  wn_d:"Chaque <b>succès</b> encore à décrocher affiche maintenant son avancement — une barre et deux nombres, « 37 / 100 ». Plus besoin d'aller chercher le compteur correspondant dans les statistiques et de faire le rapprochement soi-même.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   ab_marque:"Kit de marque", ab_marque_s:"Marque",
@@ -1425,7 +1432,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"<b>The Engineer and the Foreman finally run together.</b> They are no longer exclusive: every second the Engineer buys the cheapest affordable upgrade, and the Foreman buys a structure with whatever is left. No more pausing, no more inert switch.",
+  wn_d:"Every <b>achievement</b> still to be earned now shows its progress — a bar and two figures, \"37 / 100\". No more hunting down the matching counter in the statistics and making the connection yourself.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   ab_marque:"Brand kit", ab_marque_s:"Brand",
@@ -1997,120 +2004,120 @@ const ACHCATS=[
  {id:"chal",  ico:"🎯", nm:{fr:"Défis",en:"Challenges"}},
 ];
 const ACHS=[
- {id:"a_click1",c:"clic",f:S=>S.clicks>=1,
+ {id:"a_click1",c:"clic",v:S=>S.clicks,n:1,
   nm:{fr:"Premier caillou",en:"First pebble"},ds:{fr:"Cliquer une fois",en:"Click once"}},
- {id:"a_click100",c:"clic",f:S=>S.clicks>=100,
+ {id:"a_click100",c:"clic",v:S=>S.clicks,n:100,
   nm:{fr:"Main d'œuvre",en:"Manual labour"},ds:{fr:"100 clics",en:"100 clicks"}},
- {id:"a_click1k",c:"clic",f:S=>S.clicks>=1000,
+ {id:"a_click1k",c:"clic",v:S=>S.clicks,n:1000,
   nm:{fr:"Tendinite",en:"Tendinitis"},ds:{fr:"1 000 clics",en:"1,000 clicks"}},
- {id:"a_click10k",c:"clic",f:S=>S.clicks>=1e4,
+ {id:"a_click10k",c:"clic",v:S=>S.clicks,n:1e4,
   nm:{fr:"Métronome",en:"Metronome"},ds:{fr:"10 000 clics",en:"10,000 clicks"}},
- {id:"a_click100k",c:"clic",f:S=>S.clicks>=1e5,
+ {id:"a_click100k",c:"clic",v:S=>S.clicks,n:1e5,
   nm:{fr:"Marteau-piqueur",en:"Jackhammer"},ds:{fr:"100 000 clics",en:"100,000 clicks"}},
- {id:"a_click1M",c:"clic",f:S=>S.clicks>=1e6,
+ {id:"a_click1M",c:"clic",v:S=>S.clicks,n:1e6,
   nm:{fr:"Mémoire musculaire",en:"Muscle memory"},ds:{fr:"1 000 000 de clics",en:"1,000,000 clicks"}},
- {id:"a_click1m",c:"clic",f:S=>clickVal()>=1e6,
+ {id:"a_click1m",c:"clic",v:S=>clickVal(),n:1e6,
   nm:{fr:"Doigt de fer",en:"Iron finger"},ds:{fr:"1 M de puissance de clic",en:"1 M click power"}},
- {id:"a_drone10",c:"struct",f:S=>(S.gens.drone||0)>=10,
+ {id:"a_drone10",c:"struct",v:S=>(S.gens.drone||0),n:10,
   nm:{fr:"Petit essaim",en:"Small swarm"},ds:{fr:"10 drones mineurs",en:"10 mining drones"}},
- {id:"a_drone100",c:"struct",f:S=>(S.gens.drone||0)>=100,
+ {id:"a_drone100",c:"struct",v:S=>(S.gens.drone||0),n:100,
   nm:{fr:"Nuée",en:"Cloud"},ds:{fr:"100 drones mineurs",en:"100 mining drones"}},
- {id:"a_all1",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=1),
+ {id:"a_all1",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=1).length,n:GENS.length,
   nm:{fr:"Panoplie complète",en:"Full set"},ds:{fr:"1 de chaque générateur",en:"1 of every structure"}},
- {id:"a_all25",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=25),
+ {id:"a_all25",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=25).length,n:GENS.length,
   nm:{fr:"Industriel",en:"Industrialist"},ds:{fr:"25 de chaque générateur",en:"25 of every structure"}},
- {id:"a_e6",c:"ore",f:S=>S.totalOre>=1e6,
+ {id:"a_e6",c:"ore",v:S=>S.totalOre,n:1e6,
   nm:{fr:"Million",en:"Million"},ds:{fr:"1 M de minerai extrait",en:"1 M ore mined"}},
- {id:"a_e9",c:"ore",f:S=>S.totalOre>=1e9,
+ {id:"a_e9",c:"ore",v:S=>S.totalOre,n:1e9,
   nm:{fr:"Milliard",en:"Billion"},ds:{fr:"1 B de minerai extrait",en:"1 B ore mined"}},
- {id:"a_e12",c:"ore",f:S=>S.totalOre>=1e12,
+ {id:"a_e12",c:"ore",v:S=>S.totalOre,n:1e12,
   nm:{fr:"Billion",en:"Trillion"},ds:{fr:"1 T de minerai extrait",en:"1 T ore mined"}},
- {id:"a_e15",c:"ore",f:S=>S.totalOre>=1e15,
+ {id:"a_e15",c:"ore",v:S=>S.totalOre,n:1e15,
   nm:{fr:"Échelle planétaire",en:"Planetary scale"},ds:{fr:"1 Qa de minerai extrait",en:"1 Qa ore mined"}},
- {id:"a_e18",c:"ore",f:S=>S.totalOre>=1e18,
+ {id:"a_e18",c:"ore",v:S=>S.totalOre,n:1e18,
   nm:{fr:"Échelle stellaire",en:"Stellar scale"},ds:{fr:"1 Qi de minerai extrait",en:"1 Qi ore mined"}},
- {id:"a_rate1k",c:"rate",f:S=>perSec()>=1e3,
+ {id:"a_rate1k",c:"rate",v:S=>perSec(),n:1e3,
   nm:{fr:"Cadence",en:"Cadence"},ds:{fr:"1 K/s de production",en:"1 K/s output"}},
- {id:"a_rate1m",c:"rate",f:S=>perSec()>=1e6,
+ {id:"a_rate1m",c:"rate",v:S=>perSec(),n:1e6,
   nm:{fr:"Chaîne complète",en:"Full chain"},ds:{fr:"1 M/s de production",en:"1 M/s output"}},
- {id:"a_rate1g",c:"rate",f:S=>perSec()>=1e9,
+ {id:"a_rate1g",c:"rate",v:S=>perSec(),n:1e9,
   nm:{fr:"Débit galactique",en:"Galactic throughput"},ds:{fr:"1 B/s de production",en:"1 B/s output"}},
- {id:"a_up10",c:"tech",f:S=>Object.keys(S.ups).length>=10,
+ {id:"a_up10",c:"tech",v:S=>Object.keys(S.ups).length,n:10,
   nm:{fr:"Bricoleur",en:"Tinkerer"},ds:{fr:"10 améliorations achetées",en:"10 upgrades bought"}},
- {id:"a_up30",c:"tech",f:S=>Object.keys(S.ups).length>=30,
+ {id:"a_up30",c:"tech",v:S=>Object.keys(S.ups).length,n:30,
   nm:{fr:"Ingénieur en chef",en:"Chief engineer"},ds:{fr:"30 améliorations achetées",en:"30 upgrades bought"}},
- {id:"a_anom1",c:"anom",f:S=>S.anoms>=1,
+ {id:"a_anom1",c:"anom",v:S=>S.anoms,n:1,
   nm:{fr:"Curieux",en:"Curious"},ds:{fr:"Attraper une anomalie",en:"Catch an anomaly"}},
- {id:"a_anom25",c:"anom",f:S=>S.anoms>=25,
+ {id:"a_anom25",c:"anom",v:S=>S.anoms,n:25,
   nm:{fr:"Chasseur d'anomalies",en:"Anomaly hunter"},ds:{fr:"Attraper 25 anomalies",en:"Catch 25 anomalies"}},
- {id:"a_pr1",c:"cycle",f:S=>S.prestiges>=1,
+ {id:"a_pr1",c:"cycle",v:S=>S.prestiges,n:1,
   nm:{fr:"Renaissance",en:"Rebirth"},ds:{fr:"Premier cycle d'antimatière",en:"First antimatter cycle"}},
- {id:"a_pr5",c:"cycle",f:S=>S.prestiges>=5,
+ {id:"a_pr5",c:"cycle",v:S=>S.prestiges,n:5,
   nm:{fr:"Boucle temporelle",en:"Time loop"},ds:{fr:"5 cycles",en:"5 cycles"}},
- {id:"a_am100",c:"cycle",f:S=>S.am>=100,
+ {id:"a_am100",c:"cycle",v:S=>S.am,n:100,
   nm:{fr:"Physicien",en:"Physicist"},ds:{fr:"100 antimatière possédée",en:"100 antimatter held"}},
- {id:"a_am1k",c:"cycle",f:S=>S.am>=1000,
+ {id:"a_am1k",c:"cycle",v:S=>S.am,n:1000,
   nm:{fr:"Maître de l'antimatière",en:"Antimatter master"},ds:{fr:"1 000 antimatière possédée",en:"1,000 antimatter held"}},
- {id:"a_dyson",c:"struct",f:S=>(S.gens.dyson||0)>=1,
+ {id:"a_dyson",c:"struct",v:S=>(S.gens.dyson||0),n:1,
   nm:{fr:"Ingénierie ultime",en:"Ultimate engineering"},ds:{fr:"Construire une sphère de Dyson",en:"Build a Dyson sphere"}},
 
  /* ---- haut niveau ---- */
- {id:"a_drone500",c:"struct",f:S=>(S.gens.drone||0)>=500,
+ {id:"a_drone500",c:"struct",v:S=>(S.gens.drone||0),n:500,
   nm:{fr:"Marée de drones",en:"Drone tide"},ds:{fr:"500 drones mineurs",en:"500 mining drones"}},
- {id:"a_all100",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=100),
+ {id:"a_all100",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=100).length,n:GENS.length,
   nm:{fr:"Conglomérat",en:"Conglomerate"},ds:{fr:"100 de chaque structure",en:"100 of every structure"}},
- {id:"a_all200",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=200),
+ {id:"a_all200",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=200).length,n:GENS.length,
   nm:{fr:"Empire industriel",en:"Industrial empire"},ds:{fr:"200 de chaque structure",en:"200 of every structure"}},
- {id:"a_all250",c:"struct",f:S=>GENS.every(g=>(S.gens[g.id]||0)>=250),
+ {id:"a_all250",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=250).length,n:GENS.length,
   nm:{fr:"Machine parfaite",en:"Perfect machine"},ds:{fr:"250 de chaque structure",en:"250 of every structure"}},
- {id:"a_struct1k",c:"struct",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=1000,
+ {id:"a_struct1k",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:1000,
   nm:{fr:"Mille pièces",en:"A thousand parts"},ds:{fr:"1 000 structures au total",en:"1,000 structures in total"}},
- {id:"a_struct2k5",c:"struct",f:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0)>=2500,
+ {id:"a_struct2k5",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:2500,
   nm:{fr:"Mégastructure",en:"Megastructure"},ds:{fr:"2 500 structures au total",en:"2,500 structures in total"}},
- {id:"a_dyson50",c:"struct",f:S=>(S.gens.dyson||0)>=50,
+ {id:"a_dyson50",c:"struct",v:S=>(S.gens.dyson||0),n:50,
   nm:{fr:"Constellation captive",en:"Captive constellation"},ds:{fr:"50 sphères de Dyson",en:"50 Dyson spheres"}},
- {id:"a_e21",c:"ore",f:S=>S.totalOre>=1e21,
+ {id:"a_e21",c:"ore",v:S=>S.totalOre,n:1e21,
   nm:{fr:"Échelle galactique",en:"Galactic scale"},ds:{fr:"1 Sx de minerai extrait",en:"1 Sx ore mined"}},
- {id:"a_e24",c:"ore",f:S=>S.totalOre>=1e24,
+ {id:"a_e24",c:"ore",v:S=>S.totalOre,n:1e24,
   nm:{fr:"Échelle universelle",en:"Universal scale"},ds:{fr:"1 Sp de minerai extrait",en:"1 Sp ore mined"}},
- {id:"a_e27",c:"ore",f:S=>S.totalOre>=1e27,
+ {id:"a_e27",c:"ore",v:S=>S.totalOre,n:1e27,
   nm:{fr:"Au-delà des nombres",en:"Beyond numbers"},ds:{fr:"1 Oc de minerai extrait",en:"1 Oc ore mined"}},
- {id:"a_rate1t",c:"rate",f:S=>perSec()>=1e12,
+ {id:"a_rate1t",c:"rate",v:S=>perSec(),n:1e12,
   nm:{fr:"Torrent",en:"Torrent"},ds:{fr:"1 T/s de production",en:"1 T/s output"}},
- {id:"a_rate1qa",c:"rate",f:S=>perSec()>=1e15,
+ {id:"a_rate1qa",c:"rate",v:S=>perSec(),n:1e15,
   nm:{fr:"Singularité productive",en:"Productive singularity"},ds:{fr:"1 Qa/s de production",en:"1 Qa/s output"}},
- {id:"a_click1g",c:"clic",f:S=>clickVal()>=1e9,
+ {id:"a_click1g",c:"clic",v:S=>clickVal(),n:1e9,
   nm:{fr:"Doigt d'or",en:"Golden finger"},ds:{fr:"1 B de puissance de clic",en:"1 B click power"}},
- {id:"a_click1t",c:"clic",f:S=>clickVal()>=1e12,
+ {id:"a_click1t",c:"clic",v:S=>clickVal(),n:1e12,
   nm:{fr:"Doigt de diamant",en:"Diamond finger"},ds:{fr:"1 T de puissance de clic",en:"1 T click power"}},
- {id:"a_click1qa",c:"clic",f:S=>clickVal()>=1e15,
+ {id:"a_click1qa",c:"clic",v:S=>clickVal(),n:1e15,
   nm:{fr:"Doigt de neutronium",en:"Neutronium finger"},ds:{fr:"1 Qa de puissance de clic",en:"1 Qa click power"}},
- {id:"a_click1qi",c:"clic",f:S=>clickVal()>=1e18,
+ {id:"a_click1qi",c:"clic",v:S=>clickVal(),n:1e18,
   nm:{fr:"Doigt d'antimatière",en:"Antimatter finger"},ds:{fr:"1 Qi de puissance de clic",en:"1 Qi click power"}},
- {id:"a_click1sx",c:"clic",f:S=>clickVal()>=1e21,
+ {id:"a_click1sx",c:"clic",v:S=>clickVal(),n:1e21,
   nm:{fr:"Doigt-singularité",en:"Singularity finger"},ds:{fr:"1 Sx de puissance de clic",en:"1 Sx click power"}},
- {id:"a_anom100",c:"anom",f:S=>S.anoms>=100,
+ {id:"a_anom100",c:"anom",v:S=>S.anoms,n:100,
   nm:{fr:"Radar vivant",en:"Living radar"},ds:{fr:"Attraper 100 anomalies",en:"Catch 100 anomalies"}},
- {id:"a_anom250",c:"anom",f:S=>S.anoms>=250,
+ {id:"a_anom250",c:"anom",v:S=>S.anoms,n:250,
   nm:{fr:"Traqueur",en:"Tracker"},ds:{fr:"Attraper 250 anomalies",en:"Catch 250 anomalies"}},
- {id:"a_anom500",c:"anom",f:S=>S.anoms>=500,
+ {id:"a_anom500",c:"anom",v:S=>S.anoms,n:500,
   nm:{fr:"Œil du vide",en:"Eye of the void"},ds:{fr:"Attraper 500 anomalies",en:"Catch 500 anomalies"}},
- {id:"a_anom1k",c:"anom",f:S=>S.anoms>=1000,
+ {id:"a_anom1k",c:"anom",v:S=>S.anoms,n:1000,
   nm:{fr:"Aimant à anomalies",en:"Anomaly magnet"},ds:{fr:"Attraper 1 000 anomalies",en:"Catch 1,000 anomalies"}},
  /* Seuils calés sur les probabilités : à ~500 anomalies attrapées on a en
     moyenne 222 filons, 222 caches, 25 surtensions, 25 échos et 5 bonds. Les
     cinq se débloquent donc à peu près au même moment. */
- {id:"a_k_bond1",c:"anom",f:S=>ank("bond")>=1,
+ {id:"a_k_bond1",c:"anom",v:S=>ank("bond"),n:1,
   nm:{fr:"Instant suspendu",en:"Suspended moment"},ds:{fr:"Attraper un bond temporel (1 %)",en:"Catch a time leap (1 %)"}},
- {id:"a_k_bond5",c:"anom",f:S=>ank("bond")>=5,
+ {id:"a_k_bond5",c:"anom",v:S=>ank("bond"),n:5,
   nm:{fr:"Contre toute attente",en:"Against all odds"},ds:{fr:"5 bonds temporels",en:"5 time leaps"}},
- {id:"a_k_surge",c:"anom",f:S=>ank("surge")>=25,
+ {id:"a_k_surge",c:"anom",v:S=>ank("surge"),n:25,
   nm:{fr:"Surtension maîtrisée",en:"Surge tamed"},ds:{fr:"25 surtensions (5 %)",en:"25 power surges (5 %)"}},
- {id:"a_k_echo",c:"anom",f:S=>ank("echo")>=25,
+ {id:"a_k_echo",c:"anom",v:S=>ank("echo"),n:25,
   nm:{fr:"Écho persistant",en:"Lingering echo"},ds:{fr:"25 échos quantiques (5 %)",en:"25 quantum echoes (5 %)"}},
- {id:"a_k_filon",c:"anom",f:S=>ank("filon")>=200,
+ {id:"a_k_filon",c:"anom",v:S=>ank("filon"),n:200,
   nm:{fr:"Prospecteur",en:"Prospector"},ds:{fr:"200 filons riches",en:"200 rich veins"}},
- {id:"a_k_cache",c:"anom",f:S=>ank("cache")>=200,
+ {id:"a_k_cache",c:"anom",v:S=>ank("cache"),n:200,
   nm:{fr:"Pilleur d'épaves",en:"Wreck looter"},ds:{fr:"200 caches abandonnées",en:"200 abandoned caches"}},
  {id:"a_fast",c:"anom",f:S=>!!S.fastAnom,
   nm:{fr:"Réflexe éclair",en:"Lightning reflex"},
@@ -2118,35 +2125,35 @@ const ACHS=[
  {id:"a_2buffs",c:"anom",f:S=>!!S.chain,
   nm:{fr:"Résonance parfaite",en:"Perfect resonance"},
   ds:{fr:"Attraper un bonus alors qu'un autre est encore actif",en:"Catch a buff while another is still running"}},
- {id:"a_pr10",c:"cycle",f:S=>S.prestiges>=10,
+ {id:"a_pr10",c:"cycle",v:S=>S.prestiges,n:10,
   nm:{fr:"Éternel retour",en:"Eternal return"},ds:{fr:"10 cycles",en:"10 cycles"}},
- {id:"a_pr25",c:"cycle",f:S=>S.prestiges>=25,
+ {id:"a_pr25",c:"cycle",v:S=>S.prestiges,n:25,
   nm:{fr:"Sisyphe heureux",en:"Happy Sisyphus"},ds:{fr:"25 cycles",en:"25 cycles"}},
- {id:"a_am10k",c:"cycle",f:S=>S.am>=1e4,
+ {id:"a_am10k",c:"cycle",v:S=>S.am,n:1e4,
   nm:{fr:"Réacteur à antimatière",en:"Antimatter reactor"},ds:{fr:"10 000 antimatière possédée",en:"10,000 antimatter held"}},
- {id:"a_am100k",c:"cycle",f:S=>S.am>=1e5,
+ {id:"a_am100k",c:"cycle",v:S=>S.am,n:1e5,
   nm:{fr:"Banque d'antimatière",en:"Antimatter bank"},ds:{fr:"100 000 antimatière possédée",en:"100,000 antimatter held"}},
- {id:"a_res_all",c:"tech",f:S=>RES.every(r=>(S.res[r.id]||0)>=r.max),
+ {id:"a_res_all",c:"tech",v:S=>RES.reduce((x,r)=>x+Math.min(lvl(r.id),r.max),0),n:RES.reduce((x,r)=>x+r.max,0),
   nm:{fr:"Savoir absolu",en:"Absolute knowledge"},ds:{fr:"Toutes les recherches au maximum",en:"Every research maxed out"}},
- {id:"a_ups_all",c:"tech",f:S=>UPS.every(u=>S.ups[u.id]),
+ {id:"a_ups_all",c:"tech",v:S=>UPS.filter(u=>!!S.ups[u.id]).length,n:UPS.length,
   nm:{fr:"Collectionneur",en:"Completionist"},ds:{fr:"Toutes les améliorations achetées",en:"Every upgrade bought"}},
 
  /* ---- automatisation ---- */
- {id:"a_auto1",c:"auto",f:S=>Object.keys(S.auto).length>=1,
+ {id:"a_auto1",c:"auto",v:S=>Object.keys(S.auto).length,n:1,
   nm:{fr:"Délégation",en:"Delegation"},ds:{fr:"Acheter une première automatisation",en:"Buy a first automation"}},
- {id:"a_autoclic5",c:"auto",f:S=>alvl("clic")>=5,
+ {id:"a_autoclic5",c:"auto",v:S=>alvl("clic"),n:5,
   nm:{fr:"Escadrille",en:"Squadron"},ds:{fr:"5 satellites en orbite",en:"5 satellites in orbit"}},
- {id:"a_autoclic10",c:"auto",f:S=>alvl("clic")>=10,
+ {id:"a_autoclic10",c:"auto",v:S=>alvl("clic"),n:10,
   nm:{fr:"Ceinture orbitale",en:"Orbital belt"},ds:{fr:"10 satellites en orbite",en:"10 satellites in orbit"}},
- {id:"a_autofull",c:"auto",f:S=>AUTOS.every(a=>alvl(a.id)>=1),
+ {id:"a_autofull",c:"auto",v:S=>AUTOS.filter(a=>alvl(a.id)>=1).length,n:AUTOS.length,
   nm:{fr:"Équipe au complet",en:"Full crew"},ds:{fr:"Posséder les cinq automates",en:"Own all five automations"}},
- {id:"a_automax",c:"auto",f:S=>AUTOS.every(a=>alvl(a.id)>=a.max),
+ {id:"a_automax",c:"auto",v:S=>AUTOS.reduce((x,a)=>x+Math.min(alvl(a.id),a.max),0),n:AUTOS.reduce((x,a)=>x+a.max,0),
   nm:{fr:"Colonie autonome",en:"Self-running colony"},ds:{fr:"Tous les automates au maximum",en:"Every automation maxed out"}},
- {id:"a_asonde50",c:"auto",f:S=>(S.asonde||0)>=50,
+ {id:"a_asonde50",c:"auto",v:S=>(S.asonde||0),n:50,
   nm:{fr:"Filet dérivant",en:"Drift net"},ds:{fr:"50 anomalies ramassées par la sonde",en:"50 anomalies collected by the probe"}},
- {id:"a_acyc10",c:"auto",f:S=>(S.acyc||0)>=10,
+ {id:"a_acyc10",c:"auto",v:S=>(S.acyc||0),n:10,
   nm:{fr:"Pilote automatique",en:"Autopilot"},ds:{fr:"10 cycles relancés tout seuls",en:"10 cycles restarted on their own"}},
- {id:"a_acyc100",c:"auto",f:S=>(S.acyc||0)>=100,
+ {id:"a_acyc100",c:"auto",v:S=>(S.acyc||0),n:100,
   nm:{fr:"Roue libre",en:"Freewheel"},ds:{fr:"100 cycles relancés tout seuls",en:"100 cycles restarted on their own"}},
 ];
 /* Un succès par défi, plus un pour les six. Ils sont construits à partir de
@@ -2237,9 +2244,53 @@ ACH_CHAL.forEach(x=>{
   ACHS.push({id:"a_ch_"+x.id, c:"chal", f:S=>!!S.chalDone[x.id], nm:x.nm,
     ds:{fr:"Réussir "+c.nm.fr, en:"Beat "+c.nm.en}});
 });
-ACHS.push({id:"a_ch_all", c:"chal", f:S=>CHALS.every(c=>!!S.chalDone[c.id]),
+ACHS.push({id:"a_ch_all", c:"chal", v:S=>CHALS.filter(c=>!!S.chalDone[c.id]).length, n:CHALS.length,
   nm:{fr:"Briseur de règles",en:"Rule breaker"},
   ds:{fr:"Réussir les six défis",en:"Beat all six challenges"}});
+
+/* Un succès chiffré déclare sa MESURE (`v`) et sa CIBLE (`n`), pas un prédicat :
+   le déblocage en est déduit. Le seuil n'existe donc qu'à un seul endroit, et
+   la barre de la carte ne peut pas dire autre chose que la condition réelle —
+   c'est exactement le défaut qui avait faussé le « il manque X » de
+   l'antimatière en 3.3.0 (un coefficient appliqué d'un seul côté).
+   Les trois succès binaires — une anomalie attrapée en moins de 2 s, deux bonus
+   actifs ensemble, un défi réussi — gardent leur `f` : il n'y a rien à doser. */
+ACHS.forEach(a=>{ if(!a.f)a.f=S=>a.v(S)>=a.n });
+
+/* Les succès chiffrés vont par familles — six paliers de minerai, six de
+   puissance de clic, cinq de production… — et l'avancement se lit PAR PALIER :
+   entre celui qu'on vient de décrocher et celui qu'on vise. Mesuré depuis zéro,
+   « 1 Sx de puissance de clic » afficherait la même chose au premier et au
+   dernier palier.
+   Deux succès appartiennent à la même famille si leur fonction `v` s'écrit
+   pareil : `String(a.v)` suffit, et rien à déclarer en plus — aucune liste à
+   tenir à jour, donc aucune famille ne peut être oubliée. (Le jeu n'est jamais
+   minifié : le texte d'une fonction est stable.) */
+(function paliers(){
+  const fam={};
+  ACHS.forEach(a=>{ if(a.v){const k=String(a.v); (fam[k]=fam[k]||[]).push(a)} });
+  Object.keys(fam).forEach(k=>{
+    const l=fam[k].sort((x,y)=>x.n-y.n);
+    l.forEach((a,i)=>{ a.n0 = i ? l[i-1].n : 0 });   // palier précédent, 0 si premier
+  });
+})();
+/* Avancement d'un succès, pour la barre. null = rien à montrer (succès binaire).
+   L'échelle passe en LOGARITHMIQUE quand un palier vaut cent fois le précédent
+   — c'est-à-dire pour les seules familles qui montent de mille en mille :
+   minerai, production, puissance de clic. Là, une barre linéaire resterait
+   collée à zéro pendant tout le palier puis sauterait à plein. Partout ailleurs
+   — clics, anomalies, cycles, antimatière — elle reste linéaire, parce que
+   c'est ainsi qu'on compte ces choses-là.
+   Les deux nombres exacts sont écrits à côté : la barre donne le ressenti, le
+   texte donne la mesure, et c'est lui qui fait foi. */
+function achProg(a){
+  if(!a.v)return null;
+  const v=a.v(S), n=a.n, n0=a.n0||0;
+  if(v>=n)return 1;
+  if(!(v>n0))return 0;
+  return (n0>0 && n/n0>=100) ? Math.log(v/n0)/Math.log(n/n0)
+                             : (v-n0)/(n-n0);
+}
 const NAIN=6;
 const NAIN_MULT=4;                                // compensation, voir genMult
 const gensActives=()=>chalRegle("dwarf")?GENS.slice(0,NAIN):GENS;
@@ -3045,8 +3096,11 @@ function buildSkeleton(){
     box.appendChild(h); box.appendChild(g);
     idx.forEach(i=>{
       const d=document.createElement("div"); d.className="ach";
-      d.innerHTML='<div class="an"></div><div class="ad"></div>';
-      d.q={n:d.querySelector(".an"),d:d.querySelector(".ad")};
+      d.innerHTML='<div class="an"></div><div class="ad"></div>'+
+        '<div class="ap"><div class="bar"><i></i></div><span class="apn"></span></div>';
+      d.q={n:d.querySelector(".an"),d:d.querySelector(".ad"),
+           p:d.querySelector(".ap"),bi:d.querySelector(".bar i"),
+           pn:d.querySelector(".apn")};
       g.appendChild(d); ACHNODES[i]=d;
     });
     ACHSECS.push({cat,h,idx});
@@ -3409,6 +3463,16 @@ function renderAchs(){
     cls(n,"got",has);
     txt(n.q.n,(has?"🏆 ":"🔒 ")+(has?tr(a.nm):"???"));
     txt(n.q.d,tr(a.ds));
+    /* La barre ne sert qu'aux succès chiffrés ENCORE à décrocher : une fois
+       obtenu elle ne dirait plus que « 100 % », et un succès binaire n'a pas
+       d'avancement à montrer. */
+    const p=has?null:achProg(a);
+    show(n.q.p,p!==null);
+    if(p!==null){
+      const w=(p*100).toFixed(1)+"%";
+      if(n.q.bi._w!==w){n.q.bi._w=w;n.q.bi.style.width=w}
+      txt(n.q.pn,fmt(a.v(S))+" / "+fmt(a.n));
+    }
   });
 }
 
@@ -3811,6 +3875,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.5.0", nm:{fr:"L'avancement des succès",en:"Achievement progress"},
+  d:{fr:"Un succès encore à décrocher porte désormais une barre et deux nombres — « 37 / 100 ». Il fallait jusqu'ici ouvrir les statistiques et rapprocher soi-même le compteur du succès. Un succès chiffré déclare maintenant sa mesure et sa cible plutôt qu'un prédicat, dont le déblocage est déduit : la barre ne peut pas dire autre chose que la condition réelle. L'avancement se lit par palier, et passe en échelle logarithmique sur les seules familles qui montent de mille en mille — minerai, production, puissance de clic.",
+     en:"An achievement still to be earned now carries a bar and two figures — \"37 / 100\". Until now you had to open the statistics and match the counter to the achievement yourself. A numeric achievement now declares its measure and its target rather than a predicate, from which unlocking is derived: the bar cannot say anything other than the real condition. Progress reads per tier, and turns logarithmic only for the families that climb by factors of a thousand — ore, output, click power."}},
  {v:"3.4.0", nm:{fr:"Les deux automates ensemble",en:"Both automations at once"},
   d:{fr:"L'Ingénieur et le Contremaître ne sont plus exclusifs : la règle devient une priorité. Chaque seconde l'Ingénieur achète l'amélioration la moins chère payable ; s'il n'en reste aucune, ou qu'aucune n'est payable, le Contremaître achète une structure avec ce qui reste. Le prix d'une structure montant de 15 % à chaque exemplaire, le Contremaître relève son propre plancher et ne peut pas affamer l'Ingénieur. La mise en pause, l'interrupteur inerte et le « qui a la main » disparaissent : deux interrupteurs indépendants.",
      en:"The Engineer and the Foreman are no longer exclusive: the rule becomes a priority. Every second the Engineer buys the cheapest affordable upgrade; if none is left, or none is affordable, the Foreman buys a structure with what remains. Since a structure's price climbs 15 % per unit, the Foreman raises its own floor and cannot starve the Engineer. Pausing, the inert switch and the \"who has control\" state are gone: two independent switches."}},

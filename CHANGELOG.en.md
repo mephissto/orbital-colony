@@ -16,6 +16,38 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.5.0 — Achievement progress
+
+An achievement still to be earned now carries a **bar and two figures** —
+"37 / 100". Until now you had to open the statistics and match the counter to the
+achievement yourself: "Freewheel: 100 cycles restarted" on one side, the "Cycles
+restarted alone" tile on the other.
+
+- 🎯 **The threshold now exists in one place only.** A numeric achievement
+  declares its **measure** (`v`) and its **target** (`n`); the unlock predicate
+  is derived from them. The bar therefore cannot say anything other than the real
+  condition — exactly the flaw that skewed the antimatter "X missing" figure up
+  to 3.3.0. The eight binary achievements keep their predicate: there is nothing
+  to meter.
+- 📊 **Progress reads per tier**, not from zero. Two achievements belong to the
+  same family if their `v` function reads the same — nothing extra to declare, so
+  no family can be forgotten.
+- 📈 **Logarithmic scale when a tier is a hundred times the previous one**, so
+  only for the families that climb by factors of a thousand: ore, output, click
+  power. A linear bar would sit there at zero for the whole tier then jump to
+  full. Everywhere else it stays linear. The two exact figures sit beside it, and
+  the text is what counts.
+- 🏆 **A card already earned shows no bar**: it would only ever read "100 %".
+- 🧪 **One more test** (`t_achprog`, 33 in all): 631 states swept where the
+  predicate, the measure and a full bar must always agree, the 0–100 % bounds
+  even at ∞, and what the card displays.
+
+The 70 converted predicates were compared one by one against the old ones across
+139 states, from a fresh game to fully maxed, thresholds and just-below included:
+**no divergence**. No achievement unlocks any earlier or later than before.
+
+---
+
 ## 3.4.0 — Both automations at once
 
 The Engineer and the Foreman had been **mutually exclusive** since 2.25.0:
