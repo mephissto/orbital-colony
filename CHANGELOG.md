@@ -17,6 +17,382 @@ restent valides**.
 
 ---
 
+## 3.7.6 — Le résumé couvre toute la mise à jour
+
+La **3.5.0** était encore en ligne. Ceux qui reviennent sautent donc huit
+versions d'un coup, et le panneau **Nouveautés** ne parlait que du dernier
+correctif — un z-index sur une épingle. Il résume maintenant l'écart complet :
+les Percées, le seuil de relance calé sur l'antimatière en poche, les succès
+épinglés, et les dix-huit succès ajoutés (78 → 96).
+
+Le détail version par version reste juste en dessous, dans la même fenêtre.
+Texte uniquement, dans les deux langues.
+
+---
+
+## 3.7.5 — L'épingle se laisse cliquer
+
+Le titre de la carte se peignait **par-dessus l'épingle** et lui volait le clic.
+Effet de bord de la 3.7.3, et pas celui qu'on attend.
+
+### La règle qui manquait
+
+Pour cesser d'atténuer la carte entière, l'atténuation est passée sur son
+contenu :
+
+```css
+.ach>.an,.ach>.ad,.ach>.ap{ opacity:.38 }
+```
+
+Or **une opacité inférieure à 1 ouvre un contexte d'empilement**. Ces trois blocs
+ne se peignent donc plus avec le flux normal mais *au niveau des éléments
+positionnés*, départagés par l'ordre du DOM. `.an` suit `.apin` dans le
+gabarit — il passait devant.
+
+`.an{padding-right:24px}` écartait le *texte* de l'épingle, pas la boîte du
+`div`, qui occupe toute la largeur de la carte. Au centre du bouton, là où on
+vise, `elementFromPoint()` renvoyait `DIV.an`. Seuls les quelques pixels du
+bouton dépassant au-dessus et à droite de cette boîte répondaient encore — d'où
+un clic qui marchait une fois sur deux.
+
+`z-index:2` sur `.apin`, `isolation:isolate` sur `.ach` pour que ce z-index reste
+local à sa carte. Rien d'autre ne bouge.
+
+### Le test qui manquait
+
+Vérifier les propriétés CSS n'aurait rien vu : chaque règle était correcte
+séparément. `t_perc` demande maintenant **qui reçoit réellement le pointeur**,
+au centre et aux deux coins de chaque épingle visible, puis fait quatre vrais
+clics à la souris et vérifie que l'état bascule à chaque fois. Repassé sur la
+3.7.4, il échoue en nommant le coupable : `DIV.an`.
+
+---
+
+## 3.7.4 — Grise si libre, rouge si suivie
+
+L'épingle des succès était à peu près invisible, et pour une raison bête : **les
+opacités se multiplient**.
+
+```css
+.ach      { opacity:.38 }   /* un succès pas encore décroché */
+.ach .apin{ opacity:.38 }   /* l'épingle, discrète */
+```
+
+38 % de 38 %, soit **14 % à l'écran**, en nuances de gris par-dessus le marché.
+L'épingle allumée s'en sortait mieux (`opacity:1` × .38 = 38 %, en rouge), ce qui
+explique qu'on voyait les succès suivis et pas les autres — donc pas le bouton
+qui sert à les suivre.
+
+### Ce qui change
+
+L'atténuation porte désormais sur le **contenu** de la carte, plus sur la carte
+entière :
+
+```css
+.ach>.an,.ach>.ad,.ach>.ap{ opacity:.38 }
+```
+
+L'épingle n'est plus dans le sous-arbre atténué et garde l'opacité qu'on lui
+donne. Le cadre et le fond reprennent à la main ce que l'opacité faisait — leurs
+alphas d'origine (.16 et .78) multipliés par .38 — donc la carte a exactement le
+même rendu qu'avant.
+
+| État | Avant | Après |
+|---|---|---|
+| Non suivi | 14 %, gris intégral | **100 %**, `grayscale(1) brightness(1.75)` |
+| Survol | 28 % | `grayscale(.3)`, agrandie de 12 % |
+| Suivi | 38 %, couleur | **100 %**, rouge, aucun filtre |
+
+`brightness` après `grayscale` : sans lui le gris de l'émoji reste sombre sur un
+fond sombre, et « gris » veut dire « invisible ». Ni fond ni cadre sur aucun des
+deux états — c'est la couleur seule qui porte l'information, et on la rend
+lisible en remontant l'épingle éteinte plutôt qu'en décorant l'allumée.
+
+**Rouge partout où le succès est suivi** : dans la liste, dans la section
+épinglée en tête d'onglet, et dans le bandeau au-dessus des onglets, dont la
+puce passe de 75 % à pleine opacité. Le bouton gagne aussi 1 px de taille et son
+`.an` 4 px de marge à droite, pour la cible tactile.
+
+`t_perc` gagne six assertions, dont celle qui aurait attrapé le bug : l'opacité
+**effective**, produit de celles de tous les ancêtres. Les deux mesures sont
+séparées d'une attente — `.apin` porte une transition de 150 ms et
+`getComputedStyle` rend la valeur en cours d'animation, pas celle d'arrivée.
+
+---
+
+## 3.7.2 — Des paliers atteignables
+
+Les paliers de succès ajoutés en 3.7.0 montaient jusqu'à **un million de
+cycles**. Ils étaient faux.
+
+### D'où venait l'erreur
+
+La cadence avait été estimée par `amMinerai(cycSeuil()) / perSec()` : le minerai
+qu'il faut, divisé par la production. Sauf que `perSec()` est lu sur la colonie
+**déjà construite** — et qu'un cycle remet `S.gens` à zéro. Le temps réel d'un
+cycle, c'est la reconstruction, pas la production de pointe. L'estimation à
+« plusieurs centaines de cycles par heure » sautait purement et simplement la
+majeure partie du cycle.
+
+Mesuré ensuite dans le jeu, automates allumés, sur la partie de référence :
+
+| État | Cycles en 90 s |
+|---|---:|
+| Poche pleine (162,8 M), aucune Percée | **0** |
+| Poche pleine, 31 Percées | **0** |
+| Poche à 20 M (juste après une dépense) | 1 |
+| Poche à 2 M | 1 |
+
+Et la partie de référence elle-même en est à **131 cycles** après des semaines de
+jeu.
+
+### Le nouveau barème
+
+| Catégorie | Paliers |
+|---|---|
+| ♻️ Cycles | 100 · 250 · 500 · 1 000 · **2 500** |
+| ⚙️ Relancés seuls | 250 · 500 · 1 000 · **2 500** |
+
+Toujours 96 succès, toujours neuf de plus qu'en 3.6.x. Aucun palier ne vaut cent
+fois le précédent, donc les barres restent linéaires.
+
+### Un ménage rendu nécessaire
+
+`achMult()` compte les **clés de `S.achs`**, pas les entrées d'`ACHS` : un
+identifiant retiré continuerait de donner son +1 % et le multiplicateur ne
+collerait plus au « X / 96 » affiché à côté. C'est la première version à retirer
+des identifiants (`a_pr10k`, `a_pr100k`, `a_pr1M`, `a_acyc10k`, `a_acyc100k`,
+`a_acyc1M`, jamais parvenus jusqu'à une partie publiée), d'où `purgeAchs()` au
+chargement, à côté de `purgePauses()`.
+
+`t_cyc` gagne quatre assertions : le barème exact, aucun palier au-delà de
+2 500, l'effacement des identifiants disparus et le multiplicateur qui retombe
+juste.
+
+---
+
+## 3.7.1 — Les Percées en tête
+
+Les Percées s'affichent **au-dessus** des recherches, juste sous le panneau de
+cycle, au lieu d'être reléguées tout en bas de l'onglet.
+
+Elles ne s'ouvrent qu'une fois les **huit recherches au maximum**. À ce
+moment-là, la liste des recherches est un mur de cartes « MAX » sur lequel il n'y
+a plus rien à acheter — et c'est pourtant elle qu'il fallait faire défiler en
+entier pour arriver au seul étage encore vivant, celui où l'antimatière sert
+encore à quelque chose. Rien n'est perdu à faire descendre les recherches : elles
+ne gênent plus personne en bas.
+
+Déplacement de blocs dans le gabarit de `#pPr`, rien d'autre. `syncList()`
+travaillant en place, l'ordre du code de rendu n'a aucun effet sur le DOM ; il a
+quand même été aligné sur ce qu'on voit. Tant que les Percées sont fermées,
+`#percList` est de hauteur nulle et le titre du Laboratoire reste collé au
+panneau de cycle, à 22 px — mesuré, pas d'espace ajouté.
+
+`t_perc` gagne cinq assertions : l'ordre dans le DOM, l'ordre à l'écran, le
+panneau de cycle toujours au-dessus, et l'absence de trou quand l'étage est
+fermé.
+
+---
+
+## 3.7.0 — De quoi compter loin
+
+Depuis la 3.6.2, une partie qui dépense son antimatière tourne à **plusieurs
+centaines de cycles par heure**. Deux affichages n'avaient jamais été écrits pour
+ça.
+
+### Le numéro de cycle et le bonus passent à l'échelle du jeu
+
+| | Avant | Après |
+|---|---|---|
+| Sous la tuile ANTIMATIÈRE | `cycle #3200000` | `cycle #3.20M` |
+| Panneau Recherche | `×146785797934.3` | `×70.1M` |
+
+Les deux interpolaient leur nombre brut. La sous-ligne de la tuile tronquait déjà
+à 320 px avec trois chiffres ; à sept, elle sautait. `fmt()` couvre jusqu'à `Td`
+(10⁴⁵), il n'y a pas de plafond derrière.
+
+Le multiplicateur garde sa décimale en dessous du millier — `xfmt()` délègue à
+`mfmt()` tant que `v < 1000`, sans quoi un bonus d'anomalie à ×1,5 se serait
+affiché ×1. Les buffs, eux, continuent de passer par `mfmt()` seul.
+
+### Neuf succès de plus, 96 au total
+
+L'échelle s'arrêtait à **25 cycles** et **100 relances automatiques** — des
+chiffres calibrés quand un cycle durait des centaines d'heures. Il n'y avait plus
+rien à viser.
+
+| Catégorie | Nouveaux paliers |
+|---|---|
+| ♾️ Cycles | 100, 1 000, 10 000, 100 000, 1 M |
+| ⚙️ Automatisation | 1 000, 10 000, 100 000, 1 M relancés seuls |
+
+Les barres de progression suivent sans rien déclarer de plus : la famille se
+déduit de la fonction de mesure, et aucun palier ne vaut cent fois le précédent,
+donc elles restent linéaires.
+
+### Un test passait au vert en échouant
+
+`t_e2e` échouait **depuis la 3.4.0** — onze assertions sur l'exclusivité
+Contremaître/Ingénieur, supprimée à cette version-là. Personne ne l'a vu : le
+script ne se terminait pas par `process.exit(ko?1:0)`, donc il sortait 0 quoi
+qu'il arrive, et le lanceur ne lisait que le code de sortie.
+
+Le lanceur lit désormais **aussi le log** : un `ÉCHEC` écrit suffit à faire
+échouer le test, quel que soit le code de sortie. Les assertions de `t_e2e` sont
+réécrites sur le comportement réel (les deux automates tournent ensemble,
+interrupteurs indépendants, aucun verrou), et une douzième vérifie que les deux
+ensemble achètent bien améliorations *et* structures.
+
+À savoir : six tests (`t_upcats`, `t52`, `t7`, `t_contre3`, `t_mob24`, `t62`)
+n'affirment rien — ils impriment des valeurs à lire. Ils ne peuvent échouer que
+si la page lève une erreur. Le compte de 35 recouvre donc deux natures de test.
+
+Un test de plus (`t_cyc`, 35 au total) : le formatage des deux affichages, la
+bascule pile au millier, les neuf paliers et leurs barres, et une sauvegarde
+d'avant la 3.7.0.
+
+Sauvegardes compatibles dans les deux sens.
+
+---
+
+## 3.6.2 — Le seuil suit la poche
+
+La 3.6.0 faisait compter au seuil de relance l'antimatière versée dans les
+Percées (`S.am + S.percAm`), pour que dépenser ne raccourcisse pas les cycles par
+un tour de passe-passe. Le raisonnement tenait ; la partie qui en est sortie,
+non.
+
+### Ce qui s'est passé
+
+Une partie a enchaîné **61 niveaux** — Compression 20, Réacteur 15, Veille 14,
+Cascade 12 — en versant 184,8 M d'antimatière. La poche est tombée de **162,8 M
+à 4,8 M**, donc le multiplicateur avec ; le seuil, lui, n'a pas bougé d'un
+pouce. Le joueur payait deux fois.
+
+| | Poche | Seuil | Cycle |
+|---|---:|---:|---:|
+| Avant les Percées | 162,8 M | 16,3 M | **542 h** |
+| Après 61 niveaux, règle 3.6.0 | 4,8 M | 19,0 M | **4 449 h** |
+| Après 61 niveaux, règle 3.6.2 | 4,8 M | 0,48 M | **1,3 min** |
+
+La 3.6.1 avait répondu en affichant l'arbitrage sur chaque carte et en ajoutant
+un bouton de démantèlement. Deux ajouts corrects et deux ajouts de trop : le
+joueur n'a pas à arbitrer une formule à la main.
+
+### La règle
+
+`cycSeuil()` ne lit plus que `S.am`. C'est désormais **le même nombre qui paie
+les Percées et qui fixe la cible**, donc la sur-dépense se corrige d'elle-même :
+la poche baisse, le seuil baisse avec, le cycle raccourcit. Il n'y a plus de
+piège à signaler, donc plus rien à afficher — la 3.6.1 est annulée en entier.
+
+`S.percAm` continue d'être tenu à jour : trois succès le lisent et l'onglet
+Statistiques l'affiche. Il n'entre plus dans aucun calcul d'équilibrage.
+
+### Ce que ça coûte, assumé
+
+Dépenser raccourcit les cycles : garder son antimatière n'est plus une
+stratégie. Mesuré sur la partie de référence, à Percées constantes, le revenu
+suit `poche^−0,83` :
+
+| Poche | Seuil | Cycle | AM / heure |
+|---:|---:|---:|---:|
+| 162,8 M (100 %) | 16,3 M | 542 h | 30 000 |
+| 40,7 M (25 %) | 4,1 M | 45,7 h | 89 000 |
+| 1,6 M (1 %) | 163 k | 8,8 min | 1 108 000 |
+
+C'est donc le barème en **1,15 par niveau** qui porte seul la tension : vider sa
+poche suppose d'acheter des niveaux de plus en plus chers, et chacun rapporte.
+Le succès « 1 T d'antimatière versée » devient la ligne d'horizon à la place du
+multiplicateur.
+
+Sauvegardes compatibles dans les deux sens. Une sauvegarde 3.6.0 sur-dépensée se
+débloque à l'ouverture, sans rien faire.
+
+---
+
+## 3.6.0 — Les Percées
+
+Les huit recherches au maximum, l'antimatière n'avait plus qu'un débouché : un
+multiplicateur qui s'applique tout seul. Mesuré sur une partie à **92,9 M
+d'antimatière et 96 cycles** — un cycle de **105 heures** pour un gain de 9,29 M,
+et plus une seule décision à prendre.
+
+### Un second étage de recherche, sans plafond
+
+Ouvert quand les huit recherches sont au maximum. Niveaux illimités, payés en
+antimatière, conservés d'un cycle à l'autre, **+15 % par niveau** comme les
+structures.
+
+| Ligne | Effet par niveau | 1ᵉʳ niveau |
+|---|---|---:|
+| 🜛 **Compression** | gain d'antimatière **+4 %** | 1 M |
+| ⚛️ **Réacteur** | production **+10 %** | 1 M |
+| 🛰️ **Veille prolongée** | hors-ligne **+2 h** | 0,5 M |
+| ✴️ **Cascade** | minerai des anomalies **+5 %** | 0,5 M |
+
+Compression paraît minuscule à +4 %, mais elle agit sur le seuil de relance à la
+puissance 3,33 : c'est elle qui casse le mur de fin de partie. Sur la partie de
+référence, le premier passage achète 11 Compression et 9 Réacteur, dépense 41 M
+sur 92,9, et fait passer le cycle de **105 h à 25,5 h** — aucun achat ne coûtant
+plus de 7 % de la poche.
+
+### Le seuil de relance compte l'antimatière versée
+
+> **Annulé en 3.6.2** — le seuil ne lit plus que l'antimatière en poche. Ce qui
+> suit décrit la règle telle qu'elle a été publiée en 3.6.0.
+
+`cycSeuil()` lit désormais `S.am + S.percAm`. Sans ça, acheter viderait la poche,
+abaisserait le seuil et raccourcirait le cycle : mesuré, **vider sa poche faisait
+passer un cycle de 105 h à 4 minutes et multipliait le revenu par 125**. Dépenser
+serait devenu le meilleur coup du jeu en permanence — et pas à cause des effets
+achetés : *une Percée sans aucun effet aurait accéléré la partie de la même
+façon.*
+
+Le multiplicateur, lui, continue de ne lire que l'antimatière **possédée** :
+acheter coûte bien de la production, comme une recherche. `S.percAm` vaut 0 sur
+toute sauvegarde antérieure : **le seuil y est rigoureusement inchangé.**
+
+### Le barème, à contre-courant de l'intuition
+
+Trois pentes simulées. Une pente raide fait dépenser **moins**, parce qu'un
+niveau cesse d'être rentable dès qu'il coûte plus de ~8 % de la poche — la
+production perdue dépasse alors le bonus — et une pente raide atteint ce point
+après moins de niveaux.
+
+| Pente | Versé au 1ᵉʳ passage | Part versée à 8 mois | Cycle à 8 mois |
+|---|---:|---:|---:|
+| **+15 %** | **41 M** | **52 %** | **167 h** |
+| +30 % | 30 M | 37 % | 624 h |
+| +50 % | 21 M | 26 % | 801 h |
+
+Sur huit mois simulés, multiplier son antimatière par 155 multipliait la durée
+d'un cycle par **11 700** sans les Percées, par **4,6** avec.
+
+### Neuf succès et l'épinglage
+
+- 🜛 **Une dixième catégorie de succès**, 9 entrées : 1, 10, 25 et 50 niveaux,
+  les quatre lignes entamées, 20 niveaux dans une seule, puis 100 M, 1 G et 1 T
+  d'antimatière versée. 87 succès au total.
+- 📌 **Trois succès épinglés** au maximum s'affichent dans un bandeau permanent
+  **au-dessus des onglets** — au même endroit que le bandeau de défi, donc sous
+  les yeux quel que soit l'onglet ouvert — et dans une section en tête de
+  l'onglet Succès. Toucher une puce ouvre les Succès, toucher son épingle la
+  retire, et un succès décroché se dépingle tout seul.
+- 📊 **L'échelle des barres est corrigée** : elle ne se lit depuis le palier
+  précédent que pour les familles exponentielles. Sur « 25 niveaux de Percées »,
+  3 niveaux affichent désormais 12 % et non 0 %.
+- 📊 **Deux tuiles de statistiques** : niveaux de Percées, antimatière versée.
+- 🧪 **Un test de plus** (`t_perc`, 34 au total) : l'ouverture de l'étage, le
+  barème, ce qui bouge et ce qui ne bouge pas à l'achat, l'effet de chaque ligne,
+  l'aller-retour `amGain`/`amMinerai` Compression comprise, la conservation au
+  cycle, le blocage pendant un défi, l'épinglage et une sauvegarde 3.5.0.
+
+Aucun équilibrage existant touché.
+
+---
+
 ## 3.5.0 — L'avancement des succès
 
 Un succès encore à décrocher porte désormais une **barre et deux nombres** —

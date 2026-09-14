@@ -360,6 +360,15 @@ achievements count, which until then meant adding up ten cards by hand. It is
 written with thousands separators rather than through `fmt()`, which would show
 "1.00K" where the threshold is decided to the unit (3.3.2).
 
+The **cycle number** follows the opposite rule and goes through `fmt()` as of
+3.7.0: it has no unit-level threshold, and since the restart threshold began
+following the pocket (3.6.2) a save that spends runs at several hundred cycles an
+hour — "cycle #3200000" broke the tile's sub-line, which already truncated at
+320 px with three digits. Same reason for the **antimatter bonus** in the cycle
+panel, which was printing "×146785797934.3" across two lines: `xfmt()` keeps
+`mfmt()`'s decimal below a thousand — otherwise an anomaly buff at ×1.5 would
+read ×1 — and switches to `fmt()` above.
+
 The sum is read from `S.gens`, not from the rendered cards: the visible list
 does not always mirror the state (*Dwarf colony* hides four of them). In
 practice you own none of those anyway, since entering a challenge goes through
@@ -876,12 +885,93 @@ offline gains apply.
 
 ---
 
+## Breakthroughs
+
+A **second research tier**, opened once the eight researches are maxed. Four
+lines, **unlimited levels**, paid in antimatter and kept from one cycle to the
+next. Price: `first level × 1.15^levels`, the same ladder as structures.
+
+| Line | Effect per level | 1st level |
+|---|---|---:|
+| 🜛 Compression | antimatter gain **+4 %** | 1 M |
+| ⚛️ Reactor | output **+10 %** | 1 M |
+| 🛰️ Extended standby | offline **+2 h** | 0.5 M |
+| ✴️ Cascade | ore from anomalies **+5 %** | 0.5 M |
+
+### Why they exist
+
+Past the research tree (234,890 antimatter, 72 levels), antimatter has a single
+outlet left: `amMult`, which applies itself. Measured on a save with **92.9 M
+antimatter and 96 cycles**: a cycle lasted **105 hours** for a gain of 9.29 M,
+and nothing asked for a decision any more.
+
+The cause is arithmetic. The restart threshold is 10 % of the antimatter held,
+output climbs as `am^1.5`, and the ore needed for a given gain as
+`gain^(1/0.30)`. A cycle's length therefore grows as **`am^1.83`**: doubling your
+antimatter makes cycles 3.6 times longer for a gain only twice as large. Yield
+decays as `am^-0.83`.
+
+Compression breaks that wall: multiplying the gain by `k` divides the ore needed
+by `k^3.33`. Measured on the same save over eight simulated months, multiplying
+antimatter by 155 multiplied a cycle's length by **11,700** without
+Breakthroughs, by **4.6** with them.
+
+### Where they appear
+
+At the top of the Research tab, right under the cycle panel, **above** the
+research list (3.7.1). The tier only opens once all eight researches are maxed:
+by then that list is a wall of "MAX" cards with nothing left to buy, and yet it
+was the whole of it you had to scroll past to reach the one tier still alive.
+
+While Breakthroughs are closed, `#percTitle` and `#percHint` are hidden and
+`#percList` has zero height: the layout is exactly what it was before.
+
+### The threshold reads the pocket only
+
+`cycSeuil()` reads `S.am`, and nothing else. In 3.6.0 it also read `S.percAm`,
+the antimatter poured into Breakthroughs, so that spending could not shorten the
+cycle by sleight of hand. On paper that was right; in play, whoever overspent
+lost output **and got nothing back on the threshold**: a save with 61 levels fell
+from 162.8 M to 4.8 M in hand and its cycle went from 542 h to **4,449 h**, with
+no way back.
+
+Since 3.6.2 the same number pays for Breakthroughs and sets the target, so
+overspending corrects itself — that same save drops to **1.3 minutes**. The
+trade-off: spending shortens cycles, so at constant Breakthrough levels income
+follows `pocket^−0.83`, and holding antimatter is no longer a strategy. The
+1.15-per-level ladder carries the tension on its own.
+
+`S.percAm` is still kept up to date for the three achievements that read it and
+for the statistics tile; it enters no balance calculation.
+
+### Balance
+
+A level stays worth buying while it costs **less than ~8 % of the pocket**:
+beyond that, the output lost (`(1-f)^1.5`) exceeds the bonus gained. A player
+therefore buys about twenty levels, stops, and has to climb back.
+
+Three ladders were simulated on the reference save. Counter-intuitively, **a
+steeper ladder makes you spend less**: it reaches the 8 % break-even sooner, so
+fewer levels get bought.
+
+| Ladder | Poured on first pass | Share poured at 8 months | Cycle at 8 months |
+|---|---:|---:|---:|
+| **+15 %** | **41 M** | **52 %** | **167 h** |
+| +30 % | 30 M | 37 % | 624 h |
+| +50 % | 21 M | 26 % | 801 h |
+
+Hence +15 %. On the reference save the first pass buys 11 Compression and 9
+Reactor, spends 41 M out of 92.9, and takes the cycle from 105 h to **25.5 h** —
+with no purchase costing more than 7 % of the pocket.
+
+---
+
 ## Achievements
 
-**78 achievements**, each granting **+1 % output** — so **+78 %** in full. They
+**96 achievements**, each granting **+1 % output** — so **+96 %** in full. They
 are **never lost** on prestige.
 
-The tab sorts them into **nine categories** (the `ACHCATS` array, whose order is
+The tab sorts them into **ten categories** (the `ACHCATS` array, whose order is
 the display order; each achievement's `c` field says which section it belongs
 to). Each section heading shows its progress, and turns gold once the category is
 complete.
@@ -894,8 +984,9 @@ complete.
 | ⚡ Output | 5 | output per second, from 1 K/s to 1 Qa/s |
 | 🔬 Upgrades and research | 4 | upgrade purchases, completing both trees |
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
-| ♻️ Cycles and antimatter | 8 | number of cycles, antimatter held |
-| ⚙️ Automation | 8 | buying and using the automations |
+| ♻️ Cycles and antimatter | 13 | number of cycles up to 2,500, antimatter held |
+| ⚙️ Automation | 12 | buying and using the automations, up to 2,500 cycles restarted alone |
+| 🜛 Breakthroughs | 9 | levels bought, lines started, antimatter poured |
 | 🎯 Challenges | 7 | one per challenge beaten, plus one for all six |
 
 The two ladders in the Clicking category are deliberately separate: the **number**
@@ -933,22 +1024,40 @@ in one place only, and the bar cannot say anything other than the real condition
 eight binary achievements (Quick reflex, Perfect resonance, one per challenge)
 keep their `f`: there is nothing to meter.
 
-Progress reads **per tier**, not from zero. Numeric achievements come in families
-— six ore tiers, six click-power tiers, five output tiers — and two achievements
-belong to the same family if their `v` function **reads the same**
-(`String(a.v)`). Nothing extra to declare, so no family can be forgotten; the
-game is never minified, so a function's source text is stable. Each achievement
-thus gets its previous tier, `n0`.
+The scale depends on the family. Numeric achievements come in families — six ore
+tiers, six click-power tiers, five output tiers — and two achievements belong to
+the same family if their `v` function **reads the same** (`String(a.v)`). Nothing
+extra to declare, so no family can be forgotten; the game is never minified, so a
+function's source text is stable. Each achievement thus gets its previous tier,
+`n0`.
 
-The scale turns **logarithmic when a tier is a hundred times the previous one** —
-that is, only for the families that climb by factors of a thousand. On "1 Sx of
-click power", a linear bar would sit at zero for the whole tier then jump to
-full. Everywhere else — clicks, anomalies, cycles, antimatter, structures — it
-stays linear, because that is how those things are counted. The two exact figures
-sit beside it: the bar gives the feel, the text gives the measure, and the text is
-what counts.
+When **a tier is a hundred times the previous one** — the only families that
+climb by factors of a thousand — progress reads **logarithmically, from the
+previous tier**. On "1 Sx of click power", a linear bar would sit at zero for the
+whole tier then jump to full.
+
+Everywhere else — clicks, anomalies, cycles, antimatter, structures,
+Breakthroughs — it is **linear and counted from zero**: on "25 breakthrough
+levels", a player with 3 should read 12 %, not 0 % because they have not passed
+the 10 tier. The two exact figures sit beside it: the bar gives the feel, the
+text gives the measure, and the text is what counts.
 
 A card already earned shows no bar: it would only ever read "100 %".
+
+### Pinning
+
+A 📌 on every unearned card puts the achievement in a **permanent strip above the
+tabs** — the same place as the challenge banner, so it stays visible whatever tab
+is open — and in a **Pinned** section at the top of the Achievements tab, with
+its bar. Tapping a strip chip opens the Achievements tab; tapping its pin removes
+it. **Three at most** — it is a shopping list, not a
+second tab — and an achievement once earned unpins itself (3.6.0).
+
+Pinned cards are **separate nodes** (`PINNODES`), not the original cards moved:
+taking a card out of its category would leave a hole in the grid and complicate
+putting it back. Each card carries the id it displays (`_id`), which lets a
+pinned card change achievement without being rebuilt. The choice lives in
+`S.pins`.
 
 The eight automation achievements run from the first purchase (Delegation) to the
 Mining satellites at level 10, and to every automation maxed out (Self-running

@@ -370,6 +370,16 @@ catégories confondues : c'est le compte des succès *Mille pièces* (1 000) et
 Il est écrit avec ses séparateurs de milliers et non via `fmt()`, qui rendrait
 « 1.00K » là où le seuil se joue à l'unité (3.3.2).
 
+Le **numéro de cycle** suit la règle inverse et passe par `fmt()` depuis la
+3.7.0 : il n'a pas de seuil à l'unité, et depuis que le seuil de relance suit la
+poche (3.6.2) une partie qui dépense tourne à plusieurs centaines de cycles par
+heure — « cycle #3200000 » faisait sauter la sous-ligne de la tuile, qui
+tronquait déjà à 320 px avec trois chiffres. Même raison pour le **bonus
+d'antimatière** du panneau de cycle, qui écrivait « ×146785797934.3 » en travers
+de deux lignes : `xfmt()` garde la décimale de `mfmt()` en dessous du millier —
+sans quoi un bonus d'anomalie à ×1,5 se lirait ×1 — et bascule sur `fmt()`
+au-dessus.
+
 La somme est lue dans `S.gens`, pas sur les cartes affichées : la liste visible
 ne reflète pas toujours l'état (*Colonie naine* en masque quatre). En pratique
 on n'en possède alors aucune, puisque entrer dans un défi passe par `finCycle()`
@@ -905,12 +915,95 @@ hors-ligne habituels s'appliquent.
 
 ---
 
+## Les Percées
+
+Un **second étage de recherche**, ouvert quand les huit recherches sont au
+maximum. Quatre lignes, **niveaux illimités**, payées en antimatière et
+conservées d'un cycle à l'autre. Prix : `1er niveau × 1,15^niveaux`, le même
+barème que les structures.
+
+| Ligne | Effet par niveau | 1ᵉʳ niveau |
+|---|---|---:|
+| 🜛 Compression | gain d'antimatière **+4 %** | 1 M |
+| ⚛️ Réacteur | production **+10 %** | 1 M |
+| 🛰️ Veille prolongée | hors-ligne **+2 h** | 0,5 M |
+| ✴️ Cascade | minerai des anomalies **+5 %** | 0,5 M |
+
+### Pourquoi elles existent
+
+Passé l'arbre de recherche (234 890 antimatière, 72 niveaux), l'antimatière n'a
+plus qu'un débouché : `amMult`, qui s'applique tout seul. Mesuré sur une partie
+à **92,9 M d'antimatière et 96 cycles** : un cycle durait **105 heures** pour un
+gain de 9,29 M, et plus rien ne demandait de décision.
+
+La cause est arithmétique. Le seuil de relance vaut 10 % de l'antimatière
+possédée, la production monte en `am^1,5`, et le minerai nécessaire à un gain
+donné en `gain^(1/0,30)`. La durée d'un cycle croît donc en **`am^1,83`** :
+doubler son antimatière rend les cycles 3,6 fois plus longs pour un gain
+seulement 2 fois plus gros. Le rendement décroît en `am^-0,83`.
+
+Avec la Compression, ce mur cède : multiplier le gain par `k` divise le minerai
+nécessaire par `k^3,33`. Mesuré sur la même partie, sur huit mois simulés,
+multiplier son antimatière par 155 multipliait la durée d'un cycle par **11 700**
+sans les Percées, par **4,6** avec.
+
+### Où elles s'affichent
+
+En tête de l'onglet Recherche, juste sous le panneau de cycle, **au-dessus** de
+la liste des recherches (3.7.1). L'étage ne s'ouvre qu'une fois les huit
+recherches au maximum : à ce moment-là cette liste est un mur de cartes « MAX »
+sur lequel il n'y a plus rien à acheter, et c'est pourtant elle qu'il fallait
+faire défiler en entier pour atteindre le seul étage encore vivant.
+
+Tant que les Percées sont fermées, `#percTitle` et `#percHint` sont masqués et
+`#percList` est de hauteur nulle : la mise en page est exactement celle d'avant.
+
+### Le seuil ne lit que la poche
+
+`cycSeuil()` lit `S.am`, et rien d'autre. La 3.6.0 y ajoutait `S.percAm`,
+l'antimatière versée dans les Percées, pour que dépenser ne raccourcisse pas le
+cycle par un tour de passe-passe. Sur le papier c'était juste ; en jeu, celui qui
+dépensait trop perdait sa production **sans rien récupérer sur le seuil** : une
+partie à 61 niveaux est tombée de 162,8 M à 4,8 M de poche et son cycle est passé
+de 542 h à **4 449 h**, sans retour possible.
+
+Depuis la 3.6.2 c'est le même nombre qui paie les Percées et qui fixe la cible,
+donc la sur-dépense se corrige d'elle-même — la même partie repasse à **1,3
+minute**. En contrepartie, dépenser raccourcit les cycles : à Percées constantes
+le revenu suit `poche^−0,83`, et garder son antimatière n'est plus une stratégie.
+C'est le barème en 1,15 par niveau qui porte seul la tension.
+
+`S.percAm` reste tenu à jour pour les trois succès qui le lisent et pour la tuile
+de statistiques ; il n'entre dans aucun calcul d'équilibrage.
+
+### L'équilibrage
+
+Un niveau reste rentable tant qu'il coûte **moins de ~8 % de la poche** :
+au-delà, la production perdue (`(1-f)^1,5`) dépasse le bonus gagné. Le joueur
+achète donc une vingtaine de niveaux, s'arrête, et doit remonter.
+
+Trois pentes ont été simulées sur la partie de référence. Contre l'intuition,
+**une pente raide fait dépenser moins** : elle atteint plus tôt le seuil des 8 %,
+donc on achète moins de niveaux.
+
+| Pente | Versé au 1ᵉʳ passage | Part versée à 8 mois | Cycle à 8 mois |
+|---|---:|---:|---:|
+| **+15 %** | **41 M** | **52 %** | **167 h** |
+| +30 % | 30 M | 37 % | 624 h |
+| +50 % | 21 M | 26 % | 801 h |
+
+D'où le +15 %. Sur la partie de référence, le premier passage achète 11
+Compression et 9 Réacteur, dépense 41 M sur 92,9, et fait passer le cycle de
+105 h à **25,5 h** — aucun achat ne dépassant 7 % de la poche.
+
+---
+
 ## Les succès
 
-**78 succès**, chacun donnant **+1 % de production** — soit **+78 %** au
+**96 succès**, chacun donnant **+1 % de production** — soit **+96 %** au
 complet. Ils ne sont **jamais perdus** au prestige.
 
-L'onglet les range en **neuf catégories** (tableau `ACHCATS`, dont l'ordre est
+L'onglet les range en **dix catégories** (tableau `ACHCATS`, dont l'ordre est
 celui de l'affichage ; le champ `c` de chaque succès dit à quelle section il
 appartient). Chaque intitulé de section affiche sa progression, et passe en doré
 une fois la catégorie complète.
@@ -923,8 +1016,9 @@ une fois la catégorie complète.
 | ⚡ Production | 5 | production par seconde, de 1 K/s à 1 Qa/s |
 | 🔬 Améliorations et recherches | 4 | achats d'améliorations, complétion des deux arbres |
 | ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
-| ♻️ Cycles et antimatière | 8 | nombre de cycles, antimatière possédée |
-| ⚙️ Automatisation | 8 | achat et usage des automates |
+| ♻️ Cycles et antimatière | 13 | nombre de cycles jusqu'à 2 500, antimatière possédée |
+| ⚙️ Automatisation | 12 | achat et usage des automates, jusqu'à 2 500 cycles relancés seuls |
+| 🜛 Percées | 9 | niveaux achetés, lignes entamées, antimatière versée |
 | 🎯 Défis | 7 | un par défi réussi, plus un pour les six |
 
 Les deux échelles de la catégorie Clics sont volontairement séparées : le
@@ -964,23 +1058,42 @@ chose que la condition réelle — c'est exactement le défaut qui avait faussé
 (Réflexe éclair, Résonance parfaite, un par défi) gardent leur `f` : il n'y a
 rien à doser.
 
-L'avancement se lit **par palier**, pas depuis zéro. Les succès chiffrés vont
-par familles — six paliers de minerai, six de puissance de clic, cinq de
-production — et deux succès appartiennent à la même famille si leur fonction `v`
-**s'écrit pareil** (`String(a.v)`). Rien à déclarer en plus, donc aucune famille
-ne peut être oubliée ; le jeu n'étant jamais minifié, le texte d'une fonction est
-stable. Chaque succès reçoit ainsi son palier précédent `n0`.
+L'échelle dépend de la famille. Les succès chiffrés vont par familles — six
+paliers de minerai, six de puissance de clic, cinq de production — et deux succès
+appartiennent à la même famille si leur fonction `v` **s'écrit pareil**
+(`String(a.v)`). Rien à déclarer en plus, donc aucune famille ne peut être
+oubliée ; le jeu n'étant jamais minifié, le texte d'une fonction est stable.
+Chaque succès reçoit ainsi son palier précédent, `n0`.
 
-L'échelle passe en **logarithmique quand un palier vaut cent fois le précédent**
-— c'est-à-dire pour les seules familles qui montent de mille en mille. Sur « 1 Sx
-de puissance de clic », une barre linéaire resterait collée à zéro pendant tout
-le palier puis sauterait à plein. Partout ailleurs — clics, anomalies, cycles,
-antimatière, structures — elle reste linéaire, parce que c'est ainsi qu'on compte
-ces choses-là. Les deux nombres exacts sont écrits à côté : la barre donne le
+Quand **un palier vaut cent fois le précédent** — les seules familles qui montent
+de mille en mille — l'avancement se lit **en logarithme, depuis le palier
+précédent**. Sur « 1 Sx de puissance de clic », une barre linéaire resterait
+collée à zéro pendant tout le palier puis sauterait à plein.
+
+Partout ailleurs — clics, anomalies, cycles, antimatière, structures, Percées —
+elle est **linéaire et comptée depuis zéro** : sur « 25 niveaux de Percées », un
+joueur qui en a 3 doit lire 12 %, pas 0 % au prétexte qu'il n'a pas franchi le
+palier des 10. Les deux nombres exacts sont écrits à côté : la barre donne le
 ressenti, le texte donne la mesure, et c'est lui qui fait foi.
 
 Une carte déjà décrochée n'affiche pas de barre : elle ne dirait plus que
 « 100 % ».
+
+### Épingler
+
+Un 📌 sur chaque carte non obtenue place le succès dans un **bandeau permanent
+au-dessus des onglets** — au même endroit que le bandeau de défi, donc visible
+quel que soit l'onglet ouvert — et dans une section **Épinglés** en tête de
+l'onglet Succès, avec sa barre. Toucher une puce du bandeau ouvre l'onglet
+Succès ; toucher son épingle la retire. **Trois au maximum** — c'est une liste de
+courses, pas un second onglet — et un succès décroché se dépingle tout seul
+(3.6.0).
+
+Les cartes épinglées sont des **nœuds à part** (`PINNODES`), pas les cartes
+d'origine déplacées : sortir une carte de sa catégorie laisserait un trou dans la
+grille et compliquerait le retour. Chaque carte porte l'identifiant qu'elle
+affiche (`_id`), ce qui permet à une carte d'épinglage de changer de succès sans
+être reconstruite. Le choix vit dans `S.pins`.
 
 Les huit succès d'automatisation vont du premier achat (Délégation) aux
 Satellites d'extraction au niveau 10, et à tous les automates au maximum

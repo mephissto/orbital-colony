@@ -555,8 +555,46 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .secn{font-size:11px;letter-spacing:.08em;color:var(--dim);font-variant-numeric:tabular-nums;flex:0 0 auto}
 .secn.full{color:var(--gold)}
 .achgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
-.ach{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);opacity:.38}
-.ach.got{opacity:1;border-color:rgba(255,196,92,.45);background:rgba(255,196,92,.07)}
+.ach{padding:10px 12px;border-radius:10px;position:relative;
+  /* L'estompage porte sur le CONTENU, pas sur la carte (3.7.3). Il était posé
+     sur .ach : l'épingle en héritait, sa propre opacité de .38 se multipliait
+     par celle de la carte, et elle s'affichait à 14 % — invisible. Les alphas
+     du cadre et du fond reprennent donc à la main ce que l'opacité faisait,
+     .78 et .16 multipliés par .38. */
+  border:1px solid rgba(120,180,255,.061);background:rgba(14,20,38,.296);
+  /* isolation : l'épingle porte un z-index, on le garde local à sa carte */
+  isolation:isolate}
+/* Ces trois-là portent une opacité < 1, donc chacun ouvre un contexte
+   d'empilement et se peint AU NIVEAU des éléments positionnés, dans l'ordre du
+   DOM. Comme ils suivent .apin, ils passaient par-dessus l'épingle et lui
+   volaient le clic — au centre du bouton, là où on vise. D'où le z-index. */
+.ach>.an,.ach>.ad,.ach>.ap{opacity:.38}
+/* Épingle : GRISE CLAIRE tant que le succès n'est pas suivi, ROUGE dès qu'il
+   l'est — aux trois endroits où elle apparaît (la liste des succès, la section
+   épinglée en tête d'onglet, le bandeau au-dessus des onglets). Pas de fond, pas
+   de cadre : c'est la couleur seule qui porte l'état, et on la rend lisible en
+   montant l'épingle éteinte plutôt qu'en décorant l'allumée.
+   `brightness` après `grayscale` : sans lui le gris de l'émoji reste sombre sur
+   un fond sombre, et « gris » devient « invisible ». Elle disparaît sur un succès
+   obtenu — il n'y a plus rien à suivre. */
+.ach .apin{position:absolute;top:3px;right:3px;border:0;background:none;padding:4px;
+  font-size:13px;line-height:1;cursor:pointer;opacity:1;z-index:2;
+  filter:grayscale(1) brightness(1.75);
+  transition:filter .15s,transform .15s}
+.ach .apin:hover{filter:grayscale(.3) brightness(1.1);transform:scale(1.12)}
+.ach .apin.on{filter:none}
+.ach.got .apin{display:none}
+.ach .an{padding-right:24px}
+/* Un succès suivi se lit mieux : dans la section des épinglés on remonte
+   l'opacité, sans aller jusqu'à celle d'un succès obtenu. */
+#acPins .ach>.an,#acPins .ach>.ad,#acPins .ach>.ap{opacity:.62}
+#acPins .ach{border-color:rgba(255,196,92,.28);background:rgba(14,20,38,.48)}
+/* Le premier titre de catégorie est le premier enfant de #acSecs, donc
+   `h3.sec:first-child` lui retire sa marge haute : sans cette marge-ci, la
+   section des épinglés viendrait coller le titre « Clics ». */
+#acPins{margin-bottom:22px}
+.ach.got>.an,.ach.got>.ad,.ach.got>.ap{opacity:1}
+.ach.got{border-color:rgba(255,196,92,.45);background:rgba(255,196,92,.07)}
 .ach .an{font-size:13px;font-weight:600}
 .ach .ad{font-size:11px;color:var(--dim);margin-top:2px}
 /* Avancement d'un succès non obtenu : la barre prend la place qui reste, le
@@ -801,6 +839,35 @@ a.hbtn{text-decoration:none}
 .cbbar{height:4px;border-radius:2px;background:rgba(169,123,255,.16);margin-top:8px;overflow:hidden}
 .cbbar i{display:block;height:100%;width:0;border-radius:2px;background:var(--violet);
   transition:width .3s}
+/* Bandeau des succès suivis. Une puce par épingle, en doré comme les succès.
+   Il ne s'affiche que si le joueur a épinglé quelque chose : c'est lui qui
+   décide de dépenser cette hauteur d'écran. La rangée défile plutôt que de
+   passer sur deux lignes — elle est collante, chaque pixel compte. */
+#pinBar{display:none;gap:8px;padding:8px 14px;overflow-x:auto;scrollbar-width:none;
+  border-bottom:1px solid rgba(255,196,92,.22);background:rgba(255,196,92,.055)}
+#pinBar::-webkit-scrollbar{display:none}
+#pinBar.on{display:flex}
+/* Base fixe plutôt qu'étirement : une puce seule doit avoir la même largeur que
+   lorsqu'il y en a trois, et pas dépasser une carte de succès. Elle rétrécit
+   seulement quand la place manque. */
+.pchip{flex:0 1 250px;min-width:132px;display:flex;align-items:center;gap:8px;
+  padding:6px 8px 7px;border:1px solid rgba(255,196,92,.28);border-radius:9px;
+  background:rgba(12,17,33,.55);cursor:pointer;transition:.15s;text-align:left}
+.pchip:hover{border-color:rgba(255,196,92,.55);background:rgba(255,196,92,.10)}
+.pchip .pc{flex:1 1 auto;min-width:0}
+.pchip .pcd{font-size:11.5px;color:var(--txt);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.pchip .pcl{display:flex;align-items:center;gap:7px;margin-top:4px}
+.pchip .bar{flex:1 1 auto;height:3px;margin-top:0;max-width:none}
+.pchip .pcn{flex:0 0 auto;font-size:10px;color:var(--dim);font-variant-numeric:tabular-nums}
+.pchip .pcx{flex:0 0 auto;border:0;background:none;padding:3px;cursor:pointer;
+  font-size:12px;line-height:1;opacity:1;transition:transform .15s}
+.pchip .pcx:hover{transform:scale(1.12)}
+@media (max-width:560px){
+  #pinBar{padding:6px 10px;gap:6px}
+  .pchip{min-width:118px;padding:5px 7px 6px}
+  .pchip .pcd{font-size:11px}
+}
 #chalBar.win{border-bottom-color:rgba(87,230,164,.4);background:rgba(87,230,164,.09)}
 #chalBar.win .cbnm{color:var(--green)}
 #chalBar.win .cbbar i{background:var(--green)}
@@ -1063,6 +1130,9 @@ a.hbtn{text-decoration:none}
         <button type="button" class="hbtn cbquit" id="cbQuit" data-i18n="ch_quit">Quitter</button></div>
       <div class="cbbar"><i id="cbFill"></i></div>
     </div>
+    <!-- Succès épinglés, AU-DESSUS des onglets comme le bandeau de défi : ce
+         qu'on suit doit rester sous les yeux quel que soit l'onglet ouvert. -->
+    <div id="pinBar"></div>
     <div class="navwrap">
      <nav>
       <div class="tab on" data-p="gen"><span class="ti">⛏️</span><span data-i18n="tab_gen">Extraction</span></div>
@@ -1216,7 +1286,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.5.0";
+const VERSION="3.7.6";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1232,6 +1302,11 @@ function fmt(n){
 /* fmt() arrondit à l'entier au-delà de 10 : ×11,6 deviendrait ×11.
    Les multiplicateurs ont donc leur propre formateur. */
 const mfmt=v=>{const r=Math.round(v*10)/10; return r%1 ? r.toFixed(1) : String(r)};
+/* mfmt garde la décimale, ce qu'il faut pour un bonus à ×1,5. Mais amMult()
+   dépasse 10^11 en fin de partie : le panneau de cycle écrivait
+   « ×146785797934.3 » en travers de deux lignes. Au-delà du millier on repasse
+   donc sur l'échelle du jeu, où la décimale ne manque plus à personne. */
+const xfmt=v=>v<1000?mfmt(v):fmt(v);
 function fmtTime(s){
   s=Math.floor(s); const d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
   if(d)return d+t("u_d")+" "+h+t("u_h");
@@ -1263,9 +1338,16 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Chaque <b>succès</b> encore à décrocher affiche maintenant son avancement — une barre et deux nombres, « 37 / 100 ». Plus besoin d'aller chercher le compteur correspondant dans les statistiques et de faire le rapprochement soi-même.",
+  wn_d:"Les <b>Percées</b> : un second étage de recherche sans plafond, ouvert quand les huit recherches sont au maximum, payé en antimatière et gardé d'un cycle à l'autre. Dépenser raccourcit tes cycles — le seuil de relance suit l'antimatière en poche. On peut aussi <b>épingler</b> trois succès, affichés en permanence au-dessus des onglets. Et 18 succès de plus : 96 en tout.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
+  perc_t:"Percées — {0} antimatière disponible",
+  perc_hint:"Les huit recherches sont au maximum. Les <b>Percées</b> n'ont pas de plafond : chaque niveau coûte 15 % de plus que le précédent, et se garde d'un cycle à l'autre. Acheter fait baisser ton antimatière en poche, donc ta production — et le seuil de relance avec, puisqu'il en vaut 10 %. Dépenser raccourcit donc tes cycles.",
+  perc_sub:"niveau",
+  t_perc:"Percée : {0} niveau {1}",
+  st_perc_niv:"Niveaux de Percées", st_perc_am:"Antimatière versée",
+  ac_pin:"Épinglés", ac_pin_t:"Épingler ce succès", ac_unpin_t:"Ne plus épingler",
+  ac_pin_max:"Trois succès épinglés au maximum. Décroche-en un d'abord.",
   ab_marque:"Kit de marque", ab_marque_s:"Marque",
   ab_code:"Code source",
   ab_lic:"GPL 3.0 ou ultérieure",
@@ -1395,7 +1477,7 @@ fr:{
   res_hint:"Les recherches se paient en <b style=\"color:var(--violet)\">antimatière</b> et ne sont jamais perdues.",
   lvl:"niv. {0}/{1}", maxed:"niveau maximum atteint",
   lvl_sub:"niveaux", au_owned:"acquis",
-  ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--green)\">×{2}</b> (+1 % par succès)",
+  ac_hint:"<b>{0}/{1}</b> succès — bonus de production actuel : <b style=\"color:var(--green)\">×{2}</b> (+1 % par succès)<br>Touche le <b>📌</b> d'un succès pour le suivre : jusqu'à trois restent affichés au-dessus des onglets.",
   st_off:"max {0} à {1} %",
   st_save_ok:"navigateur (auto toutes les 20 s)", st_save_mem:"mémoire seule — utilise Export !",
   t_up:"Amélioration : {0}", t_res:"Recherche : {0} niv.{1}", t_ach:"🏆 Succès : {0}  (+1 % production)",
@@ -1432,9 +1514,16 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"Every <b>achievement</b> still to be earned now shows its progress — a bar and two figures, \"37 / 100\". No more hunting down the matching counter in the statistics and making the connection yourself.",
+  wn_d:"<b>Breakthroughs</b>: a second research tier with no ceiling, opening once all eight researches are maxed, paid in antimatter and kept from one cycle to the next. Spending shortens your cycles — the restart threshold follows the antimatter in hand. You can also <b>pin</b> three achievements, on screen above the tabs. And 18 more achievements: 96 in all.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
+  perc_t:"Breakthroughs — {0} antimatter available",
+  perc_hint:"All eight researches are maxed. <b>Breakthroughs</b> have no ceiling: each level costs 15 % more than the last, and is kept from one cycle to the next. Buying lowers the antimatter in hand, and therefore your output — and the restart threshold with it, since the threshold is 10 % of it. So spending shortens your cycles.",
+  perc_sub:"level",
+  t_perc:"Breakthrough: {0} level {1}",
+  st_perc_niv:"Breakthrough levels", st_perc_am:"Antimatter poured",
+  ac_pin:"Pinned", ac_pin_t:"Pin this achievement", ac_unpin_t:"Unpin",
+  ac_pin_max:"Three pinned achievements at most. Unpin one first.",
   ab_marque:"Brand kit", ab_marque_s:"Brand",
   ab_code:"Source code",
   ab_lic:"GPL 3.0 or later",
@@ -1562,7 +1651,7 @@ en:{
   res_hint:"Research is paid in <b style=\"color:var(--violet)\">antimatter</b> and is never lost.",
   lvl:"lvl {0}/{1}", maxed:"maximum level reached",
   lvl_sub:"levels", au_owned:"owned",
-  ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--green)\">×{2}</b> (+1 % each)",
+  ac_hint:"<b>{0}/{1}</b> achievements — current output bonus: <b style=\"color:var(--green)\">×{2}</b> (+1 % each)<br>Tap an achievement's <b>📌</b> to follow it: up to three stay on screen above the tabs.",
   st_off:"max {0} at {1} %",
   st_save_ok:"browser (auto every 20 s)", st_save_mem:"memory only — use Export!",
   t_up:"Upgrade: {0}", t_res:"Research: {0} lvl {1}", t_ach:"🏆 Achievement: {0}  (+1 % output)",
@@ -1810,6 +1899,57 @@ const RES=[
    invisible à l'œil sur d'aussi petits nombres. */
 const resCost=(r,l)=>Math.ceil(r.c0*Math.pow(r.cg,l));
 
+/* ---------- les Percées ----------
+   Second étage de recherche, ouvert quand les huit recherches sont au maximum.
+   Niveaux ILLIMITÉS, payés en antimatière, conservés d'un cycle à l'autre.
+
+   Pourquoi elles existent : passé l'arbre de recherche, l'antimatière n'a plus
+   qu'un débouché, le multiplicateur, qui s'applique tout seul. Mesuré sur une
+   partie à 92,9 M d'antimatière et 96 cycles : un cycle durait 105 h pour un
+   gain de 9,29 M, et rien ne demandait plus la moindre décision.
+
+   Le seuil et la poche (3.6.2). La 3.6.0 ajoutait `S.percAm` au seuil de
+   relance pour que dépenser ne le fasse pas baisser : sur le papier, sans ça,
+   vider sa poche raccourcissait les cycles et devenait le meilleur coup du jeu.
+   En pratique ça a produit pire. Une partie a enchaîné 61 niveaux : la poche est
+   tombée de 162,8 M à 4,8 M, la production avec — mais le seuil, lui, n'a pas
+   bougé. Le cycle est passé de 542 h à 4 449 h, sans le moindre retour possible.
+   Le joueur payait deux fois : la production perdue, et un seuil qui restait
+   calé sur une antimatière qu'il n'avait plus.
+
+   Depuis la 3.6.2 le seuil ne lit que la poche. La sur-dépense se corrige donc
+   d'elle-même : c'est le même nombre qui paie les Percées et qui fixe la cible.
+   La même partie repasse de 4 449 h à 1,3 minute. Le prix à payer, assumé :
+   dépenser raccourcit les cycles, donc garder son antimatière n'est plus une
+   stratégie — ce sont les prix en 1,15^n qui font la tension, pas la poche.
+
+   `S.percAm` reste tenu à jour : trois succès le lisent, et l'onglet
+   Statistiques l'affiche. Il n'entre plus dans aucun calcul d'équilibrage. */
+const PERC=[
+ {id:"comp",  ico:"🜛",  c0:1e6, cg:1.15, val:1.04,
+  nm:{fr:"Compression",en:"Compression"},
+  ds:{fr:"+4 % de gain d'antimatière par niveau",en:"+4 % antimatter gain per level"}},
+ {id:"reac",  ico:"⚛️",  c0:1e6, cg:1.15, val:1.10,
+  nm:{fr:"Réacteur",en:"Reactor"},
+  ds:{fr:"+10 % de production par niveau",en:"+10 % output per level"}},
+ {id:"veille",ico:"🛰️", c0:5e5, cg:1.15, val:2,
+  nm:{fr:"Veille prolongée",en:"Extended standby"},
+  ds:{fr:"+2 h de gains hors-ligne par niveau",en:"+2 h of offline gains per level"}},
+ {id:"casc",  ico:"✴️",  c0:5e5, cg:1.15, val:1.05,
+  nm:{fr:"Cascade",en:"Cascade"},
+  ds:{fr:"+5 % de minerai sur les anomalies par niveau",en:"+5 % ore from anomalies per level"}},
+];
+const plvl=id=>S.perc[id]||0;
+const percCost=(p,l)=>Math.ceil(p.c0*Math.pow(p.cg,l));
+const percDef=id=>PERC.find(p=>p.id===id);
+/* Prix +15 % par niveau, comme les structures. Mesuré sur trois pentes : c'est
+   celle qui fait consommer le PLUS d'antimatière (52 % du total à long terme,
+   contre 37 % à +30 % et 26 % à +50 %). Une pente raide n'allonge pas l'échelle,
+   elle atteint plus tôt le seuil de rentabilité des 8 % et on achète moins. */
+const percFact=id=>Math.pow(percDef(id).val,plvl(id));
+const percNiv=()=>PERC.reduce((a,p)=>a+plvl(p.id),0);
+const percOuvert=()=>RES.every(r=>lvl(r.id)>=r.max);
+
 /* ---------- automatisations ----------
    Payées en antimatière comme les recherches, conservées d'un cycle à l'autre.
    Elles font gagner du confort, pas de la puissance : les Satellites d'extraction
@@ -1913,6 +2053,15 @@ function etatTexte(a){
    tout seul. Une coupure manuelle (`autoOff`), elle, reste une intention du
    joueur et n'est pas touchée. */
 function purgePauses(){ S.autoPause={}; S.autoMain=""; }
+/* achMult() compte les CLÉS de S.achs, pas les entrées d'ACHS : un identifiant
+   qui n'existe plus continuerait donc de donner son +1 %, et le multiplicateur
+   ne collerait plus au « X / 96 » affiché juste à côté. La 3.7.2 est la première
+   version à retirer des identifiants (les paliers à 10 K, 100 K et 1 M de la
+   3.7.0, jamais parvenus jusqu'à une partie publiée) — d'où ce ménage. */
+function purgeAchs(){
+  const connus=new Set(ACHS.map(a=>a.id));
+  Object.keys(S.achs).forEach(id=>{ if(!connus.has(id))delete S.achs[id] });
+}
 /* Sauvegarde d'avant les défis : aucun record de cycle n'a été tenu. Le total
    extrait est dominé par le dernier cycle (croissance exponentielle), donc la
    moitié en est une approximation basse et sans risque : au pire l'objectif du
@@ -1932,7 +2081,14 @@ function migrerBest(d){
    plancher à 10 % de l'antimatière possédée. Le panneau affiche toujours le
    seuil réellement appliqué, jamais la seule valeur saisie. */
 const CYC_MIN=0.10;
-const cycSeuil=()=>Math.max(1,Math.floor(S.autoCyc)||1,Math.ceil(S.am*CYC_MIN));
+/* Le seuil ne lit QUE l'antimatière en poche (3.6.2). La 3.6.0 y ajoutait
+   `S.percAm`, l'antimatière versée dans les Percées, pour que dépenser ne
+   raccourcisse pas le cycle. Conséquence non voulue : le joueur qui dépensait
+   trop perdait sa production sans rien récupérer sur le seuil, et se retrouvait
+   avec un cycle de 1 900 h sans retour possible. Poche seule, la sur-dépense se
+   corrige d'elle-même — c'est le même nombre qui paie et qui fixe la cible. */
+const cycSeuil=()=>Math.max(1,Math.floor(S.autoCyc)||1,
+                            Math.ceil(S.am*CYC_MIN));
 
 /* ---------- données : succès ---------- */
 /* Les succès sont rangés par catégorie : la liste avait dépassé la quarantaine
@@ -1981,6 +2137,9 @@ const STATS=[
  {c:"auto",nm:{fr:"Seuil de relance",en:"Restart threshold"},        v:()=>alvl("cycle")?"+"+fmt(cycSeuil()):"—"},
  {c:"auto",nm:{fr:"Cycles relancés seuls",en:"Cycles restarted alone"}, v:()=>fmt(S.acyc||0)},
 
+ {c:"cyc", nm:{fr:"Niveaux de Percées",en:"Breakthrough levels"},    v:()=>fmt(percNiv())},
+ {c:"cyc", nm:{fr:"Antimatière versée",en:"Antimatter poured"},      v:()=>fmt(S.percAm||0)},
+
  {c:"prog",nm:{fr:"Améliorations",en:"Upgrades"},                    v:()=>Object.keys(S.ups).length+"/"+UPS.length},
  {c:"prog",nm:{fr:"Recherches",en:"Research"},                       v:()=>RES.reduce((a,r)=>a+lvl(r.id),0)+"/"+RES.reduce((a,r)=>a+r.max,0)},
  {c:"prog",nm:{fr:"Succès",en:"Achievements"},                       v:()=>Object.keys(S.achs).length+"/"+ACHS.length},
@@ -2001,6 +2160,7 @@ const ACHCATS=[
  {id:"anom",  ico:"✦",  nm:{fr:"Anomalies",en:"Anomalies"}},
  {id:"cycle", ico:"♻️", nm:{fr:"Cycles et antimatière",en:"Cycles and antimatter"}},
  {id:"auto",  ico:"⚙️", nm:{fr:"Automatisation",en:"Automation"}},
+ {id:"perc",  ico:"🜛",  nm:{fr:"Percées",en:"Breakthroughs"}},
  {id:"chal",  ico:"🎯", nm:{fr:"Défis",en:"Challenges"}},
 ];
 const ACHS=[
@@ -2153,8 +2313,56 @@ const ACHS=[
   nm:{fr:"Filet dérivant",en:"Drift net"},ds:{fr:"50 anomalies ramassées par la sonde",en:"50 anomalies collected by the probe"}},
  {id:"a_acyc10",c:"auto",v:S=>(S.acyc||0),n:10,
   nm:{fr:"Pilote automatique",en:"Autopilot"},ds:{fr:"10 cycles relancés tout seuls",en:"10 cycles restarted on their own"}},
+ {id:"a_perc1",c:"perc",v:S=>percNiv(),n:1,
+  nm:{fr:"Première percée",en:"First breakthrough"},ds:{fr:"1 niveau de Percée",en:"1 breakthrough level"}},
+ {id:"a_perc10",c:"perc",v:S=>percNiv(),n:10,
+  nm:{fr:"Front de recherche",en:"Research front"},ds:{fr:"10 niveaux de Percées",en:"10 breakthrough levels"}},
+ {id:"a_perc25",c:"perc",v:S=>percNiv(),n:25,
+  nm:{fr:"Programme long",en:"Long programme"},ds:{fr:"25 niveaux de Percées",en:"25 breakthrough levels"}},
+ {id:"a_perc50",c:"perc",v:S=>percNiv(),n:50,
+  nm:{fr:"Percée majeure",en:"Major breakthrough"},ds:{fr:"50 niveaux de Percées",en:"50 breakthrough levels"}},
+ {id:"a_perc_all",c:"perc",v:S=>PERC.filter(p=>plvl(p.id)>0).length,n:PERC.length,
+  nm:{fr:"Sur tous les fronts",en:"On every front"},ds:{fr:"Un niveau dans chacune des quatre lignes",en:"One level in each of the four lines"}},
+ {id:"a_perc_spe",c:"perc",v:S=>PERC.reduce((a,p)=>Math.max(a,plvl(p.id)),0),n:20,
+  nm:{fr:"Spécialiste",en:"Specialist"},ds:{fr:"20 niveaux dans une seule ligne",en:"20 levels in a single line"}},
+ {id:"a_percam1",c:"perc",v:S=>S.percAm||0,n:1e8,
+  nm:{fr:"Fonderie",en:"Foundry"},ds:{fr:"100 M d'antimatière versée",en:"100 M antimatter poured"}},
+ {id:"a_percam2",c:"perc",v:S=>S.percAm||0,n:1e9,
+  nm:{fr:"Haut fourneau",en:"Blast furnace"},ds:{fr:"1 G d'antimatière versée",en:"1 G antimatter poured"}},
+ {id:"a_percam3",c:"perc",v:S=>S.percAm||0,n:1e12,
+  nm:{fr:"Puits sans fond",en:"Bottomless well"},ds:{fr:"1 T d'antimatière versée",en:"1 T antimatter poured"}},
  {id:"a_acyc100",c:"auto",v:S=>(S.acyc||0),n:100,
   nm:{fr:"Roue libre",en:"Freewheel"},ds:{fr:"100 cycles relancés tout seuls",en:"100 cycles restarted on their own"}},
+
+ /* ---- très haut niveau ----
+    Tant qu'un cycle durait des centaines d'heures, 25 cycles était une fin de
+    parcours. Il fallait de quoi viser au-dessus, des deux côtés.
+
+    Le barème a été recalibré en 3.7.2. La 3.7.0 montait jusqu'à 1 M, sur une
+    cadence extrapolée de amMinerai(cycSeuil())/perSec() — c'est-à-dire avec la
+    colonie DÉJÀ construite. Or un cycle remet les structures à zéro : le temps
+    réel d'un cycle, c'est la reconstruction, pas la production de pointe.
+    Mesuré ensuite sur la partie de référence, automates allumés : zéro cycle en
+    90 secondes à poche pleine. Une partie réelle en est à 131 cycles après des
+    semaines. 2 500 est donc un horizon lointain, 1 M une plaisanterie. */
+ {id:"a_pr100",c:"cycle",v:S=>S.prestiges,n:100,
+  nm:{fr:"Centième aube",en:"Hundredth dawn"},ds:{fr:"100 cycles",en:"100 cycles"}},
+ {id:"a_pr250",c:"cycle",v:S=>S.prestiges,n:250,
+  nm:{fr:"Horloge cosmique",en:"Cosmic clock"},ds:{fr:"250 cycles",en:"250 cycles"}},
+ {id:"a_pr500",c:"cycle",v:S=>S.prestiges,n:500,
+  nm:{fr:"Poussière d'ères",en:"Dust of ages"},ds:{fr:"500 cycles",en:"500 cycles"}},
+ {id:"a_pr1k",c:"cycle",v:S=>S.prestiges,n:1000,
+  nm:{fr:"Roue des mondes",en:"Wheel of worlds"},ds:{fr:"1 000 cycles",en:"1,000 cycles"}},
+ {id:"a_pr2500",c:"cycle",v:S=>S.prestiges,n:2500,
+  nm:{fr:"Au bout du temps",en:"At the end of time"},ds:{fr:"2 500 cycles",en:"2,500 cycles"}},
+ {id:"a_acyc250",c:"auto",v:S=>(S.acyc||0),n:250,
+  nm:{fr:"Machine perpétuelle",en:"Perpetual machine"},ds:{fr:"250 cycles relancés tout seuls",en:"250 cycles restarted on their own"}},
+ {id:"a_acyc500",c:"auto",v:S=>(S.acyc||0),n:500,
+  nm:{fr:"Sans les mains",en:"No hands"},ds:{fr:"500 cycles relancés tout seuls",en:"500 cycles restarted on their own"}},
+ {id:"a_acyc1k",c:"auto",v:S=>(S.acyc||0),n:1000,
+  nm:{fr:"Régime de croisière",en:"Cruising speed"},ds:{fr:"1 000 cycles relancés tout seuls",en:"1,000 cycles restarted on their own"}},
+ {id:"a_acyc2500",c:"auto",v:S=>(S.acyc||0),n:2500,
+  nm:{fr:"Le jeu se joue tout seul",en:"The game plays itself"},ds:{fr:"2 500 cycles relancés tout seuls",en:"2,500 cycles restarted on their own"}},
 ];
 /* Un succès par défi, plus un pour les six. Ils sont construits à partir de
    CHALS, qui reste l'unique source de vérité : ajouter un défi ajoutera son
@@ -2287,9 +2495,16 @@ function achProg(a){
   if(!a.v)return null;
   const v=a.v(S), n=a.n, n0=a.n0||0;
   if(v>=n)return 1;
-  if(!(v>n0))return 0;
-  return (n0>0 && n/n0>=100) ? Math.log(v/n0)/Math.log(n/n0)
-                             : (v-n0)/(n-n0);
+  if(!(v>0))return 0;
+  /* Familles exponentielles seulement — un palier qui vaut cent fois le
+     précédent, donc minerai, production, puissance de clic. Là on lit
+     l'avancement DEPUIS le palier précédent, faute de quoi la barre reste
+     collée à zéro pendant tout le palier puis saute à plein.
+     Partout ailleurs on compte depuis zéro : sur « 25 niveaux de Percées », un
+     joueur qui en a 3 veut lire 12 %, pas 0 % au prétexte qu'il n'a pas encore
+     franchi le palier des 10. */
+  if(n0>0 && n/n0>=100) return v<=n0 ? 0 : Math.log(v/n0)/Math.log(n/n0);
+  return v/n;
 }
 const NAIN=6;
 const NAIN_MULT=4;                                // compensation, voir genMult
@@ -2354,6 +2569,10 @@ const chalReste=()=>Math.max(0,CHAL_FAITS-S.prestiges);
 /* ---------- état ---------- */
 const NEW=()=>({
   ore:0,totalOre:0,runOre:0,am:0,amTotal:0,prestiges:0,
+  /* Percées : niveaux par ligne, et total versé — ce dernier ne sert plus qu'aux
+     succès et aux statistiques depuis la 3.6.2 (voir cycSeuil). */
+  perc:{},percAm:0,
+  pins:[],                      // succès épinglés, trois au plus
   chal:null,chalDone:{},chalStart:0,chalBut:0,bestRun:0,
   gens:{},ups:{},res:{},achs:{},seen:1,
   /* autoPause / autoMain : vidés depuis la 3.4.0 (l'exclusivité a disparu),
@@ -2434,7 +2653,9 @@ function genMult(id){
 function perSec(noBuff){
   let t=0;
   gensActives().forEach(g=>{t+=(S.gens[g.id]||0)*g.rate*genMult(g.id)});
-  return t*globalMult(noBuff);
+  // Réacteur : la production seule. Le clic n'en profite que par son écho, qui
+  // est justement une fraction de la production — c'est cohérent.
+  return t*globalMult(noBuff)*percFact("reac");
 }
 /* auto = clic produit par les satellites. Ils ignorent le bonus de clic : sinon
    l'Écho quantique cessait d'être une récompense du joueur actif pour devenir un
@@ -2520,7 +2741,7 @@ const AM_EXPG=0.30;
    Elle ne l'était pas, et amMinerai() renvoyait le minerai d'un gain 1,15 fois
    plus grand — d'où un « il manque X » surévalué d'un facteur ~80 en fin de
    partie, sur une tuile où le gain, lui, montait à vue d'œil. */
-const amCoef=()=>chalBonus("am15")?1.15:1;
+const amCoef=()=>(chalBonus("am15")?1.15:1)*percFact("comp");
 function amGain(){
   if(!(S.runOre>0))return 0;
   const g=Math.pow(S.runOre/AM_SEUIL,AM_EXPG)*amCoef();
@@ -2561,6 +2782,13 @@ function toggleAuto(a){
   if(aOn(a.id)){ S.autoOff[a.id]=1;      toast(t("t_auto_off",tr(a.nm))) }
   else         { delete S.autoOff[a.id]; toast(t("t_auto_on",tr(a.nm))) }
   render();
+}
+function buyPerc(p){
+  if(S.chal){ toast(t("t_chal_locked")); return }   // même règle que les recherches
+  if(!percOuvert())return;
+  const l=plvl(p.id), c=percCost(p,l); if(S.am<c)return;
+  S.am-=c; S.percAm=(S.percAm||0)+c; S.perc[p.id]=l+1;
+  toast(t("t_perc",tr(p.nm),l+1),"violet"); render();
 }
 function buyRes(r){
   if(S.chal){ toast(t("t_chal_locked")); return }   // pas d'achat pendant un défi
@@ -2720,17 +2948,17 @@ const ANOMS=[
   }},
  {k:"bond", w:2, super:1, f:()=>{                       // 1 % : un bond de 20 à 30 minutes
     const min=20+Math.random()*10;
-    const v=Math.max(2000,perSec(true)*min*60);           // perSec(true) : hors Surtension en cours
+    const v=Math.max(2000,perSec(true)*min*60)*percFact("casc");  // perSec(true) : hors Surtension
     gain(v); toast(t("an_leap",fmt(v),Math.round(min)),"violet");
   }},
  {k:"filon", w:89, f:()=>{                                 // 120 à 300 s de production
     const sec=120+Math.random()*180;
-    const v=Math.max(50,perSec(true)*sec);                // perSec(true) : hors Surtension en cours
+    const v=Math.max(50,perSec(true)*sec)*percFact("casc");       // perSec(true) : hors Surtension
     gain(v); toast(t("an_vein",fmt(v),Math.round(sec)),"gold");
   }},
  {k:"cache", w:89, f:()=>{                                 // 15 à 20 % de la réserve
     const pct=15+Math.random()*5;
-    const v=Math.max(100,S.ore*pct/100);
+    const v=Math.max(100,S.ore*pct/100)*percFact("casc");
     gain(v); toast(t("an_cache",fmt(v),pct.toFixed(1)),"gold");
   }},
 ];
@@ -2979,7 +3207,73 @@ function priceInfo(cost,cur,rate,unit){
 }
 
 /* ---------- squelette statique des onglets (reconstruit au changement de langue) ---------- */
-let QBTN=[], QGEN=[], ACHNODES=[], ACHSECS=[], STROWS=[], SWROWS=[], CHNODES=[], CYCIN=null, GENSEL=null;
+let QBTN=[], QGEN=[], ACHNODES=[], ACHSECS=[], PINNODES=[], PINCHIPS=[], STROWS=[], SWROWS=[], CHNODES=[], CYCIN=null, GENSEL=null;
+/* Une carte de succès, utilisée aussi bien dans les catégories que dans la
+   section des épinglés. `_id` porte le succès affiché : c'est lui que lit
+   l'épingle, ce qui permet à une carte d'épinglage de changer de succès. */
+function carteAch(){
+  const d=document.createElement("div"); d.className="ach";
+  d.innerHTML='<button class="apin" type="button">📌</button>'+
+    '<div class="an"></div><div class="ad"></div>'+
+    '<div class="ap"><div class="bar"><i></i></div><span class="apn"></span></div>';
+  d.q={n:d.querySelector(".an"),d:d.querySelector(".ad"),
+       p:d.querySelector(".ap"),bi:d.querySelector(".bar i"),
+       pn:d.querySelector(".apn"),pin:d.querySelector(".apin")};
+  bindAction(d.q.pin,()=>{if(d._id)bascPin(d._id)});
+  return d;
+}
+/* Une puce du bandeau : la description du succès (son nom est caché tant qu'il
+   n'est pas décroché), sa barre, son compte, et l'épingle pour le retirer.
+   Toucher la puce ouvre l'onglet Succès ; toucher l'épingle dépingle — d'où le
+   stopPropagation, sans quoi les deux se déclencheraient. */
+function pucePin(){
+  const d=document.createElement("div"); d.className="pchip";
+  d.innerHTML='<div class="pc"><div class="pcd"></div>'+
+    '<div class="pcl"><div class="bar"><i></i></div><span class="pcn"></span></div></div>'+
+    '<button class="pcx" type="button">📌</button>';
+  d.q={d:d.querySelector(".pcd"),l:d.querySelector(".pcl"),bi:d.querySelector(".bar i"),
+       n:d.querySelector(".pcn"),x:d.querySelector(".pcx")};
+  ["pointerdown","pointerup","click"].forEach(ev=>
+    d.q.x.addEventListener(ev,e=>e.stopPropagation()));
+  bindAction(d,()=>{if(d._id)activerOnglet("ac")});
+  bindAction(d.q.x,()=>{if(d._id)bascPin(d._id)});
+  return d;
+}
+/* Le bandeau vit au-dessus des onglets, donc il se met à jour à CHAQUE rendu et
+   pas seulement dans l'onglet Succès. C'est aussi ici qu'on retire les épingles
+   devenues inutiles : un succès décroché garderait sinon une puce pleine. */
+function majPins(){
+  const l=(S.pins||[]).filter(id=>{const a=ACHS.find(x=>x.id===id); return a&&!S.achs[id]});
+  if(l.length!==(S.pins||[]).length)S.pins=l;
+  const bar=$("#pinBar"), avant=bar.classList.contains("on");
+  cls(bar,"on",l.length>0);
+  PINCHIPS.forEach((c,i)=>{
+    show(c,i<l.length);
+    if(i>=l.length)return;
+    const a=ACHS.find(x=>x.id===l[i]);
+    c._id=a.id;
+    txt(c.q.d,tr(a.ds));
+    c.q.x.title=t("ac_unpin_t");
+    const pr=achProg(a);
+    show(c.q.l,pr!==null);
+    if(pr!==null){
+      const w=(pr*100).toFixed(1)+"%";
+      if(c.q.bi._w!==w){c.q.bi._w=w;c.q.bi.style.width=w}
+      txt(c.q.n,fmt(a.v(S))+" / "+fmt(a.n));
+    }
+  });
+  // la hauteur de l'en-tête collant change : le point d'accrochage de la rangée
+  // d'achat est calculé à partir d'elle
+  if(avant!==(l.length>0))syncHero();
+}
+/* Trois épingles au plus : c'est une liste de courses, pas un second onglet. */
+const PIN_MAX=3;
+function bascPin(id){
+  const l=S.pins||(S.pins=[]), i=l.indexOf(id);
+  if(i>=0)l.splice(i,1);
+  else{ if(l.length>=PIN_MAX){toast(t("ac_pin_max"));return} l.push(id) }
+  save(); render();
+}
 function buildSkeleton(){
   /* --- Extraction --- */
   $("#pGen").innerHTML=
@@ -3016,6 +3310,14 @@ function buildSkeleton(){
       '<div class="hint" id="prNote" style="margin:8px 0 0"></div>'+
       '<button class="pbtn" id="prBtn">'+t("pr_btn")+'</button>'+
     '</div>'+
+    /* Les Percées passent AVANT les recherches (3.7.1). Elles ne s'ouvrent que
+       lorsque les huit recherches sont au maximum : à ce moment-là la liste du
+       dessous n'est plus qu'un mur de cartes « MAX », et le seul étage encore
+       vivant se trouvait sous elle, hors écran. Rien n'est perdu à les reléguer
+       en bas — il n'y a plus rien à y acheter. */
+    '<h3 class="sec" id="percTitle" style="display:none"></h3>'+
+    '<p class="hint" id="percHint" style="display:none"></p>'+
+    '<div id="percList"></div>'+
     '<h3 class="sec" id="resTitle"></h3>'+
     '<p class="hint">'+t("res_hint")+'</p>'+
     '<div id="resList"></div>';
@@ -3086,8 +3388,16 @@ function buildSkeleton(){
   $("#auCycCtl").appendChild(CYCIN); $("#auCycCtl").appendChild(uni);
 
   /* --- Succès --- */
-  $("#pAc").innerHTML='<p class="hint" id="acHint"></p><div id="acSecs"></div>';
+  $("#pAc").innerHTML='<p class="hint" id="acHint"></p>'+
+    '<h3 class="sec" id="acPinT" style="display:none"></h3>'+
+    '<div class="achgrid" id="acPins"></div><div id="acSecs"></div>';
   const box=$("#acSecs"); ACHNODES=[]; ACHSECS=[];
+  /* Trois cartes d'épinglage, à part : déplacer les vraies cartes hors de leur
+     catégorie laisserait un trou dans la grille et compliquerait le retour. */
+  PINNODES=[0,1,2].map(()=>{const d=carteAch(); $("#acPins").appendChild(d); return d});
+  if(!PINCHIPS.length){                      // le bandeau vit hors des onglets
+    PINCHIPS=[0,1,2].map(()=>{const d=pucePin(); $("#pinBar").appendChild(d); return d});
+  }
   ACHCATS.forEach(cat=>{
     const idx=[]; ACHS.forEach((a,i)=>{if(a.c===cat.id)idx.push(i)});
     if(!idx.length)return;
@@ -3095,13 +3405,7 @@ function buildSkeleton(){
     const g=document.createElement("div"); g.className="achgrid";
     box.appendChild(h); box.appendChild(g);
     idx.forEach(i=>{
-      const d=document.createElement("div"); d.className="ach";
-      d.innerHTML='<div class="an"></div><div class="ad"></div>'+
-        '<div class="ap"><div class="bar"><i></i></div><span class="apn"></span></div>';
-      d.q={n:d.querySelector(".an"),d:d.querySelector(".ad"),
-           p:d.querySelector(".ap"),bi:d.querySelector(".bar i"),
-           pn:d.querySelector(".apn")};
-      g.appendChild(d); ACHNODES[i]=d;
+      const d=carteAch(); g.appendChild(d); ACHNODES[i]=d;
     });
     ACHSECS.push({cat,h,idx});
   });
@@ -3343,7 +3647,8 @@ function renderPrestige(){
      défis — pas le nombre de cycles terminés. Deux façons de compter dans la
      même interface, c'est exactement ce qui avait rendu le déblocage des défis
      illisible. */
-  html($("#prInfo"),t("pr_info",(amBonus()*100).toFixed(1),mfmt(amMult()),S.prestiges+1,String(amExp())));
+  html($("#prInfo"),t("pr_info",(amBonus()*100).toFixed(1),xfmt(amMult()),
+                      fmt(S.prestiges+1),String(amExp())));
   const note=$("#prNote");
   show(note,g<1);
   if(g<1){
@@ -3354,6 +3659,29 @@ function renderPrestige(){
   // le bouton se désactive aussi pendant un défi : doPrestige() refuse de toute
   // façon, mais un bouton actif qui ne fait rien est une promesse non tenue
   const b=$("#prBtn"), off=(g<1||!!S.chal); if(b.disabled!==off)b.disabled=off;
+
+  /* Les Percées n'apparaissent qu'une fois les huit recherches au maximum :
+     avant, elles ne feraient que promettre un étage inatteignable. Elles se
+     rendent avant les recherches parce qu'elles s'affichent au-dessus d'elles
+     (3.7.1) — l'ordre des deux blocs n'a aucun effet sur le DOM, syncList
+     travaillant en place, mais le code suit ce qu'on voit. */
+  const ouv=percOuvert();
+  show($("#percTitle"),ouv); show($("#percHint"),ouv);
+  if(ouv){
+    html($("#percTitle"),t("perc_t",'<b style=\"color:var(--violet)\">'+fmt(S.am)+"</b>"));
+    html($("#percHint"),t("perc_hint"));
+  }
+  syncList($("#percList"),!ouv?[]:PERC.map(pc=>{
+    const l=plvl(pc.id), cost=percCost(pc,l);
+    const c=getCard("perc:"+pc.id,()=>buyPerc(pc));
+    const pi=priceInfo(cost,S.am,0,t("unit_am"));
+    upd(c,{ico:pc.ico,nm:tr(pc.nm),ds:tr(pc.ds),
+      clbl:tm("price_lvl",l+1),
+      cost:t("cost_am",fmt(cost)), am:1,
+      miss:"", done:0, cant:pi.cant, prog:S.am/cost,
+      own:fmt(l), owsub:t("perc_sub")});
+    return c;
+  }));
 
   html($("#resTitle"),t("res_title",'<b style=\"color:var(--violet)\">'+fmt(S.am)+"</b>"));
   syncList($("#resList"),RES.map(r=>{
@@ -3458,22 +3786,35 @@ function renderAchs(){
     html(sec.h,'<span>'+sec.cat.ico+" "+tr(sec.cat.nm)+'</span>'+
                '<span class="secn'+(n===sec.idx.length?" full":"")+'">'+n+"/"+sec.idx.length+"</span>");
   });
-  ACHS.forEach((a,i)=>{
-    const n=ACHNODES[i], has=!!S.achs[a.id];
-    cls(n,"got",has);
-    txt(n.q.n,(has?"🏆 ":"🔒 ")+(has?tr(a.nm):"???"));
-    txt(n.q.d,tr(a.ds));
-    /* La barre ne sert qu'aux succès chiffrés ENCORE à décrocher : une fois
-       obtenu elle ne dirait plus que « 100 % », et un succès binaire n'a pas
-       d'avancement à montrer. */
-    const p=has?null:achProg(a);
-    show(n.q.p,p!==null);
-    if(p!==null){
-      const w=(p*100).toFixed(1)+"%";
-      if(n.q.bi._w!==w){n.q.bi._w=w;n.q.bi.style.width=w}
-      txt(n.q.pn,fmt(a.v(S))+" / "+fmt(a.n));
-    }
+  ACHS.forEach((a,i)=>remplirAch(ACHNODES[i],a));
+  // majPins() a déjà écarté les épingles devenues inutiles
+  const pins=S.pins||[];
+  html($("#acPinT"),"📌 "+t("ac_pin"));
+  show($("#acPinT"),pins.length>0); show($("#acPins"),pins.length>0);
+  PINNODES.forEach((n,i)=>{
+    show(n,i<pins.length);
+    if(i<pins.length)remplirAch(n,ACHS.find(x=>x.id===pins[i]));
   });
+}
+function remplirAch(n,a){
+  const has=!!S.achs[a.id];
+  n._id=a.id;
+  cls(n,"got",has);
+  txt(n.q.n,(has?"🏆 ":"🔒 ")+(has?tr(a.nm):"???"));
+  txt(n.q.d,tr(a.ds));
+  const pin=(S.pins||[]).indexOf(a.id)>=0;
+  cls(n.q.pin,"on",pin);
+  n.q.pin.title=t(pin?"ac_unpin_t":"ac_pin_t");
+  /* La barre ne sert qu'aux succès chiffrés ENCORE à décrocher : une fois
+     obtenu elle ne dirait plus que « 100 % », et un succès binaire n'a pas
+     d'avancement à montrer. */
+  const p=has?null:achProg(a);
+  show(n.q.p,p!==null);
+  if(p!==null){
+    const w=(p*100).toFixed(1)+"%";
+    if(n.q.bi._w!==w){n.q.bi._w=w;n.q.bi.style.width=w}
+    txt(n.q.pn,fmt(a.v(S))+" / "+fmt(a.n));
+  }
 }
 
 function renderChals(){
@@ -3564,7 +3905,8 @@ function renderHeader(){
      son numéro. Seul cas encore trop long : « +24 · #5 · −56.9T » sur un écran
      de 320 px (96 px demandés), où la fin est coupée par des points de
      suspension — l'infobulle donne le texte entier. */
-  html($("#sAm"),g>=1?tm("sub_next",fmt(g),S.prestiges+1,mq):tm("sub_cycle",S.prestiges+1,mq));
+  html($("#sAm"),g>=1?tm("sub_next",fmt(g),fmt(S.prestiges+1),mq)
+                     :tm("sub_cycle",fmt(S.prestiges+1),mq));
   $("#sAm").title=t("sub_am_t");
   const full=[];
   if(m.am>1.0001)full.push(t("f_am",fmt(m.am)));
@@ -3603,6 +3945,7 @@ function render(){
   else if(currentTab==="ac")renderAchs();
   else renderStats();
   majChalBar();
+  majPins();
   // Recherche est inutilisable pendant un défi (achats bloqués) : onglet grisé
   // ET bandeau en tête de panneau, parce qu'un onglet grisé seul n'explique pas
   // pourquoi. Automatisation reste pleinement utilisable — seul le relanceur de
@@ -3732,7 +4075,7 @@ let rzT=null;
 addEventListener("resize",()=>{clearTimeout(rzT);rzT=setTimeout(applyI18n,150)});
 
 /* ---------- hors-ligne ---------- */
-function offlineCap(){return (4+3*lvl("buffer"))*3600}
+function offlineCap(){return (4+3*lvl("buffer")+2*plvl("veille"))*3600}
 function offlineRate(){return Math.min(1,0.35+0.10*lvl("auto"))}
 
 /* ---------- boucle ---------- */
@@ -3838,7 +4181,7 @@ function load(){
   const raw=readSave(); if(!raw)return false;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(raw))));
-    S=Object.assign(NEW(),d); purgePauses(); migrerBest(d);
+    S=Object.assign(NEW(),d); purgePauses(); purgeAchs(); migrerBest(d);
     S.buffs=(S.buffs||[]).filter(b=>b.until>Date.now());
     // gains hors-ligne (même règle que le retour d'arrière-plan)
     const away=(Date.now()-(d.lastSave||Date.now()))/1000;
@@ -3855,7 +4198,7 @@ bindAction($("#mImport"),()=>{
   const v=$("#mText").value.trim(); if(!v)return;
   try{
     const d=JSON.parse(decodeURIComponent(escape(atob(v))));
-    S=Object.assign(NEW(),d); purgePauses(); migrerBest(d);
+    S=Object.assign(NEW(),d); purgePauses(); purgeAchs(); migrerBest(d);
     S.lastTick=Date.now(); save(); render();
     $("#modal").classList.remove("on"); toast(t("t_imported"));
   }catch(e){toast(t("bad_code"),"red")}
@@ -3875,6 +4218,30 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.6", nm:{fr:"Le résumé couvre toute la mise à jour",en:"The summary covers the whole update"},
+  d:{fr:"La 3.5.0 était encore en ligne : ceux qui reviennent sautent huit versions d'un coup. Le panneau Nouveautés ne parlait que du dernier correctif, ce qui n'apprenait rien à personne. Il résume maintenant l'ensemble — les Percées, le seuil de relance calé sur l'antimatière en poche, les succès épinglés et les dix-huit succès ajoutés. Le détail version par version reste juste en dessous.",
+     en:"3.5.0 was still the live version: anyone coming back jumps eight versions at once. The What's new panel only described the latest fix, which told nobody anything. It now sums up the whole thing — Breakthroughs, the restart threshold tied to the antimatter in hand, pinned achievements and the eighteen achievements added. The version-by-version detail is still right below it."}},
+ {v:"3.7.5", nm:{fr:"L'épingle se laisse cliquer",en:"The pin accepts the click"},
+  d:{fr:"Le titre de la carte se peignait par-dessus l'épingle et lui volait le clic. C'est un effet de bord de la 3.7.3 : pour cesser d'atténuer la carte entière, l'atténuation est passée sur son contenu — or une opacité inférieure à 1 ouvre un contexte d'empilement, et ces blocs se peignent alors au niveau des éléments positionnés, dans l'ordre du DOM. Suivant l'épingle, ils passaient devant elle. Seuls les bords du bouton répondaient encore, d'où un clic qui marchait une fois sur deux. Un z-index remet l'épingle au-dessus.",
+     en:"The card's title was painting over the pin and stealing the click. It is a side effect of 3.7.3: to stop dimming the whole card, the dimming moved onto its content — but an opacity below 1 opens a stacking context, and those blocks then paint at the level of positioned elements, in DOM order. Coming after the pin, they went in front of it. Only the button's edges still responded, hence a click that worked about half the time. A z-index puts the pin back on top."}},
+ {v:"3.7.4", nm:{fr:"Grise si libre, rouge si suivie",en:"Grey if free, red if followed"},
+  d:{fr:"L'épingle des succès était à peu près invisible. Elle portait une opacité de 38 %, posée sur une carte qui en portait déjà 38 % — et les opacités se multiplient : 14 % à l'écran. C'est maintenant le contenu de la carte qui est atténué, pas la carte entière, donc l'épingle garde l'opacité qu'on lui donne. Elle est grise et bien lisible tant que le succès n'est pas suivi, rouge dès qu'il l'est — aux trois endroits où elle apparaît : la liste des succès, la section épinglée en tête d'onglet, et le bandeau au-dessus des onglets. Ni fond ni cadre : c'est la couleur qui porte l'état.",
+     en:"The achievement pin was all but invisible. It carried 38 % opacity, sitting on a card that already carried 38 % — and opacities multiply: 14 % on screen. The card's content is what gets dimmed now, not the whole card, so the pin keeps the opacity it is given. It is grey and clearly legible while an achievement is not followed, and red as soon as it is — in all three places it appears: the achievement list, the pinned section at the top of the tab, and the strip above the tabs. No fill, no ring: colour carries the state."}},
+ {v:"3.7.2", nm:{fr:"Des paliers atteignables",en:"Tiers you can actually reach"},
+  d:{fr:"Les paliers de succès ajoutés en 3.7.0 montaient jusqu'à un million de cycles. Ils venaient d'une cadence calculée sur une colonie déjà construite — or un cycle remet les structures à zéro, et c'est la reconstruction qui fait la durée, pas la production de pointe. Mesuré ensuite dans le jeu, automates allumés : zéro cycle en 90 secondes à poche pleine. Les cycles s'arrêtent donc à 100, 250, 500, 1 000 et 2 500, les relances automatiques à 250, 500, 1 000 et 2 500. Toujours 96 succès.",
+     en:"The achievement tiers added in 3.7.0 went up to a million cycles. They came from a cadence computed on an already-built colony — but a cycle resets the structures, and the rebuild is what takes the time, not peak output. Measured in game afterwards, automations on: zero cycles in 90 seconds on a full pocket. Cycles now stop at 100, 250, 500, 1,000 and 2,500, automatic restarts at 250, 500, 1,000 and 2,500. Still 96 achievements."}},
+ {v:"3.7.1", nm:{fr:"Les Percées en tête",en:"Breakthroughs first"},
+  d:{fr:"Les Percées s'affichent au-dessus des recherches au lieu d'en dessous. Elles ne s'ouvrent qu'une fois les huit recherches au maximum : à ce moment-là la liste des recherches n'est plus qu'un mur de cartes « MAX », plus rien n'y est achetable, et c'est pourtant elle qu'il fallait faire défiler pour arriver au seul étage encore vivant. Les recherches passent donc en bas, où elles ne gênent personne.",
+     en:"Breakthroughs now sit above the researches instead of below them. They only open once all eight researches are maxed: by then the research list is a wall of \"MAX\" cards with nothing left to buy, and it was that list you had to scroll past to reach the one tier still alive. The researches move to the bottom, where they are in nobody's way."}},
+ {v:"3.7.0", nm:{fr:"De quoi compter loin",en:"Room to count"},
+  d:{fr:"Le numéro de cycle et le bonus d'antimatière s'écrivaient en chiffres bruts : avec la 3.6.2, une partie qui dépense tourne à plusieurs centaines de cycles par heure, et le panneau affichait « ×146785797934.3 » en travers de deux lignes. Les deux passent à l'échelle du jeu — « cycle #3.20M », « ×70.1M ». Neuf succès s'ajoutent au-dessus des anciens : 100, 1 000, 10 000, 100 000 et 1 M de cycles, puis 1 000, 10 000, 100 000 et 1 M de cycles relancés tout seuls. On plafonnait à 25 cycles et 100 relances, ce qui datait d'une époque où un cycle durait des centaines d'heures. 96 succès au total.",
+     en:"The cycle number and the antimatter bonus were printed as raw digits: since 3.6.2 a save that spends runs at several hundred cycles an hour, and the panel was writing \"×146785797934.3\" across two lines. Both now use the game's own scale — \"cycle #3.20M\", \"×70.1M\". Nine achievements stack above the old ones: 100, 1,000, 10,000, 100,000 and 1 M cycles, then 1,000, 10,000, 100,000 and 1 M cycles restarted on their own. The ceiling was 25 cycles and 100 restarts, from a time when a cycle lasted hundreds of hours. 96 achievements in all."}},
+ {v:"3.6.2", nm:{fr:"Le seuil suit la poche",en:"The threshold follows the pocket"},
+  d:{fr:"Le seuil de relance vaut 10 % de l'antimatière en poche, et rien d'autre. La 3.6.0 y comptait aussi l'antimatière versée dans les Percées, pour que dépenser ne raccourcisse pas artificiellement les cycles ; en pratique le joueur qui dépensait trop perdait sa production sans rien récupérer sur le seuil. Mesuré sur une partie à 61 niveaux de Percées : la poche tombe de 162,8 M à 4,8 M et le cycle passe de 542 h à 4 449 h, sans retour possible. Avec le seuil calé sur la poche, la même partie repasse à 1,3 minute : c'est le même nombre qui paie les Percées et qui fixe la cible, donc la sur-dépense se corrige d'elle-même. En contrepartie, garder son antimatière n'accélère plus rien — ce sont les prix en 1,15 par niveau qui font désormais la tension.",
+     en:"The restart threshold is 10 % of the antimatter in hand, and nothing else. In 3.6.0 it also counted the antimatter poured into Breakthroughs, so that spending would not artificially shorten cycles; in practice a player who overspent lost output and got nothing back on the threshold. Measured on a save with 61 Breakthrough levels: the pocket falls from 162.8 M to 4.8 M and the cycle goes from 542 h to 4,449 h, with no way back. With the threshold tied to the pocket, that same save drops to 1.3 minutes: the same number pays for Breakthroughs and sets the target, so overspending corrects itself. The trade-off: holding antimatter no longer speeds anything up — the 1.15-per-level prices now carry the tension."}},
+ {v:"3.6.0", nm:{fr:"Les Percées",en:"Breakthroughs"},
+  d:{fr:"Quand les huit recherches sont au maximum, l'antimatière n'a plus qu'un débouché : un multiplicateur qui s'applique tout seul. Les Percées ouvrent un second étage sans plafond — Compression, Réacteur, Veille prolongée, Cascade — payé en antimatière, conservé d'un cycle à l'autre, au même barème que les structures (+15 % par niveau). Acheter fait baisser la production, comme une recherche, mais pas le seuil de relance : l'antimatière versée y reste comptée, sans quoi vider sa poche raccourcirait les cycles et deviendrait le meilleur coup du jeu. Neuf succès s'y ajoutent, et trois succès peuvent être épinglés : ils restent affichés au-dessus des onglets, quel que soit celui qu'on regarde.",
+     en:"Once the eight researches are maxed, antimatter has only one outlet left: a multiplier that applies itself. Breakthroughs open a second tier with no ceiling — Compression, Reactor, Extended standby, Cascade — paid in antimatter, kept from one cycle to the next, on the same ladder as structures (+15 % per level). Buying lowers output, like a research, but not the restart threshold: antimatter poured in keeps counting there, otherwise emptying your pocket would shorten cycles and become the best move in the game. Nine achievements come with them, and three achievements can be pinned: they stay on screen above the tabs, whichever one you are looking at."}},
  {v:"3.5.0", nm:{fr:"L'avancement des succès",en:"Achievement progress"},
   d:{fr:"Un succès encore à décrocher porte désormais une barre et deux nombres — « 37 / 100 ». Il fallait jusqu'ici ouvrir les statistiques et rapprocher soi-même le compteur du succès. Un succès chiffré déclare maintenant sa mesure et sa cible plutôt qu'un prédicat, dont le déblocage est déduit : la barre ne peut pas dire autre chose que la condition réelle. L'avancement se lit par palier, et passe en échelle logarithmique sur les seules familles qui montent de mille en mille — minerai, production, puissance de clic.",
      en:"An achievement still to be earned now carries a bar and two figures — \"37 / 100\". Until now you had to open the statistics and match the counter to the achievement yourself. A numeric achievement now declares its measure and its target rather than a predicate, from which unlocking is derived: the bar cannot say anything other than the real condition. Progress reads per tier, and turns logarithmic only for the families that climb by factors of a thousand — ore, output, click power."}},

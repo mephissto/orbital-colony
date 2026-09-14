@@ -16,6 +16,366 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.6 — The summary covers the whole update
+
+**3.5.0** was still live. Anyone coming back jumps eight versions at once, and
+the **What's new** panel only described the latest fix — a z-index on a pin. It
+now sums up the whole gap: Breakthroughs, the restart threshold tied to the
+antimatter in hand, pinned achievements, and the eighteen achievements added
+(78 → 96).
+
+The version-by-version detail is still right below it, in the same window. Text
+only, in both languages.
+
+---
+
+## 3.7.5 — The pin accepts the click
+
+The card's title was painting **over the pin** and stealing the click. A side
+effect of 3.7.3, and not the one you would expect.
+
+### The rule that was missing
+
+To stop dimming the whole card, the dimming moved onto its content:
+
+```css
+.ach>.an,.ach>.ad,.ach>.ap{ opacity:.38 }
+```
+
+But **an opacity below 1 opens a stacking context**. Those three blocks no longer
+paint with the normal flow but *at the level of positioned elements*, separated
+by DOM order. `.an` comes after `.apin` in the template — it went in front.
+
+`.an{padding-right:24px}` kept the *text* clear of the pin, not the `div`'s box,
+which spans the full width of the card. At the centre of the button, where you
+aim, `elementFromPoint()` returned `DIV.an`. Only the few pixels of the button
+sticking out above and to the right of that box still responded — hence a click
+that worked about half the time.
+
+`z-index:2` on `.apin`, `isolation:isolate` on `.ach` so that z-index stays local
+to its card. Nothing else moves.
+
+### The test that was missing
+
+Checking CSS properties would have seen nothing: every rule was correct on its
+own. `t_perc` now asks **who actually receives the pointer**, at the centre and
+both corners of every visible pin, then performs four real mouse clicks and
+checks the state toggles each time. Run against 3.7.4 it fails, naming the
+culprit: `DIV.an`.
+
+---
+
+## 3.7.4 — Grey if free, red if followed
+
+The achievement pin was all but invisible, for a silly reason: **opacities
+multiply**.
+
+```css
+.ach      { opacity:.38 }   /* an achievement not yet earned */
+.ach .apin{ opacity:.38 }   /* the pin, discreet */
+```
+
+38 % of 38 % is **14 % on screen**, in greyscale on top of that. The lit pin fared
+better (`opacity:1` × .38 = 38 %, in red), which is why followed achievements were
+visible and the others were not — and so was the button you use to follow them.
+
+### What changes
+
+The dimming now applies to the card's **content**, not to the whole card:
+
+```css
+.ach>.an,.ach>.ad,.ach>.ap{ opacity:.38 }
+```
+
+The pin is no longer inside the dimmed subtree and keeps the opacity it is given.
+Border and background take over by hand what the opacity used to do — their
+original alphas (.16 and .78) multiplied by .38 — so the card renders exactly as
+before.
+
+| State | Before | After |
+|---|---|---|
+| Not followed | 14 %, full greyscale | **100 %**, `grayscale(1) brightness(1.75)` |
+| Hover | 28 % | `grayscale(.3)`, scaled up 12 % |
+| Followed | 38 %, colour | **100 %**, red, no filter |
+
+`brightness` after `grayscale`: without it the emoji's grey stays dark on a dark
+background, and "grey" means "invisible". No fill and no ring on either state —
+colour alone carries the information, and it is made legible by lifting the unlit
+pin rather than decorating the lit one.
+
+**Red everywhere an achievement is followed**: in the list, in the pinned section
+at the top of the tab, and in the strip above the tabs, whose chip goes from 75 %
+to full opacity. The button also gains 1 px of size and its `.an` 4 px of right
+padding, for the touch target.
+
+`t_perc` gains six assertions, including the one that would have caught the bug:
+**effective** opacity, the product of every ancestor's. The two measurements are
+separated by a wait — `.apin` carries a 150 ms transition and `getComputedStyle`
+returns the value mid-animation, not the destination.
+
+---
+
+## 3.7.2 — Tiers you can actually reach
+
+The achievement tiers added in 3.7.0 went up to **a million cycles**. They were
+wrong.
+
+### Where the error came from
+
+The cadence was estimated as `amMinerai(cycSeuil()) / perSec()`: the ore needed,
+divided by output. Except `perSec()` is read on the **already-built** colony —
+and a cycle resets `S.gens` to zero. The real length of a cycle is the rebuild,
+not peak output. The "several hundred cycles an hour" estimate simply skipped
+most of the cycle.
+
+Measured in game afterwards, automations on, on the reference save:
+
+| State | Cycles in 90 s |
+|---|---:|
+| Full pocket (162.8 M), no Breakthroughs | **0** |
+| Full pocket, 31 Breakthroughs | **0** |
+| Pocket at 20 M (just after spending) | 1 |
+| Pocket at 2 M | 1 |
+
+And the reference save itself is at **131 cycles** after weeks of play.
+
+### The new ladder
+
+| Category | Tiers |
+|---|---|
+| ♻️ Cycles | 100 · 250 · 500 · 1,000 · **2,500** |
+| ⚙️ Restarted alone | 250 · 500 · 1,000 · **2,500** |
+
+Still 96 achievements, still nine more than 3.6.x. No tier is a hundred times the
+last, so the bars stay linear.
+
+### A clean-up this made necessary
+
+`achMult()` counts the **keys of `S.achs`**, not the entries of `ACHS`: a removed
+id would keep granting its +1 % and the multiplier would no longer match the
+"X / 96" shown beside it. This is the first version to remove ids (`a_pr10k`,
+`a_pr100k`, `a_pr1M`, `a_acyc10k`, `a_acyc100k`, `a_acyc1M`, none of which ever
+reached a published save), hence `purgeAchs()` on load, alongside
+`purgePauses()`.
+
+`t_cyc` gains four assertions: the exact ladder, no tier beyond 2,500, removed
+ids erased, and the multiplier landing right again.
+
+---
+
+## 3.7.1 — Breakthroughs first
+
+Breakthroughs now sit **above** the researches, right under the cycle panel,
+instead of being pushed to the very bottom of the tab.
+
+They only open once all **eight researches are maxed**. By then the research list
+is a wall of "MAX" cards with nothing left to buy — and yet it was that list you
+had to scroll all the way past to reach the one tier still alive, the one where
+antimatter is still good for something. Nothing is lost by moving the researches
+down: at the bottom they are in nobody's way.
+
+Blocks moved in the `#pPr` template, nothing else. Since `syncList()` works in
+place, the order of the render code has no effect on the DOM; it was aligned with
+what you see anyway. While Breakthroughs are closed, `#percList` has zero height
+and the Laboratory heading stays tucked under the cycle panel at 22 px —
+measured, no gap added.
+
+`t_perc` gains five assertions: DOM order, on-screen order, the cycle panel still
+on top, and no gap when the tier is closed.
+
+---
+
+## 3.7.0 — Room to count
+
+Since 3.6.2, a save that spends its antimatter runs at **several hundred cycles
+an hour**. Two displays had never been written for that.
+
+### The cycle number and the bonus move to the game's scale
+
+| | Before | After |
+|---|---|---|
+| Under the ANTIMATTER tile | `cycle #3200000` | `cycle #3.20M` |
+| Research panel | `×146785797934.3` | `×70.1M` |
+
+Both interpolated their raw number. The tile's sub-line already truncated at
+320 px with three digits; at seven it gave up. `fmt()` reaches `Td` (10⁴⁵), so
+there is no ceiling behind it.
+
+The multiplier keeps its decimal below a thousand — `xfmt()` defers to `mfmt()`
+while `v < 1000`, otherwise an anomaly buff at ×1.5 would have shown as ×1. Buffs
+themselves still go through `mfmt()` alone.
+
+### Nine more achievements, 96 in all
+
+The ladder stopped at **25 cycles** and **100 automatic restarts** — figures set
+when a cycle lasted hundreds of hours. There was nothing left to aim for.
+
+| Category | New tiers |
+|---|---|
+| ♾️ Cycles | 100, 1,000, 10,000, 100,000, 1 M |
+| ⚙️ Automation | 1,000, 10,000, 100,000, 1 M restarted alone |
+
+Progress bars follow with nothing extra to declare: the family is derived from
+the measure function, and no tier is a hundred times the last, so they stay
+linear.
+
+### A test was passing while failing
+
+`t_e2e` had been failing **since 3.4.0** — eleven assertions about the
+Foreman/Engineer exclusivity removed in that version. Nobody saw it: the script
+did not end with `process.exit(ko?1:0)`, so it exited 0 no matter what, and the
+runner only read the exit code.
+
+The runner now reads **the log as well**: one written `ÉCHEC` fails the test
+whatever the exit code. `t_e2e`'s assertions are rewritten against the real
+behaviour (both automations run together, independent switches, no lock), and a
+twelfth checks that the two together buy upgrades *and* structures.
+
+Worth knowing: six tests (`t_upcats`, `t52`, `t7`, `t_contre3`, `t_mob24`,
+`t62`) assert nothing — they print values to be read. They can only fail if the
+page throws. The count of 35 therefore covers two kinds of test.
+
+One more test (`t_cyc`, 35 in all): the formatting of both displays, the
+switchover exactly at a thousand, the nine tiers and their bars, and a pre-3.7.0
+save.
+
+Saves remain compatible both ways.
+
+---
+
+## 3.6.2 — The threshold follows the pocket
+
+In 3.6.0 the restart threshold counted the antimatter poured into Breakthroughs
+(`S.am + S.percAm`), so that spending could not shorten cycles by sleight of
+hand. The reasoning held; the save that came out of it did not.
+
+### What happened
+
+One save bought **61 levels** — Compression 20, Reactor 15, Standby 14, Cascade
+12 — pouring in 184.8 M antimatter. The pocket fell from **162.8 M to 4.8 M**,
+and the multiplier with it; the threshold did not move an inch. The player paid
+twice.
+
+| | Pocket | Threshold | Cycle |
+|---|---:|---:|---:|
+| Before Breakthroughs | 162.8 M | 16.3 M | **542 h** |
+| After 61 levels, 3.6.0 rule | 4.8 M | 19.0 M | **4,449 h** |
+| After 61 levels, 3.6.2 rule | 4.8 M | 0.48 M | **1.3 min** |
+
+3.6.1 answered by printing the trade-off on every card and adding a dismantle
+button. Two correct additions, and two additions too many: a player should not
+have to arbitrate a formula by hand.
+
+### The rule
+
+`cycSeuil()` now reads `S.am` and nothing else. **The same number pays for
+Breakthroughs and sets the target**, so overspending corrects itself: the pocket
+falls, the threshold falls with it, the cycle shortens. There is no trap left to
+signal, so there is nothing left to display — 3.6.1 is reverted in full.
+
+`S.percAm` is still kept up to date: three achievements read it and the
+Statistics tab shows it. It no longer enters any balance calculation.
+
+### What it costs, knowingly
+
+Spending shortens cycles, so holding antimatter is no longer a strategy. Measured
+on the reference save at constant Breakthrough levels, income follows
+`pocket^−0.83`:
+
+| Pocket | Threshold | Cycle | AM / hour |
+|---:|---:|---:|---:|
+| 162.8 M (100 %) | 16.3 M | 542 h | 30,000 |
+| 40.7 M (25 %) | 4.1 M | 45.7 h | 89,000 |
+| 1.6 M (1 %) | 163 k | 8.8 min | 1,108,000 |
+
+The **1.15-per-level** ladder therefore carries the tension on its own: emptying
+your pocket means buying ever more expensive levels, and every one of them pays.
+The "1 T poured" achievement becomes the horizon, in place of the multiplier.
+
+Saves remain compatible both ways. An overspent 3.6.0 save unblocks itself on
+open, with nothing to do.
+
+---
+
+## 3.6.0 — Breakthroughs
+
+With the eight researches maxed, antimatter had a single outlet left: a
+multiplier that applies itself. Measured on a save with **92.9 M antimatter and
+96 cycles** — a **105-hour** cycle for a gain of 9.29 M, and not one decision
+left to make.
+
+### A second research tier, with no ceiling
+
+Opened once the eight researches are maxed. Unlimited levels, paid in antimatter,
+kept from one cycle to the next, **+15 % per level** like structures.
+
+| Line | Effect per level | 1st level |
+|---|---|---:|
+| 🜛 **Compression** | antimatter gain **+4 %** | 1 M |
+| ⚛️ **Reactor** | output **+10 %** | 1 M |
+| 🛰️ **Extended standby** | offline **+2 h** | 0.5 M |
+| ✴️ **Cascade** | ore from anomalies **+5 %** | 0.5 M |
+
+Compression looks tiny at +4 %, but it acts on the restart threshold to the power
+3.33: it is what breaks the late-game wall. On the reference save the first pass
+buys 11 Compression and 9 Reactor, spends 41 M out of 92.9, and takes the cycle
+from **105 h to 25.5 h** — with no purchase costing more than 7 % of the pocket.
+
+### The restart threshold counts the antimatter poured in
+
+> **Reverted in 3.6.2** — the threshold now reads only the antimatter in hand.
+> What follows describes the rule as it shipped in 3.6.0.
+
+`cycSeuil()` now reads `S.am + S.percAm`. Without that, buying would empty the
+pocket, lower the threshold and shorten the cycle: measured, **emptying the
+pocket took a cycle from 105 h to 4 minutes and multiplied income by 125**.
+Spending would have become the best move in the game, permanently — and not
+because of what was bought: *a Breakthrough with no effect at all would have
+accelerated the game just as much.*
+
+The multiplier still reads only the antimatter **held**: buying really does cost
+output, like a research. `S.percAm` is 0 on every earlier save: **the threshold
+there is rigorously unchanged.**
+
+### The ladder, against intuition
+
+Three ladders simulated. A steeper one makes you spend **less**, because a level
+stops being worth buying as soon as it costs more than ~8 % of the pocket — the
+output lost then exceeds the bonus — and a steep ladder reaches that point after
+fewer levels.
+
+| Ladder | Poured on first pass | Share poured at 8 months | Cycle at 8 months |
+|---|---:|---:|---:|
+| **+15 %** | **41 M** | **52 %** | **167 h** |
+| +30 % | 30 M | 37 % | 624 h |
+| +50 % | 21 M | 26 % | 801 h |
+
+Over eight simulated months, multiplying antimatter by 155 multiplied a cycle's
+length by **11,700** without Breakthroughs, by **4.6** with them.
+
+### Nine achievements, and pinning
+
+- 🜛 **A tenth achievement category**, 9 entries: 1, 10, 25 and 50 levels, all
+  four lines started, 20 levels in a single one, then 100 M, 1 G and 1 T of
+  antimatter poured. 87 achievements in all.
+- 📌 **Three pinned achievements** at most show in a permanent strip **above the
+  tabs** — the same place as the challenge banner, so in view whatever tab is
+  open — and in a section at the top of the Achievements tab. Tapping a chip
+  opens Achievements, tapping its pin removes it, and an achievement once earned
+  unpins itself.
+- 📊 **The bar scale is corrected**: it reads from the previous tier only for
+  exponential families. On "25 breakthrough levels", 3 levels now show 12 %
+  rather than 0 %.
+- 📊 **Two statistics tiles**: breakthrough levels, antimatter poured.
+- 🧪 **One more test** (`t_perc`, 34 in all): the tier opening, the ladder, what
+  moves and what does not on a purchase, each line's effect, the
+  `amGain`/`amMinerai` round trip with Compression, survival across a cycle, the
+  block during a challenge, pinning, and a 3.5.0 save.
+
+No existing balance value touched.
+
+---
+
 ## 3.5.0 — Achievement progress
 
 An achievement still to be earned now carries a **bar and two figures** —
