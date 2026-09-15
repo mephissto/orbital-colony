@@ -17,32 +17,39 @@ restent valides**.
 
 ---
 
-## 3.7.9 — La barre d'état, enfin
+## 3.7.10 — La bande du bas, sans réinstaller
 
-En application installée sur iPhone, une bande de fond restait en bas de
-l'écran : **62 px sur un 16 Pro Max**, soit exactement la hauteur de la barre
-d'état.
+La bande de fond en bas de l'écran sur iPhone venait d'une barre d'état déclarée
+**translucide** : iOS dessine alors la page *sous* la barre mais annonce une
+hauteur qui l'*exclut* — `innerHeight` 894 pour un écran de 956, d'où 62 px de
+vide en bas.
 
-Le jeu déclarait `apple-mobile-web-app-status-bar-style:black-translucent`. iOS
-dessine alors la page **sous** la barre d'état, mais annonce une hauteur qui
-l'**exclut** : `innerHeight` vaut 894 pour un écran de 956. La page se posait en
-haut et laissait le reste vide.
+La 3.7.9 avait corrigé la déclaration. **Sans effet** : iOS fige ces réglages au
+moment où l'icône est posée sur l'écran d'accueil. Une installation existante
+garde l'ancien tant qu'on ne la supprime pas pour la refaire — corriger le HTML
+ne suffit donc pas.
 
-La 3.7.8 avait figé la hauteur en pixels durs (`--appH`, posée depuis
-`innerHeight`) pour écarter tout calcul CSS. La bande est restée identique au
-pixel près — ce qui désignait le coupable : la hauteur annoncée elle-même. La
-balise vaut maintenant `black`, iOS pose la vue sous la barre, et `innerHeight`
-correspond à ce qui est réellement dessinable.
+Le jeu reconnaît maintenant la situation lui-même :
 
-`viewport-fit=cover` reste : les marges latérales en paysage et celle de la barre
-d'accueil en dépendent toujours. Le travail de la 3.7.8 reste aussi — hauteur
-mesurée et marge sûre du bas sous la liste — il était juste insuffisant seul.
+```js
+function hauteurUtile(){
+  const h=window.innerHeight;
+  if(!estInstallee())return h;
+  const ecran=screen.height, top=satTop();
+  if(ecran&&top>0&&Math.abs(ecran-h-top)<=2)return ecran;
+  return h;
+}
+```
 
-### Un instrument, en développement seulement
+Les trois conditions doivent être réunies — application installée, marge sûre en
+haut non nulle, et écart entre l'écran et la fenêtre valant *exactement* cette
+marge. C'est une signature, pas une heuristique : ailleurs, la hauteur annoncée
+est respectée telle quelle. En paysage, `screen.height` suit l'orientation sur
+iOS moderne, l'écart ne correspond plus et le rattrapage ne s'applique pas.
 
-Il aura fallu trois versions pour établir un nombre que personne ne pouvait lire.
-Le pied du menu affiche désormais la géométrie réelle en version de
-développement : `440×894 · écran 440×956 · sûr 62/34 · PWA`. Rien en production.
+`t_haut` rejoue les cinq situations : PWA iOS translucide (rattrapée), PWA saine,
+PWA Android, navigateur non installé, et un écart qui ne colle pas à la marge —
+seule la première est corrigée.
 
 ---
 

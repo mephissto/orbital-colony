@@ -1319,7 +1319,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.9";
+const VERSION="3.7.10";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1371,7 +1371,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Correctif d'affichage : en application installée sur iPhone, une bande de fond restait en bas de l'écran. iOS dessinait la page sous la barre d'état tout en annonçant une hauteur qui l'excluait — 894 px pour un écran de 956. La barre d'état n'est plus déclarée translucide : la page occupe exactement ce qu'iOS lui donne.",
+  wn_d:"La bande noire en bas de l'écran sur iPhone est rattrapée <b>sans réinstaller</b> le jeu. iOS fige le réglage de la barre d'état au moment où l'icône est posée sur l'écran d'accueil : corriger la page ne suffisait pas. Le jeu détecte maintenant le décalage — écran plus haut que la fenêtre annoncée, d'exactement la hauteur de la barre — et occupe l'écran entier.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1547,7 +1547,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"Display fix: in the installed app on iPhone, a band of background was left at the bottom of the screen. iOS was drawing the page under the status bar while reporting a height that excluded it — 894 px for a 956 px screen. The status bar is no longer declared translucent: the page now fills exactly what iOS gives it.",
+  wn_d:"The black band at the bottom of the screen on iPhone is now corrected <b>without reinstalling</b> the game. iOS freezes the status-bar setting when the icon is added to the home screen, so fixing the page was not enough. The game now detects the mismatch — screen taller than the reported window by exactly the bar's height — and fills the whole screen.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3092,9 +3092,33 @@ const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
 
 /* innerHeight, et surtout pas visualViewport.height : ce dernier rétrécit
    quand le clavier s'ouvre (seuil de relance, export/import), et l'application
-   sauterait à chaque saisie. innerHeight, lui, ne bouge pas pour le clavier. */
+   sauterait à chaque saisie. innerHeight, lui, ne bouge pas pour le clavier.
+
+   Sauf qu'iOS ment dans un cas précis. Avec une barre d'état déclarée
+   translucide, il dessine la vue SOUS la barre mais annonce une hauteur qui
+   l'exclut : innerHeight 894 pour un écran de 956, d'où 62 px de fond en bas.
+   La 3.7.9 a corrigé la déclaration — mais iOS fige ces balises AU MOMENT DE
+   L'INSTALLATION : une icône déjà posée sur l'écran d'accueil garde l'ancien
+   réglage tant qu'on ne la supprime pas pour la réinstaller. Corriger le HTML
+   ne suffit donc pas pour les installations existantes.
+
+   D'où le rattrapage ci-dessous. Il ne se déclenche que sur une signature
+   exacte — application installée, marge sûre en haut non nulle, et écart entre
+   l'écran et la fenêtre qui vaut précisément cette marge. Trois conditions
+   réunies, c'est ce cas-là et rien d'autre ; sinon on garde innerHeight tel
+   quel. En paysage, screen.height suit l'orientation sur iOS moderne : l'écart
+   ne correspond plus et le rattrapage ne s'applique pas. */
+function hauteurUtile(){
+  const h=window.innerHeight;
+  const pwa=matchMedia("(display-mode: standalone)").matches
+            ||navigator.standalone===true;
+  if(!pwa)return h;
+  const ecran=(window.screen&&window.screen.height)||0, top=satTop();
+  if(ecran&&top>0&&Math.abs(ecran-h-top)<=2)return ecran;
+  return h;
+}
 function syncAppH(){
-  const h=Math.round(window.innerHeight);
+  const h=Math.round(hauteurUtile());
   if(!h)return;
   const v=h+"px";
   if(document.documentElement.style.getPropertyValue("--appH")!==v)
@@ -4289,9 +4313,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
- {v:"3.7.9", nm:{fr:"La barre d'état, enfin",en:"The status bar, at last"},
-  d:{fr:"En application installée sur iPhone, une bande de fond restait en bas de l'écran, haute de 62 px sur un 16 Pro Max. Le jeu déclarait sa barre d'état translucide : iOS dessine alors la page SOUS la barre, mais annonce une hauteur qui l'exclut — 894 px pour un écran de 956. La page se posait donc en haut et laissait le reste vide. La 3.7.8 avait figé la hauteur en pixels durs pour écarter tout calcul CSS ; la bande est restée identique au pixel près, ce qui a désigné le coupable. La barre d'état n'est plus déclarée translucide : la page occupe exactement ce qu'iOS lui donne. En version de développement, le pied du menu affiche désormais la géométrie réelle de la fenêtre — il a fallu trois versions pour établir un nombre que personne ne pouvait lire.",
-     en:"In the installed app on iPhone, a band of background was left at the bottom of the screen, 62 px tall on a 16 Pro Max. The game declared its status bar translucent: iOS then draws the page UNDER the bar but reports a height that excludes it — 894 px for a 956 px screen. The page sat at the top and left the rest empty. 3.7.8 had pinned the height to hard pixels to rule out any CSS computation; the band stayed identical to the pixel, which named the culprit. The status bar is no longer declared translucent: the page fills exactly what iOS gives it. In development builds the menu footer now shows the window's real geometry — it took three versions to establish a number nobody could read."}},
+ {v:"3.7.10", nm:{fr:"La bande du bas, sans réinstaller",en:"The bottom band, without reinstalling"},
+  d:{fr:"La bande de fond en bas de l'écran, sur iPhone, venait d'une barre d'état déclarée translucide : iOS dessine alors la page SOUS la barre mais annonce une hauteur qui l'exclut — 894 px pour un écran de 956. La 3.7.9 avait corrigé la déclaration, sans effet : iOS fige ces réglages AU MOMENT OÙ L'ICÔNE EST POSÉE sur l'écran d'accueil, et une installation existante garde l'ancien. Le jeu reconnaît donc maintenant la situation lui-même — application installée, marge sûre en haut non nulle, et écran plus haut que la fenêtre d'exactement cette marge — et occupe l'écran entier. Rien à réinstaller. Les trois conditions doivent être réunies : ailleurs, la hauteur annoncée est respectée telle quelle.",
+     en:"The band of background at the bottom of the screen on iPhone came from a status bar declared translucent: iOS then draws the page UNDER the bar but reports a height that excludes it — 894 px for a 956 px screen. 3.7.9 fixed the declaration to no effect: iOS freezes those settings WHEN THE ICON IS ADDED to the home screen, and an existing install keeps the old one. So the game now recognises the situation itself — installed app, non-zero top safe area, and a screen taller than the window by exactly that inset — and fills the whole screen. Nothing to reinstall. All three conditions must hold: anywhere else, the reported height is used as is."}},
  {v:"3.7.6", nm:{fr:"Le résumé couvre toute la mise à jour",en:"The summary covers the whole update"},
   d:{fr:"La 3.5.0 était encore en ligne : ceux qui reviennent sautent huit versions d'un coup. Le panneau Nouveautés ne parlait que du dernier correctif, ce qui n'apprenait rien à personne. Il résume maintenant l'ensemble — les Percées, le seuil de relance calé sur l'antimatière en poche, les succès épinglés et les dix-huit succès ajoutés. Le détail version par version reste juste en dessous.",
      en:"3.5.0 was still the live version: anyone coming back jumps eight versions at once. The What's new panel only described the latest fix, which told nobody anything. It now sums up the whole thing — Breakthroughs, the restart threshold tied to the antimatter in hand, pinned achievements and the eighteen achievements added. The version-by-version detail is still right below it."}},

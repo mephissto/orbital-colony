@@ -16,30 +16,38 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
-## 3.7.9 — The status bar, at last
+## 3.7.10 — The bottom band, without reinstalling
 
-In the installed app on iPhone, a band of background was left at the bottom of
-the screen: **62 px on a 16 Pro Max**, exactly the height of the status bar.
+The band of background at the bottom of the screen on iPhone came from a status
+bar declared **translucent**: iOS then draws the page *under* the bar but reports
+a height that *excludes* it — `innerHeight` 894 for a 956 px screen, hence 62 px
+of empty space at the bottom.
 
-The game declared `apple-mobile-web-app-status-bar-style:black-translucent`. iOS
-then draws the page **under** the status bar but reports a height that
-**excludes** it: `innerHeight` is 894 for a 956 px screen. The page sat at the top
-and left the rest empty.
+3.7.9 fixed the declaration. **To no effect**: iOS freezes those settings when
+the icon is added to the home screen. An existing install keeps the old one until
+it is removed and re-added — so fixing the HTML is not enough.
 
-3.7.8 had pinned the height to hard pixels (`--appH`, set from `innerHeight`) to
-rule out any CSS computation. The band stayed identical to the pixel — which
-named the culprit: the reported height itself. The tag is now `black`, iOS lays
-the view below the bar, and `innerHeight` matches what is actually drawable.
+The game now recognises the situation itself:
 
-`viewport-fit=cover` stays: the side insets in landscape and the home-indicator
-inset still depend on it. 3.7.8's work stays too — measured height and bottom
-safe area under the list — it was simply not enough on its own.
+```js
+function hauteurUtile(){
+  const h=window.innerHeight;
+  if(!isInstalled())return h;
+  const screenH=screen.height, top=satTop();
+  if(screenH&&top>0&&Math.abs(screenH-h-top)<=2)return screenH;
+  return h;
+}
+```
 
-### An instrument, in development builds only
+All three conditions must hold — installed app, non-zero top safe area, and a
+screen taller than the window by *exactly* that inset. It is a signature, not a
+heuristic: anywhere else the reported height is used as is. In landscape,
+`screen.height` follows the orientation on modern iOS, the gap no longer matches
+and the correction does not apply.
 
-It took three versions to establish a number nobody could read. The menu footer
-now shows the window's real geometry in development builds:
-`440×894 · screen 440×956 · safe 62/34 · PWA`. Nothing in production.
+`t_haut` replays the five situations: translucent iOS PWA (corrected), healthy
+PWA, Android PWA, browser not installed, and a gap that does not match the inset
+— only the first is changed.
 
 ---
 
