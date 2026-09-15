@@ -17,6 +17,80 @@ restent valides**.
 
 ---
 
+## 3.7.8 — Une hauteur mesurée
+
+En application installée sur iOS, une bande de fond restait en bas de l'écran.
+
+### La mesure
+
+Capture d'un **iPhone 16 Pro Max** (440 × 956 css), liste défilée jusqu'en bas,
+contre le même état rendu ici :
+
+| | Bas de la dernière carte | Vide en dessous |
+|---|---:|---:|
+| Sur l'appareil | 894 css | **62 css** |
+| Rendu de référence | 936 css | 20 css *(12 de padding + 8 de marge)* |
+
+**62 px est exactement la marge sûre HAUTE de cet appareil.** Le vide en bas
+valait la hauteur de l'encoche en haut : l'application était peinte trop haut,
+d'une hauteur d'encoche.
+
+### La cause, et pourquoi aucune unité CSS ne la règle vraiment
+
+`html`, `body` et `#app` prenaient leur hauteur en **pourcentage**. Un
+pourcentage se résout contre son parent — dont la hauteur peut elle-même être
+fausse. `dvh` déplace le problème sans le supprimer : il faut que le navigateur
+le connaisse (Safari 15.4, Chrome 108) *et* qu'il déclare la bonne fenêtre.
+
+Une **hauteur en pixels** ne peut être mal résolue nulle part. Elle est mesurée
+et posée par le script :
+
+```js
+function syncAppH(){
+  const h=Math.round(window.innerHeight);
+  if(!h)return;
+  document.documentElement.style.setProperty("--appH",h+"px");
+}
+```
+
+`innerHeight`, et surtout pas `visualViewport.height` : ce dernier rétrécit quand
+le clavier s'ouvre (seuil de relance, export/import) et l'application sauterait à
+chaque saisie. Remesuré au redimensionnement, au `pageshow`, à la rotation — en
+trois temps, la hauteur ne se stabilisant pas immédiatement — et à 60, 250 et
+800 ms après le lancement, iOS annonçant parfois une valeur périmée au démarrage.
+
+La cascade garde deux replis, le dernier compris l'emportant :
+
+```css
+html,body{height:100%;height:100dvh;height:var(--appH,100dvh)}
+```
+
+1. `100%` — partout, y compris avant que le script tourne ;
+2. `100dvh` — évite un saut au premier rendu sur les navigateurs récents ;
+3. `var(--appH,…)` — la mesure.
+
+Un navigateur sans `dvh` ignore les deux dernières et garde exactement le
+comportement d'avant.
+
+### La marge sûre du bas
+
+`#panels` n'en réservait aucune : la dernière carte finissait à 12 px du bord,
+donc partiellement sous la barre d'accueil. Son padding bas vaut désormais
+`calc(12px + env(safe-area-inset-bottom))` — soit 12 px inchangés sur un appareil
+sans encoche.
+
+### Ce qui est vérifiable ici, et ce qui ne l'est pas
+
+`t_haut` (36ᵉ test) vérifie sur six tailles d'écran que `--appH` vaut exactement
+`innerHeight` et que `#app` atteint le bas de la fenêtre, qu'un redimensionnement
+et une rotation sont suivis, que la cascade des trois hauteurs est intacte dans
+la source, et que le padding reste à 12 px sans encoche.
+
+Ce que Chromium ne peut pas rejouer : l'encoche et la barre d'état translucide.
+Seul un appareil réel confirme la disparition de la bande.
+
+---
+
 ## 3.7.6 — Le résumé couvre toute la mise à jour
 
 La **3.5.0** était encore en ligne. Ceux qui reviennent sautent donc huit

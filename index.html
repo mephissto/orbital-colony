@@ -61,7 +61,24 @@ html,body,main,#hero,#panels,#right{touch-action:manipulation}
    descendre sous le doigt. overscroll-behavior évite d'enchaîner sur le geste
    « page précédente » du navigateur en bout de course. */
 nav{touch-action:pan-x;overscroll-behavior-x:contain}
-html,body{height:100%;overscroll-behavior:none}
+/* La hauteur de l'application est MESURÉE, jamais déduite d'un pourcentage
+   (3.7.8). En PWA installée sur iOS, avec viewport-fit=cover et une barre d'état
+   translucide, `100%` se résout contre une hauteur décalée de celle de
+   l'encoche : l'application est peinte trop haut et il reste une bande de fond
+   en bas. Mesuré sur un 16 Pro Max (440 × 956) : 62 px de vide sous la dernière
+   carte au lieu des 20 attendus — soit exactement la marge sûre du haut.
+
+   Une hauteur en pixels ne peut pas être mal résolue, quel que soit l'appareil :
+   `--appH` est posée par syncAppH() à partir de innerHeight. Les trois
+   déclarations forment une cascade, la dernière que le navigateur comprend
+   l'emportant :
+     1. `100%`             — partout, y compris avant que le script tourne ;
+     2. `100dvh`           — dès Safari 15.4 / Chrome 108, évite un saut au
+                             premier rendu sur les navigateurs récents ;
+     3. `var(--appH,…)`    — la mesure, dès que le script a tourné.
+   Un navigateur sans `dvh` ignore les deux dernières et garde `100%`. */
+html,body{height:100%;height:100dvh;height:var(--appH,100dvh);
+  overscroll-behavior:none}
 body{
   margin:0;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
   background:var(--bg);color:var(--txt);overflow:hidden;
@@ -76,7 +93,9 @@ textarea{-webkit-user-select:text;user-select:text}
   radial-gradient(900px 600px at 10% 110%, rgba(79,216,255,.09), transparent 60%);
 }
 #starcanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
-#app{position:relative;z-index:2;height:100%;display:flex;flex-direction:column}
+#app{position:relative;z-index:2;
+  height:100%;height:100dvh;height:var(--appH,100dvh);
+  display:flex;flex-direction:column}
 
 /* ---------- HEADER ---------- */
 header{
@@ -979,7 +998,10 @@ a.hbtn{text-decoration:none}
     border-bottom:1px solid var(--line)}
   #stickyhead nav{border-bottom:none}
   nav{padding:6px 10px 0;gap:2px}
-  #panels{padding:12px 10px}
+  /* La marge sûre du bas (barre d'accueil iPhone, barre de gestes Android)
+     s'ajoute SOUS la liste : sans elle la dernière carte finit à 12 px du bord,
+     donc en partie dessous. Vaut 0 sur un appareil qui n'en a pas. */
+  #panels{padding:12px 10px calc(12px + env(safe-area-inset-bottom))}
   #buyRow{margin:-12px -10px 12px;padding:12px 10px 9px}
   .card{grid-template-columns:32px minmax(0,1fr) auto;gap:9px;padding:10px 11px}
   .acard{grid-template-columns:32px minmax(0,1fr) auto;gap:8px}
@@ -1286,7 +1308,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.6";
+const VERSION="3.7.8";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1338,7 +1360,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Les <b>Percées</b> : un second étage de recherche sans plafond, ouvert quand les huit recherches sont au maximum, payé en antimatière et gardé d'un cycle à l'autre. Dépenser raccourcit tes cycles — le seuil de relance suit l'antimatière en poche. On peut aussi <b>épingler</b> trois succès, affichés en permanence au-dessus des onglets. Et 18 succès de plus : 96 en tout.",
+  wn_d:"Correctif d'affichage : en application installée, une bande de fond pouvait rester en bas de l'écran. La hauteur de la page est maintenant <b>mesurée</b> au lieu d'être déduite d'un pourcentage — un nombre de pixels ne peut pas être mal calculé, quel que soit l'appareil. La marge sûre du bas est aussi réservée sous la liste.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1514,7 +1536,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"<b>Breakthroughs</b>: a second research tier with no ceiling, opening once all eight researches are maxed, paid in antimatter and kept from one cycle to the next. Spending shortens your cycles — the restart threshold follows the antimatter in hand. You can also <b>pin</b> three achievements, on screen above the tabs. And 18 more achievements: 96 in all.",
+  wn_d:"Display fix: in the installed app a band of background could be left at the bottom of the screen. The page height is now <b>measured</b> instead of derived from a percentage — a number of pixels cannot be resolved wrongly, on any device. The bottom safe-area inset is reserved under the list too.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3040,6 +3062,27 @@ $("#rock").addEventListener("pointerdown",e=>doTap(e.clientX,e.clientY));
    pile pareil partout : sur un autre navigateur/OS, l'en-tête réel est un
    peu plus ou moins haut, et l'écart laissait un espace (ou un recouvrement)
    visible entre le bandeau et la planète. On mesure, un point c'est tout. */
+/* innerHeight, et surtout pas visualViewport.height : ce dernier rétrécit
+   quand le clavier s'ouvre (seuil de relance, export/import), et l'application
+   sauterait à chaque saisie. innerHeight, lui, ne bouge pas pour le clavier. */
+function syncAppH(){
+  const h=Math.round(window.innerHeight);
+  if(!h)return;
+  const v=h+"px";
+  if(document.documentElement.style.getPropertyValue("--appH")!==v)
+    document.documentElement.style.setProperty("--appH",v);
+}
+syncAppH();
+addEventListener("resize",syncAppH);
+addEventListener("pageshow",syncAppH);
+/* Une rotation change la hauteur en plusieurs temps sur mobile : on remesure
+   après coup. Même raison au démarrage — iOS annonce parfois une hauteur
+   périmée dans les premières centaines de millisecondes après le lancement. */
+addEventListener("orientationchange",()=>{
+  syncAppH(); [120,400].forEach(d=>setTimeout(syncAppH,d));
+});
+[60,250,800].forEach(d=>setTimeout(syncAppH,d));
+
 function syncHeaderH(){
   const h=Math.round($("header").getBoundingClientRect().height);
   document.documentElement.style.setProperty("--headerH",h+"px");
@@ -4218,6 +4261,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.8", nm:{fr:"Une hauteur mesurée",en:"A measured height"},
+  d:{fr:"En application installée, une bande de fond pouvait rester en bas de l'écran. La hauteur de la page était donnée en pourcentage, et un pourcentage se résout contre un parent — dont la hauteur peut elle-même être fausse. Mesuré sur un 16 Pro Max : 62 px de vide sous la dernière carte au lieu des 20 attendus, soit exactement la marge sûre du haut de cet appareil. La hauteur est désormais mesurée en pixels et posée par le script, remesurée à chaque redimensionnement et à chaque rotation : un nombre de pixels ne peut pas être mal résolu, sur aucun appareil. La marge sûre du bas est en plus réservée sous la liste, pour que la dernière carte ne finisse pas sous la barre d'accueil.",
+     en:"In the installed app, a band of background could be left at the bottom of the screen. The page height was given as a percentage, and a percentage resolves against a parent — whose own height may be wrong. Measured on a 16 Pro Max: 62 px of empty space under the last card instead of the expected 20, exactly that device's top safe-area inset. Height is now measured in pixels and set by the script, re-measured on every resize and rotation: a number of pixels cannot be resolved wrongly, on any device. The bottom safe-area inset is also reserved under the list, so the last card does not end up under the home indicator."}},
  {v:"3.7.6", nm:{fr:"Le résumé couvre toute la mise à jour",en:"The summary covers the whole update"},
   d:{fr:"La 3.5.0 était encore en ligne : ceux qui reviennent sautent huit versions d'un coup. Le panneau Nouveautés ne parlait que du dernier correctif, ce qui n'apprenait rien à personne. Il résume maintenant l'ensemble — les Percées, le seuil de relance calé sur l'antimatière en poche, les succès épinglés et les dix-huit succès ajoutés. Le détail version par version reste juste en dessous.",
      en:"3.5.0 was still the live version: anyone coming back jumps eight versions at once. The What's new panel only described the latest fix, which told nobody anything. It now sums up the whole thing — Breakthroughs, the restart threshold tied to the antimatter in hand, pinned achievements and the eighteen achievements added. The version-by-version detail is still right below it."}},

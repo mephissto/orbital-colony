@@ -16,6 +16,80 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.8 — A measured height
+
+In the installed app on iOS, a band of background was left at the bottom of the
+screen.
+
+### The measurement
+
+A screenshot from an **iPhone 16 Pro Max** (440 × 956 css), list scrolled to the
+end, against the same state rendered here:
+
+| | Bottom of the last card | Empty space below |
+|---|---:|---:|
+| On the device | 894 css | **62 css** |
+| Reference render | 936 css | 20 css *(12 padding + 8 margin)* |
+
+**62 px is exactly that device's TOP safe-area inset.** The gap at the bottom was
+the height of the notch at the top: the app was painted one notch too high.
+
+### The cause, and why no CSS unit really settles it
+
+`html`, `body` and `#app` took their height as a **percentage**. A percentage
+resolves against its parent — whose own height may be wrong. `dvh` moves the
+problem without removing it: the browser has to know the unit (Safari 15.4,
+Chrome 108) *and* report the right window.
+
+A **height in pixels** cannot be resolved wrongly anywhere. It is measured and
+set by the script:
+
+```js
+function syncAppH(){
+  const h=Math.round(window.innerHeight);
+  if(!h)return;
+  document.documentElement.style.setProperty("--appH",h+"px");
+}
+```
+
+`innerHeight`, and emphatically not `visualViewport.height`: the latter shrinks
+when the keyboard opens (restart threshold, export/import) and the app would jump
+on every keystroke. Re-measured on resize, on `pageshow`, on rotation — in three
+steps, since the height does not settle at once — and at 60, 250 and 800 ms after
+launch, iOS sometimes reporting a stale value at startup.
+
+The cascade keeps two fallbacks, the last understood one winning:
+
+```css
+html,body{height:100%;height:100dvh;height:var(--appH,100dvh)}
+```
+
+1. `100%` — everywhere, including before the script runs;
+2. `100dvh` — avoids a jump on the first paint in recent browsers;
+3. `var(--appH,…)` — the measurement.
+
+A browser without `dvh` ignores the last two and keeps exactly the previous
+behaviour.
+
+### The bottom safe area
+
+`#panels` reserved none: the last card ended 12 px from the edge, so partly under
+the home indicator. Its bottom padding is now
+`calc(12px + env(safe-area-inset-bottom))` — 12 px unchanged on a device without
+an inset.
+
+### What can be verified here, and what cannot
+
+`t_haut` (36th test) checks across six screen sizes that `--appH` equals
+`innerHeight` exactly and that `#app` reaches the bottom of the window, that a
+resize and a rotation are followed, that the three-height cascade is intact in
+the source, and that the padding stays at 12 px without an inset.
+
+What Chromium cannot replay: the notch and the translucent status bar. Only a
+real device confirms the band is gone.
+
+---
+
 ## 3.7.6 — The summary covers the whole update
 
 **3.5.0** was still live. Anyone coming back jumps eight versions at once, and
