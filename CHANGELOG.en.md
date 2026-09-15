@@ -16,77 +16,30 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
-## 3.7.8 — A measured height
+## 3.7.9 — The status bar, at last
 
-In the installed app on iOS, a band of background was left at the bottom of the
-screen.
+In the installed app on iPhone, a band of background was left at the bottom of
+the screen: **62 px on a 16 Pro Max**, exactly the height of the status bar.
 
-### The measurement
+The game declared `apple-mobile-web-app-status-bar-style:black-translucent`. iOS
+then draws the page **under** the status bar but reports a height that
+**excludes** it: `innerHeight` is 894 for a 956 px screen. The page sat at the top
+and left the rest empty.
 
-A screenshot from an **iPhone 16 Pro Max** (440 × 956 css), list scrolled to the
-end, against the same state rendered here:
+3.7.8 had pinned the height to hard pixels (`--appH`, set from `innerHeight`) to
+rule out any CSS computation. The band stayed identical to the pixel — which
+named the culprit: the reported height itself. The tag is now `black`, iOS lays
+the view below the bar, and `innerHeight` matches what is actually drawable.
 
-| | Bottom of the last card | Empty space below |
-|---|---:|---:|
-| On the device | 894 css | **62 css** |
-| Reference render | 936 css | 20 css *(12 padding + 8 margin)* |
+`viewport-fit=cover` stays: the side insets in landscape and the home-indicator
+inset still depend on it. 3.7.8's work stays too — measured height and bottom
+safe area under the list — it was simply not enough on its own.
 
-**62 px is exactly that device's TOP safe-area inset.** The gap at the bottom was
-the height of the notch at the top: the app was painted one notch too high.
+### An instrument, in development builds only
 
-### The cause, and why no CSS unit really settles it
-
-`html`, `body` and `#app` took their height as a **percentage**. A percentage
-resolves against its parent — whose own height may be wrong. `dvh` moves the
-problem without removing it: the browser has to know the unit (Safari 15.4,
-Chrome 108) *and* report the right window.
-
-A **height in pixels** cannot be resolved wrongly anywhere. It is measured and
-set by the script:
-
-```js
-function syncAppH(){
-  const h=Math.round(window.innerHeight);
-  if(!h)return;
-  document.documentElement.style.setProperty("--appH",h+"px");
-}
-```
-
-`innerHeight`, and emphatically not `visualViewport.height`: the latter shrinks
-when the keyboard opens (restart threshold, export/import) and the app would jump
-on every keystroke. Re-measured on resize, on `pageshow`, on rotation — in three
-steps, since the height does not settle at once — and at 60, 250 and 800 ms after
-launch, iOS sometimes reporting a stale value at startup.
-
-The cascade keeps two fallbacks, the last understood one winning:
-
-```css
-html,body{height:100%;height:100dvh;height:var(--appH,100dvh)}
-```
-
-1. `100%` — everywhere, including before the script runs;
-2. `100dvh` — avoids a jump on the first paint in recent browsers;
-3. `var(--appH,…)` — the measurement.
-
-A browser without `dvh` ignores the last two and keeps exactly the previous
-behaviour.
-
-### The bottom safe area
-
-`#panels` reserved none: the last card ended 12 px from the edge, so partly under
-the home indicator. Its bottom padding is now
-`calc(12px + env(safe-area-inset-bottom))` — 12 px unchanged on a device without
-an inset.
-
-### What can be verified here, and what cannot
-
-`t_haut` (36th test) checks across six screen sizes that `--appH` equals
-`innerHeight` exactly and that `#app` reaches the bottom of the window, that a
-resize and a rotation are followed, that the three-height cascade is intact in
-the source, and that the padding stays at 12 px without an inset.
-
-What Chromium cannot replay: the notch and the translucent status bar. Only a
-real device confirms the band is gone.
+It took three versions to establish a number nobody could read. The menu footer
+now shows the window's real geometry in development builds:
+`440×894 · screen 440×956 · safe 62/34 · PWA`. Nothing in production.
 
 ---
 

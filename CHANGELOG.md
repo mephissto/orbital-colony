@@ -17,77 +17,32 @@ restent valides**.
 
 ---
 
-## 3.7.8 — Une hauteur mesurée
+## 3.7.9 — La barre d'état, enfin
 
-En application installée sur iOS, une bande de fond restait en bas de l'écran.
+En application installée sur iPhone, une bande de fond restait en bas de
+l'écran : **62 px sur un 16 Pro Max**, soit exactement la hauteur de la barre
+d'état.
 
-### La mesure
+Le jeu déclarait `apple-mobile-web-app-status-bar-style:black-translucent`. iOS
+dessine alors la page **sous** la barre d'état, mais annonce une hauteur qui
+l'**exclut** : `innerHeight` vaut 894 pour un écran de 956. La page se posait en
+haut et laissait le reste vide.
 
-Capture d'un **iPhone 16 Pro Max** (440 × 956 css), liste défilée jusqu'en bas,
-contre le même état rendu ici :
+La 3.7.8 avait figé la hauteur en pixels durs (`--appH`, posée depuis
+`innerHeight`) pour écarter tout calcul CSS. La bande est restée identique au
+pixel près — ce qui désignait le coupable : la hauteur annoncée elle-même. La
+balise vaut maintenant `black`, iOS pose la vue sous la barre, et `innerHeight`
+correspond à ce qui est réellement dessinable.
 
-| | Bas de la dernière carte | Vide en dessous |
-|---|---:|---:|
-| Sur l'appareil | 894 css | **62 css** |
-| Rendu de référence | 936 css | 20 css *(12 de padding + 8 de marge)* |
+`viewport-fit=cover` reste : les marges latérales en paysage et celle de la barre
+d'accueil en dépendent toujours. Le travail de la 3.7.8 reste aussi — hauteur
+mesurée et marge sûre du bas sous la liste — il était juste insuffisant seul.
 
-**62 px est exactement la marge sûre HAUTE de cet appareil.** Le vide en bas
-valait la hauteur de l'encoche en haut : l'application était peinte trop haut,
-d'une hauteur d'encoche.
+### Un instrument, en développement seulement
 
-### La cause, et pourquoi aucune unité CSS ne la règle vraiment
-
-`html`, `body` et `#app` prenaient leur hauteur en **pourcentage**. Un
-pourcentage se résout contre son parent — dont la hauteur peut elle-même être
-fausse. `dvh` déplace le problème sans le supprimer : il faut que le navigateur
-le connaisse (Safari 15.4, Chrome 108) *et* qu'il déclare la bonne fenêtre.
-
-Une **hauteur en pixels** ne peut être mal résolue nulle part. Elle est mesurée
-et posée par le script :
-
-```js
-function syncAppH(){
-  const h=Math.round(window.innerHeight);
-  if(!h)return;
-  document.documentElement.style.setProperty("--appH",h+"px");
-}
-```
-
-`innerHeight`, et surtout pas `visualViewport.height` : ce dernier rétrécit quand
-le clavier s'ouvre (seuil de relance, export/import) et l'application sauterait à
-chaque saisie. Remesuré au redimensionnement, au `pageshow`, à la rotation — en
-trois temps, la hauteur ne se stabilisant pas immédiatement — et à 60, 250 et
-800 ms après le lancement, iOS annonçant parfois une valeur périmée au démarrage.
-
-La cascade garde deux replis, le dernier compris l'emportant :
-
-```css
-html,body{height:100%;height:100dvh;height:var(--appH,100dvh)}
-```
-
-1. `100%` — partout, y compris avant que le script tourne ;
-2. `100dvh` — évite un saut au premier rendu sur les navigateurs récents ;
-3. `var(--appH,…)` — la mesure.
-
-Un navigateur sans `dvh` ignore les deux dernières et garde exactement le
-comportement d'avant.
-
-### La marge sûre du bas
-
-`#panels` n'en réservait aucune : la dernière carte finissait à 12 px du bord,
-donc partiellement sous la barre d'accueil. Son padding bas vaut désormais
-`calc(12px + env(safe-area-inset-bottom))` — soit 12 px inchangés sur un appareil
-sans encoche.
-
-### Ce qui est vérifiable ici, et ce qui ne l'est pas
-
-`t_haut` (36ᵉ test) vérifie sur six tailles d'écran que `--appH` vaut exactement
-`innerHeight` et que `#app` atteint le bas de la fenêtre, qu'un redimensionnement
-et une rotation sont suivis, que la cascade des trois hauteurs est intacte dans
-la source, et que le padding reste à 12 px sans encoche.
-
-Ce que Chromium ne peut pas rejouer : l'encoche et la barre d'état translucide.
-Seul un appareil réel confirme la disparition de la bande.
+Il aura fallu trois versions pour établir un nombre que personne ne pouvait lire.
+Le pied du menu affiche désormais la géométrie réelle en version de
+développement : `440×894 · écran 440×956 · sûr 62/34 · PWA`. Rien en production.
 
 ---
 

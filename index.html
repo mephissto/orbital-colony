@@ -33,7 +33,15 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- `black` et non `black-translucent` (3.7.9). En translucide, iOS dessine la
+     vue web SOUS la barre d'état mais annonce une hauteur qui l'exclut : sur un
+     16 Pro Max, innerHeight vaut 894 pour un écran de 956. La page se pose donc
+     en haut et laisse 62 px de fond en bas — exactement la hauteur de la barre.
+     Prouvé par la 3.7.8 : la hauteur y était posée en pixels durs depuis
+     innerHeight, et la bande est restée identique au pixel près.
+     En `black`, iOS pose la vue SOUS la barre d'état, innerHeight correspond à
+     ce qui est réellement dessinable, et la marge sûre du haut tombe à 0. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Colony">
 <style>
 :root{
@@ -788,6 +796,8 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .pied .h{display:flex;align-items:baseline;gap:10px}
 .pied .h b{color:var(--txt);font-weight:600}
 .pied .h .ver{margin-left:auto;flex:none;font-variant-numeric:tabular-nums}
+.pied .geo{margin-top:4px;font-size:10px;color:var(--dim);opacity:.8;
+  font-variant-numeric:tabular-nums}
 .pied .liens{margin-top:5px}
 .pied a{color:var(--dim);text-decoration:none;
   border-bottom:1px dotted rgba(132,148,184,.5)}
@@ -1235,6 +1245,7 @@ a.hbtn{text-decoration:none}
   <div class="pied">
     <div class="h"><span id="piedPar"></span>
       <span class="ver" id="piedVer"></span></div>
+    <div class="geo" id="piedGeo" style="display:none"></div>
     <div class="liens">
       <a id="piedMarque" target="_blank" rel="noopener noreferrer"><span class="lbl"
         data-i18n="ab_marque" data-i18n-s="ab_marque_s">Kit de marque</span><i class="ext">↗</i></a>
@@ -1308,7 +1319,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.8";
+const VERSION="3.7.9";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1360,7 +1371,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Correctif d'affichage : en application installée, une bande de fond pouvait rester en bas de l'écran. La hauteur de la page est maintenant <b>mesurée</b> au lieu d'être déduite d'un pourcentage — un nombre de pixels ne peut pas être mal calculé, quel que soit l'appareil. La marge sûre du bas est aussi réservée sous la liste.",
+  wn_d:"Correctif d'affichage : en application installée sur iPhone, une bande de fond restait en bas de l'écran. iOS dessinait la page sous la barre d'état tout en annonçant une hauteur qui l'excluait — 894 px pour un écran de 956. La barre d'état n'est plus déclarée translucide : la page occupe exactement ce qu'iOS lui donne.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1536,7 +1547,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"Display fix: in the installed app a band of background could be left at the bottom of the screen. The page height is now <b>measured</b> instead of derived from a percentage — a number of pixels cannot be resolved wrongly, on any device. The bottom safe-area inset is reserved under the list too.",
+  wn_d:"Display fix: in the installed app on iPhone, a band of background was left at the bottom of the screen. iOS was drawing the page under the status bar while reporting a height that excluded it — 894 px for a 956 px screen. The status bar is no longer declared translucent: the page now fills exactly what iOS gives it.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3062,6 +3073,23 @@ $("#rock").addEventListener("pointerdown",e=>doTap(e.clientX,e.clientY));
    pile pareil partout : sur un autre navigateur/OS, l'en-tête réel est un
    peu plus ou moins haut, et l'écart laissait un espace (ou un recouvrement)
    visible entre le bandeau et la planète. On mesure, un point c'est tout. */
+/* env() n'existe qu'en CSS : on le lit par une sonde invisible, mesurée à la
+   demande. Sert au pied de page en dev, et à rien d'autre — la mise en page,
+   elle, utilise env() directement. */
+let SONDE=null;
+function satPx(cote){
+  if(!SONDE){
+    SONDE=document.createElement("div");
+    SONDE.style.cssText="position:fixed;left:0;top:0;width:0;height:0;"+
+      "visibility:hidden;pointer-events:none;"+
+      "padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";
+    document.body.appendChild(SONDE);
+  }
+  const cs=getComputedStyle(SONDE);
+  return Math.round(parseFloat(cote==="top"?cs.paddingTop:cs.paddingBottom)||0);
+}
+const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
+
 /* innerHeight, et surtout pas visualViewport.height : ce dernier rétrécit
    quand le clavier s'ouvre (seuil de relance, export/import), et l'application
    sauterait à chaque saisie. innerHeight, lui, ne bouge pas pour le clavier. */
@@ -4261,9 +4289,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
- {v:"3.7.8", nm:{fr:"Une hauteur mesurée",en:"A measured height"},
-  d:{fr:"En application installée, une bande de fond pouvait rester en bas de l'écran. La hauteur de la page était donnée en pourcentage, et un pourcentage se résout contre un parent — dont la hauteur peut elle-même être fausse. Mesuré sur un 16 Pro Max : 62 px de vide sous la dernière carte au lieu des 20 attendus, soit exactement la marge sûre du haut de cet appareil. La hauteur est désormais mesurée en pixels et posée par le script, remesurée à chaque redimensionnement et à chaque rotation : un nombre de pixels ne peut pas être mal résolu, sur aucun appareil. La marge sûre du bas est en plus réservée sous la liste, pour que la dernière carte ne finisse pas sous la barre d'accueil.",
-     en:"In the installed app, a band of background could be left at the bottom of the screen. The page height was given as a percentage, and a percentage resolves against a parent — whose own height may be wrong. Measured on a 16 Pro Max: 62 px of empty space under the last card instead of the expected 20, exactly that device's top safe-area inset. Height is now measured in pixels and set by the script, re-measured on every resize and rotation: a number of pixels cannot be resolved wrongly, on any device. The bottom safe-area inset is also reserved under the list, so the last card does not end up under the home indicator."}},
+ {v:"3.7.9", nm:{fr:"La barre d'état, enfin",en:"The status bar, at last"},
+  d:{fr:"En application installée sur iPhone, une bande de fond restait en bas de l'écran, haute de 62 px sur un 16 Pro Max. Le jeu déclarait sa barre d'état translucide : iOS dessine alors la page SOUS la barre, mais annonce une hauteur qui l'exclut — 894 px pour un écran de 956. La page se posait donc en haut et laissait le reste vide. La 3.7.8 avait figé la hauteur en pixels durs pour écarter tout calcul CSS ; la bande est restée identique au pixel près, ce qui a désigné le coupable. La barre d'état n'est plus déclarée translucide : la page occupe exactement ce qu'iOS lui donne. En version de développement, le pied du menu affiche désormais la géométrie réelle de la fenêtre — il a fallu trois versions pour établir un nombre que personne ne pouvait lire.",
+     en:"In the installed app on iPhone, a band of background was left at the bottom of the screen, 62 px tall on a 16 Pro Max. The game declared its status bar translucent: iOS then draws the page UNDER the bar but reports a height that excludes it — 894 px for a 956 px screen. The page sat at the top and left the rest empty. 3.7.8 had pinned the height to hard pixels to rule out any CSS computation; the band stayed identical to the pixel, which named the culprit. The status bar is no longer declared translucent: the page fills exactly what iOS gives it. In development builds the menu footer now shows the window's real geometry — it took three versions to establish a number nobody could read."}},
  {v:"3.7.6", nm:{fr:"Le résumé couvre toute la mise à jour",en:"The summary covers the whole update"},
   d:{fr:"La 3.5.0 était encore en ligne : ceux qui reviennent sautent huit versions d'un coup. Le panneau Nouveautés ne parlait que du dernier correctif, ce qui n'apprenait rien à personne. Il résume maintenant l'ensemble — les Percées, le seuil de relance calé sur l'antimatière en poche, les succès épinglés et les dix-huit succès ajoutés. Le détail version par version reste juste en dessous.",
      en:"3.5.0 was still the live version: anyone coming back jumps eight versions at once. The What's new panel only described the latest fix, which told nobody anything. It now sums up the whole thing — Breakthroughs, the restart threshold tied to the antimatter in hand, pinned achievements and the eighteen achievements added. The version-by-version detail is still right below it."}},
@@ -4422,7 +4450,17 @@ function majMenu(){
   $("#piedCode").href=LIEN_CODE;
   $("#piedMarque").href=LIEN_MARQUE;
   $("#piedLic").href=LIEN_CODE+"/blob/main/LICENSE";
+  /* En dev, le pied affiche la géométrie réelle de la fenêtre. Trois versions
+     ont été nécessaires pour établir qu'iOS annonçait 894 px de haut sur un
+     écran de 956 : ce nombre-là, personne ne pouvait le lire. Maintenant si. */
   txt($("#piedVer"),"v"+VERSION+(estDev()?" — DEV":""));
+  const g=$("#piedGeo");
+  show(g,estDev());
+  if(estDev()){
+    const sd=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+    txt(g,innerWidth+"×"+innerHeight+" · écran "+screen.width+"×"+screen.height+
+         " · sûr "+satTop()+"/"+satBas()+(sd?" · PWA":" · nav"));
+  }
 }
 
 /* ---------- tutoriel ----------
