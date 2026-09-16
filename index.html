@@ -33,15 +33,14 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- `black` et non `black-translucent` (3.7.9). En translucide, iOS dessine la
-     vue web SOUS la barre d'état mais annonce une hauteur qui l'exclut : sur un
-     16 Pro Max, innerHeight vaut 894 pour un écran de 956. La page se pose donc
-     en haut et laisse 62 px de fond en bas — exactement la hauteur de la barre.
-     Prouvé par la 3.7.8 : la hauteur y était posée en pixels durs depuis
-     innerHeight, et la bande est restée identique au pixel près.
-     En `black`, iOS pose la vue SOUS la barre d'état, innerHeight correspond à
-     ce qui est réellement dessinable, et la marge sûre du haut tombe à 0. -->
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<!-- Translucide : la vue web monte SOUS la barre d'état, qui prend donc le
+     dégradé de l'en-tête au lieu du noir opaque qu'iOS peindrait autrement
+     (essayé en 3.7.9, et la couture se voyait).
+     Le revers, c'est qu'iOS annonce alors une hauteur qui EXCLUT la barre :
+     894 px pour un écran de 956 sur un 16 Pro Max, d'où une bande de fond en
+     bas. hauteurUtile() rattrape exactement ça — sans ce rattrapage, ne pas
+     remettre `black-translucent` ici. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Colony">
 <style>
 :root{
@@ -1319,7 +1318,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.10";
+const VERSION="3.7.11";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1371,7 +1370,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"La bande noire en bas de l'écran sur iPhone est rattrapée <b>sans réinstaller</b> le jeu. iOS fige le réglage de la barre d'état au moment où l'icône est posée sur l'écran d'accueil : corriger la page ne suffisait pas. Le jeu détecte maintenant le décalage — écran plus haut que la fenêtre annoncée, d'exactement la hauteur de la barre — et occupe l'écran entier.",
+  wn_d:"La barre d'état retrouve le dégradé de l'en-tête : plus de bande noire en haut de l'écran sur iPhone, et toujours pas de bande en bas. Le jeu remonte sous la barre d'état comme avant, et corrige de lui-même la hauteur qu'iOS annonce de travers dans ce mode — c'est ce qui manquait aux versions précédentes.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1547,7 +1546,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The black band at the bottom of the screen on iPhone is now corrected <b>without reinstalling</b> the game. iOS freezes the status-bar setting when the icon is added to the home screen, so fixing the page was not enough. The game now detects the mismatch — screen taller than the reported window by exactly the bar's height — and fills the whole screen.",
+  wn_d:"The status bar gets the header gradient back: no more black band at the top of the screen on iPhone, and still none at the bottom. The game reaches under the status bar as it used to, and corrects on its own the height iOS reports wrongly in that mode — which is what the previous versions were missing.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3094,27 +3093,33 @@ const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
    quand le clavier s'ouvre (seuil de relance, export/import), et l'application
    sauterait à chaque saisie. innerHeight, lui, ne bouge pas pour le clavier.
 
-   Sauf qu'iOS ment dans un cas précis. Avec une barre d'état déclarée
-   translucide, il dessine la vue SOUS la barre mais annonce une hauteur qui
-   l'exclut : innerHeight 894 pour un écran de 956, d'où 62 px de fond en bas.
-   La 3.7.9 a corrigé la déclaration — mais iOS fige ces balises AU MOMENT DE
-   L'INSTALLATION : une icône déjà posée sur l'écran d'accueil garde l'ancien
-   réglage tant qu'on ne la supprime pas pour la réinstaller. Corriger le HTML
-   ne suffit donc pas pour les installations existantes.
+   Sauf qu'iOS ment quand la barre d'état est translucide : il dessine la vue
+   SOUS la barre mais annonce une hauteur qui l'exclut — 894 px pour un écran de
+   956 sur un 16 Pro Max — d'où une bande de fond en bas. Le principe du
+   rattrapage : dans une application installée, la fenêtre EST l'écran. Si iOS
+   annonce moins, et qu'il manque au plus la hauteur de la barre, on croit
+   l'écran.
 
-   D'où le rattrapage ci-dessous. Il ne se déclenche que sur une signature
-   exacte — application installée, marge sûre en haut non nulle, et écart entre
-   l'écran et la fenêtre qui vaut précisément cette marge. Trois conditions
-   réunies, c'est ce cas-là et rien d'autre ; sinon on garde innerHeight tel
-   quel. En paysage, screen.height suit l'orientation sur iOS moderne : l'écart
-   ne correspond plus et le rattrapage ne s'applique pas. */
+   Chaque condition écarte un cas où ce serait faux :
+   · pas installée      → le navigateur a sa propre barre d'adresse, la fenêtre
+                          est légitimement plus courte que l'écran ;
+   · marge haute nulle  → barre d'état opaque, rien n'est caché, rien à rendre ;
+   · il ne manque rien  → déjà juste ;
+   · il manque plus que
+     la marge haute     → autre chose (iPad en Split View, fenêtre redimensionnée
+                          sur ordinateur) : on ne devine pas.
+   En paysage, screen.height suit l'orientation sur iOS moderne, donc il ne
+   manque rien et le rattrapage ne s'applique pas. La marge de 4 px absorbe les
+   arrondis : la 3.7.10 exigeait l'égalité au pixel près, ce qui aurait laissé
+   la bande revenir pour trois pixels d'écart. */
 function hauteurUtile(){
   const h=window.innerHeight;
   const pwa=matchMedia("(display-mode: standalone)").matches
             ||navigator.standalone===true;
   if(!pwa)return h;
   const ecran=(window.screen&&window.screen.height)||0, top=satTop();
-  if(ecran&&top>0&&Math.abs(ecran-h-top)<=2)return ecran;
+  const manque=ecran-h;
+  if(ecran&&top>0&&manque>0&&manque<=top+4)return ecran;
   return h;
 }
 function syncAppH(){
@@ -4313,9 +4318,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
- {v:"3.7.10", nm:{fr:"La bande du bas, sans réinstaller",en:"The bottom band, without reinstalling"},
-  d:{fr:"La bande de fond en bas de l'écran, sur iPhone, venait d'une barre d'état déclarée translucide : iOS dessine alors la page SOUS la barre mais annonce une hauteur qui l'exclut — 894 px pour un écran de 956. La 3.7.9 avait corrigé la déclaration, sans effet : iOS fige ces réglages AU MOMENT OÙ L'ICÔNE EST POSÉE sur l'écran d'accueil, et une installation existante garde l'ancien. Le jeu reconnaît donc maintenant la situation lui-même — application installée, marge sûre en haut non nulle, et écran plus haut que la fenêtre d'exactement cette marge — et occupe l'écran entier. Rien à réinstaller. Les trois conditions doivent être réunies : ailleurs, la hauteur annoncée est respectée telle quelle.",
-     en:"The band of background at the bottom of the screen on iPhone came from a status bar declared translucent: iOS then draws the page UNDER the bar but reports a height that excludes it — 894 px for a 956 px screen. 3.7.9 fixed the declaration to no effect: iOS freezes those settings WHEN THE ICON IS ADDED to the home screen, and an existing install keeps the old one. So the game now recognises the situation itself — installed app, non-zero top safe area, and a screen taller than the window by exactly that inset — and fills the whole screen. Nothing to reinstall. All three conditions must hold: anywhere else, the reported height is used as is."}},
+ {v:"3.7.11", nm:{fr:"Ni bande en haut, ni bande en bas",en:"No band at the top, none at the bottom"},
+  d:{fr:"Supprimer la bande du bas avait fait apparaître une bande noire en haut : en renonçant à la barre d'état translucide, iOS la peignait lui-même en noir opaque au lieu de laisser le dégradé de l'en-tête la recouvrir. Le translucide est donc rétabli, et le rattrapage de hauteur introduit juste avant s'occupe du revers — iOS annonce dans ce mode une hauteur qui exclut la barre, 894 px pour un écran de 956. Le principe : dans une application installée, la fenêtre EST l'écran ; si iOS en annonce moins et qu'il manque au plus la hauteur de la barre, on croit l'écran. Ailleurs — navigateur, barre opaque, iPad en écran partagé, paysage — la hauteur annoncée est respectée telle quelle.",
+     en:"Removing the band at the bottom had produced a black band at the top: giving up the translucent status bar meant iOS painted it opaque black itself instead of letting the header gradient cover it. Translucency is back, and the height correction introduced just before handles the downside — in that mode iOS reports a height that excludes the bar, 894 px for a 956 px screen. The principle: in an installed app, the window IS the screen; if iOS reports less and at most the bar's height is missing, trust the screen. Anywhere else — browser, opaque bar, iPad in Split View, landscape — the reported height is used as is."}},
  {v:"3.7.6", nm:{fr:"Le résumé couvre toute la mise à jour",en:"The summary covers the whole update"},
   d:{fr:"La 3.5.0 était encore en ligne : ceux qui reviennent sautent huit versions d'un coup. Le panneau Nouveautés ne parlait que du dernier correctif, ce qui n'apprenait rien à personne. Il résume maintenant l'ensemble — les Percées, le seuil de relance calé sur l'antimatière en poche, les succès épinglés et les dix-huit succès ajoutés. Le détail version par version reste juste en dessous.",
      en:"3.5.0 was still the live version: anyone coming back jumps eight versions at once. The What's new panel only described the latest fix, which told nobody anything. It now sums up the whole thing — Breakthroughs, the restart threshold tied to the antimatter in hand, pinned achievements and the eighteen achievements added. The version-by-version detail is still right below it."}},

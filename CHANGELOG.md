@@ -17,39 +17,38 @@ restent valides**.
 
 ---
 
-## 3.7.10 — La bande du bas, sans réinstaller
+## 3.7.11 — Ni bande en haut, ni bande en bas
 
-La bande de fond en bas de l'écran sur iPhone venait d'une barre d'état déclarée
-**translucide** : iOS dessine alors la page *sous* la barre mais annonce une
-hauteur qui l'*exclut* — `innerHeight` 894 pour un écran de 956, d'où 62 px de
-vide en bas.
+Supprimer la bande du bas avait fait apparaître une bande **noire en haut** : en
+renonçant à `black-translucent`, iOS peignait lui-même la barre d'état en noir
+opaque au lieu de laisser le dégradé de l'en-tête la recouvrir.
 
-La 3.7.9 avait corrigé la déclaration. **Sans effet** : iOS fige ces réglages au
-moment où l'icône est posée sur l'écran d'accueil. Une installation existante
-garde l'ancien tant qu'on ne la supprime pas pour la refaire — corriger le HTML
-ne suffit donc pas.
-
-Le jeu reconnaît maintenant la situation lui-même :
+Le translucide est donc rétabli, et le rattrapage de hauteur s'occupe du revers —
+dans ce mode iOS annonce une hauteur qui **exclut** la barre : 894 px pour un
+écran de 956.
 
 ```js
 function hauteurUtile(){
   const h=window.innerHeight;
-  if(!estInstallee())return h;
-  const ecran=screen.height, top=satTop();
-  if(ecran&&top>0&&Math.abs(ecran-h-top)<=2)return ecran;
+  if(!installée())return h;
+  const manque=screen.height-h, top=satTop();
+  if(top>0 && manque>0 && manque<=top+4)return screen.height;
   return h;
 }
 ```
 
-Les trois conditions doivent être réunies — application installée, marge sûre en
-haut non nulle, et écart entre l'écran et la fenêtre valant *exactement* cette
-marge. C'est une signature, pas une heuristique : ailleurs, la hauteur annoncée
-est respectée telle quelle. En paysage, `screen.height` suit l'orientation sur
-iOS moderne, l'écart ne correspond plus et le rattrapage ne s'applique pas.
+Le principe tient en une phrase : **dans une application installée, la fenêtre
+est l'écran**. Si iOS en annonce moins et qu'il manque au plus la hauteur de la
+barre, on croit l'écran. Chaque condition écarte un cas où ce serait faux — pas
+installée (le navigateur a sa barre d'adresse), marge haute nulle (barre opaque,
+rien n'est caché), rien ne manque (déjà juste), il manque bien plus (iPad en
+écran partagé, fenêtre redimensionnée : on ne devine pas).
 
-`t_haut` rejoue les cinq situations : PWA iOS translucide (rattrapée), PWA saine,
-PWA Android, navigateur non installé, et un écart qui ne colle pas à la marge —
-seule la première est corrigée.
+Les 4 px absorbent les arrondis. La 3.7.10 exigeait l'égalité au pixel près, ce
+qui aurait laissé la bande revenir pour trois pixels d'écart.
+
+`t_haut` rejoue huit situations : les trois variantes de l'écart, barre opaque,
+Android, navigateur, iPad en Split View, paysage.
 
 ---
 

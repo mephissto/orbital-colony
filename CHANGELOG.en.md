@@ -16,38 +16,37 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
-## 3.7.10 — The bottom band, without reinstalling
+## 3.7.11 — No band at the top, none at the bottom
 
-The band of background at the bottom of the screen on iPhone came from a status
-bar declared **translucent**: iOS then draws the page *under* the bar but reports
-a height that *excludes* it — `innerHeight` 894 for a 956 px screen, hence 62 px
-of empty space at the bottom.
+Removing the band at the bottom produced a **black band at the top**: giving up
+`black-translucent` meant iOS painted the status bar opaque black itself, instead
+of letting the header gradient cover it.
 
-3.7.9 fixed the declaration. **To no effect**: iOS freezes those settings when
-the icon is added to the home screen. An existing install keeps the old one until
-it is removed and re-added — so fixing the HTML is not enough.
-
-The game now recognises the situation itself:
+Translucency is back, and the height correction handles the downside — in that
+mode iOS reports a height that **excludes** the bar: 894 px for a 956 px screen.
 
 ```js
 function hauteurUtile(){
   const h=window.innerHeight;
   if(!isInstalled())return h;
-  const screenH=screen.height, top=satTop();
-  if(screenH&&top>0&&Math.abs(screenH-h-top)<=2)return screenH;
+  const missing=screen.height-h, top=satTop();
+  if(top>0 && missing>0 && missing<=top+4)return screen.height;
   return h;
 }
 ```
 
-All three conditions must hold — installed app, non-zero top safe area, and a
-screen taller than the window by *exactly* that inset. It is a signature, not a
-heuristic: anywhere else the reported height is used as is. In landscape,
-`screen.height` follows the orientation on modern iOS, the gap no longer matches
-and the correction does not apply.
+The principle is one sentence: **in an installed app, the window is the screen**.
+If iOS reports less and at most the bar's height is missing, trust the screen.
+Each condition rules out a case where that would be wrong — not installed (the
+browser has its address bar), zero top inset (opaque bar, nothing hidden),
+nothing missing (already right), much more missing (iPad in Split View, a resized
+window: no guessing).
 
-`t_haut` replays the five situations: translucent iOS PWA (corrected), healthy
-PWA, Android PWA, browser not installed, and a gap that does not match the inset
-— only the first is changed.
+The 4 px absorb rounding. 3.7.10 required equality to the pixel, which would have
+let the band return over a three-pixel discrepancy.
+
+`t_haut` replays eight situations: the three gap variants, opaque bar, Android,
+browser, iPad in Split View, landscape.
 
 ---
 
