@@ -3,11 +3,20 @@
    Voir le fichier LICENSE.
 
    Stratégie :
-   - le document HTML est cherché sur le réseau en priorité (tu vois toujours la
-     dernière version publiée), avec repli sur le cache si tu es hors connexion ;
-   - le reste (icônes, manifeste) est servi depuis le cache en priorité.
-   Après une mise à jour du jeu, incrémente CACHE ci-dessous. */
-const CACHE = "colonie-orbitale-v2";
+   - le document HTML et le MANIFESTE sont cherchés sur le réseau en priorité
+     (tu vois toujours la dernière version publiée), avec repli sur le cache si
+     tu es hors connexion ;
+   - le reste (les icônes) est servi depuis le cache en priorité.
+
+   Le manifeste est passé côté réseau en v3 : il était servi depuis le cache,
+   donc le nom de l'application sur l'écran d'accueil restait celui du jour de
+   l'installation. Renommer « Colony » en « Orbital Colony » dans le fichier
+   n'avait aucun effet — le navigateur ne relisait jamais le fichier. Les
+   icônes, elles, peuvent rester au cache : quand elles changent, leur nom
+   change aussi.
+
+   Après une mise à jour des icônes, incrémente CACHE ci-dessous. */
+const CACHE = "colonie-orbitale-v3";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"
@@ -36,7 +45,8 @@ self.addEventListener("fetch", e => {
   try { url = new URL(req.url); } catch (_) { return; }
   if (url.origin !== self.location.origin) return;
 
-  const isDoc = req.mode === "navigate" || url.pathname.endsWith(".html");
+  const isDoc = req.mode === "navigate" || url.pathname.endsWith(".html")
+             || url.pathname.endsWith(".webmanifest");
   if (isDoc) {
     e.respondWith(
       fetch(req)

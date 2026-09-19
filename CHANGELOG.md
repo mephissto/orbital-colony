@@ -17,6 +17,71 @@ restent valides**.
 
 ---
 
+## 3.7.16 — Le flou du haut, expliqué
+
+Ce n'était pas un bug du jeu. Depuis **iOS 26**, le système applique son *scroll
+edge effect* à toute application installée dont la page remonte sous la barre
+d'état : un flou qui descend d'environ **35 points sous la barre**, donc par
+dessus l'en-tête. iOS 27 l'a accentué, et plusieurs projets rapportent le même
+symptôme au même endroit.
+
+Il est composé par le système **au-dessus du fond déjà peint**. Aucune règle CSS
+ne l'enlève — d'où l'échec du fond opaque (3.7.12) puis de la bande d'absorption
+(3.7.14). Le seul remède connu est de ne plus remonter là-dessous :
+
+```html
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+```
+
+### Ce qui manquait aux tentatives précédentes
+
+Les 3.7.9 et 3.7.10 posaient déjà `black`, et laissaient une **bande sombre** en
+haut. La cause : avec une barre opaque, iOS la peint avec `theme-color`, qui
+valait le fond de page — `#05070f` — quand l'en-tête commence à `#090f1f`.
+
+```html
+<meta name="theme-color" content="#090f1f">
+```
+
+La couleur est **mesurée sur le rendu**, pas calculée : le dégradé translucide de
+l'en-tête se compose sur le fond de page *et* sur le champ d'étoiles.
+
+`viewport-fit=cover` reste — la marge sûre du bas en dépend — ainsi que
+`hauteurUtile()`, qui ne se déclenchera simplement plus : avec une barre opaque,
+la fenêtre annoncée est déjà la bonne.
+
+La bande `#satband` de la 3.7.14 est retirée, son hypothèse étant infirmée.
+
+Sources : [fin-app #411](https://github.com/MrClit/fin-app/issues/411) ·
+[meshmonitor #5286](https://github.com/Yeraze/meshmonitor/issues/5286)
+
+---
+
+## 3.7.15 — Le manifeste n'était jamais relu
+
+Renommer l'application en 3.7.14 n'a rien changé sur l'écran d'accueil. Le
+service worker servait `manifest.webmanifest` **depuis le cache** :
+
+```js
+const isDoc = req.mode === "navigate" || url.pathname.endsWith(".html");
+if (isDoc) { /* réseau d'abord */ }
+/* tout le reste : cache d'abord */
+```
+
+Le manifeste tombait dans « tout le reste ». Il dormait dans
+`colonie-orbitale-v2` depuis la première installation, et le fichier avait beau
+changer sur le serveur, le navigateur ne le relisait jamais.
+
+Il rejoint donc le document HTML côté réseau, et le cache passe en `v3` pour que
+l'ancien soit jeté. Les icônes restent au cache : quand elles changent, leur nom
+de fichier change aussi, donc la question ne se pose pas pour elles.
+
+**À faire côté appareil** : iOS fige le nom de l'application à l'installation. Il
+faut déployer, ouvrir le jeu une fois pour que le service worker se mette à jour,
+puis supprimer l'icône de l'écran d'accueil et la reposer.
+
+---
+
 ## 3.7.14 — Une bande pour encaisser
 
 Le flou de l'en-tête sur iOS 26+ ne vient pas du jeu : **Chromium ne le

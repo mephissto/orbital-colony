@@ -16,6 +16,73 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.16 — The blur at the top, explained
+
+It was not a bug in the game. Since **iOS 26**, the system applies its *scroll
+edge effect* to any installed app whose page reaches under the status bar: a blur
+descending about **35 points below the bar**, hence over the header. iOS 27 made
+it stronger, and several projects report the same symptom in the same place.
+
+It is composited by the system **above the already-painted background**. No CSS
+rule removes it — hence the failure of the opaque background (3.7.12) and then of
+the absorbing band (3.7.14). The only known remedy is to stop reaching under
+there:
+
+```html
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+```
+
+### What the earlier attempts were missing
+
+3.7.9 and 3.7.10 already set `black`, and left a **dark band** at the top. The
+cause: with an opaque bar, iOS paints it with `theme-color`, which was the page
+background — `#05070f` — while the header starts at `#090f1f`.
+
+```html
+<meta name="theme-color" content="#090f1f">
+```
+
+The colour is **measured from the render**, not computed: the header's
+translucent gradient composites over the page background *and* over the
+starfield.
+
+`viewport-fit=cover` stays — the bottom safe area depends on it — as does
+`hauteurUtile()`, which will simply never fire again: with an opaque bar the
+reported window is already correct.
+
+The `#satband` band from 3.7.14 is removed, its hypothesis having been
+disproven.
+
+Sources: [fin-app #411](https://github.com/MrClit/fin-app/issues/411) ·
+[meshmonitor #5286](https://github.com/Yeraze/meshmonitor/issues/5286)
+
+---
+
+## 3.7.15 — The manifest was never re-read
+
+Renaming the app in 3.7.14 changed nothing on the home screen. The service worker
+was serving `manifest.webmanifest` **from the cache**:
+
+```js
+const isDoc = req.mode === "navigate" || url.pathname.endsWith(".html");
+if (isDoc) { /* network first */ }
+/* everything else: cache first */
+```
+
+The manifest fell into "everything else". It had been sitting in
+`colonie-orbitale-v2` since the first install, and however much the file changed
+on the server, the browser never re-read it.
+
+So it joins the HTML document on the network-first path, and the cache moves to
+`v3` so the old one is thrown away. Icons stay cache-first: when they change
+their filename changes too, so the question does not arise for them.
+
+**On the device**: iOS freezes the app name at install time. Deploy, open the
+game once so the service worker updates, then remove the icon from the home
+screen and add it again.
+
+---
+
 ## 3.7.14 — A band to take the hit
 
 The header blur on iOS 26+ does not come from the game: **Chromium does not

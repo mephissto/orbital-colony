@@ -28,19 +28,31 @@
 <meta name="description" content="Space idle game: mine ore, build a colony, bend space-time. Free, offline, installable, no account.">
 <title>Orbital Colony</title>
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0icCIgY3g9IjM0JSIgY3k9IjI3JSIgcj0iNzglIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjOWRiMGQyIi8+PHN0b3Agb2Zmc2V0PSI0NSUiIHN0b3AtY29sb3I9IiM0YzVhNzIiLz4KPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMTUxYjI4Ii8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+CjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgcng9IjEwIiBmaWxsPSIjMDcwYjE2Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8ZWxsaXBzZSBjeD0iMzIiIGN5PSIzMyIgcng9IjI5LjUiIHJ5PSI5LjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2E5N2JmZiIgc3Ryb2tlLXdpZHRoPSIzLjYiIG9wYWNpdHk9Ii42Ii8+PC9nPgo8Y2lyY2xlIGN4PSIzMiIgY3k9IjMxIiByPSIxNy41IiBmaWxsPSJ1cmwoI3ApIi8+CjxjaXJjbGUgY3g9IjI1LjUiIGN5PSIyNS41IiByPSI0LjIiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii41Ii8+CjxjaXJjbGUgY3g9IjM4LjUiIGN5PSIzNS41IiByPSIzLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40NSIvPgo8Y2lyY2xlIGN4PSIzNCIgY3k9IjIxIiByPSIyLjEiIGZpbGw9IiMwYjEwMTgiIG9wYWNpdHk9Ii40Ii8+CjxnIHRyYW5zZm9ybT0icm90YXRlKC0yMiAzMiAzMykiPgo8cGF0aCBkPSJNMi41IDMzYTI5LjUgOS41IDAgMCAwIDU5IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRmZDhmZiIgc3Ryb2tlLXdpZHRoPSIzLjgiLz48L2c+Cjwvc3ZnPg==">
-<meta name="theme-color" content="#05070f">
+<!-- La couleur de la barre d'état en application installée (3.7.16) : celle du
+     HAUT du dégradé de l'en-tête, pas celle du fond de page, sinon la barre se
+     détache en plus sombre juste au-dessus de l'en-tête. Mesurée sur le rendu
+     plutôt que calculée : le dégradé translucide se compose sur le fond de page
+     ET sur le champ d'étoiles. -->
+<meta name="theme-color" content="#090f1f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- Translucide : la vue web monte SOUS la barre d'état, qui prend donc le
-     dégradé de l'en-tête au lieu du noir opaque qu'iOS peindrait autrement
-     (essayé en 3.7.9, et la couture se voyait).
-     Le revers, c'est qu'iOS annonce alors une hauteur qui EXCLUT la barre :
-     894 px pour un écran de 956 sur un 16 Pro Max, d'où une bande de fond en
-     bas. hauteurUtile() rattrape exactement ça — sans ce rattrapage, ne pas
-     remettre `black-translucent` ici. -->
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- `black` et NON `black-translucent` (3.7.16). Depuis iOS 26, le système
+     applique son « scroll edge effect » à toute application installée dont la
+     vue remonte sous la barre d'état : un flou qui descend d'environ 35 points
+     SOUS la barre, donc en plein dans l'en-tête. iOS 27 l'a accentué. Le même
+     symptôme est rapporté par plusieurs projets, et le seul remède connu est
+     celui-ci : une barre d'état opaque, sous laquelle la vue ne monte plus.
+     Il n'y a rien à corriger en CSS — le flou est composé par le système, au
+     niveau du compositeur, par-dessus le fond déjà peint.
+     Ce qui manquait aux tentatives 3.7.9 et 3.7.10, qui posaient déjà `black` :
+     la couleur. Avec une barre opaque, iOS la peint avec <meta theme-color>, et
+     celui-ci valait le fond de page (#05070f) alors que l'en-tête commence à
+     #0a1020 — d'où la « bande noire » visible en haut. Les deux sont désormais
+     accordés, voir theme-color juste en dessous.
+     viewport-fit=cover reste : la marge sûre du BAS en dépend. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Orbital Colony">
 <style>
 :root{
@@ -105,10 +117,6 @@ textarea{-webkit-user-select:text;user-select:text}
   display:flex;flex-direction:column}
 
 /* ---------- HEADER ---------- */
-/* La bande porte la couleur de départ du dégradé de l'en-tête : la jointure est
-   invisible, le dégradé continue simplement en dessous. */
-#satband{height:var(--satTop, env(safe-area-inset-top));background:rgba(10,16,32,.96)}
-html.dev #satband{background:rgba(46,12,22,.96)}
 header{
   padding:9px 18px;border-bottom:1px solid var(--line);
   /* Marges sûres ARRONDIES (3.7.13). L'en-tête est le seul élément qui reçoit
@@ -120,7 +128,7 @@ header{
      rien (Chromium aligne le texte sur la grille de l'écran). Cause non
      déterminée à ce jour. env() reste en repli tant que le script n'a pas
      tourné. */
-  padding-top:9px;                       /* la marge haute est prise par #satband */
+  padding-top:calc(9px + var(--satTop, env(safe-area-inset-top)));
   padding-left:calc(18px + var(--satLeft, env(safe-area-inset-left)));
   padding-right:calc(18px + var(--satRight, env(safe-area-inset-right)));
   background:linear-gradient(180deg,rgba(10,16,32,.96),rgba(10,16,32,.68));
@@ -1093,13 +1101,6 @@ a.hbtn{text-decoration:none}
 <div id="stars"></div><canvas id="starcanvas"></canvas>
 
 <div id="app">
-<!-- Bande vide sous la barre d'état (3.7.14). Sur iOS 26+, le texte de
-     l'en-tête est rendu flou dès qu'il remonte sous la barre d'état — mesuré :
-     5 px d'étalement vertical contre 2 px partout ailleurs, et Chromium ne
-     reproduit rien à densité égale. L'en-tête ne monte donc plus lui-même : une
-     bande sans contenu occupe la marge sûre à sa place, et absorbe ce que le
-     système applique là. Hauteur nulle sur un appareil sans encoche. -->
-<div id="satband"></div>
 <header>
   <div class="topbar">
     <span class="devtag" id="devTag">DEV</span>
@@ -1341,7 +1342,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.14";
+const VERSION="3.7.16";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1393,7 +1394,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Nouvelle tentative contre le flou de l'en-tête sur iOS récent : ce n'est plus l'en-tête qui remonte sous la barre d'état, mais une bande sans contenu, qui absorbe ce que le système applique à cet endroit. Le jeu s'appelle aussi <b>Orbital Colony</b> sur l'écran d'accueil, au lieu de « Colony ».",
+  wn_d:"Le flou en haut de l'écran sur iPhone est corrigé. Depuis iOS 26, le système floute toute application installée dont la page remonte sous la barre d'état — un effet qui déborde d'environ 35 points sous la barre, donc en plein dans l'en-tête. La barre d'état redevient opaque, et prend exactement la couleur du haut de l'en-tête : pas de flou, et pas de bande sombre non plus.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1569,7 +1570,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"Another attempt at the header blur on recent iOS: it is no longer the header that reaches under the status bar, but an empty band, which absorbs whatever the system applies there. The game is also called <b>Orbital Colony</b> on the home screen now, instead of \"Colony\".",
+  wn_d:"The blur at the top of the screen on iPhone is fixed. Since iOS 26 the system blurs any installed app whose page reaches under the status bar — an effect that spills about 35 points below the bar, right into the header. The status bar is opaque again, and takes exactly the colour of the top of the header: no blur, and no dark band either.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3122,7 +3123,7 @@ function syncSat(){
     const px=satPx(c)+"px";
     if(d.getPropertyValue(v)!==px)d.setProperty(v,px);
   });
-  /* #satband tire sa hauteur de --satTop : le bas de l'en-tête vient de bouger */
+  /* le rembourrage haut de l'en-tête suit --satTop : sa hauteur vient de bouger */
   if(typeof syncHeaderH==="function")syncHeaderH();
 }
 syncSat();
@@ -3182,8 +3183,8 @@ addEventListener("orientationchange",()=>{
 [60,250,800].forEach(d=>setTimeout(syncAppH,d));
 
 function syncHeaderH(){
-  /* le BAS de l'en-tête, pas sa hauteur : depuis la 3.7.14 une bande le précède
-     (voir #satband), et c'est sous l'ensemble que #hero doit se poser */
+  /* le BAS de l'en-tête : il commence à 0 aujourd'hui, mais le mesurer ainsi
+     reste juste si quoi que ce soit venait un jour le précéder */
   const h=Math.round($("header").getBoundingClientRect().bottom);
   document.documentElement.style.setProperty("--headerH",h+"px");
 }
@@ -4361,6 +4362,12 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.16", nm:{fr:"Le flou du haut, expliqué",en:"The blur at the top, explained"},
+  d:{fr:"Depuis iOS 26, le système applique son « scroll edge effect » à toute application installée dont la page remonte sous la barre d'état : un flou qui descend d'environ 35 points SOUS la barre, donc par-dessus l'en-tête. iOS 27 l'a accentué, et plusieurs autres projets rapportent exactement le même symptôme. Il est composé par le système au-dessus du fond déjà peint : aucune règle CSS ne peut l'enlever. Le seul remède est de ne plus remonter là-dessous — barre d'état opaque. C'est ce que faisaient déjà les 3.7.9 et 3.7.10, mais il leur manquait la couleur : iOS peint alors la barre avec theme-color, qui valait le fond de page (#05070f) quand l'en-tête commence à #090f1f. D'où la bande sombre qu'on voyait en haut. Les deux sont désormais accordés, la couleur ayant été mesurée sur le rendu.",
+     en:"Since iOS 26 the system applies its scroll edge effect to any installed app whose page reaches under the status bar: a blur descending about 35 points BELOW the bar, hence over the header. iOS 27 made it stronger, and several other projects report exactly the same symptom. It is composited by the system above the already-painted background: no CSS rule can remove it. The only remedy is to stop reaching under there — an opaque status bar. That is what 3.7.9 and 3.7.10 already did, but they were missing the colour: iOS then paints the bar with theme-color, which was the page background (#05070f) while the header starts at #090f1f. Hence the dark band at the top. The two now match, the colour having been measured from the render."}},
+ {v:"3.7.15", nm:{fr:"Le manifeste n'était jamais relu",en:"The manifest was never re-read"},
+  d:{fr:"Renommer l'application « Orbital Colony » en 3.7.14 n'avait aucun effet : le service worker servait le manifeste DEPUIS LE CACHE, où il dormait depuis la première installation. Le fichier avait beau changer sur le serveur, le navigateur ne le relisait jamais. Le manifeste passe donc côté réseau, comme le document HTML, et le cache change de nom pour que l'ancien soit jeté. Les icônes restent au cache : quand elles changent, leur nom de fichier change aussi. Reste qu'iOS fige le nom de l'application à l'installation — il faut supprimer l'icône de l'écran d'accueil et la reposer pour voir « Orbital Colony ».",
+     en:"Renaming the app to \"Orbital Colony\" in 3.7.14 had no effect: the service worker was serving the manifest FROM THE CACHE, where it had been sitting since the first install. However much the file changed on the server, the browser never re-read it. So the manifest moves to network-first, like the HTML document, and the cache is renamed so the old one is thrown away. Icons stay cache-first: when they change, their filename changes too. That said, iOS freezes the app name at install time — the icon has to be removed from the home screen and added again for \"Orbital Colony\" to show."}},
  {v:"3.7.14", nm:{fr:"Une bande pour encaisser",en:"A band to take the hit"},
   d:{fr:"Sur iOS 26 et suivants, le texte de l'en-tête est flou : 5 px d'étalement vertical contre 2 px partout ailleurs dans le jeu, et Chromium ne reproduit rien à densité d'écran égale. C'est donc le système, et il ne touche qu'une chose — le seul élément qui remonte sous la barre d'état. L'en-tête n'y monte donc plus : une bande sans contenu occupe la marge sûre à sa place et encaisse le traitement, l'en-tête commence en dessous. La bande porte la couleur de départ du dégradé, la jointure est invisible, et sa hauteur est nulle sur un appareil sans encoche. Le jeu s'appelle par ailleurs « Orbital Colony » sur l'écran d'accueil, au lieu de « Colony » — visible après réinstallation de l'icône, iOS figeant ce nom à l'installation.",
      en:"On iOS 26 and later the header text is blurred: 5 px of vertical spread against 2 px everywhere else in the game, and Chromium reproduces nothing at the same screen density. So it is the system, and it touches only one thing — the single element reaching under the status bar. The header no longer goes there: an empty band occupies the safe area in its place and takes the treatment, with the header starting below it. The band carries the gradient's starting colour, the seam is invisible, and its height is zero on a device without an inset. The game is also called \"Orbital Colony\" on the home screen instead of \"Colony\" — visible after reinstalling the icon, since iOS freezes that name at install time."}},
