@@ -16,6 +16,44 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.12 — A crisp header on recent iOS
+
+On iOS 26 and later, the header text was visibly blurred. Measured from a
+screenshot, comparing how steep text edges are:
+
+| | Edge sharpness |
+|---|---:|
+| iOS status bar | 242 |
+| "23" tile | 173 |
+| "Extraction" tab | 127 |
+| **Header, the logo** | **58** |
+| **Header, the FR button** | **46** |
+
+Half as sharp as everything else, and the blur stops exactly at the separator
+line under the header.
+
+The system's Liquid Glass material blurs **translucent** content reaching under
+the status bar — which 3.7.11 had just restored in order to remove the black
+band. So the header background becomes opaque in the installed app:
+
+```css
+@media (display-mode: standalone){
+  header{background:linear-gradient(180deg,#0a101f,#080d1b)}
+}
+```
+
+The two shades are exactly what the translucent gradient composited to over the
+page background. Verified by rendering the header before and after: **2 units of
+average difference per channel**, the worst case being a star that no longer
+shows through. The dev-banner rule is repeated in the same block, otherwise its
+specificity would win and the fix would be invisible in the very build where it
+is tested.
+
+In a browser the page does not reach under the status bar: the translucent
+gradient is unchanged there.
+
+---
+
 ## 3.7.11 — No band at the top, none at the bottom
 
 Removing the band at the bottom produced a **black band at the top**: giving up

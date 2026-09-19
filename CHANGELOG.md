@@ -17,6 +17,44 @@ restent valides**.
 
 ---
 
+## 3.7.12 — L'en-tête net sur iOS récent
+
+Sur iOS 26 et suivants, le texte de l'en-tête était visiblement flou. Mesuré sur
+une capture, en comparant la raideur des bords de texte :
+
+| | Netteté des bords |
+|---|---:|
+| Barre d'état iOS | 242 |
+| Tuile « 23 » | 173 |
+| Onglet « Extraction » | 127 |
+| **En-tête, le logo** | **58** |
+| **En-tête, le bouton FR** | **46** |
+
+Deux fois moins net que le reste, et le flou s'arrête pile au trait de
+séparation sous l'en-tête.
+
+Le matériau « Liquid Glass » du système floute le contenu **translucide** qui
+remonte sous la barre d'état — ce que la 3.7.11 venait justement de rétablir pour
+supprimer la bande noire. Le fond de l'en-tête devient donc opaque dans
+l'application installée :
+
+```css
+@media (display-mode: standalone){
+  header{background:linear-gradient(180deg,#0a101f,#080d1b)}
+}
+```
+
+Les deux teintes sont le résultat exact du dégradé translucide composé sur le
+fond de page. Vérifié en rendant l'en-tête avant et après : **2 unités d'écart
+moyen par canal**, le pire étant une étoile qui ne transparaît plus. La règle du
+bandeau de dev est reprise dans le même bloc, sinon sa spécificité l'emporterait
+et le correctif serait invisible là même où il est testé.
+
+Dans un navigateur, la page ne passe pas sous la barre d'état : le dégradé
+translucide y reste inchangé.
+
+---
+
 ## 3.7.11 — Ni bande en haut, ni bande en bas
 
 Supprimer la bande du bas avait fait apparaître une bande **noire en haut** : en
