@@ -17,6 +17,43 @@ restent valides**.
 
 ---
 
+## 3.7.14 — Une bande pour encaisser
+
+Le flou de l'en-tête sur iOS 26+ ne vient pas du jeu : **Chromium ne le
+reproduit pas** à densité d'écran égale, alors que l'appareil montre 5 px
+d'étalement vertical sur l'en-tête contre 2 px partout ailleurs. C'est le
+système, et il ne touche qu'une chose — le seul élément qui remonte sous la
+barre d'état.
+
+L'en-tête n'y monte donc plus. Une bande sans contenu occupe la marge sûre à sa
+place :
+
+```html
+<div id="satband"></div>
+<header>…</header>
+```
+```css
+#satband{height:var(--satTop, env(safe-area-inset-top));
+         background:rgba(10,16,32,.96)}
+header  {padding-top:9px}
+```
+
+La bande porte la couleur de départ du dégradé : la jointure est invisible, le
+dégradé continue simplement en dessous. Hauteur nulle sur un appareil sans
+encoche, donc rien ne bouge ailleurs.
+
+`syncHeaderH()` mesure désormais le **bas** de l'en-tête et non sa hauteur —
+`#hero` doit se poser sous l'ensemble bande + en-tête — et `syncSat()` le
+rappelle, la hauteur de la bande dépendant de `--satTop`.
+
+### Le nom sur l'écran d'accueil
+
+« Colony » devient **« Orbital Colony »** (`short_name` du manifeste et
+`apple-mobile-web-app-title`). iOS fige ce nom à l'installation : il faut
+supprimer l'icône et la reposer pour le voir changer.
+
+---
+
 ## 3.7.13 — Retour en arrière
 
 La 3.7.12 rendait le fond de l'en-tête opaque, sur l'hypothèse que le flou

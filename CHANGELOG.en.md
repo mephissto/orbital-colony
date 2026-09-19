@@ -16,6 +16,42 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.14 — A band to take the hit
+
+The header blur on iOS 26+ does not come from the game: **Chromium does not
+reproduce it** at the same screen density, while the device shows 5 px of
+vertical spread on the header against 2 px everywhere else. It is the system,
+and it touches only one thing — the single element reaching under the status bar.
+
+So the header no longer goes there. An empty band occupies the safe area in its
+place:
+
+```html
+<div id="satband"></div>
+<header>…</header>
+```
+```css
+#satband{height:var(--satTop, env(safe-area-inset-top));
+         background:rgba(10,16,32,.96)}
+header  {padding-top:9px}
+```
+
+The band carries the gradient's starting colour: the seam is invisible, the
+gradient simply continues below it. Zero height on a device without an inset, so
+nothing moves anywhere else.
+
+`syncHeaderH()` now measures the **bottom** of the header rather than its height
+— `#hero` has to sit below band plus header — and `syncSat()` calls it, since the
+band's height depends on `--satTop`.
+
+### The home-screen name
+
+"Colony" becomes **"Orbital Colony"** (the manifest's `short_name` and
+`apple-mobile-web-app-title`). iOS freezes that name at install time: the icon
+has to be removed and re-added for the change to show.
+
+---
+
 ## 3.7.13 — Rolled back
 
 3.7.12 made the header background opaque, on the hypothesis that the blur seen on

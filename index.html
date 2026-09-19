@@ -41,7 +41,7 @@
      bas. hauteurUtile() rattrape exactement ça — sans ce rattrapage, ne pas
      remettre `black-translucent` ici. -->
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Colony">
+<meta name="apple-mobile-web-app-title" content="Orbital Colony">
 <style>
 :root{
   --bg:#05070f;
@@ -105,6 +105,10 @@ textarea{-webkit-user-select:text;user-select:text}
   display:flex;flex-direction:column}
 
 /* ---------- HEADER ---------- */
+/* La bande porte la couleur de départ du dégradé de l'en-tête : la jointure est
+   invisible, le dégradé continue simplement en dessous. */
+#satband{height:var(--satTop, env(safe-area-inset-top));background:rgba(10,16,32,.96)}
+html.dev #satband{background:rgba(46,12,22,.96)}
 header{
   padding:9px 18px;border-bottom:1px solid var(--line);
   /* Marges sûres ARRONDIES (3.7.13). L'en-tête est le seul élément qui reçoit
@@ -116,7 +120,7 @@ header{
      rien (Chromium aligne le texte sur la grille de l'écran). Cause non
      déterminée à ce jour. env() reste en repli tant que le script n'a pas
      tourné. */
-  padding-top:calc(9px + var(--satTop, env(safe-area-inset-top)));
+  padding-top:9px;                       /* la marge haute est prise par #satband */
   padding-left:calc(18px + var(--satLeft, env(safe-area-inset-left)));
   padding-right:calc(18px + var(--satRight, env(safe-area-inset-right)));
   background:linear-gradient(180deg,rgba(10,16,32,.96),rgba(10,16,32,.68));
@@ -1089,6 +1093,13 @@ a.hbtn{text-decoration:none}
 <div id="stars"></div><canvas id="starcanvas"></canvas>
 
 <div id="app">
+<!-- Bande vide sous la barre d'état (3.7.14). Sur iOS 26+, le texte de
+     l'en-tête est rendu flou dès qu'il remonte sous la barre d'état — mesuré :
+     5 px d'étalement vertical contre 2 px partout ailleurs, et Chromium ne
+     reproduit rien à densité égale. L'en-tête ne monte donc plus lui-même : une
+     bande sans contenu occupe la marge sûre à sa place, et absorbe ce que le
+     système applique là. Hauteur nulle sur un appareil sans encoche. -->
+<div id="satband"></div>
 <header>
   <div class="topbar">
     <span class="devtag" id="devTag">DEV</span>
@@ -1330,7 +1341,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.13";
+const VERSION="3.7.14";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1382,7 +1393,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"La 3.7.12 rendait le fond de l'en-tête opaque pour tenter de corriger un flou observé sur iOS 27. Sans effet : c'est annulé, les étoiles retransparaissent derrière l'en-tête. Les marges sûres sont par ailleurs arrondies avant usage, par hygiène.",
+  wn_d:"Nouvelle tentative contre le flou de l'en-tête sur iOS récent : ce n'est plus l'en-tête qui remonte sous la barre d'état, mais une bande sans contenu, qui absorbe ce que le système applique à cet endroit. Le jeu s'appelle aussi <b>Orbital Colony</b> sur l'écran d'accueil, au lieu de « Colony ».",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1558,7 +1569,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"3.7.12 made the header background opaque to try to fix a blur seen on iOS 27. It had no effect, so it is reverted and the stars show through the header again. Safe-area insets are now rounded before use, as a matter of hygiene.",
+  wn_d:"Another attempt at the header blur on recent iOS: it is no longer the header that reaches under the status bar, but an empty band, which absorbs whatever the system applies there. The game is also called <b>Orbital Colony</b> on the home screen now, instead of \"Colony\".",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3111,6 +3122,8 @@ function syncSat(){
     const px=satPx(c)+"px";
     if(d.getPropertyValue(v)!==px)d.setProperty(v,px);
   });
+  /* #satband tire sa hauteur de --satTop : le bas de l'en-tête vient de bouger */
+  if(typeof syncHeaderH==="function")syncHeaderH();
 }
 syncSat();
 addEventListener("resize",syncSat);
@@ -3169,7 +3182,9 @@ addEventListener("orientationchange",()=>{
 [60,250,800].forEach(d=>setTimeout(syncAppH,d));
 
 function syncHeaderH(){
-  const h=Math.round($("header").getBoundingClientRect().height);
+  /* le BAS de l'en-tête, pas sa hauteur : depuis la 3.7.14 une bande le précède
+     (voir #satband), et c'est sous l'ensemble que #hero doit se poser */
+  const h=Math.round($("header").getBoundingClientRect().bottom);
   document.documentElement.style.setProperty("--headerH",h+"px");
 }
 if("ResizeObserver" in window){
@@ -4346,6 +4361,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.14", nm:{fr:"Une bande pour encaisser",en:"A band to take the hit"},
+  d:{fr:"Sur iOS 26 et suivants, le texte de l'en-tête est flou : 5 px d'étalement vertical contre 2 px partout ailleurs dans le jeu, et Chromium ne reproduit rien à densité d'écran égale. C'est donc le système, et il ne touche qu'une chose — le seul élément qui remonte sous la barre d'état. L'en-tête n'y monte donc plus : une bande sans contenu occupe la marge sûre à sa place et encaisse le traitement, l'en-tête commence en dessous. La bande porte la couleur de départ du dégradé, la jointure est invisible, et sa hauteur est nulle sur un appareil sans encoche. Le jeu s'appelle par ailleurs « Orbital Colony » sur l'écran d'accueil, au lieu de « Colony » — visible après réinstallation de l'icône, iOS figeant ce nom à l'installation.",
+     en:"On iOS 26 and later the header text is blurred: 5 px of vertical spread against 2 px everywhere else in the game, and Chromium reproduces nothing at the same screen density. So it is the system, and it touches only one thing — the single element reaching under the status bar. The header no longer goes there: an empty band occupies the safe area in its place and takes the treatment, with the header starting below it. The band carries the gradient's starting colour, the seam is invisible, and its height is zero on a device without an inset. The game is also called \"Orbital Colony\" on the home screen instead of \"Colony\" — visible after reinstalling the icon, since iOS freezes that name at install time."}},
  {v:"3.7.13", nm:{fr:"Retour en arrière",en:"Rolled back"},
   d:{fr:"La 3.7.12 rendait le fond de l'en-tête opaque, sur l'hypothèse que le flou observé sur iOS 27 venait du matériau « Liquid Glass » du système, qui traite le contenu translucide remontant sous la barre d'état. Sans effet sur l'appareil : l'hypothèse était fausse, et elle coûtait les quelques étoiles qui transparaissaient derrière l'en-tête. Annulée. Les marges sûres sont désormais arrondies avant d'être utilisées par la mise en page, par hygiène — l'en-tête était le seul élément à recevoir la valeur brute. La cause du flou reste à déterminer.",
      en:"3.7.12 made the header background opaque, on the hypothesis that the blur seen on iOS 27 came from the system's Liquid Glass material, which treats translucent content reaching under the status bar. No effect on the device: the hypothesis was wrong, and it cost the few stars that showed through the header. Reverted. Safe-area insets are now rounded before the layout uses them, as a matter of hygiene — the header was the only element receiving the raw value. The cause of the blur is still undetermined."}},
