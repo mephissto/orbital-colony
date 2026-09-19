@@ -16,6 +16,29 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.19 — The band blends into the bar
+
+3.7.18 cleared 24 px at the top of the header to move the text out of the blur.
+It worked, and it showed: a header gone tall, with emptiness above the logo.
+
+The gradient now starts from the background colour — exactly the one iOS paints
+the status bar with — and reaches its normal shade at the bottom of those 24 px:
+
+```css
+html.edgeband header{
+  background:linear-gradient(180deg,var(--bg) 0,
+    rgba(10,16,32,.96) var(--edgeTop,0px), rgba(10,16,32,.68) 100%)}
+```
+
+The two areas join without a seam. The whole reads as a slightly taller status
+bar, and the header appears to begin where its content begins. The system band
+falls on the darkest part of the gradient, where there is nothing to darken.
+
+The `edgeband` class is set by `syncEdge()` alongside `--edgeTop`: outside an
+installed app on iOS the rule does not apply at all.
+
+---
+
 ## 3.7.18 — Below the band
 
 The status bar style makes no difference: in an installed app on iOS 26+, the

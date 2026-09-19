@@ -17,6 +17,31 @@ restent valides**.
 
 ---
 
+## 3.7.19 — La bande se fond dans la barre
+
+La 3.7.18 dégageait 24 px en haut de l'en-tête pour sortir le texte du flou.
+Ça marchait, et ça se voyait : un en-tête devenu haut, avec un vide au-dessus du
+logo.
+
+Le dégradé part maintenant de la couleur de fond — exactement celle dont iOS
+peint la barre d'état — et rejoint sa teinte normale au bas de ces 24 px :
+
+```css
+html.edgeband header{
+  background:linear-gradient(180deg,var(--bg) 0,
+    rgba(10,16,32,.96) var(--edgeTop,0px), rgba(10,16,32,.68) 100%)}
+```
+
+Les deux zones se raccordent sans couture. L'ensemble se lit comme une barre
+d'état un peu plus haute, et l'en-tête semble commencer là où son contenu
+commence. La bande du système tombe sur la partie la plus sombre du dégradé,
+là où il n'y a rien à assombrir.
+
+La classe `edgeband` est posée par `syncEdge()`, en même temps que `--edgeTop` :
+hors application installée sur iOS, la règle ne s'applique pas du tout.
+
+---
+
 ## 3.7.18 — Sous la bande
 
 Le style de barre d'état n'y change rien : en application installée sur iOS 26+,

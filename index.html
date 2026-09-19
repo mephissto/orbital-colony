@@ -143,6 +143,19 @@ header{
   padding-right:calc(18px + var(--satRight, env(safe-area-inset-right)));
   background:linear-gradient(180deg,rgba(10,16,32,.96),rgba(10,16,32,.68));
 }
+/* Quand le contenu est décalé sous la bande du système (voir --edgeTop), les
+   24 px dégagés au-dessus ne doivent pas ressembler à un en-tête vide : le
+   dégradé part donc de la couleur de fond, celle-là même dont iOS peint la
+   barre d'état. Les deux se rejoignent sans couture, la zone se lit comme une
+   barre d'état un peu plus haute, et l'en-tête semble commencer là où son
+   contenu commence. La bande, elle, tombe sur la partie la plus sombre du
+   dégradé — là où il n'y a rien à assombrir. */
+html.edgeband header{
+  background:linear-gradient(180deg,var(--bg) 0,
+    rgba(10,16,32,.96) var(--edgeTop,0px), rgba(10,16,32,.68) 100%)}
+html.edgeband.dev header{
+  background:linear-gradient(180deg,var(--bg) 0,
+    rgba(46,12,22,.96) var(--edgeTop,0px), rgba(38,10,20,.72) 100%)}
 /* La 3.7.12 rendait ce fond opaque, sur l'idée que le flou de l'en-tête venait
    du matériau « Liquid Glass » d'iOS. C'était faux : annulé en 3.7.13, voir
    --satTop plus bas pour la vraie cause. */
@@ -1353,7 +1366,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.18";
+const VERSION="3.7.19";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1405,7 +1418,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le flou en haut de l'écran sur iPhone : iOS peint une bande sur le bord haut de la vue, quoi qu'on fasse. Mesurée sur l'appareil, elle s'éteint vers 20 px — et le logo commençait à 9 px, donc sa moitié haute baignait dedans. Le contenu de l'en-tête est décalé sous la bande : elle tombe maintenant sur du dégradé lisse, où il n'y a rien à brouiller.",
+  wn_d:"Les 24 px dégagés en haut de l'en-tête pour échapper au flou d'iOS ne ressemblent plus à un en-tête vide : le dégradé part maintenant de la couleur de fond, celle dont iOS peint la barre d'état. Les deux se rejoignent sans couture — la zone se lit comme une barre d'état un peu plus haute, et l'en-tête commence là où son contenu commence.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1581,7 +1594,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The blur at the top of the screen on iPhone: iOS paints a band along the top edge of the view whatever you do. Measured on the device, it fades out around 20 px — and the logo started at 9 px, so its upper half sat inside it. The header content is moved below the band: it now falls on smooth gradient, where there is nothing to smear.",
+  wn_d:"The 24 px cleared at the top of the header to escape the iOS blur no longer look like an empty header: the gradient now starts from the background colour, the one iOS paints the status bar with. The two meet without a seam — the area reads as a slightly taller status bar, and the header begins where its content begins.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3138,6 +3151,7 @@ function syncEdge(){
   const v=(ios&&pwa)?"24px":"0px";
   const d=document.documentElement.style;
   if(d.getPropertyValue("--edgeTop")!==v)d.setProperty("--edgeTop",v);
+  cls(document.documentElement,"edgeband",ios&&pwa);
 }
 syncEdge();
 addEventListener("resize",syncEdge);
@@ -4389,6 +4403,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.19", nm:{fr:"La bande se fond dans la barre",en:"The band blends into the bar"},
+  d:{fr:"La 3.7.18 dégageait 24 px en haut de l'en-tête pour sortir le texte du flou que le système peint sur le bord de la vue. Ça marchait, mais ça se voyait : un en-tête devenu haut, avec un vide au-dessus du logo. Le dégradé de l'en-tête part désormais de la couleur de fond — exactement celle dont iOS peint la barre d'état — et rejoint sa teinte normale au bas de ces 24 px. Les deux zones se raccordent sans couture : l'ensemble se lit comme une barre d'état un peu plus haute, et l'en-tête semble commencer là où son contenu commence. La bande du système, elle, tombe sur la partie la plus sombre du dégradé, là où il n'y a rien à assombrir.",
+     en:"3.7.18 cleared 24 px at the top of the header to move the text out of the blur the system paints along the edge of the view. It worked, but it showed: a header gone tall, with emptiness above the logo. The header gradient now starts from the background colour — exactly the one iOS paints the status bar with — and reaches its normal shade at the bottom of those 24 px. The two areas join without a seam: the whole reads as a slightly taller status bar, and the header appears to begin where its content begins. The system band falls on the darkest part of the gradient, where there is nothing to darken."}},
  {v:"3.7.18", nm:{fr:"Sous la bande",en:"Below the band"},
   d:{fr:"En application installée sur iOS 26+, le système peint une bande de flou sur le bord haut de la vue web — quel que soit le style de barre d'état, ce que les versions 3.7.16 et 3.7.17 avaient tenté sans succès. Elle a été mesurée sur l'appareil, en comparant une colonne vide de l'en-tête au dégradé seul : un assombrissement de 24 au tout bord, 11 à 8 px, 4,5 à 17 px, éteint vers 20. Le logo occupait 9 à 24 px : sa moitié haute baignait dedans, d'où un flou plus marqué en vertical qu'en horizontal — l'asymétrie qu'on mesurait depuis le début sans savoir l'expliquer. Le contenu de l'en-tête est donc décalé de 24 px vers le bas, et la bande tombe sur du dégradé lisse où il n'y a rien à brouiller. L'en-tête passe de 53 à 77 px, uniquement dans l'application installée sur iOS.",
      en:"In an installed app on iOS 26+, the system paints a blur band along the top edge of the web view — whatever the status bar style, which is what 3.7.16 and 3.7.17 tried without success. It was measured on the device, comparing an empty column of the header against the gradient alone: a darkening of 24 at the very edge, 11 at 8 px, 4.5 at 17 px, gone by about 20. The logo occupied 9 to 24 px: its upper half sat inside it, hence a blur stronger vertically than horizontally — the asymmetry measured from the start without an explanation. The header content is therefore pushed down by 24 px, and the band falls on smooth gradient where there is nothing to smear. The header goes from 53 to 77 px, in the installed app on iOS only."}},
