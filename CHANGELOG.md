@@ -17,20 +17,23 @@ restent valides**.
 
 ---
 
-## 3.7.22 — Huit pixels
+## 3.7.23 — Onze pixels
 
-`--edgeTop` se pose à **8 px**, après essais sur l'appareil.
+`--edgeTop` est fixé à **11 px**, après quatre essais sur l'appareil.
 
-| Valeur | En-tête | Haut du logo | Verdict |
-|---:|---:|---:|---|
-| 24 px | 77 px | 43,5 | dégage, trop épais |
-| 11 px | 64 px | 30,5 | dégage, marge restante |
-| **8 px** | **61 px** | **27,5** | |
-| 5 px | 58 px | 24,5 | trop juste |
+| Valeur | En-tête | Haut du logo | Haut des boutons | Verdict |
+|---:|---:|---:|---:|---|
+| 24 px | 77 px | 43,5 | 32 | dégage, trop épais |
+| **11 px** | **64 px** | **30,5** | **20** | **retenu** |
+| 8 px | 61 px | 27,5 | 17 | acceptable |
+| 5 px | 58 px | 24,5 | 14 | trop juste |
 
-La mesure de la bande ne permettait pas de trancher seule : elle donnait un
-plancher de 20 px, pas sa fin — la colonne d'échantillonnage tombait sur du texte
-au-delà. C'est donc l'œil sur l'appareil qui a décidé, en quatre essais.
+11 px est la plus petite valeur qui laisse le logo **et** le haut des boutons
+hors de la bande — ce qui n'est vrai d'aucune valeur plus basse.
+
+La mesure ne permettait pas de trancher seule : elle donnait un plancher de
+20 px, pas la fin de la bande, la colonne d'échantillonnage tombant sur du texte
+au-delà. C'est l'œil sur l'appareil qui a décidé.
 
 ---
 

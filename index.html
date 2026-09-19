@@ -1366,7 +1366,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.22";
+const VERSION="3.7.23";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1418,7 +1418,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le décalage qui sort l'en-tête du flou d'iOS se pose à <b>8 px</b> : 5 px était trop juste, 11 px laissait de la marge. L'en-tête fait 61 px, contre 53 hors application installée.",
+  wn_d:"Le décalage qui sort l'en-tête du flou d'iOS est fixé à <b>11 px</b> : c'est la plus petite valeur qui laisse le logo <i>et</i> le haut des boutons hors de la bande du système. L'en-tête fait 64 px, contre 53 hors application installée.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1594,7 +1594,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The offset that lifts the header out of the iOS blur settles at <b>8 px</b>: 5 px was too tight, 11 px left room to spare. The header is 61 px, against 53 outside an installed app.",
+  wn_d:"The offset that lifts the header out of the iOS blur is set at <b>11 px</b>: the smallest value that keeps the logo <i>and</i> the top of the buttons clear of the system band. The header is 64 px, against 53 outside an installed app.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3147,19 +3147,20 @@ const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
    colonne d'échantillonnage ne tombe sur du texte, donc 20 px est un plancher
    et non la fin de la bande.
      24 px (3.7.18) — dégage, mais en-tête à 77 px, trop épais ;
-     11 px (3.7.20) — dégage, en-tête à 64 px, il restait de la marge ;
       5 px (3.7.21) — trop juste ;
-      8 px (ici)    — en-tête à 61 px.
+      8 px (3.7.22) — acceptable ;
+     11 px (ici)    — retenu, en-tête à 64 px.
    Ce qui contraint la valeur, c'est le TEXTE et non la boîte de l'en-tête : le
-   logo est centré au milieu d'une rangée de boutons plus hauts que lui, donc
-   il descend déjà d'une dizaine de pixels tout seul. À 8 px son haut tombe à
-   27,5 px du bord de la vue. */
+   logo est centré au milieu d'une rangée de boutons plus hauts que lui, donc il
+   descend déjà d'une dizaine de pixels tout seul. À 11 px son haut tombe à
+   30,5 px du bord de la vue, et le haut des boutons à 20 — soit hors de la
+   bande tous les deux, ce qui n'est vrai d'aucune valeur plus basse. */
 function syncEdge(){
   const ios=/iP(hone|od|ad)/.test(navigator.platform)
             ||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
   const pwa=matchMedia("(display-mode: standalone)").matches
             ||navigator.standalone===true;
-  const v=(ios&&pwa)?"8px":"0px";
+  const v=(ios&&pwa)?"11px":"0px";
   const d=document.documentElement.style;
   if(d.getPropertyValue("--edgeTop")!==v)d.setProperty("--edgeTop",v);
   cls(document.documentElement,"edgeband",ios&&pwa);
@@ -4414,9 +4415,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
- {v:"3.7.22", nm:{fr:"Huit pixels",en:"Eight pixels"},
-  d:{fr:"Le décalage qui sort l'en-tête de la bande du système se pose à 8 px, après essais sur l'appareil : 24 px dégageait le texte mais donnait un en-tête de 77 px, 11 px laissait encore de la marge, 5 px était trop juste. À 8 px le haut du logo tombe à 27,5 px du bord de la vue et l'en-tête fait 61 px, contre 53 hors application installée. La mesure de la bande ne permettait pas de trancher seule — elle donnait un plancher de 20 px, pas sa fin — donc c'est l'œil sur l'appareil qui a décidé.",
-     en:"The offset that lifts the header out of the system band settles at 8 px, after trials on the device: 24 px cleared the text but made a 77 px header, 11 px still left room to spare, 5 px was too tight. At 8 px the top of the logo lands 27.5 px from the edge of the view and the header is 61 px, against 53 outside an installed app. Measuring the band could not settle it alone — it gave a floor of 20 px, not its end — so the eye on the device decided."}},
+ {v:"3.7.23", nm:{fr:"Onze pixels",en:"Eleven pixels"},
+  d:{fr:"Le décalage qui sort l'en-tête de la bande du système est fixé à 11 px, après quatre essais sur l'appareil : 24 px dégageait tout mais donnait un en-tête de 77 px, 5 px était trop juste, 8 px acceptable. À 11 px le haut du logo tombe à 30,5 px du bord de la vue et le haut des boutons à 20 — les deux hors de la bande, ce qui n'est vrai d'aucune valeur plus basse. L'en-tête fait 64 px, contre 53 hors application installée. La mesure de la bande ne permettait pas de trancher seule : elle donnait un plancher de 20 px, pas sa fin. C'est l'œil sur l'appareil qui a décidé.",
+     en:"The offset that lifts the header out of the system band is set at 11 px, after four trials on the device: 24 px cleared everything but made a 77 px header, 5 px was too tight, 8 px acceptable. At 11 px the top of the logo lands 30.5 px from the edge of the view and the top of the buttons at 20 — both clear of the band, which is true of no lower value. The header is 64 px, against 53 outside an installed app. Measuring the band could not settle it alone: it gave a floor of 20 px, not its end. The eye on the device decided."}},
  {v:"3.7.21", nm:{fr:"Cinq pixels suffisent",en:"Five pixels is enough"},
   d:{fr:"Le décalage descend de 11 à 5 px. Ce qui contraint la valeur, c'est le texte et non la boîte de l'en-tête : le logo n'est pas collé au bord, il est centré au milieu d'une rangée de boutons plus hauts que lui, donc il descend déjà d'une dizaine de pixels tout seul. À 5 px, le haut du logo tombe à 24,5 px du bord de la vue, au-delà des 20 px où la bande du système cesse d'être mesurable ; le haut des boutons Langue et Réglages, lui, y entre. Un bord arrondi légèrement adouci ne se voit pas, du texte oui — c'est l'arbitrage. L'en-tête ne fait plus que 58 px, contre 53 hors application installée et 77 au premier jet.",
      en:"The offset comes down from 11 to 5 px. What constrains the value is the text, not the header box: the logo is not flush with the edge, it is centred in a row of buttons taller than itself, so it already sits ten-odd pixels lower on its own. At 5 px the top of the logo lands 24.5 px from the edge of the view, beyond the 20 px where the system band stops being measurable; the top of the Language and Settings buttons does enter it. A slightly softened rounded border does not show, text does — that is the trade. The header is now 58 px, against 53 outside an installed app and 77 on the first attempt."}},
