@@ -16,6 +16,25 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.20 — To the minimum
+
+`--edgeTop` goes from 24 to **11 px**, the bare minimum.
+
+The logo starts 9 px from the top of the header, and the system band is measured
+at **at least** 20 px from the edge of the view: 9 + 11 therefore lands exactly on
+it, give or take the two or three pixels characters leave at the top of their box.
+
+**That 20 px is a floor, not the end of the band.** The profile still showed 4.5
+of darkening at 17 px before the sampling column ran into text; and an independent
+report mentions "about 35 points". 24 px remains the only value known to clear the
+text on the device.
+
+So this is a deliberate test of the theoretical minimum. If the blur returns, the
+range to go back to is 16 to 24 px.
+The header goes from 77 to **64 px**, against 53 outside an installed app.
+
+---
+
 ## 3.7.19 — The band blends into the bar
 
 3.7.18 cleared 24 px at the top of the header to move the text out of the blur.

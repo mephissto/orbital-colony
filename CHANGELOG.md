@@ -17,6 +17,25 @@ restent valides**.
 
 ---
 
+## 3.7.20 — Au plus juste
+
+`--edgeTop` passe de 24 à **11 px**, le strict nécessaire.
+
+Le logo commence à 9 px du haut de l'en-tête, et la bande du système est mesurée
+à **au moins** 20 px du bord de la vue : 9 + 11 tombe donc pile dessus, aux deux
+ou trois pixels près que les caractères laissent en haut de leur boîte.
+
+**Ce 20 px est un plancher, pas la fin de la bande.** Le profil montrait encore
+4,5 d'assombrissement à 17 px, puis la colonne d'échantillonnage est tombée sur
+du texte ; et un rapport indépendant parle d'« environ 35 points ». 24 px reste
+la seule valeur dont on sache qu'elle dégage le texte sur l'appareil.
+
+C'est donc un essai délibéré du minimum théorique. Si le flou revient, la
+fourchette à reprendre est 16 à 24 px. L'en-tête passe de 77 à **64 px**, contre 53 hors application
+installée.
+
+---
+
 ## 3.7.19 — La bande se fond dans la barre
 
 La 3.7.18 dégageait 24 px en haut de l'en-tête pour sortir le texte du flou.

@@ -1366,7 +1366,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.19";
+const VERSION="3.7.20";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1418,7 +1418,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Les 24 px dégagés en haut de l'en-tête pour échapper au flou d'iOS ne ressemblent plus à un en-tête vide : le dégradé part maintenant de la couleur de fond, celle dont iOS peint la barre d'état. Les deux se rejoignent sans couture — la zone se lit comme une barre d'état un peu plus haute, et l'en-tête commence là où son contenu commence.",
+  wn_d:"Le décalage qui sort l'en-tête du flou d'iOS passe de 24 à <b>11 px</b>, pour voir si le minimum théorique suffit. L'en-tête retrouve presque sa hauteur d'origine. Si le flou revient, c'est que la bande du système est plus haute que mesuré et il faudra remonter vers 16 à 24 px.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1594,7 +1594,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The 24 px cleared at the top of the header to escape the iOS blur no longer look like an empty header: the gradient now starts from the background colour, the one iOS paints the status bar with. The two meet without a seam — the area reads as a slightly taller status bar, and the header begins where its content begins.",
+  wn_d:"The offset that lifts the header out of the iOS blur goes from 24 to <b>11 px</b>, to see whether the theoretical minimum is enough. The header is nearly back to its original height. If the blur returns, the system band is taller than measured and the value will have to go back up to somewhere between 16 and 24 px.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3141,14 +3141,20 @@ const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
 /* Les marges sûres arrondies, publiées pour la CSS : posées sur une fraction de
    pixel, les glyphes sont rendus flous en vertical (voir l'en-tête). */
 /* La bande du bord haut n'existe qu'en application installée sur iOS : ailleurs
-   ce décalage ne serait que de la place perdue. 24 px plutôt que les 20 mesurés,
-   pour ne pas raser le bord — et parce que la mesure vient d'un seul appareil. */
+   ce décalage ne serait que de la place perdue.
+   ATTENTION à la valeur. Le profil mesuré sur l'appareil montre la bande encore
+   à 4,5 d'assombrissement à 17 px, puis la colonne d'échantillonnage tombe sur
+   du texte : 20 px est donc un PLANCHER, pas la fin de la bande. Un rapport
+   indépendant donne « environ 35 points ». 24 px (3.7.18) est la seule valeur
+   dont on sache qu'elle dégage le texte sur l'appareil. 11 px est un essai
+   délibéré du minimum théorique — si le flou revient, c'est que la bande
+   dépasse 20 px, et 16 à 24 px est la fourchette à reprendre. */
 function syncEdge(){
   const ios=/iP(hone|od|ad)/.test(navigator.platform)
             ||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
   const pwa=matchMedia("(display-mode: standalone)").matches
             ||navigator.standalone===true;
-  const v=(ios&&pwa)?"24px":"0px";
+  const v=(ios&&pwa)?"11px":"0px";
   const d=document.documentElement.style;
   if(d.getPropertyValue("--edgeTop")!==v)d.setProperty("--edgeTop",v);
   cls(document.documentElement,"edgeband",ios&&pwa);
@@ -4403,6 +4409,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.20", nm:{fr:"Au plus juste",en:"To the minimum"},
+  d:{fr:"Le décalage introduit en 3.7.18 passe de 24 à 11 px, pour éprouver le minimum théorique : le logo commence à 9 px du haut de l'en-tête, la bande du système est mesurée à au moins 20 px du bord de la vue, donc 9 + 11 tombe pile dessus, aux deux ou trois pixels près que les caractères laissent en haut de leur boîte. À savoir : ce 20 px est un plancher, pas la fin de la bande — la colonne d'échantillonnage tombait sur du texte au-delà, et un rapport indépendant parle d'environ 35 points. Si le flou revient, c'est réglé : il faudra remonter entre 16 et 24 px, cette dernière étant la seule valeur dont on sache qu'elle dégage le texte. L'en-tête passe de 77 à 64 px, contre 53 hors application installée.",
+     en:"The offset introduced in 3.7.18 goes from 24 to 11 px, to test the theoretical minimum: the logo starts 9 px from the top of the header, the system band is measured at at least 20 px from the edge of the view, so 9 + 11 lands exactly on it, give or take the two or three pixels characters leave at the top of their box. Worth knowing: that 20 px is a floor, not the end of the band — the sampling column ran into text beyond it, and an independent report mentions about 35 points. If the blur comes back, that settles it: the value goes up to between 16 and 24 px, the latter being the only one known to clear the text. The header goes from 77 to 64 px, against 53 outside an installed app."}},
  {v:"3.7.19", nm:{fr:"La bande se fond dans la barre",en:"The band blends into the bar"},
   d:{fr:"La 3.7.18 dégageait 24 px en haut de l'en-tête pour sortir le texte du flou que le système peint sur le bord de la vue. Ça marchait, mais ça se voyait : un en-tête devenu haut, avec un vide au-dessus du logo. Le dégradé de l'en-tête part désormais de la couleur de fond — exactement celle dont iOS peint la barre d'état — et rejoint sa teinte normale au bas de ces 24 px. Les deux zones se raccordent sans couture : l'ensemble se lit comme une barre d'état un peu plus haute, et l'en-tête semble commencer là où son contenu commence. La bande du système, elle, tombe sur la partie la plus sombre du dégradé, là où il n'y a rien à assombrir.",
      en:"3.7.18 cleared 24 px at the top of the header to move the text out of the blur the system paints along the edge of the view. It worked, but it showed: a header gone tall, with emptiness above the logo. The header gradient now starts from the background colour — exactly the one iOS paints the status bar with — and reaches its normal shade at the bottom of those 24 px. The two areas join without a seam: the whole reads as a slightly taller status bar, and the header appears to begin where its content begins. The system band falls on the darkest part of the gradient, where there is nothing to darken."}},
