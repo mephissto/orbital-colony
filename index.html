@@ -1366,7 +1366,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.20";
+const VERSION="3.7.21";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1418,7 +1418,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le décalage qui sort l'en-tête du flou d'iOS passe de 24 à <b>11 px</b>, pour voir si le minimum théorique suffit. L'en-tête retrouve presque sa hauteur d'origine. Si le flou revient, c'est que la bande du système est plus haute que mesuré et il faudra remonter vers 16 à 24 px.",
+  wn_d:"Le décalage qui sort l'en-tête du flou d'iOS descend à <b>5 px</b> : l'en-tête ne fait plus que 58 px, contre 53 hors application installée. Ce qui compte est la position du texte, pas celle de la boîte — le logo étant centré parmi des boutons plus hauts, il reste dégagé.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1594,7 +1594,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The offset that lifts the header out of the iOS blur goes from 24 to <b>11 px</b>, to see whether the theoretical minimum is enough. The header is nearly back to its original height. If the blur returns, the system band is taller than measured and the value will have to go back up to somewhere between 16 and 24 px.",
+  wn_d:"The offset that lifts the header out of the iOS blur comes down to <b>5 px</b>: the header is now 58 px, against 53 outside an installed app. What matters is where the text sits, not the box — the logo being centred among taller buttons, it stays clear.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3142,19 +3142,25 @@ const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
    pixel, les glyphes sont rendus flous en vertical (voir l'en-tête). */
 /* La bande du bord haut n'existe qu'en application installée sur iOS : ailleurs
    ce décalage ne serait que de la place perdue.
-   ATTENTION à la valeur. Le profil mesuré sur l'appareil montre la bande encore
-   à 4,5 d'assombrissement à 17 px, puis la colonne d'échantillonnage tombe sur
-   du texte : 20 px est donc un PLANCHER, pas la fin de la bande. Un rapport
-   indépendant donne « environ 35 points ». 24 px (3.7.18) est la seule valeur
-   dont on sache qu'elle dégage le texte sur l'appareil. 11 px est un essai
-   délibéré du minimum théorique — si le flou revient, c'est que la bande
-   dépasse 20 px, et 16 à 24 px est la fourchette à reprendre. */
+   Ce qui contraint la valeur, c'est le TEXTE, pas la boîte de l'en-tête. Le
+   logo n'est pas collé au bord : il est centré au milieu d'une rangée de
+   boutons plus hauts que lui, donc il descend déjà d'une dizaine de pixels
+   tout seul. À 5 px de décalage, le haut du logo tombe à 24,5 px du bord de la
+   vue — au-delà des 20 px où la bande cesse d'être mesurable — tandis que le
+   haut des boutons Langue et Réglages, lui, y entre. Un bord arrondi
+   légèrement adouci ne se voit pas ; du texte, si. C'est l'arbitrage assumé
+   ici, et il rend l'en-tête à 58 px contre 53 hors application installée.
+   Historique : 24 px en 3.7.18 (prudence), 11 px en 3.7.20, 5 px ici. Le
+   profil mesuré donnait encore 4,5 d'assombrissement à 17 px avant que la
+   colonne d'échantillonnage ne tombe sur du texte : 20 px est un plancher, pas
+   la fin de la bande. Si le flou revient, remonter — 11 px a été vérifié bon
+   sur l'appareil. */
 function syncEdge(){
   const ios=/iP(hone|od|ad)/.test(navigator.platform)
             ||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
   const pwa=matchMedia("(display-mode: standalone)").matches
             ||navigator.standalone===true;
-  const v=(ios&&pwa)?"11px":"0px";
+  const v=(ios&&pwa)?"5px":"0px";
   const d=document.documentElement.style;
   if(d.getPropertyValue("--edgeTop")!==v)d.setProperty("--edgeTop",v);
   cls(document.documentElement,"edgeband",ios&&pwa);
@@ -4409,6 +4415,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.21", nm:{fr:"Cinq pixels suffisent",en:"Five pixels is enough"},
+  d:{fr:"Le décalage descend de 11 à 5 px. Ce qui contraint la valeur, c'est le texte et non la boîte de l'en-tête : le logo n'est pas collé au bord, il est centré au milieu d'une rangée de boutons plus hauts que lui, donc il descend déjà d'une dizaine de pixels tout seul. À 5 px, le haut du logo tombe à 24,5 px du bord de la vue, au-delà des 20 px où la bande du système cesse d'être mesurable ; le haut des boutons Langue et Réglages, lui, y entre. Un bord arrondi légèrement adouci ne se voit pas, du texte oui — c'est l'arbitrage. L'en-tête ne fait plus que 58 px, contre 53 hors application installée et 77 au premier jet.",
+     en:"The offset comes down from 11 to 5 px. What constrains the value is the text, not the header box: the logo is not flush with the edge, it is centred in a row of buttons taller than itself, so it already sits ten-odd pixels lower on its own. At 5 px the top of the logo lands 24.5 px from the edge of the view, beyond the 20 px where the system band stops being measurable; the top of the Language and Settings buttons does enter it. A slightly softened rounded border does not show, text does — that is the trade. The header is now 58 px, against 53 outside an installed app and 77 on the first attempt."}},
  {v:"3.7.20", nm:{fr:"Au plus juste",en:"To the minimum"},
   d:{fr:"Le décalage introduit en 3.7.18 passe de 24 à 11 px, pour éprouver le minimum théorique : le logo commence à 9 px du haut de l'en-tête, la bande du système est mesurée à au moins 20 px du bord de la vue, donc 9 + 11 tombe pile dessus, aux deux ou trois pixels près que les caractères laissent en haut de leur boîte. À savoir : ce 20 px est un plancher, pas la fin de la bande — la colonne d'échantillonnage tombait sur du texte au-delà, et un rapport indépendant parle d'environ 35 points. Si le flou revient, c'est réglé : il faudra remonter entre 16 et 24 px, cette dernière étant la seule valeur dont on sache qu'elle dégage le texte. L'en-tête passe de 77 à 64 px, contre 53 hors application installée.",
      en:"The offset introduced in 3.7.18 goes from 24 to 11 px, to test the theoretical minimum: the logo starts 9 px from the top of the header, the system band is measured at at least 20 px from the edge of the view, so 9 + 11 lands exactly on it, give or take the two or three pixels characters leave at the top of their box. Worth knowing: that 20 px is a floor, not the end of the band — the sampling column ran into text beyond it, and an independent report mentions about 35 points. If the blur comes back, that settles it: the value goes up to between 16 and 24 px, the latter being the only one known to clear the text. The header goes from 77 to 64 px, against 53 outside an installed app."}},

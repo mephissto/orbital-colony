@@ -16,6 +16,31 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.21 — Five pixels is enough
+
+`--edgeTop` comes down from 11 to **5 px**.
+
+What constrains the value is the **text**, not the header box. The logo is not
+flush with the edge: it is centred in a row of buttons taller than itself, so it
+already sits ten-odd pixels lower on its own.
+
+| `--edgeTop` | Header | Top of logo | Top of buttons |
+|---:|---:|---:|---:|
+| 11 px | 64 px | 30.5 | 20 |
+| 8 px | 61 px | 27.5 | 17 |
+| **5 px** | **58 px** | **24.5** | **14** |
+| 0 px | 53 px | 19.5 ✗ | 9 |
+
+The system band stops being measurable around 20 px. At a 5 px offset the text is
+beyond it; the top of the Language and Settings buttons does enter it. A slightly
+softened rounded border does not show, text does — that is the accepted trade.
+
+The header is now **58 px**, against 53 outside an installed app and 77 on the
+first attempt. Should a blur reappear on the logo, 11 px was verified good on the
+device.
+
+---
+
 ## 3.7.20 — To the minimum
 
 `--edgeTop` goes from 24 to **11 px**, the bare minimum.

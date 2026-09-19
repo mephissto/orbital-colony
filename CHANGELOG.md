@@ -17,6 +17,32 @@ restent valides**.
 
 ---
 
+## 3.7.21 — Cinq pixels suffisent
+
+`--edgeTop` descend de 11 à **5 px**.
+
+Ce qui contraint la valeur, c'est le **texte**, pas la boîte de l'en-tête. Le
+logo n'est pas collé au bord : il est centré au milieu d'une rangée de boutons
+plus hauts que lui, donc il descend déjà d'une dizaine de pixels tout seul.
+
+| `--edgeTop` | En-tête | Haut du logo | Haut des boutons |
+|---:|---:|---:|---:|
+| 11 px | 64 px | 30,5 | 20 |
+| 8 px | 61 px | 27,5 | 17 |
+| **5 px** | **58 px** | **24,5** | **14** |
+| 0 px | 53 px | 19,5 ✗ | 9 |
+
+La bande du système cesse d'être mesurable vers 20 px. À 5 px de décalage le
+texte est au-delà ; le haut des boutons Langue et Réglages, lui, y entre. Un bord
+arrondi légèrement adouci ne se voit pas, du texte oui — c'est l'arbitrage
+assumé.
+
+L'en-tête ne fait plus que **58 px**, contre 53 hors application installée et 77
+au premier jet. Si un flou réapparaissait sur le logo, 11 px a été vérifié bon
+sur l'appareil.
+
+---
+
 ## 3.7.20 — Au plus juste
 
 `--edgeTop` passe de 24 à **11 px**, le strict nécessaire.
