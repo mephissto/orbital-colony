@@ -16,6 +16,23 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.22 — Eight pixels
+
+`--edgeTop` settles at **8 px**, after trials on the device.
+
+| Value | Header | Top of logo | Verdict |
+|---:|---:|---:|---|
+| 24 px | 77 px | 43.5 | clears, too thick |
+| 11 px | 64 px | 30.5 | clears, room to spare |
+| **8 px** | **61 px** | **27.5** | |
+| 5 px | 58 px | 24.5 | too tight |
+
+Measuring the band could not settle it alone: it gave a floor of 20 px, not its
+end — the sampling column ran into text beyond that. So the eye on the device
+decided, in four trials.
+
+---
+
 ## 3.7.21 — Five pixels is enough
 
 `--edgeTop` comes down from 11 to **5 px**.

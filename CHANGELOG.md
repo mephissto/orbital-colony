@@ -17,6 +17,23 @@ restent valides**.
 
 ---
 
+## 3.7.22 — Huit pixels
+
+`--edgeTop` se pose à **8 px**, après essais sur l'appareil.
+
+| Valeur | En-tête | Haut du logo | Verdict |
+|---:|---:|---:|---|
+| 24 px | 77 px | 43,5 | dégage, trop épais |
+| 11 px | 64 px | 30,5 | dégage, marge restante |
+| **8 px** | **61 px** | **27,5** | |
+| 5 px | 58 px | 24,5 | trop juste |
+
+La mesure de la bande ne permettait pas de trancher seule : elle donnait un
+plancher de 20 px, pas sa fin — la colonne d'échantillonnage tombait sur du texte
+au-delà. C'est donc l'œil sur l'appareil qui a décidé, en quatre essais.
+
+---
+
 ## 3.7.21 — Cinq pixels suffisent
 
 `--edgeTop` descend de 11 à **5 px**.
