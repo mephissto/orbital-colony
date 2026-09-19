@@ -17,6 +17,45 @@ restent valides**.
 
 ---
 
+## 3.7.17 — Le flou du haut, deuxième prise
+
+Trois corrections sur la 3.7.16.
+
+**La valeur.** `black` ne suffit pas ; les projets qui ont réglé ce même problème
+posent tous `default`.
+
+```html
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+```
+
+**La couleur.** iOS 27 **ignore `<meta theme-color>`** pour la barre d'état. Il
+lit le `background-color` d'un *élément réel* placé en haut de la page — la
+propriété, pas les pixels rendus. D'où une bande d'un pixel, invisible à la mise
+en page :
+
+```html
+<div id="sbsample"></div>
+```
+```css
+#sbsample{position:fixed;top:0;left:0;right:0;height:1px;z-index:0;
+  pointer-events:none;background-color:#090f1f}
+```
+
+C'est elle qui empêche la barre de se peindre en noir et de se détacher au-dessus
+de l'en-tête, comme en 3.7.9 et 3.7.10. `theme-color` reste pour Android et les
+iOS antérieurs.
+
+**L'installation.** iOS ne lit ce réglage qu'**à l'installation**. Une icône déjà
+posée sur l'écran d'accueil garde l'ancien — ce qui explique sans doute pourquoi
+les versions précédentes semblaient sans effet. Il faut supprimer l'icône et la
+reposer.
+
+Sources : [holy-grails #191](https://github.com/shawnhiatt/holy-grails/pull/191) ·
+[vcsudoku #38](https://github.com/tmshv/vcsudoku/pull/38) ·
+[fin-app #411](https://github.com/MrClit/fin-app/issues/411)
+
+---
+
 ## 3.7.16 — Le flou du haut, expliqué
 
 Ce n'était pas un bug du jeu. Depuis **iOS 26**, le système applique son *scroll

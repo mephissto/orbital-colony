@@ -38,7 +38,9 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<!-- `black` et NON `black-translucent` (3.7.16). Depuis iOS 26, le système
+<!-- `default` et NON `black-translucent` (3.7.17 ; `black` en 3.7.16 ne
+     suffisait pas, les projets qui ont réglé le problème posent tous
+     `default`). Depuis iOS 26, le système
      applique son « scroll edge effect » à toute application installée dont la
      vue remonte sous la barre d'état : un flou qui descend d'environ 35 points
      SOUS la barre, donc en plein dans l'en-tête. iOS 27 l'a accentué. Le même
@@ -46,13 +48,13 @@
      celui-ci : une barre d'état opaque, sous laquelle la vue ne monte plus.
      Il n'y a rien à corriger en CSS — le flou est composé par le système, au
      niveau du compositeur, par-dessus le fond déjà peint.
-     Ce qui manquait aux tentatives 3.7.9 et 3.7.10, qui posaient déjà `black` :
-     la couleur. Avec une barre opaque, iOS la peint avec <meta theme-color>, et
-     celui-ci valait le fond de page (#05070f) alors que l'en-tête commence à
-     #0a1020 — d'où la « bande noire » visible en haut. Les deux sont désormais
-     accordés, voir theme-color juste en dessous.
-     viewport-fit=cover reste : la marge sûre du BAS en dépend. -->
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+     Pour la couleur de la barre, voir #sbsample plus bas : iOS 27 ignore
+     <meta theme-color> et lit le background-color d'un élément réel.
+     viewport-fit=cover reste : la marge sûre du BAS en dépend.
+     À SAVOIR : iOS ne lit cette balise qu'à L'INSTALLATION. Une icône déjà
+     posée sur l'écran d'accueil garde l'ancien réglage — il faut la supprimer
+     et la reposer pour que le changement prenne effet. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Orbital Colony">
 <style>
 :root{
@@ -115,6 +117,10 @@ textarea{-webkit-user-select:text;user-select:text}
 #app{position:relative;z-index:2;
   height:100%;height:100dvh;height:var(--appH,100dvh);
   display:flex;flex-direction:column}
+
+#sbsample{position:fixed;top:0;left:0;right:0;height:1px;z-index:0;
+  pointer-events:none;background-color:#090f1f}
+html.dev #sbsample{background-color:#2b0c15}
 
 /* ---------- HEADER ---------- */
 header{
@@ -1101,6 +1107,14 @@ a.hbtn{text-decoration:none}
 <div id="stars"></div><canvas id="starcanvas"></canvas>
 
 <div id="app">
+<!-- Sonde de couleur pour la barre d'état (3.7.17). Avec une barre opaque, iOS
+     doit lui donner une couleur ; depuis iOS 27 il ignore <meta theme-color> et
+     lit le background-color d'un ÉLÉMENT réel placé en haut — pas les pixels
+     rendus, la propriété. D'où cette bande d'un pixel, invisible à la mise en
+     page, qui porte la couleur du haut de l'en-tête. Sans elle, la barre se
+     peint en noir et se détache au-dessus de l'en-tête, ce qu'on a vu en
+     3.7.9 et 3.7.10. -->
+<div id="sbsample"></div>
 <header>
   <div class="topbar">
     <span class="devtag" id="devTag">DEV</span>
@@ -1342,7 +1356,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.16";
+const VERSION="3.7.17";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1394,7 +1408,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le flou en haut de l'écran sur iPhone est corrigé. Depuis iOS 26, le système floute toute application installée dont la page remonte sous la barre d'état — un effet qui déborde d'environ 35 points sous la barre, donc en plein dans l'en-tête. La barre d'état redevient opaque, et prend exactement la couleur du haut de l'en-tête : pas de flou, et pas de bande sombre non plus.",
+  wn_d:"Deuxième correction du flou en haut de l'écran sur iPhone : la barre d'état passe en <i>default</i> plutôt que <i>black</i>, et une sonde d'un pixel lui donne la couleur de l'en-tête — iOS 27 ignore la balise prévue pour ça et lit celle d'un élément réel. <b>iOS ne lit ce réglage qu'à l'installation</b> : il faut supprimer l'icône de l'écran d'accueil et la reposer.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1570,7 +1584,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The blur at the top of the screen on iPhone is fixed. Since iOS 26 the system blurs any installed app whose page reaches under the status bar — an effect that spills about 35 points below the bar, right into the header. The status bar is opaque again, and takes exactly the colour of the top of the header: no blur, and no dark band either.",
+  wn_d:"Second go at the blur at the top of the screen on iPhone: the status bar switches to <i>default</i> rather than <i>black</i>, and a one-pixel sampler gives it the header's colour — iOS 27 ignores the meta tag meant for that and reads a real element's instead. <b>iOS only reads this setting at install time</b>: the icon has to be removed from the home screen and added again.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -4362,6 +4376,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.17", nm:{fr:"Le flou du haut, deuxième prise",en:"The blur at the top, take two"},
+  d:{fr:"La 3.7.16 posait une barre d'état `black`. Ce n'est pas assez : les projets qui ont réglé ce même problème posent tous `default`, et c'est ce que fait cette version. Deuxième oubli, plus gênant : iOS 27 ignore <meta theme-color> pour colorer la barre. Il lit le background-color d'un ÉLÉMENT réel placé en haut de la page — la propriété, pas les pixels rendus. D'où une bande d'un pixel, invisible à la mise en page, qui porte la couleur du haut de l'en-tête ; c'est elle qui empêche la barre de se peindre en noir et de se détacher, comme on l'a vu en 3.7.9 et 3.7.10. Enfin, et c'est sans doute pourquoi les versions précédentes semblaient sans effet : iOS ne lit ce réglage qu'à l'installation. Une icône déjà posée garde l'ancien tant qu'on ne la supprime pas pour la reposer.",
+     en:"3.7.16 set a `black` status bar. That is not enough: the projects that solved this same problem all set `default`, and so does this version. A second oversight, and a worse one: iOS 27 ignores <meta theme-color> for the bar's colour. It reads the background-color of a real ELEMENT placed at the top of the page — the property, not the rendered pixels. Hence a one-pixel band, invisible to the layout, carrying the colour of the top of the header; it is what stops the bar painting itself black and standing out, as seen in 3.7.9 and 3.7.10. Lastly, and this is probably why the previous versions seemed to change nothing: iOS only reads this setting at install time. An icon already on the home screen keeps the old one until it is removed and added again."}},
  {v:"3.7.16", nm:{fr:"Le flou du haut, expliqué",en:"The blur at the top, explained"},
   d:{fr:"Depuis iOS 26, le système applique son « scroll edge effect » à toute application installée dont la page remonte sous la barre d'état : un flou qui descend d'environ 35 points SOUS la barre, donc par-dessus l'en-tête. iOS 27 l'a accentué, et plusieurs autres projets rapportent exactement le même symptôme. Il est composé par le système au-dessus du fond déjà peint : aucune règle CSS ne peut l'enlever. Le seul remède est de ne plus remonter là-dessous — barre d'état opaque. C'est ce que faisaient déjà les 3.7.9 et 3.7.10, mais il leur manquait la couleur : iOS peint alors la barre avec theme-color, qui valait le fond de page (#05070f) quand l'en-tête commence à #090f1f. D'où la bande sombre qu'on voyait en haut. Les deux sont désormais accordés, la couleur ayant été mesurée sur le rendu.",
      en:"Since iOS 26 the system applies its scroll edge effect to any installed app whose page reaches under the status bar: a blur descending about 35 points BELOW the bar, hence over the header. iOS 27 made it stronger, and several other projects report exactly the same symptom. It is composited by the system above the already-painted background: no CSS rule can remove it. The only remedy is to stop reaching under there — an opaque status bar. That is what 3.7.9 and 3.7.10 already did, but they were missing the colour: iOS then paints the bar with theme-color, which was the page background (#05070f) while the header starts at #090f1f. Hence the dark band at the top. The two now match, the colour having been measured from the render."}},

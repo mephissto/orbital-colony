@@ -16,6 +16,43 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.17 — The blur at the top, take two
+
+Three corrections to 3.7.16.
+
+**The value.** `black` is not enough; the projects that solved this same problem
+all set `default`.
+
+```html
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+```
+
+**The colour.** iOS 27 **ignores `<meta theme-color>`** for the status bar. It
+reads the `background-color` of a *real element* placed at the top of the page —
+the property, not the rendered pixels. Hence a one-pixel band, invisible to the
+layout:
+
+```html
+<div id="sbsample"></div>
+```
+```css
+#sbsample{position:fixed;top:0;left:0;right:0;height:1px;z-index:0;
+  pointer-events:none;background-color:#090f1f}
+```
+
+It is what stops the bar painting itself black and standing out above the header,
+as in 3.7.9 and 3.7.10. `theme-color` stays for Android and earlier iOS.
+
+**The install.** iOS only reads this setting **at install time**. An icon already
+on the home screen keeps the old one — which probably explains why the previous
+versions seemed to change nothing. The icon has to be removed and added again.
+
+Sources: [holy-grails #191](https://github.com/shawnhiatt/holy-grails/pull/191) ·
+[vcsudoku #38](https://github.com/tmshv/vcsudoku/pull/38) ·
+[fin-app #411](https://github.com/MrClit/fin-app/issues/411)
+
+---
+
 ## 3.7.16 — The blur at the top, explained
 
 It was not a bug in the game. Since **iOS 26**, the system applies its *scroll
