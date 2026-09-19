@@ -17,6 +17,43 @@ restent valides**.
 
 ---
 
+## 3.7.18 — Sous la bande
+
+Le style de barre d'état n'y change rien : en application installée sur iOS 26+,
+le système peint une bande de flou sur le **bord haut de la vue web**. Les 3.7.16
+et 3.7.17 s'attaquaient à la barre d'état, ce n'était pas le bon endroit.
+
+La bande a été mesurée sur l'appareil, en comparant une colonne vide de l'en-tête
+au dégradé seul :
+
+| Distance au bord | Assombrissement |
+|---:|---:|
+| 0,5 px | 24 |
+| 8 px | 11 |
+| 17 px | 4,5 |
+| 20 px | 0 |
+
+Le logo occupait **9 à 24 px** : sa moitié haute baignait dedans. C'est
+l'explication de l'asymétrie mesurée depuis le premier jour — 5 px d'étalement en
+vertical contre 3 en horizontal — le haut des glyphes était brouillé, pas le bas.
+
+Le contenu de l'en-tête est donc décalé sous la bande, qui tombe alors sur du
+dégradé lisse où il n'y a rien à brouiller :
+
+```css
+header{padding-top:calc(9px + var(--satTop,env(safe-area-inset-top))
+                            + var(--edgeTop,0px))}
+```
+
+`--edgeTop` vaut 24 px — quatre de plus que les 20 mesurés, la mesure venant d'un
+seul appareil — et **uniquement en application installée sur iOS**. L'en-tête y
+passe de 53 à 77 px ; partout ailleurs, rien ne bouge.
+
+La sonde d'un pixel de la 3.7.17 est retirée : la barre d'état se peint avec le
+fond du `body`, pas avec elle.
+
+---
+
 ## 3.7.17 — Le flou du haut, deuxième prise
 
 Trois corrections sur la 3.7.16.

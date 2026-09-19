@@ -118,10 +118,6 @@ textarea{-webkit-user-select:text;user-select:text}
   height:100%;height:100dvh;height:var(--appH,100dvh);
   display:flex;flex-direction:column}
 
-#sbsample{position:fixed;top:0;left:0;right:0;height:1px;z-index:0;
-  pointer-events:none;background-color:#090f1f}
-html.dev #sbsample{background-color:#2b0c15}
-
 /* ---------- HEADER ---------- */
 header{
   padding:9px 18px;border-bottom:1px solid var(--line);
@@ -134,7 +130,15 @@ header{
      rien (Chromium aligne le texte sur la grille de l'écran). Cause non
      déterminée à ce jour. env() reste en repli tant que le script n'a pas
      tourné. */
-  padding-top:calc(9px + var(--satTop, env(safe-area-inset-top)));
+  /* --edgeTop : hauteur de la bande que le système peint sur le bord haut de
+     la vue web, en application installée sur iOS 26+. Mesurée sur l'appareil,
+     en comparant une colonne vide de l'en-tête au dégradé seul :
+     assombrissement de 24 au tout bord, 11 à 8 px, 4,5 à 17 px, éteint vers 20.
+     Le logo occupait 9 à 24 px — sa moitié haute baignait dedans, d'où le flou
+     asymétrique, plus marqué en vertical qu'en horizontal. On décale donc le
+     contenu sous la bande ; elle tombe alors sur du dégradé lisse, où il n'y a
+     rien à brouiller. Vaut 0 partout ailleurs (voir syncEdge). */
+  padding-top:calc(9px + var(--satTop, env(safe-area-inset-top)) + var(--edgeTop, 0px));
   padding-left:calc(18px + var(--satLeft, env(safe-area-inset-left)));
   padding-right:calc(18px + var(--satRight, env(safe-area-inset-right)));
   background:linear-gradient(180deg,rgba(10,16,32,.96),rgba(10,16,32,.68));
@@ -1107,14 +1111,7 @@ a.hbtn{text-decoration:none}
 <div id="stars"></div><canvas id="starcanvas"></canvas>
 
 <div id="app">
-<!-- Sonde de couleur pour la barre d'état (3.7.17). Avec une barre opaque, iOS
-     doit lui donner une couleur ; depuis iOS 27 il ignore <meta theme-color> et
-     lit le background-color d'un ÉLÉMENT réel placé en haut — pas les pixels
-     rendus, la propriété. D'où cette bande d'un pixel, invisible à la mise en
-     page, qui porte la couleur du haut de l'en-tête. Sans elle, la barre se
-     peint en noir et se détache au-dessus de l'en-tête, ce qu'on a vu en
-     3.7.9 et 3.7.10. -->
-<div id="sbsample"></div>
+
 <header>
   <div class="topbar">
     <span class="devtag" id="devTag">DEV</span>
@@ -1356,7 +1353,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.17";
+const VERSION="3.7.18";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1408,7 +1405,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Deuxième correction du flou en haut de l'écran sur iPhone : la barre d'état passe en <i>default</i> plutôt que <i>black</i>, et une sonde d'un pixel lui donne la couleur de l'en-tête — iOS 27 ignore la balise prévue pour ça et lit celle d'un élément réel. <b>iOS ne lit ce réglage qu'à l'installation</b> : il faut supprimer l'icône de l'écran d'accueil et la reposer.",
+  wn_d:"Le flou en haut de l'écran sur iPhone : iOS peint une bande sur le bord haut de la vue, quoi qu'on fasse. Mesurée sur l'appareil, elle s'éteint vers 20 px — et le logo commençait à 9 px, donc sa moitié haute baignait dedans. Le contenu de l'en-tête est décalé sous la bande : elle tombe maintenant sur du dégradé lisse, où il n'y a rien à brouiller.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1584,7 +1581,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"Second go at the blur at the top of the screen on iPhone: the status bar switches to <i>default</i> rather than <i>black</i>, and a one-pixel sampler gives it the header's colour — iOS 27 ignores the meta tag meant for that and reads a real element's instead. <b>iOS only reads this setting at install time</b>: the icon has to be removed from the home screen and added again.",
+  wn_d:"The blur at the top of the screen on iPhone: iOS paints a band along the top edge of the view whatever you do. Measured on the device, it fades out around 20 px — and the logo started at 9 px, so its upper half sat inside it. The header content is moved below the band: it now falls on smooth gradient, where there is nothing to smear.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3130,6 +3127,21 @@ function satPx(cote){
 const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
 /* Les marges sûres arrondies, publiées pour la CSS : posées sur une fraction de
    pixel, les glyphes sont rendus flous en vertical (voir l'en-tête). */
+/* La bande du bord haut n'existe qu'en application installée sur iOS : ailleurs
+   ce décalage ne serait que de la place perdue. 24 px plutôt que les 20 mesurés,
+   pour ne pas raser le bord — et parce que la mesure vient d'un seul appareil. */
+function syncEdge(){
+  const ios=/iP(hone|od|ad)/.test(navigator.platform)
+            ||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
+  const pwa=matchMedia("(display-mode: standalone)").matches
+            ||navigator.standalone===true;
+  const v=(ios&&pwa)?"24px":"0px";
+  const d=document.documentElement.style;
+  if(d.getPropertyValue("--edgeTop")!==v)d.setProperty("--edgeTop",v);
+}
+syncEdge();
+addEventListener("resize",syncEdge);
+
 function syncSat(){
   const d=document.documentElement.style;
   [["--satTop","top"],["--satBottom","bottom"],
@@ -3137,7 +3149,8 @@ function syncSat(){
     const px=satPx(c)+"px";
     if(d.getPropertyValue(v)!==px)d.setProperty(v,px);
   });
-  /* le rembourrage haut de l'en-tête suit --satTop : sa hauteur vient de bouger */
+  syncEdge();
+  /* le rembourrage haut de l'en-tête suit --satTop et --edgeTop */
   if(typeof syncHeaderH==="function")syncHeaderH();
 }
 syncSat();
@@ -4376,6 +4389,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.7.18", nm:{fr:"Sous la bande",en:"Below the band"},
+  d:{fr:"En application installée sur iOS 26+, le système peint une bande de flou sur le bord haut de la vue web — quel que soit le style de barre d'état, ce que les versions 3.7.16 et 3.7.17 avaient tenté sans succès. Elle a été mesurée sur l'appareil, en comparant une colonne vide de l'en-tête au dégradé seul : un assombrissement de 24 au tout bord, 11 à 8 px, 4,5 à 17 px, éteint vers 20. Le logo occupait 9 à 24 px : sa moitié haute baignait dedans, d'où un flou plus marqué en vertical qu'en horizontal — l'asymétrie qu'on mesurait depuis le début sans savoir l'expliquer. Le contenu de l'en-tête est donc décalé de 24 px vers le bas, et la bande tombe sur du dégradé lisse où il n'y a rien à brouiller. L'en-tête passe de 53 à 77 px, uniquement dans l'application installée sur iOS.",
+     en:"In an installed app on iOS 26+, the system paints a blur band along the top edge of the web view — whatever the status bar style, which is what 3.7.16 and 3.7.17 tried without success. It was measured on the device, comparing an empty column of the header against the gradient alone: a darkening of 24 at the very edge, 11 at 8 px, 4.5 at 17 px, gone by about 20. The logo occupied 9 to 24 px: its upper half sat inside it, hence a blur stronger vertically than horizontally — the asymmetry measured from the start without an explanation. The header content is therefore pushed down by 24 px, and the band falls on smooth gradient where there is nothing to smear. The header goes from 53 to 77 px, in the installed app on iOS only."}},
  {v:"3.7.17", nm:{fr:"Le flou du haut, deuxième prise",en:"The blur at the top, take two"},
   d:{fr:"La 3.7.16 posait une barre d'état `black`. Ce n'est pas assez : les projets qui ont réglé ce même problème posent tous `default`, et c'est ce que fait cette version. Deuxième oubli, plus gênant : iOS 27 ignore <meta theme-color> pour colorer la barre. Il lit le background-color d'un ÉLÉMENT réel placé en haut de la page — la propriété, pas les pixels rendus. D'où une bande d'un pixel, invisible à la mise en page, qui porte la couleur du haut de l'en-tête ; c'est elle qui empêche la barre de se peindre en noir et de se détacher, comme on l'a vu en 3.7.9 et 3.7.10. Enfin, et c'est sans doute pourquoi les versions précédentes semblaient sans effet : iOS ne lit ce réglage qu'à l'installation. Une icône déjà posée garde l'ancien tant qu'on ne la supprime pas pour la reposer.",
      en:"3.7.16 set a `black` status bar. That is not enough: the projects that solved this same problem all set `default`, and so does this version. A second oversight, and a worse one: iOS 27 ignores <meta theme-color> for the bar's colour. It reads the background-color of a real ELEMENT placed at the top of the page — the property, not the rendered pixels. Hence a one-pixel band, invisible to the layout, carrying the colour of the top of the header; it is what stops the bar painting itself black and standing out, as seen in 3.7.9 and 3.7.10. Lastly, and this is probably why the previous versions seemed to change nothing: iOS only reads this setting at install time. An icon already on the home screen keeps the old one until it is removed and added again."}},

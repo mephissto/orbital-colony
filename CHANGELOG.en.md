@@ -16,6 +16,43 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.18 — Below the band
+
+The status bar style makes no difference: in an installed app on iOS 26+, the
+system paints a blur band along the **top edge of the web view**. 3.7.16 and
+3.7.17 were going after the status bar, which was the wrong place.
+
+The band was measured on the device, comparing an empty column of the header
+against the gradient alone:
+
+| Distance from the edge | Darkening |
+|---:|---:|
+| 0.5 px | 24 |
+| 8 px | 11 |
+| 17 px | 4.5 |
+| 20 px | 0 |
+
+The logo occupied **9 to 24 px**: its upper half sat inside it. That is the
+explanation for the asymmetry measured from day one — 5 px of spread vertically
+against 3 horizontally — the top of the glyphs was smeared, not the bottom.
+
+The header content is therefore moved below the band, which then falls on smooth
+gradient where there is nothing to smear:
+
+```css
+header{padding-top:calc(9px + var(--satTop,env(safe-area-inset-top))
+                            + var(--edgeTop,0px))}
+```
+
+`--edgeTop` is 24 px — four more than the 20 measured, since the measurement
+comes from a single device — and **only in an installed app on iOS**. The header
+goes from 53 to 77 px there; everywhere else nothing moves.
+
+The one-pixel sampler from 3.7.17 is removed: the status bar paints itself with
+the `body` background, not with it.
+
+---
+
 ## 3.7.17 — The blur at the top, take two
 
 Three corrections to 3.7.16.
