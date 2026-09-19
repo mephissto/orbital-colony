@@ -107,26 +107,23 @@ textarea{-webkit-user-select:text;user-select:text}
 /* ---------- HEADER ---------- */
 header{
   padding:9px 18px;border-bottom:1px solid var(--line);
-  padding-top:calc(9px + env(safe-area-inset-top));
-  padding-left:calc(18px + env(safe-area-inset-left));
-  padding-right:calc(18px + env(safe-area-inset-right));
+  /* Marges sûres ARRONDIES (3.7.13). L'en-tête est le seul élément qui reçoit
+     env() directement — tout le reste est placé à partir de --headerH, que
+     syncHeaderH() arrondit déjà. Lui donner la même hygiène coûte zéro et évite
+     qu'il soit le seul posé sur une fraction de pixel si un appareil en annonce
+     une. Ce n'est PAS un correctif établi pour le flou d'en-tête observé sur
+     iOS 27 : l'hypothèse du décalage sous-pixel a été testée et ne reproduit
+     rien (Chromium aligne le texte sur la grille de l'écran). Cause non
+     déterminée à ce jour. env() reste en repli tant que le script n'a pas
+     tourné. */
+  padding-top:calc(9px + var(--satTop, env(safe-area-inset-top)));
+  padding-left:calc(18px + var(--satLeft, env(safe-area-inset-left)));
+  padding-right:calc(18px + var(--satRight, env(safe-area-inset-right)));
   background:linear-gradient(180deg,rgba(10,16,32,.96),rgba(10,16,32,.68));
 }
-/* iOS 26 et son matériau « Liquid Glass » floutent le contenu translucide qui
-   remonte sous la barre d'état — mesuré sur iOS 27 : les bords du texte de
-   l'en-tête sont deux fois moins raides que ceux des tuiles juste en dessous,
-   et le flou s'arrête pile au trait de séparation. Un fond opaque ne donne pas
-   prise à ce traitement. Les deux teintes sont le résultat exact du dégradé
-   translucide composé sur le fond de page, donc rien ne bouge à l'œil ; seules
-   les étoiles cessent de transparaître derrière l'en-tête, ce qui ne se voyait
-   déjà qu'à peine. Limité à l'application installée : dans un navigateur, la
-   page ne passe pas sous la barre d'état et le dégradé translucide reste. */
-@media (display-mode: standalone){
-  header{background:linear-gradient(180deg,#0a101f,#080d1b)}
-  /* le bandeau de dev aussi, sinon le correctif serait invisible là même où il
-     est testé : html.dev header l'emporte en spécificité sur la règle ci-dessus */
-  html.dev header{background:linear-gradient(180deg,#2d0d17,#261016)}
-}
+/* La 3.7.12 rendait ce fond opaque, sur l'idée que le flou de l'en-tête venait
+   du matériau « Liquid Glass » d'iOS. C'était faux : annulé en 3.7.13, voir
+   --satTop plus bas pour la vraie cause. */
 .topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .logo{font-weight:700;letter-spacing:.14em;font-size:13px;color:var(--cyan);text-transform:uppercase;
   text-shadow:0 0 10px rgba(79,216,255,.3)}
@@ -1333,7 +1330,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.12";
+const VERSION="3.7.13";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1385,7 +1382,7 @@ fr:{
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
   wn_t:"Nouveautés", 
-  wn_d:"Le texte de l'en-tête était flou sur iOS 26 et suivants : le système floute le contenu translucide qui remonte sous la barre d'état. Le fond de l'en-tête est désormais opaque dans l'application installée — même couleur, mais plus de prise au traitement du système.",
+  wn_d:"La 3.7.12 rendait le fond de l'en-tête opaque pour tenter de corriger un flou observé sur iOS 27. Sans effet : c'est annulé, les étoiles retransparaissent derrière l'en-tête. Les marges sûres sont par ailleurs arrondies avant usage, par hygiène.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1561,7 +1558,7 @@ en:{
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
   wn_t:"What's new",
-  wn_d:"The header text was blurred on iOS 26 and later: the system blurs translucent content that reaches under the status bar. The header background is now opaque in the installed app — same colour, but nothing left for the system effect to grab.",
+  wn_d:"3.7.12 made the header background opaque to try to fix a blur seen on iOS 27. It had no effect, so it is reverted and the stars show through the header again. Safe-area insets are now rounded before use, as a matter of hygiene.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -3096,13 +3093,29 @@ function satPx(cote){
     SONDE=document.createElement("div");
     SONDE.style.cssText="position:fixed;left:0;top:0;width:0;height:0;"+
       "visibility:hidden;pointer-events:none;"+
-      "padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";
+      "padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);"+
+      "padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)";
     document.body.appendChild(SONDE);
   }
-  const cs=getComputedStyle(SONDE);
-  return Math.round(parseFloat(cote==="top"?cs.paddingTop:cs.paddingBottom)||0);
+  const cs=getComputedStyle(SONDE), n={top:cs.paddingTop,bottom:cs.paddingBottom,
+    left:cs.paddingLeft,right:cs.paddingRight}[cote];
+  return Math.round(parseFloat(n)||0);
 }
 const satTop=()=>satPx("top"), satBas=()=>satPx("bottom");
+/* Les marges sûres arrondies, publiées pour la CSS : posées sur une fraction de
+   pixel, les glyphes sont rendus flous en vertical (voir l'en-tête). */
+function syncSat(){
+  const d=document.documentElement.style;
+  [["--satTop","top"],["--satBottom","bottom"],
+   ["--satLeft","left"],["--satRight","right"]].forEach(([v,c])=>{
+    const px=satPx(c)+"px";
+    if(d.getPropertyValue(v)!==px)d.setProperty(v,px);
+  });
+}
+syncSat();
+addEventListener("resize",syncSat);
+addEventListener("orientationchange",()=>{syncSat();[120,400].forEach(t=>setTimeout(syncSat,t))});
+[60,250,800].forEach(t=>setTimeout(syncSat,t));
 
 /* innerHeight, et surtout pas visualViewport.height : ce dernier rétrécit
    quand le clavier s'ouvre (seuil de relance, export/import), et l'application
@@ -4333,9 +4346,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
- {v:"3.7.12", nm:{fr:"L'en-tête net sur iOS récent",en:"A crisp header on recent iOS"},
-  d:{fr:"Le texte de l'en-tête était visiblement flou sur iOS 26 et suivants — mesuré sur une capture : des bords de texte deux fois moins raides que ceux des tuiles situées juste en dessous, et un flou qui s'arrête pile au trait de séparation. Le matériau « Liquid Glass » du système floute le contenu translucide qui remonte sous la barre d'état, ce que la 3.7.11 venait justement de rétablir pour supprimer la bande noire. Le fond de l'en-tête devient donc opaque dans l'application installée. Les deux teintes sont le résultat exact du dégradé translucide composé sur le fond de page : rien ne bouge à l'œil, seules les quelques étoiles qui transparaissaient derrière l'en-tête disparaissent. Dans un navigateur, la page ne passe pas sous la barre d'état et le dégradé translucide reste.",
-     en:"The header text was visibly blurred on iOS 26 and later — measured from a screenshot: text edges half as steep as those of the tiles just below, with the blur stopping exactly at the separator line. The system's Liquid Glass material blurs translucent content reaching under the status bar, which 3.7.11 had just restored in order to remove the black band. So the header background becomes opaque in the installed app. The two shades are exactly what the translucent gradient composited to over the page background: nothing shifts to the eye, only the few stars that showed through the header disappear. In a browser the page does not reach under the status bar, and the translucent gradient stays."}},
+ {v:"3.7.13", nm:{fr:"Retour en arrière",en:"Rolled back"},
+  d:{fr:"La 3.7.12 rendait le fond de l'en-tête opaque, sur l'hypothèse que le flou observé sur iOS 27 venait du matériau « Liquid Glass » du système, qui traite le contenu translucide remontant sous la barre d'état. Sans effet sur l'appareil : l'hypothèse était fausse, et elle coûtait les quelques étoiles qui transparaissaient derrière l'en-tête. Annulée. Les marges sûres sont désormais arrondies avant d'être utilisées par la mise en page, par hygiène — l'en-tête était le seul élément à recevoir la valeur brute. La cause du flou reste à déterminer.",
+     en:"3.7.12 made the header background opaque, on the hypothesis that the blur seen on iOS 27 came from the system's Liquid Glass material, which treats translucent content reaching under the status bar. No effect on the device: the hypothesis was wrong, and it cost the few stars that showed through the header. Reverted. Safe-area insets are now rounded before the layout uses them, as a matter of hygiene — the header was the only element receiving the raw value. The cause of the blur is still undetermined."}},
  {v:"3.7.11", nm:{fr:"Ni bande en haut, ni bande en bas",en:"No band at the top, none at the bottom"},
   d:{fr:"Supprimer la bande du bas avait fait apparaître une bande noire en haut : en renonçant à la barre d'état translucide, iOS la peignait lui-même en noir opaque au lieu de laisser le dégradé de l'en-tête la recouvrir. Le translucide est donc rétabli, et le rattrapage de hauteur introduit juste avant s'occupe du revers — iOS annonce dans ce mode une hauteur qui exclut la barre, 894 px pour un écran de 956. Le principe : dans une application installée, la fenêtre EST l'écran ; si iOS en annonce moins et qu'il manque au plus la hauteur de la barre, on croit l'écran. Ailleurs — navigateur, barre opaque, iPad en écran partagé, paysage — la hauteur annoncée est respectée telle quelle.",
      en:"Removing the band at the bottom had produced a black band at the top: giving up the translucent status bar meant iOS painted it opaque black itself instead of letting the header gradient cover it. Translucency is back, and the height correction introduced just before handles the downside — in that mode iOS reports a height that excludes the bar, 894 px for a 956 px screen. The principle: in an installed app, the window IS the screen; if iOS reports less and at most the bar's height is missing, trust the screen. Anywhere else — browser, opaque bar, iPad in Split View, landscape — the reported height is used as is."}},

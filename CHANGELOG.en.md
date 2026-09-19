@@ -16,41 +16,33 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
-## 3.7.12 — A crisp header on recent iOS
+## 3.7.13 — Rolled back
 
-On iOS 26 and later, the header text was visibly blurred. Measured from a
-screenshot, comparing how steep text edges are:
+3.7.12 made the header background opaque, on the hypothesis that the blur seen on
+iOS 27 came from the system's Liquid Glass material. **No effect on the device.**
+The hypothesis was wrong, and it cost the few stars that showed through the
+header: reverted.
 
-| | Edge sharpness |
-|---|---:|
-| iOS status bar | 242 |
-| "23" tile | 173 |
-| "Extraction" tab | 127 |
-| **Header, the logo** | **58** |
-| **Header, the FR button** | **46** |
+What the measurement actually says, separating the two axes — an ordinary blur
+spreads equally in both:
 
-Half as sharp as everything else, and the blur stops exactly at the separator
-line under the header.
+| | horizontal | vertical |
+|---|---:|---:|
+| iOS status bar | 2 | 2 |
+| **Header, the logo** | **3** | **5** |
+| **Header, the FR button** | **3** | **4** |
+| "23" tile | 2 | 2 |
+| "Extraction" tab | 2 | 2 |
 
-The system's Liquid Glass material blurs **translucent** content reaching under
-the status bar — which 3.7.11 had just restored in order to remove the black
-band. So the header background becomes opaque in the installed app:
+The spread is markedly vertical. The natural explanation — text sitting on a
+fraction of a pixel — was tested: the same text rendered at 60, 60.17, 60.5 and
+60.83 px of offset, no difference, the engine snaps glyphs to the device grid.
+**Cause undetermined.**
 
-```css
-@media (display-mode: standalone){
-  header{background:linear-gradient(180deg,#0a101f,#080d1b)}
-}
-```
-
-The two shades are exactly what the translucent gradient composited to over the
-page background. Verified by rendering the header before and after: **2 units of
-average difference per channel**, the worst case being a star that no longer
-shows through. The dev-banner rule is repeated in the same block, otherwise its
-specificity would win and the fix would be invisible in the very build where it
-is tested.
-
-In a browser the page does not reach under the status bar: the translucent
-gradient is unchanged there.
+Safe-area insets are rounded before use anyway (`--satTop` and its siblings): the
+header was the only element receiving raw `env()`, everything else being placed
+from `--headerH`, which `syncHeaderH()` already rounds. That is hygiene, not a
+fix.
 
 ---
 

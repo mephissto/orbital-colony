@@ -17,41 +17,33 @@ restent valides**.
 
 ---
 
-## 3.7.12 — L'en-tête net sur iOS récent
+## 3.7.13 — Retour en arrière
 
-Sur iOS 26 et suivants, le texte de l'en-tête était visiblement flou. Mesuré sur
-une capture, en comparant la raideur des bords de texte :
+La 3.7.12 rendait le fond de l'en-tête opaque, sur l'hypothèse que le flou
+observé sur iOS 27 venait du matériau « Liquid Glass » du système. **Sans effet
+sur l'appareil.** L'hypothèse était fausse, et elle coûtait les quelques étoiles
+qui transparaissaient derrière l'en-tête : annulée.
 
-| | Netteté des bords |
-|---|---:|
-| Barre d'état iOS | 242 |
-| Tuile « 23 » | 173 |
-| Onglet « Extraction » | 127 |
-| **En-tête, le logo** | **58** |
-| **En-tête, le bouton FR** | **46** |
+Ce que la mesure dit vraiment, en séparant les deux axes — un flou ordinaire
+étale autant dans les deux sens :
 
-Deux fois moins net que le reste, et le flou s'arrête pile au trait de
-séparation sous l'en-tête.
+| | horizontal | vertical |
+|---|---:|---:|
+| Barre d'état iOS | 2 | 2 |
+| **En-tête, le logo** | **3** | **5** |
+| **En-tête, le bouton FR** | **3** | **4** |
+| Tuile « 23 » | 2 | 2 |
+| Onglet « Extraction » | 2 | 2 |
 
-Le matériau « Liquid Glass » du système floute le contenu **translucide** qui
-remonte sous la barre d'état — ce que la 3.7.11 venait justement de rétablir pour
-supprimer la bande noire. Le fond de l'en-tête devient donc opaque dans
-l'application installée :
+L'étalement est nettement vertical. L'explication naturelle — du texte posé sur
+une fraction de pixel — a été testée : rendu du même texte à 60, 60,17, 60,5 et
+60,83 px de décalage, aucune différence, le moteur aligne les glyphes sur la
+grille de l'écran. **Cause non déterminée.**
 
-```css
-@media (display-mode: standalone){
-  header{background:linear-gradient(180deg,#0a101f,#080d1b)}
-}
-```
-
-Les deux teintes sont le résultat exact du dégradé translucide composé sur le
-fond de page. Vérifié en rendant l'en-tête avant et après : **2 unités d'écart
-moyen par canal**, le pire étant une étoile qui ne transparaît plus. La règle du
-bandeau de dev est reprise dans le même bloc, sinon sa spécificité l'emporterait
-et le correctif serait invisible là même où il est testé.
-
-Dans un navigateur, la page ne passe pas sous la barre d'état : le dégradé
-translucide y reste inchangé.
+Les marges sûres sont malgré tout arrondies avant usage (`--satTop` et ses
+voisines) : l'en-tête était le seul élément à recevoir `env()` brut, tout le
+reste étant placé à partir de `--headerH`, que `syncHeaderH()` arrondit déjà.
+C'est de l'hygiène, pas un correctif.
 
 ---
 
