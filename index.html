@@ -924,8 +924,13 @@ a.hbtn{text-decoration:none}
 #pinBar.on{display:flex}
 /* Base fixe plutôt qu'étirement : une puce seule doit avoir la même largeur que
    lorsqu'il y en a trois, et pas dépasser une carte de succès. Elle rétrécit
-   seulement quand la place manque. */
-.pchip{flex:0 1 250px;min-width:132px;display:flex;align-items:center;gap:8px;
+   seulement quand la place manque.
+   Cette base VAUT une carte de succès : `--pchipW` est la largeur d'une colonne
+   de .achgrid, recalculée par syncChipW() à chaque changement de largeur. Les
+   250px codés en dur de la 3.6.0 ne tombaient juste qu'autour de 530px de
+   fenêtre ; sur un téléphone la colonne fait ~205px et la puce dépassait la
+   carte d'un cinquième. */
+.pchip{flex:0 1 var(--pchipW,250px);min-width:132px;display:flex;align-items:center;gap:8px;
   padding:6px 8px 7px;border:1px solid rgba(255,196,92,.28);border-radius:9px;
   background:rgba(12,17,33,.55);cursor:pointer;transition:.15s;text-align:left}
 .pchip:hover{border-color:rgba(255,196,92,.55);background:rgba(255,196,92,.10)}
@@ -1366,7 +1371,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.23";
+const VERSION="3.7.25";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2545,45 +2550,26 @@ ACHS.push({id:"a_ch_all", c:"chal", v:S=>CHALS.filter(c=>!!S.chalDone[c.id]).len
    actifs ensemble, un défi réussi — gardent leur `f` : il n'y a rien à doser. */
 ACHS.forEach(a=>{ if(!a.f)a.f=S=>a.v(S)>=a.n });
 
-/* Les succès chiffrés vont par familles — six paliers de minerai, six de
-   puissance de clic, cinq de production… — et l'avancement se lit PAR PALIER :
-   entre celui qu'on vient de décrocher et celui qu'on vise. Mesuré depuis zéro,
-   « 1 Sx de puissance de clic » afficherait la même chose au premier et au
-   dernier palier.
-   Deux succès appartiennent à la même famille si leur fonction `v` s'écrit
-   pareil : `String(a.v)` suffit, et rien à déclarer en plus — aucune liste à
-   tenir à jour, donc aucune famille ne peut être oubliée. (Le jeu n'est jamais
-   minifié : le texte d'une fonction est stable.) */
-(function paliers(){
-  const fam={};
-  ACHS.forEach(a=>{ if(a.v){const k=String(a.v); (fam[k]=fam[k]||[]).push(a)} });
-  Object.keys(fam).forEach(k=>{
-    const l=fam[k].sort((x,y)=>x.n-y.n);
-    l.forEach((a,i)=>{ a.n0 = i ? l[i-1].n : 0 });   // palier précédent, 0 si premier
-  });
-})();
 /* Avancement d'un succès, pour la barre. null = rien à montrer (succès binaire).
-   L'échelle passe en LOGARITHMIQUE quand un palier vaut cent fois le précédent
-   — c'est-à-dire pour les seules familles qui montent de mille en mille :
-   minerai, production, puissance de clic. Là, une barre linéaire resterait
-   collée à zéro pendant tout le palier puis sauterait à plein. Partout ailleurs
-   — clics, anomalies, cycles, antimatière — elle reste linéaire, parce que
-   c'est ainsi qu'on compte ces choses-là.
-   Les deux nombres exacts sont écrits à côté : la barre donne le ressenti, le
-   texte donne la mesure, et c'est lui qui fait foi. */
+   UNE SEULE RÈGLE, partout : la barre vaut le rapport des deux nombres écrits à
+   côté d'elle. C'est le seul dessin qu'un joueur puisse vérifier d'un coup d'œil.
+
+   Jusqu'à la 3.7.24, les familles qui montent de mille en mille — minerai,
+   production, puissance de clic — avaient une barre logarithmique, comptée
+   depuis le palier précédent : elle avançait régulièrement au lieu de rester
+   collée à zéro pendant presque tout le palier. Mais le texte, lui, restait en
+   valeurs brutes : « 124K / 1.00M » sous une barre aux trois quarts pleine. Le
+   joueur lit les nombres, pas le code — deux dessins qui se contredisent, c'est
+   le dessin qui a tort. Supprimée, avec les paliers précédents qu'elle seule
+   utilisait.
+
+   Conséquence assumée sur ces dix-huit succès : la barre bouge peu longtemps,
+   puis se remplit sur la dernière décade. Elle ne ment plus. */
 function achProg(a){
   if(!a.v)return null;
-  const v=a.v(S), n=a.n, n0=a.n0||0;
+  const v=a.v(S), n=a.n;
   if(v>=n)return 1;
   if(!(v>0))return 0;
-  /* Familles exponentielles seulement — un palier qui vaut cent fois le
-     précédent, donc minerai, production, puissance de clic. Là on lit
-     l'avancement DEPUIS le palier précédent, faute de quoi la barre reste
-     collée à zéro pendant tout le palier puis saute à plein.
-     Partout ailleurs on compte depuis zéro : sur « 25 niveaux de Percées », un
-     joueur qui en a 3 veut lire 12 %, pas 0 % au prétexte qu'il n'a pas encore
-     franchi le palier des 10. */
-  if(n0>0 && n/n0>=100) return v<=n0 ? 0 : Math.log(v/n0)/Math.log(n/n0);
   return v/n;
 }
 const NAIN=6;
@@ -3245,6 +3231,35 @@ if("ResizeObserver" in window){
   new ResizeObserver(syncHeaderH).observe($("header"));
 }
 syncHeaderH();
+
+/* ---------- largeur d'une puce épinglée ----------
+   Une puce du bandeau et une carte de l'onglet Succès montrent la même chose ;
+   elles doivent faire la même largeur, sinon l'œil cherche le rapport entre les
+   deux. On ne mesure pas une carte : l'onglet est le plus souvent caché, et une
+   carte cachée mesure zéro. On refait donc le calcul de la grille —
+   repeat(auto-fill, minmax(180px,1fr)) avec 9px de gouttière — sur la largeur
+   utile de #panels, qui est le conteneur de cette grille et reste toujours
+   affiché. clientWidth exclut déjà la barre de défilement. */
+function largeurCarteAch(){
+  const p=$("#panels"); if(!p)return 0;
+  const cs=getComputedStyle(p);
+  const W=p.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0);
+  if(!(W>0))return 0;
+  const MIN=180, GAP=9;
+  const n=Math.max(1,Math.floor((W+GAP)/(MIN+GAP)));
+  return (W-GAP*(n-1))/n;
+}
+function syncChipW(){
+  const w=largeurCarteAch(); if(!w)return;
+  const v=(Math.round(w*10)/10)+"px";
+  const d=document.documentElement.style;
+  if(d.getPropertyValue("--pchipW")!==v)d.setProperty("--pchipW",v);
+}
+if("ResizeObserver" in window){
+  new ResizeObserver(syncChipW).observe($("#panels"));
+}
+syncChipW();
+addEventListener("resize",syncChipW);
 
 /* ---------- en-tête fixe (mobile) ----------
    #hero est en position fixe, dans une forme unique : #herospacer réserve sa

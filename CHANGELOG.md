@@ -17,6 +17,64 @@ restent valides**.
 
 ---
 
+## 3.7.25 — La barre dit ce que disent les nombres
+
+Signalé sur « 1 M/s de production » : le texte lit `124K / 1.00M`, soit 12 %, et
+la barre est aux trois quarts pleine.
+
+Ce n'était pas un défaut de calcul. Dix-huit succès sur quatre-vingt-huit —
+minerai, production, puissance de clic, antimatière des percées — montent de
+mille en mille, et leur barre était **logarithmique**, comptée depuis le palier
+précédent : de 1 K/s à 124 K/s, on a multiplié par 124 sur les 1000 nécessaires,
+donc 70 %. Elle avançait régulièrement au lieu de rester à plat presque tout le
+palier.
+
+Le texte, lui, restait en valeurs brutes. Deux dessins de la même chose qui se
+contredisent à l'écran : c'est le dessin que le joueur ne peut pas vérifier qui
+a tort. `achProg()` rend désormais `v / n`, partout, sans exception. Les paliers
+précédents (`n0`) et la fonction qui les calculait disparaissent — plus personne
+ne s'en servait.
+
+| Production | Barre avant | Barre après |
+|---:|---:|---:|
+| 1 K/s | 0 % | 0,1 % |
+| 124 K/s | 69,8 % | **12,4 %** |
+| 500 K/s | 89,9 % | **50 %** |
+| 1 M/s | 100 % | 100 % |
+
+Contrepartie assumée : sur ces dix-huit succès la barre bouge peu longtemps,
+puis se remplit sur la dernière décade. Elle ne ment plus.
+
+---
+
+## 3.7.24 — La puce à la largeur d'une carte
+
+Une puce du bandeau et une carte de l'onglet Succès montrent le même succès :
+elles doivent faire la même largeur. La 3.6.0 avait corrigé la puce seule qui
+s'étirait sur toute la ligne, mais avec une **constante** : `flex:0 1 250px`.
+250 px ne vaut une colonne de la grille que vers 530 px de fenêtre. Sur un
+téléphone de 440 px la colonne fait 205,5 px — la puce dépassait la carte d'un
+cinquième.
+
+La base de la puce est maintenant `var(--pchipW)`, posée par `syncChipW()` à
+chaque changement de largeur. On ne mesure pas une carte : l'onglet Succès est
+le plus souvent caché et une carte cachée mesure zéro. On refait le calcul de
+la grille — `repeat(auto-fill, minmax(180px,1fr))`, gouttière de 9 px — sur la
+largeur utile de `#panels`, qui contient cette grille et reste toujours
+affiché.
+
+| Fenêtre | Colonne | Puce avant | Puce après |
+|---:|---:|---:|---:|
+| 320 px | 300 | 250 | **300** |
+| 390 px | 180,5 | 250 | **180,5** |
+| 440 px | 205,5 | 250 | **205,5** |
+| 529 px | 250 | 250 | **250** |
+| 1280 px | 217,3 | 250 | **217,3** |
+
+À trois puces elles rétrécissent comme avant : la base a changé, pas la règle.
+
+---
+
 ## 3.7.23 — Onze pixels
 
 `--edgeTop` est fixé à **11 px**, après quatre essais sur l'appareil.

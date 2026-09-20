@@ -16,6 +16,61 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.25 — The bar says what the numbers say
+
+Reported on "1 M/s output": the text reads `124K / 1.00M`, which is 12 %, and
+the bar sits three quarters full.
+
+Not an arithmetic bug. Eighteen achievements out of eighty-eight — ore, output,
+click power, breakthrough antimatter — climb a thousand at a time, and their bar
+was **logarithmic**, measured from the previous tier: from 1 K/s to 124 K/s you
+have multiplied by 124 out of the 1000 needed, hence 70 %. It moved steadily
+instead of lying flat for most of the tier.
+
+The label, though, stayed in raw values. Two drawings of the same thing
+contradicting each other on screen: the one the player cannot check is the one
+that is wrong. `achProg()` now returns `v / n`, everywhere, with no exception.
+The previous tiers (`n0`) and the function computing them are gone — nothing
+else used them.
+
+| Output | Bar before | Bar after |
+|---:|---:|---:|
+| 1 K/s | 0 % | 0.1 % |
+| 124 K/s | 69.8 % | **12.4 %** |
+| 500 K/s | 89.9 % | **50 %** |
+| 1 M/s | 100 % | 100 % |
+
+Accepted trade-off: on those eighteen achievements the bar moves little for a
+long time, then fills over the last decade. It no longer lies.
+
+---
+
+## 3.7.24 — A chip the width of a card
+
+A chip in the bar and a card in the Achievements tab show the same achievement:
+they should be the same width. 3.6.0 fixed the lone chip stretching across the
+row, but with a **constant**: `flex:0 1 250px`. 250 px only equals a grid
+column at about 530 px of window. On a 440 px phone the column is 205.5 px —
+the chip overshot the card by a fifth.
+
+The chip's basis is now `var(--pchipW)`, set by `syncChipW()` on every width
+change. It does not measure a card: the Achievements tab is hidden most of the
+time and a hidden card measures zero. It redoes the grid's own arithmetic —
+`repeat(auto-fill, minmax(180px,1fr))`, 9 px gutter — on the usable width of
+`#panels`, which holds that grid and is always displayed.
+
+| Window | Column | Chip before | Chip after |
+|---:|---:|---:|---:|
+| 320 px | 300 | 250 | **300** |
+| 390 px | 180.5 | 250 | **180.5** |
+| 440 px | 205.5 | 250 | **205.5** |
+| 529 px | 250 | 250 | **250** |
+| 1280 px | 217.3 | 250 | **217.3** |
+
+With three chips they shrink as before: the basis changed, not the rule.
+
+---
+
 ## 3.7.23 — Eleven pixels
 
 `--edgeTop` is set at **11 px**, after four trials on the device.
