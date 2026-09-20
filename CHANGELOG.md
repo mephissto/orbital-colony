@@ -17,6 +17,65 @@ restent valides**.
 
 ---
 
+## 3.7.27 — Jusqu'au centillion
+
+La 3.7.26 avait ajouté sept unités, jusqu'au vigintillion (10^63). Trop court :
+une partie qui a franchi 10^52 franchira 10^63.
+
+L'échelle va maintenant jusqu'au **centillion** (10^303), soit **102 unités** —
+le bout de ce qu'un nombre JavaScript sait tenir (1,8×10^308). La puissance de
+dix ne sert plus que sur les deux derniers ordres de grandeur, entre 10^306 et
+l'infini, là où plus aucune partie ne va.
+
+Les noms composés ne sont pas écrits à la main. Au-delà du décillion, un nom
+d'échelle courte est un préfixe latin d'unité suivi d'une dizaine —
+*un* + *vigintillion* = unvigintillion, `Uvg`. Une liste de cent abréviations
+tapées à la main contiendrait une coquille, et personne ne la verrait avant
+qu'un joueur l'atteigne, c'est-à-dire des mois plus tard. Neuf lignes de
+fabrication remplacent la liste :
+
+| 10^n | Unité | 10^n | Unité |
+|---:|---|---:|---|
+| 10^63 | Vg | 10^153 | Qig |
+| 10^66 | Uvg | 10^183 | Sxg |
+| 10^90 | Novg | 10^213 | Spg |
+| 10^93 | Tg | 10^243 | Ocg |
+| 10^123 | Qag | 10^273 | Nog |
+| 10^150 | Noqag | 10^303 | **Ce** |
+
+Le test vérifie la longueur, l'absence de doublon, vingt-deux repères connus, et
+que le rendu reste propre — mantisse à trois chiffres, jamais `1000X` — sur
+chaque ordre de grandeur de 10^3 à 10^308.
+
+---
+
+## 3.7.26 — Au-delà du tredecillion
+
+Signalé en partie au cycle 518, avec 4,3×10^52 de minerai : l'écran affichait
+`42972149251Td`.
+
+L'échelle des unités s'arrêtait au **tredecillion** (10^42). Passé ce cap, la
+boucle de `fmt()` ne pouvait plus diviser et recrachait la mantisse entière —
+onze chiffres collés à une unité. Sept unités ont été ajoutées, jusqu'au
+**vigintillion** (10^63) : Qad, Qid, Sxd, Spd, Ocd, Nod, Vg. Le même nombre
+s'écrit maintenant `43.0Sxd`.
+
+Au-delà de 10^66, `fmt()` bascule en **puissance de dix** — `1.23e70`. Aucune
+abréviation ne parle plus à personne à ce niveau, et surtout : quelle que soit
+la longueur de la liste, l'affichage ne peut plus casser. C'est le vrai
+correctif ; les sept unités ne sont que du confort devant.
+
+Deux arrondis au passage : `999,6K` s'écrivait `1000K` au lieu de `1.00M`, et
+`9,999×10^65` aurait donné `1000Vg`.
+
+**Le jeu, lui, n'a pas de limite à cet endroit.** Vérifié : à 10^308 de minerai
+— le plus grand nombre que JavaScript sache tenir — `perSec()`, `amGain()`,
+`genCost()` et `maxAffordable()` rendent tous des valeurs finies. Le premier
+vrai mur est le prix d'une structure au-delà de ~5 100 exemplaires du même
+type, ce qui suppose déjà 10^305 de minerai.
+
+---
+
 ## 3.7.25 — La barre dit ce que disent les nombres
 
 Signalé sur « 1 M/s de production » : le texte lit `124K / 1.00M`, soit 12 %, et

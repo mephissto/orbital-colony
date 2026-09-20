@@ -16,6 +16,62 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.7.27 — All the way to the centillion
+
+3.7.26 added seven units, up to the vigintillion (10^63). Too short: a run that
+has passed 10^52 will pass 10^63.
+
+The ladder now reaches the **centillion** (10^303) — **102 units**, the end of
+what a JavaScript number can hold (1.8×10^308). Powers of ten now only serve the
+last two orders of magnitude, between 10^306 and infinity, where no run goes.
+
+The compound names are not typed by hand. Past the decillion, a short-scale name
+is a Latin unit prefix followed by a ten — *un* + *vigintillion* =
+unvigintillion, `Uvg`. A hand-typed list of a hundred abbreviations would hold a
+typo, and nobody would see it until a player got there, months later. Nine lines
+of construction replace the list:
+
+| 10^n | Unit | 10^n | Unit |
+|---:|---|---:|---|
+| 10^63 | Vg | 10^153 | Qig |
+| 10^66 | Uvg | 10^183 | Sxg |
+| 10^90 | Novg | 10^213 | Spg |
+| 10^93 | Tg | 10^243 | Ocg |
+| 10^123 | Qag | 10^273 | Nog |
+| 10^150 | Noqag | 10^303 | **Ce** |
+
+The test checks the length, the absence of duplicates, twenty-two known
+landmarks, and that rendering stays clean — three-digit mantissa, never
+`1000X` — at every order of magnitude from 10^3 to 10^308.
+
+---
+
+## 3.7.26 — Past the tredecillion
+
+Reported in a run at cycle 518, holding 4.3×10^52 ore: the screen read
+`42972149251Td`.
+
+The unit ladder stopped at the **tredecillion** (10^42). Past that cap `fmt()`
+could no longer divide and spat out the whole mantissa — eleven digits glued to
+a unit. Seven units were added, up to the **vigintillion** (10^63): Qad, Qid,
+Sxd, Spd, Ocd, Nod, Vg. The same number now reads `43.0Sxd`.
+
+Beyond 10^66, `fmt()` switches to **powers of ten** — `1.23e70`. No
+abbreviation means anything to anyone at that level, and more to the point: however
+long the list, the display can no longer break. That is the real fix; the seven
+units are just comfort in front of it.
+
+Two rounding cases on the way: `999.6K` printed `1000K` instead of `1.00M`, and
+`9.999×10^65` would have given `1000Vg`.
+
+**The game itself has no limit there.** Verified: at 10^308 ore — the largest
+number JavaScript can hold — `perSec()`, `amGain()`, `genCost()` and
+`maxAffordable()` all return finite values. The first real wall is the price of
+a structure past ~5,100 units of the same type, which already assumes 10^305
+ore.
+
+---
+
 ## 3.7.25 — The bar says what the numbers say
 
 Reported on "1 M/s output": the text reads `124K / 1.00M`, which is 12 %, and

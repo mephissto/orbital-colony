@@ -1371,18 +1371,58 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.25";
+const VERSION="3.7.27";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const UNITS=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc","Ud","Dd","Td"];
+/* L'échelle courte, de mille en mille, du millier au CENTILLION (10^303) —
+   c'est-à-dire jusqu'au bout de ce qu'un nombre JavaScript sait tenir
+   (1,8×10^308). Elle s'arrêtait au tredecillion (10^42) : passé ce cap la
+   boucle de fmt() ne pouvait plus diviser et écrivait la mantisse entière,
+   « 42972149251Td » au lieu de « 43.0Sxd ». Vu en partie au cycle 518.
+
+   Au-delà du décillion les noms sont composés — préfixe latin de l'unité, puis
+   la dizaine : un + vigintillion = unvigintillion, Uvg. On les FABRIQUE plutôt
+   que d'aligner cent abréviations à la main, où une coquille passerait
+   inaperçue jusqu'à ce qu'un joueur l'atteigne, c'est-à-dire des mois plus
+   tard. La dizaine des décillions garde son suffixe court (-d : Ud, Dd, Td…),
+   les autres prennent le leur (-vg, -tg, -qag…). */
+const UNITS=(function(){
+  const u=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No"];        // jusqu'au nonillion
+  const UN=["","U","D","T","Qa","Qi","Sx","Sp","Oc","No"];           // 1 à 9, en préfixe
+  const DIZ=["","Dc","Vg","Tg","Qag","Qig","Sxg","Spg","Ocg","Nog"]; // 10, 20, … 90
+  const SUF=["","d","vg","tg","qag","qig","sxg","spg","ocg","nog"];  // la même, en suffixe
+  for(let d=1;d<=9;d++)for(let n=0;n<=9;n++)u.push(n?UN[n]+SUF[d]:DIZ[d]);
+  u.push("Ce");                                                      // centillion, 10^303
+  return u;
+})();
+const FMT_MAX=Math.pow(1000,UNITS.length);   // 10^306, au-delà de la dernière unité
 function fmt(n){
   if(!isFinite(n))return "∞";
   if(n<0)return "-"+fmt(-n);
   if(n<1000)return (n<10&&n%1!==0)?n.toFixed(1):Math.floor(n).toString();
+  /* Au-delà de la dernière unité nommée, la puissance de dix. Aucune
+     abréviation ne parle encore à personne à ce niveau, et surtout : quelle
+     que soit la longueur de la liste, l'affichage ne peut plus casser. */
+  const sci=v=>{
+    let e=Math.floor(Math.log10(v)), m=v/Math.pow(10,e);
+    if(m>=9.995){m/=10;e++}                  // l'arrondi à deux décimales déborde
+    return m.toFixed(2)+"e"+e;
+  };
+  if(n>=FMT_MAX)return sci(n);
+  const v0=n;
   let t=0; while(n>=1000&&t<UNITS.length-1){n/=1000;t++;}
-  return n.toFixed(n<10?2:n<100?1:0)+UNITS[t];
+  /* 999,6 s'arrondit à « 1000 » : on passe alors à l'unité suivante plutôt que
+     d'écrire quatre chiffres là où la règle en veut trois. Sur la dernière
+     unité il n'y a plus de suivante — c'est la puissance de dix qui prend le
+     relais, sans quoi « 9,999e305 » s'écrirait « 1000Ce ». */
+  const d=n<10?2:n<100?1:0;
+  if(+n.toFixed(d)>=1000){
+    if(t>=UNITS.length-1)return sci(v0);
+    n/=1000;t++;return n.toFixed(2)+UNITS[t];
+  }
+  return n.toFixed(d)+UNITS[t];
 }
 /* fmt() arrondit à l'entier au-delà de 10 : ×11,6 deviendrait ×11.
    Les multiplicateurs ont donc leur propre formateur. */
