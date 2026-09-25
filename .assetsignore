@@ -1,0 +1,10 @@
+# Le répertoire de sortie est la racine du dépôt : sans ce fichier, Workers
+# sert aussi le dépôt Git lui-même. Ici il est petit, donc aucune erreur de
+# taille — mais un `.git/` accessible en ligne expose tout l'historique.
+.git
+.git/**
+.gitignore
+.assetsignore
+README.md
+LICENSE
+LICENSE-ASSETS.md
