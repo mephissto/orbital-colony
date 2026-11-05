@@ -8,8 +8,8 @@ installable as an app (PWA) and playable offline. The whole game fits in
 
 Free software under [GPL 3.0 or later](#licence).
 
-**Play online:** [orbital-colony.app](https://orbital-colony.app/)
-· development build: [dev.orbital-colony.app](https://dev.orbital-colony.app/)
+**Play online:** [orbital-colony.msto.app](https://orbital-colony.msto.app/)
+· development build: [dev.orbital-colony.msto.app](https://dev.orbital-colony.msto.app/)
 
 ---
 

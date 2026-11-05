@@ -9,8 +9,8 @@ donnée qui sort de ton navigateur.
 
 Logiciel libre sous [GPL 3.0 ou ultérieure](#licence).
 
-**Jouer en ligne :** [orbital-colony.app](https://orbital-colony.app/)
-· version de développement : [dev.orbital-colony.app](https://dev.orbital-colony.app/)
+**Jouer en ligne :** [orbital-colony.msto.app](https://orbital-colony.msto.app/)
+· version de développement : [dev.orbital-colony.msto.app](https://dev.orbital-colony.msto.app/)
 
 ---
 
