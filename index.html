@@ -966,6 +966,19 @@ a.hbtn{text-decoration:none}
 .chlock{border:1px solid rgba(169,123,255,.3);background:rgba(169,123,255,.08);
   border-radius:10px;padding:9px 12px;margin:0 0 12px;font-size:12.5px;color:var(--violet)}
 
+/* --- annonce du changement d'adresse ---
+   Au-dessus de l'invitation PWA (90), sous la confirmation (95). */
+#migr{position:fixed;inset:0;z-index:92;background:rgba(2,4,10,.88);display:none;
+  align-items:center;justify-content:center;padding:20px}
+#migr.on{display:flex}
+.migrbox{max-width:460px}
+.migrbox ol{margin:0 0 14px;padding-left:20px;font-size:12.5px;line-height:1.6;color:var(--txt)}
+.migrbox li{margin-bottom:4px}
+.migrbox .migrnew{color:var(--cyan);font-weight:700;word-break:break-all}
+#migrText{width:100%;height:70px;box-sizing:border-box;background:#070b16;border:1px solid var(--line);
+  border-radius:8px;color:var(--txt);padding:9px;font-family:monospace;font-size:11px;resize:none}
+.migrbox .mrow a.hbtn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+
 /* --- invitation à installer la PWA --- */
 #pwa{position:fixed;inset:0;z-index:90;background:rgba(2,4,10,.88);display:none;
   align-items:center;justify-content:center;padding:18px}
@@ -1263,6 +1276,26 @@ a.hbtn{text-decoration:none}
     <button class="hbtn prim" id="pwaGo" data-i18n="pwa_install" style="display:none">Installer</button>
   </div>
 </div></div>
+<!-- Annonce du changement d'adresse : montrée uniquement sur l'ancien domaine
+     (voir migrAffiche). Le stockage du navigateur est propre à chaque adresse,
+     d'où le code de sauvegarde à copier. -->
+<div id="migr"><div class="mbox migrbox">
+  <h2 data-i18n="migr_title">Le jeu change d'adresse</h2>
+  <p class="hint" data-i18n="migr_intro" data-i18n-html></p>
+  <ol>
+    <li data-i18n="migr_s1" data-i18n-html></li>
+    <li data-i18n="migr_s2" data-i18n-html></li>
+    <li data-i18n="migr_s3" data-i18n-html></li>
+  </ol>
+  <textarea id="migrText" readonly></textarea>
+  <div class="mrow">
+    <button class="hbtn" id="migrLater" data-i18n="migr_later">Plus tard</button>
+    <button class="hbtn prim" id="migrCopy" data-i18n="migr_copy">Copier ma sauvegarde</button>
+  </div>
+  <div class="mrow">
+    <a class="hbtn" id="migrGo" href="https://orbital-colony.msto.app/" rel="noopener" data-i18n="migr_go">Ouvrir la nouvelle adresse</a>
+  </div>
+</div></div>
 <button type="button" id="pwaTab" data-i18n-title="pwa_title" title="Installe le jeu">📲</button>
 
 <!-- Confirmation interne au jeu. confirm() du navigateur est purement et
@@ -1371,7 +1404,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.7.27";
+const VERSION="3.8.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1525,6 +1558,13 @@ fr:{
   pwa_why:"Tu y gagnes le plein écran, le jeu hors connexion, et une icône sur ton écran d'accueil. Ta partie reste la même.",
   pwa_install:"Installer", pwa_close:"Fermer",
   pwa_never:"Ne plus me le rappeler sur cet appareil",
+  migr_title:"Le jeu change d'adresse",
+  migr_intro:"Colonie Orbitale quitte <b>orbital-colony.app</b> pour <b class=\"migrnew\">orbital-colony.msto.app</b>. Ta partie est enregistrée dans ce navigateur, <b>pour cette adresse seulement</b> : elle ne suivra pas toute seule.",
+  migr_s1:"Clique sur <b>Copier ma sauvegarde</b> ci-dessous.",
+  migr_s2:"Ouvre la <b>nouvelle adresse</b>.",
+  migr_s3:"Dans le jeu : <b>Menu → Export / Import</b>, colle le code, puis clique <b>Importer</b>.",
+  migr_copy:"Copier ma sauvegarde", migr_copied:"Sauvegarde copiée — colle-la sur la nouvelle adresse",
+  migr_go:"Ouvrir la nouvelle adresse", migr_later:"Plus tard",
   gen_hint:"Chaque structure produit du minerai en continu. Le prix monte de 15 % à chaque exemplaire acheté.",
   buy_by:"Acheter par", buy_by_s:"Par",
   u_struct:"structures",
@@ -1699,6 +1739,13 @@ en:{
   pwa_why:"You get full screen, offline play, and an icon on your home screen. Your save stays exactly the same.",
   pwa_install:"Install", pwa_close:"Close",
   pwa_never:"Don't remind me on this device",
+  migr_title:"The game is moving",
+  migr_intro:"Orbital Colony is leaving <b>orbital-colony.app</b> for <b class=\"migrnew\">orbital-colony.msto.app</b>. Your game is stored in this browser, <b>for this address only</b>: it will not follow by itself.",
+  migr_s1:"Click <b>Copy my save</b> below.",
+  migr_s2:"Open the <b>new address</b>.",
+  migr_s3:"In the game: <b>Menu → Export / Import</b>, paste the code, then click <b>Import</b>.",
+  migr_copy:"Copy my save", migr_copied:"Save copied — paste it on the new address",
+  migr_go:"Open the new address", migr_later:"Later",
   gen_hint:"Each structure produces ore continuously. The price rises 15 % with every unit bought.",
   buy_by:"Buy in lots of", buy_by_s:"Lots of",
   u_struct:"structures",
@@ -3745,8 +3792,8 @@ function majLang(){
   });
 }
 /* Version de développement : reconnue au domaine, pas au numéro de version —
-   c'est l'adresse qui dit où l'on est. dev.orbital-colony.app est en dev,
-   orbital-colony.app ne l'est pas. Un fichier ouvert en local (hostname vide)
+   c'est l'adresse qui dit où l'on est. dev.orbital-colony.msto.app est en dev,
+   orbital-colony.msto.app ne l'est pas. Un fichier ouvert en local (hostname vide)
    compte aussi : c'est du test, pas la prod. */
 const estDev=()=>{
   const h=(location.hostname||"").toLowerCase();
@@ -4461,7 +4508,7 @@ bindAction($("#mImport"),()=>{
 const LIEN_CODE="https://github.com/mephissto/orbital-colony";
 const LIEN_KOFI="https://ko-fi.com/mephissto";
 const LIEN_AUTEUR="https://github.com/mephissto";
-const LIEN_MARQUE="https://brand.orbital-colony.app/";
+const LIEN_MARQUE="https://brand.orbital-colony.msto.app/";
 const LIEN_LOG=LIEN_CODE+"/blob/main/CHANGELOG.md";
 const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
 
@@ -4470,6 +4517,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.8.0", nm:{fr:"Le jeu change d'adresse",en:"The game is moving"},
+  d:{fr:"Le jeu passe de orbital-colony.app à orbital-colony.msto.app. Sur l'ancien domaine, une fenêtre l'annonce et guide la migration : copier sa sauvegarde, ouvrir la nouvelle adresse, l'importer via Menu → Export / Import. Nécessaire parce que le navigateur cloisonne la partie par adresse. Toutes les références au domaine du dépôt sont mises à jour.",
+     en:"The game moves from orbital-colony.app to orbital-colony.msto.app. On the old domain, a window announces it and walks through the migration: copy your save, open the new address, import it via Menu → Export / Import. Needed because the browser keeps the game separate for each address. Every domain reference in the repository is updated."}},
  {v:"3.7.23", nm:{fr:"Onze pixels",en:"Eleven pixels"},
   d:{fr:"Le décalage qui sort l'en-tête de la bande du système est fixé à 11 px, après quatre essais sur l'appareil : 24 px dégageait tout mais donnait un en-tête de 77 px, 5 px était trop juste, 8 px acceptable. À 11 px le haut du logo tombe à 30,5 px du bord de la vue et le haut des boutons à 20 — les deux hors de la bande, ce qui n'est vrai d'aucune valeur plus basse. L'en-tête fait 64 px, contre 53 hors application installée. La mesure de la bande ne permettait pas de trancher seule : elle donnait un plancher de 20 px, pas sa fin. C'est l'œil sur l'appareil qui a décidé.",
      en:"The offset that lifts the header out of the system band is set at 11 px, after four trials on the device: 24 px cleared everything but made a 77 px header, 5 px was too tight, 8 px acceptable. At 11 px the top of the logo lands 30.5 px from the edge of the view and the top of the buttons at 20 — both clear of the band, which is true of no lower value. The header is 64 px, against 53 outside an installed app. Measuring the band could not settle it alone: it gave a floor of 20 px, not its end. The eye on the device decided."}},
@@ -4839,6 +4889,32 @@ bindAction($("#pwaGo"),()=>{
   p.prompt();
   p.userChoice.then(r=>{ if(r&&r.outcome==="accepted")pwaEcrit("ok"); else pwaFerme() });
 });
+/* ---------- changement d'adresse ----------
+   orbital-colony.app devient orbital-colony.msto.app. localStorage est cloisonné
+   par origine : la partie ne suit pas, le joueur doit la transporter par le code
+   d'export. La fenêtre ne s'affiche que sur l'ancien domaine (jamais en local,
+   en dev, ni sur la nouvelle adresse) et revient à chaque chargement tant que
+   le domaine répond — « Plus tard » ne la ferme que pour la session. */
+const NOUVEAU_DOMAINE="orbital-colony.msto.app";
+const ANCIENS_DOMAINES=["orbital-colony.app","www.orbital-colony.app"];
+const surAncienDomaine=()=>ANCIENS_DOMAINES.indexOf((location.hostname||"").toLowerCase())>=0;
+function migrAffiche(){
+  if(!surAncienDomaine())return;
+  save(); $("#migrText").value=readSave()||"";
+  $("#migrGo").href="https://"+NOUVEAU_DOMAINE+"/";
+  ouvre("#migr");
+}
+bindAction($("#migrLater"),()=>ferme("#migr"));
+bindAction($("#migrCopy"),()=>{
+  const ta=$("#migrText"), v=ta.value;
+  const ok=()=>toast(t("migr_copied"),"gold");
+  const repli=()=>{ ta.focus(); ta.select(); try{ if(document.execCommand("copy"))ok() }catch(e){} };
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(v).then(ok,repli);
+  else repli();
+});
+setTimeout(migrAffiche,2200);
+
 /* Premier lancement : le tutoriel d'abord, l'invitation à installer ensuite —
    c'est tutoFerme() qui la déclenche. Une partie déjà commencée (importée, ou
    d'une version antérieure au tutoriel) ne le redéclenche pas : `tuto` vaut 0

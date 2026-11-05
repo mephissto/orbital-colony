@@ -17,6 +17,26 @@ restent valides**.
 
 ---
 
+## 3.8.0 — Le jeu change d'adresse
+
+Le jeu passe de **orbital-colony.app** à **orbital-colony.msto.app**.
+
+Le navigateur range la partie par adresse (`localStorage` est cloisonné par
+origine) : elle ne suit donc pas toute seule. Sur l'ancien domaine, une fenêtre
+annonce le changement et guide la migration en trois temps — copier sa
+sauvegarde, ouvrir la nouvelle adresse, la coller dans **Menu → Export /
+Import**. « Plus tard » la ferme pour la session ; elle revient au chargement
+suivant tant que l'ancien domaine répond. Elle n'apparaît jamais en local, en
+version de développement, ni sur la nouvelle adresse.
+
+Toutes les références au domaine du dépôt sont mises à jour (README FR/EN,
+liens sortants, détection de la version de développement : désormais
+`dev.orbital-colony.msto.app`).
+
+Aucun champ de sauvegarde ajouté ni modifié.
+
+---
+
 ## 3.7.27 — Jusqu'au centillion
 
 La 3.7.26 avait ajouté sept unités, jusqu'au vigintillion (10^63). Trop court :
@@ -1109,7 +1129,7 @@ Aucun champ de sauvegarde touché.
   jeu » remplace son chevron par la même. Le pointillé reste sous le libellé
   seul : passer sous la flèche la faisait ressembler à un caractère du texte.
 - 🎨 **Un lien vers le kit de marque** ouvre le pied de page, avant le code
-  source : [brand.orbital-colony.app](https://brand.orbital-colony.app/) — le
+  source : [brand.orbital-colony.msto.app](https://brand.orbital-colony.msto.app/) — le
   logo, la palette et les fonds d'écran du jeu. Sur petit écran il se raccourcit
   en « Marque ».
 - 🌍 **La détection de langue suit toute la liste des préférences.** Elle ne

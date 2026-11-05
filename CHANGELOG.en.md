@@ -16,6 +16,25 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.8.0 — The game is moving
+
+The game moves from **orbital-colony.app** to **orbital-colony.msto.app**.
+
+The browser keeps the game separate for each address (`localStorage` is scoped
+per origin), so it does not follow by itself. On the old domain, a window
+announces the change and walks through the migration in three steps — copy your
+save, open the new address, paste it into **Menu → Export / Import**. "Later"
+closes it for the session; it comes back on the next load as long as the old
+domain still answers. It never shows locally, on the development build, or on
+the new address.
+
+Every domain reference in the repository is updated (README FR/EN, outgoing
+links, development-build detection: now `dev.orbital-colony.msto.app`).
+
+No save field added or changed.
+
+---
+
 ## 3.7.27 — All the way to the centillion
 
 3.7.26 added seven units, up to the vigintillion (10^63). Too short: a run that
@@ -1071,7 +1090,7 @@ No save field touched.
   its chevron for the same one. The dotted rule stays under the label alone:
   running it under the arrow made it look like a character of the text.
 - 🎨 **A link to the brand kit** opens the footer, before the source code:
-  [brand.orbital-colony.app](https://brand.orbital-colony.app/) — the game's
+  [brand.orbital-colony.msto.app](https://brand.orbital-colony.msto.app/) — the game's
   logo, palette and wallpapers. It shortens to "Brand" on a small screen.
 - 🌍 **Language detection walks the full preference list.** It only looked at
   `navigator.language`, the first choice: a browser set to `nl-BE` then `fr-BE`
