@@ -132,8 +132,7 @@ Up to 2.35 the top bar carried three buttons — Save, Export / Import, Reset.
 3.0.28 groups them behind **a single Menu button**: at five entries the bar no
 longer fitted on a phone, and Reset sat dangerously next to Save.
 
-The menu holds a what's-new summary (the `wn_d` key, three lines, to be
-rewritten at every notable version) then **five entries as a list**, one per row
+The menu holds **five entries as a list**, one per row
 and full width: Save, Export / Import, Reset, Tutorial, Changelog. Each carries a
 **subtitle** saying what it does — "the game already does it on its own, every
 20 s" under Save answers the only question that button raises. Subtitles have a
