@@ -1404,7 +1404,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.8.0";
+const VERSION="3.9.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1929,7 +1929,7 @@ const GROWTH_CHAL=1.35;
 
 /* ---------- données : améliorations ---------- */
 const UPS=[];
-const TIERS=[{need:10,mult:2},{need:25,mult:2},{need:50,mult:3},{need:100,mult:4},{need:175,mult:5},{need:250,mult:6}];
+const TIERS=[{need:10,mult:2},{need:25,mult:2},{need:50,mult:3},{need:100,mult:4},{need:175,mult:5},{need:250,mult:6},{need:350,mult:7}];
 GENS.forEach(g=>{
   TIERS.forEach((tier,i)=>{
     UPS.push({
@@ -4517,6 +4517,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.9.0", nm:{fr:"Un septième palier",en:"A seventh tier"},
+  d:{fr:"Chaque structure gagne un palier de plus : ×7 à 350 exemplaires, au prix du palier précédent × 11. Une structure entièrement améliorée produit ×10 080 au lieu de ×1 440. Dix améliorations de plus (70 au lieu de 60) : le succès « Collectionneur » exige désormais les 70 ; qui l'avait déjà le garde.",
+     en:"Every structure gains one more tier: ×7 at 350 units, priced at the previous tier × 11. A fully upgraded structure now produces ×10,080 instead of ×1,440. Ten more upgrades (70 instead of 60): the \"Completionist\" achievement now requires all 70; anyone who already had it keeps it."}},
  {v:"3.8.0", nm:{fr:"Le jeu change d'adresse",en:"The game is moving"},
   d:{fr:"Le jeu passe de orbital-colony.app à orbital-colony.msto.app. Sur l'ancien domaine, une fenêtre l'annonce et guide la migration : copier sa sauvegarde, ouvrir la nouvelle adresse, l'importer via Menu → Export / Import. Nécessaire parce que le navigateur cloisonne la partie par adresse. Toutes les références au domaine du dépôt sont mises à jour.",
      en:"The game moves from orbital-colony.app to orbital-colony.msto.app. On the old domain, a window announces it and walks through the migration: copy your save, open the new address, import it via Menu → Export / Import. Needed because the browser keeps the game separate for each address. Every domain reference in the repository is updated."}},
