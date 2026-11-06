@@ -16,6 +16,15 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.9.1 — One box fewer
+
+The **what's-new summary** at the top of the menu is removed: never up to date,
+it duplicated the Changelog, which stays in the menu.
+
+No save field added or changed.
+
+---
+
 ## 3.9.0 — A seventh tier
 
 Every structure gains one more tier: **×7 at 350 units**, priced at the previous

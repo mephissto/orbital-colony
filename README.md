@@ -136,8 +136,7 @@ Export / Import, Reset. La 3.0.28 les regroupe derrière **un seul bouton Menu**
 à cinq entrées la barre ne tenait plus sur téléphone, et Reset y voisinait
 dangereusement avec Sauvegarder.
 
-Le menu contient un résumé des nouveautés (clé `wn_d`, trois lignes, à réécrire
-à chaque version notable) puis **cinq entrées en liste**, une par ligne et pleine
+Le menu contient **cinq entrées en liste**, une par ligne et pleine
 largeur : Sauvegarder, Export / Import, Reset, Tutoriel, Changelog. Chacune porte
 un **sous-titre** qui dit ce qu'elle fait — « le jeu le fait déjà tout seul,
 toutes les 20 s » sous Sauvegarder répond à la seule question que pose ce bouton.

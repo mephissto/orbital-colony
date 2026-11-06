@@ -17,6 +17,15 @@ restent valides**.
 
 ---
 
+## 3.9.1 — Un encadré de moins
+
+Le **résumé des nouveautés** en tête du menu est supprimé : jamais à jour, il
+faisait doublon avec le Changelog, qui reste dans le menu.
+
+Aucun champ de sauvegarde ajouté ni modifié.
+
+---
+
 ## 3.9.0 — Un septième palier
 
 Chaque structure gagne un palier de plus : **×7 à 350 exemplaires**, au prix du
