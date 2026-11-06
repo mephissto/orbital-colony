@@ -24,8 +24,9 @@ tier × 11 (`TIERS` in `index.html`).
 - A fully upgraded structure now produces **×10,080** instead of ×1,440.
 - 70 structure tiers instead of 60. The "Completionist" achievement (every
   upgrade) therefore requires all 70; a player who already had it keeps it.
-- One more achievement, **"Beyond perfect"** (350 of every structure): 97
-  achievements, so **+97 %** output in full instead of +96 %.
+- Two more achievements: **"Beyond perfect"** (350 of every structure) and
+  **"Seventh heaven"** (tier 7 of every structure). 98 achievements, so **+98 %**
+  output in full instead of +96 %.
 
 No save field added or changed: tiers are identified by `<structure>_t6`, a new
 identifier.

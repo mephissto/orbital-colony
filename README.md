@@ -1001,7 +1001,7 @@ Compression et 9 Réacteur, dépense 41 M sur 92,9, et fait passer le cycle de
 
 ## Les succès
 
-**97 succès**, chacun donnant **+1 % de production** — soit **+97 %** au
+**98 succès**, chacun donnant **+1 % de production** — soit **+98 %** au
 complet. Ils ne sont **jamais perdus** au prestige.
 
 L'onglet les range en **dix catégories** (tableau `ACHCATS`, dont l'ordre est
@@ -1015,7 +1015,7 @@ une fois la catégorie complète.
 | 🏗️ Structures | 13 | drones, sphères de Dyson, paliers « X de chaque », totaux |
 | ⛏️ Extraction | 8 | minerai extrait, de 1 M à 1 Oc |
 | ⚡ Production | 5 | production par seconde, de 1 K/s à 1 Qa/s |
-| 🔬 Améliorations et recherches | 4 | achats d'améliorations, complétion des deux arbres |
+| 🔬 Améliorations et recherches | 5 | achats d'améliorations, complétion des deux arbres |
 | ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
 | ♻️ Cycles et antimatière | 13 | nombre de cycles jusqu'à 2 500, antimatière possédée |
 | ⚙️ Automatisation | 12 | achat et usage des automates, jusqu'à 2 500 cycles relancés seuls |

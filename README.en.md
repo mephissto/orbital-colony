@@ -969,7 +969,7 @@ with no purchase costing more than 7 % of the pocket.
 
 ## Achievements
 
-**97 achievements**, each granting **+1 % output** — so **+97 %** in full. They
+**98 achievements**, each granting **+1 % output** — so **+98 %** in full. They
 are **never lost** on prestige.
 
 The tab sorts them into **ten categories** (the `ACHCATS` array, whose order is
@@ -983,7 +983,7 @@ complete.
 | 🏗️ Structures | 13 | drones, Dyson spheres, "X of each" tiers, totals |
 | ⛏️ Mining | 8 | ore mined, from 1 M to 1 Oc |
 | ⚡ Output | 5 | output per second, from 1 K/s to 1 Qa/s |
-| 🔬 Upgrades and research | 4 | upgrade purchases, completing both trees |
+| 🔬 Upgrades and research | 5 | upgrade purchases, completing both trees |
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
 | ♻️ Cycles and antimatter | 13 | number of cycles up to 2,500, antimatter held |
 | ⚙️ Automation | 12 | buying and using the automations, up to 2,500 cycles restarted alone |

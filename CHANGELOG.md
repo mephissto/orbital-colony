@@ -25,8 +25,9 @@ palier précédent × 11 (`TIERS` dans `index.html`).
 - Une structure entièrement améliorée produit **×10 080** au lieu de ×1 440.
 - 70 paliers de structure au lieu de 60. Le succès « Collectionneur » (toutes
   les améliorations) exige donc les 70 ; un joueur qui l'avait déjà le garde.
-- Un succès de plus, **« Au-delà du parfait »** (350 de chaque structure) : 97
-  succès, donc **+97 %** de production au complet au lieu de +96 %.
+- Deux succès de plus : **« Au-delà du parfait »** (350 de chaque structure) et
+  **« Septième ciel »** (le palier 7 de chaque structure). 98 succès, donc
+  **+98 %** de production au complet au lieu de +96 %.
 
 Aucun champ de sauvegarde ajouté ni modifié : les paliers sont identifiés par
 `<structure>_t6`, un identifiant nouveau.
