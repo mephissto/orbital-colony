@@ -2402,6 +2402,8 @@ const ACHS=[
   nm:{fr:"Empire industriel",en:"Industrial empire"},ds:{fr:"200 de chaque structure",en:"200 of every structure"}},
  {id:"a_all250",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=250).length,n:GENS.length,
   nm:{fr:"Machine parfaite",en:"Perfect machine"},ds:{fr:"250 de chaque structure",en:"250 of every structure"}},
+ {id:"a_all350",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=350).length,n:GENS.length,
+  nm:{fr:"Au-delà du parfait",en:"Beyond perfect"},ds:{fr:"350 de chaque structure",en:"350 of every structure"}},
  {id:"a_struct1k",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:1000,
   nm:{fr:"Mille pièces",en:"A thousand parts"},ds:{fr:"1 000 structures au total",en:"1,000 structures in total"}},
  {id:"a_struct2k5",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:2500,
@@ -4518,8 +4520,8 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
  {v:"3.9.0", nm:{fr:"Un septième palier",en:"A seventh tier"},
-  d:{fr:"Chaque structure gagne un palier de plus : ×7 à 350 exemplaires, au prix du palier précédent × 11. Une structure entièrement améliorée produit ×10 080 au lieu de ×1 440. Dix améliorations de plus (70 au lieu de 60) : le succès « Collectionneur » exige désormais les 70 ; qui l'avait déjà le garde.",
-     en:"Every structure gains one more tier: ×7 at 350 units, priced at the previous tier × 11. A fully upgraded structure now produces ×10,080 instead of ×1,440. Ten more upgrades (70 instead of 60): the \"Completionist\" achievement now requires all 70; anyone who already had it keeps it."}},
+  d:{fr:"Chaque structure gagne un palier de plus : ×7 à 350 exemplaires, au prix du palier précédent × 11. Une structure entièrement améliorée produit ×10 080 au lieu de ×1 440. Dix améliorations de plus (70 au lieu de 60) : le succès « Collectionneur » exige désormais les 70 ; qui l'avait déjà le garde. Un succès de plus (97) : « Au-delà du parfait », 350 de chaque structure.",
+     en:"Every structure gains one more tier: ×7 at 350 units, priced at the previous tier × 11. A fully upgraded structure now produces ×10,080 instead of ×1,440. Ten more upgrades (70 instead of 60): the \"Completionist\" achievement now requires all 70; anyone who already had it keeps it. One more achievement (97): \"Beyond perfect\", 350 of every structure."}},
  {v:"3.8.0", nm:{fr:"Le jeu change d'adresse",en:"The game is moving"},
   d:{fr:"Le jeu passe de orbital-colony.app à orbital-colony.msto.app. Sur l'ancien domaine, une fenêtre l'annonce et guide la migration : copier sa sauvegarde, ouvrir la nouvelle adresse, l'importer via Menu → Export / Import. Nécessaire parce que le navigateur cloisonne la partie par adresse. Toutes les références au domaine du dépôt sont mises à jour.",
      en:"The game moves from orbital-colony.app to orbital-colony.msto.app. On the old domain, a window announces it and walks through the migration: copy your save, open the new address, import it via Menu → Export / Import. Needed because the browser keeps the game separate for each address. Every domain reference in the repository is updated."}},

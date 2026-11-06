@@ -1001,7 +1001,7 @@ Compression et 9 Réacteur, dépense 41 M sur 92,9, et fait passer le cycle de
 
 ## Les succès
 
-**96 succès**, chacun donnant **+1 % de production** — soit **+96 %** au
+**97 succès**, chacun donnant **+1 % de production** — soit **+97 %** au
 complet. Ils ne sont **jamais perdus** au prestige.
 
 L'onglet les range en **dix catégories** (tableau `ACHCATS`, dont l'ordre est
@@ -1012,7 +1012,7 @@ une fois la catégorie complète.
 | Catégorie | Nombre | Ce qu'elle mesure |
 |---|---|---|
 | 🖱️ Clics | 12 | nombre de clics jusqu'à 1 000 000, puissance de clic de 1 M à 1 Sx |
-| 🏗️ Structures | 12 | drones, sphères de Dyson, paliers « X de chaque », totaux |
+| 🏗️ Structures | 13 | drones, sphères de Dyson, paliers « X de chaque », totaux |
 | ⛏️ Extraction | 8 | minerai extrait, de 1 M à 1 Oc |
 | ⚡ Production | 5 | production par seconde, de 1 K/s à 1 Qa/s |
 | 🔬 Améliorations et recherches | 4 | achats d'améliorations, complétion des deux arbres |
