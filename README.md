@@ -420,7 +420,7 @@ comme les améliorations elles-mêmes : chaque cycle redécouvre sa liste au fil
 l'extraction. Jusqu'à la 2.28.0 il s'appuyait sur le total de la partie, jamais
 remis à zéro : dès le deuxième cycle la liste entière apparaissait d'un coup.
 
-**Paliers de structure** — 6 par structure, soit 60 au total. Chacun exige un
+**Paliers de structure** — 7 par structure, soit 70 au total. Chacun exige un
 nombre d'exemplaires et multiplie la production de cette seule structure :
 
 | Palier | Exemplaires requis | Effet | Prix |
@@ -431,8 +431,9 @@ nombre d'exemplaires et multiplie la production de cette seule structure :
 | 4 | 100 | ×4 | × 11 |
 | 5 | 175 | ×5 | × 11 |
 | 6 | 250 | ×6 | × 11 |
+| 7 | 350 | ×7 | × 11 |
 
-Une structure entièrement améliorée produit **×1 440**.
+Une structure entièrement améliorée produit **×10 080**.
 
 **Améliorations de clic** — sur le clic entier : Marteau ionique ×1,45 (250),
 Exosquelette ×1,52 (18 000, dès 50 clics), Condensateur ×1,58 (5e6, dès 250
@@ -1000,7 +1001,7 @@ Compression et 9 Réacteur, dépense 41 M sur 92,9, et fait passer le cycle de
 
 ## Les succès
 
-**96 succès**, chacun donnant **+1 % de production** — soit **+96 %** au
+**98 succès**, chacun donnant **+1 % de production** — soit **+98 %** au
 complet. Ils ne sont **jamais perdus** au prestige.
 
 L'onglet les range en **dix catégories** (tableau `ACHCATS`, dont l'ordre est
@@ -1011,10 +1012,10 @@ une fois la catégorie complète.
 | Catégorie | Nombre | Ce qu'elle mesure |
 |---|---|---|
 | 🖱️ Clics | 12 | nombre de clics jusqu'à 1 000 000, puissance de clic de 1 M à 1 Sx |
-| 🏗️ Structures | 12 | drones, sphères de Dyson, paliers « X de chaque », totaux |
+| 🏗️ Structures | 13 | drones, sphères de Dyson, paliers « X de chaque », totaux |
 | ⛏️ Extraction | 8 | minerai extrait, de 1 M à 1 Oc |
 | ⚡ Production | 5 | production par seconde, de 1 K/s à 1 Qa/s |
-| 🔬 Améliorations et recherches | 4 | achats d'améliorations, complétion des deux arbres |
+| 🔬 Améliorations et recherches | 5 | achats d'améliorations, complétion des deux arbres |
 | ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
 | ♻️ Cycles et antimatière | 13 | nombre de cycles jusqu'à 2 500, antimatière possédée |
 | ⚙️ Automatisation | 12 | achat et usage des automates, jusqu'à 2 500 cycles relancés seuls |

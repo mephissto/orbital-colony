@@ -16,6 +16,23 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.9.0 — A seventh tier
+
+Every structure gains one more tier: **×7 at 350 units**, priced at the previous
+tier × 11 (`TIERS` in `index.html`).
+
+- A fully upgraded structure now produces **×10,080** instead of ×1,440.
+- 70 structure tiers instead of 60. The "Completionist" achievement (every
+  upgrade) therefore requires all 70; a player who already had it keeps it.
+- Two more achievements: **"Beyond perfect"** (350 of every structure) and
+  **"Seventh heaven"** (tier 7 of every structure). 98 achievements, so **+98 %**
+  output in full instead of +96 %.
+
+No save field added or changed: tiers are identified by `<structure>_t6`, a new
+identifier.
+
+---
+
 ## 3.8.0 — The game is moving
 
 The game moves from **orbital-colony.app** to **orbital-colony.msto.app**.

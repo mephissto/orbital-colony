@@ -410,7 +410,7 @@ every cycle rediscovers its list as you mine. Up to 2.28.0 it was based on the
 lifetime total, never reset: from the second cycle on, the whole list appeared at
 once.
 
-**Structure tiers** — 6 per structure, 60 in total. Each requires a number of
+**Structure tiers** — 7 per structure, 70 in total. Each requires a number of
 units and multiplies that one structure's output:
 
 | Tier | Units required | Effect | Price |
@@ -421,8 +421,9 @@ units and multiplies that one structure's output:
 | 4 | 100 | ×4 | × 11 |
 | 5 | 175 | ×5 | × 11 |
 | 6 | 250 | ×6 | × 11 |
+| 7 | 350 | ×7 | × 11 |
 
-A fully upgraded structure produces **×1,440**.
+A fully upgraded structure produces **×10,080**.
 
 **Click upgrades** — on the whole click: Ion hammer ×1.45 (250), Exoskeleton
 ×1.52 (18,000, from 50 clicks), Capacitor ×1.58 (5e6, from 250 clicks), Magnetic
@@ -968,7 +969,7 @@ with no purchase costing more than 7 % of the pocket.
 
 ## Achievements
 
-**96 achievements**, each granting **+1 % output** — so **+96 %** in full. They
+**98 achievements**, each granting **+1 % output** — so **+98 %** in full. They
 are **never lost** on prestige.
 
 The tab sorts them into **ten categories** (the `ACHCATS` array, whose order is
@@ -979,10 +980,10 @@ complete.
 | Category | Count | What it measures |
 |---|---|---|
 | 🖱️ Clicking | 12 | number of clicks up to 1,000,000, click power from 1 M to 1 Sx |
-| 🏗️ Structures | 12 | drones, Dyson spheres, "X of each" tiers, totals |
+| 🏗️ Structures | 13 | drones, Dyson spheres, "X of each" tiers, totals |
 | ⛏️ Mining | 8 | ore mined, from 1 M to 1 Oc |
 | ⚡ Output | 5 | output per second, from 1 K/s to 1 Qa/s |
-| 🔬 Upgrades and research | 4 | upgrade purchases, completing both trees |
+| 🔬 Upgrades and research | 5 | upgrade purchases, completing both trees |
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
 | ♻️ Cycles and antimatter | 13 | number of cycles up to 2,500, antimatter held |
 | ⚙️ Automation | 12 | buying and using the automations, up to 2,500 cycles restarted alone |
