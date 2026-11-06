@@ -28,6 +28,9 @@ tier × 11 (`TIERS` in `index.html`).
   **"Seventh heaven"** (tier 7 of every structure). 98 achievements, so **+98 %**
   output in full instead of +96 %.
 
+The **what's-new summary** at the top of the menu is removed: never up to date,
+it duplicated the Changelog, which stays in the menu.
+
 No save field added or changed: tiers are identified by `<structure>_t6`, a new
 identifier.
 

@@ -783,15 +783,6 @@ h3.achsec,h3.upsec,h3.chsec{display:flex;align-items:baseline;justify-content:sp
 .logbox{max-width:560px}
 .tutobox{max-width:440px}
 
-/* Résumé des nouveautés, en tête du menu : trois lignes, pas un changelog. */
-.whatsnew{border:1px solid rgba(79,216,255,.28);border-radius:11px;
-  background:rgba(79,216,255,.07);padding:11px 13px;margin-bottom:14px}
-.wnh{display:flex;align-items:baseline;gap:8px;font-size:11px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--cyan);font-weight:700}
-.wnv{margin-left:auto;color:var(--dim);letter-spacing:.04em;font-weight:400;
-  text-transform:none;font-variant-numeric:tabular-nums}
-.wnd{font-size:12.5px;color:var(--txt);margin-top:6px;line-height:1.5}
-
 /* Grille de boutons du menu : deux colonnes partout — à une seule, la fenêtre
    dépassait la hauteur d'un téléphone et Reset se retrouvait hors écran. */
 .mgrid{display:flex;flex-direction:column;gap:6px}
@@ -1315,10 +1306,6 @@ a.hbtn{text-decoration:none}
      propos ». Une barre à cinq boutons ne tenait plus sur téléphone, et Reset
      y voisinait dangereusement avec Sauvegarder. -->
 <div id="menu"><div class="mbox menubox">
-  <div class="whatsnew">
-    <div class="wnh"><span data-i18n="wn_t">Nouveautés</span><span class="wnv" id="wnVer"></span></div>
-    <div class="wnd" data-i18n="wn_d" data-i18n-html></div>
-  </div>
   <div class="mgrid" id="mGrid"></div>
   <div class="mgrp don">
     <a class="mitem" id="mKofi" target="_blank" rel="noopener noreferrer">
@@ -1495,8 +1482,6 @@ fr:{
   don_sub:"si le jeu t'a plu — il reste gratuit dans tous les cas",
   don_sub_s:"si le jeu t'a plu — gratuit",
   pied_par:"Créé par {0}, avec l'aide de Claude",
-  wn_t:"Nouveautés", 
-  wn_d:"Le décalage qui sort l'en-tête du flou d'iOS est fixé à <b>11 px</b> : c'est la plus petite valeur qui laisse le logo <i>et</i> le haut des boutons hors de la bande du système. L'en-tête fait 64 px, contre 53 hors application installée.",
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
@@ -1678,8 +1663,6 @@ en:{
   don_sub:"if you enjoyed it — the game stays free either way",
   don_sub_s:"if you enjoyed it — free",
   pied_par:"Created by {0}, with help from Claude",
-  wn_t:"What's new",
-  wn_d:"The offset that lifts the header out of the iOS blur is set at <b>11 px</b>: the smallest value that keeps the logo <i>and</i> the top of the buttons clear of the system band. The header is 64 px, against 53 outside an installed app.",
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
@@ -4703,7 +4686,6 @@ function buildMenu(){
 /* Les textes des deux fenêtres suivent la langue : ils sont remplis au moment
    où on les ouvre plutôt qu'à chaque image — rien n'y bouge autrement. */
 function majMenu(){
-  txt($("#wnVer"),"v"+VERSION);
   $$("#mGrid .mitem").forEach(b=>{ txt(b.ql,t(b._k)); txt(b.qs,tm(b._s)) });
   $$("#mGrid .msec").forEach(h=>{
     const x=MGRP.find(y=>String(y.g)===h.dataset.g);
