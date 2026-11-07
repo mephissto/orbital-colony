@@ -818,6 +818,8 @@ leur icône. Il n'achète que celle-là, une par seconde. Tant que le joueur n'a
 rien choisi, `autoGenId()` vise la **dernière structure révélée** ; dès qu'il
 choisit, `S.autoGen` est écrit et ne bouge plus tout seul. La ligne affichée
 donne le prix visé, le minerai qu'il reste à posséder et une estimation de temps.
+La quantité achetée par seconde se règle sur **×1 / ×10 / ×25 / MAX** (`CONTRE_QTE`) :
+en MAX il achète chaque seconde **tout ce que le minerai permet** (`autoLot()`).
 
 **Le Contremaître et l'Ingénieur tournent ensemble, par priorité** (3.4.0).
 Ils puisent dans le même minerai, et l'arbitrage tient en une phrase : **chaque

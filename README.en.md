@@ -792,6 +792,8 @@ It only ever buys that one, one per second. Until the player picks one,
 `autoGenId()` aims at the **last revealed structure**; as soon as they pick,
 `S.autoGen` is written and no longer moves on its own. The line shown gives the
 target price, the ore still to own and a time estimate.
+The amount bought per second is set to **×1 / ×10 / ×25 / MAX** (`CONTRE_QTE`):
+on MAX it buys **everything the ore allows** every second (`autoLot()`).
 
 **The Foreman and the Engineer run together, by priority** (3.4.0). They draw on
 the same ore, and the arbitration fits in one sentence: **every second the
