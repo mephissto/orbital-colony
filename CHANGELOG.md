@@ -17,6 +17,22 @@ restent valides**.
 
 ---
 
+## 3.10.0 — Le Contremaître en MAX
+
+Le réglage de quantité du Contremaître (onglet Auto) gagne une option **MAX**,
+après ×1, ×10 et ×25 : chaque seconde, il achète **tout ce que le minerai
+permet** de la structure choisie, au lieu d'un lot fixe.
+
+- Comme les lots fixes, l'achat se fait avec le minerai que l'Ingénieur laisse :
+  la priorité Ingénieur → Contremaître ne change pas.
+- Si rien n'est payable, la ligne d'état affiche le prix d'un exemplaire et ce
+  qu'il manque.
+- Aucun champ de sauvegarde ajouté : `autoQte` accepte désormais `"max"`. Une
+  sauvegarde antérieure reste valide ; une sauvegarde 3.10 ouverte dans une
+  version plus ancienne retombe sur ×1.
+
+---
+
 ## 3.9.1 — Un encadré de moins
 
 Le **résumé des nouveautés** en tête du menu est supprimé : jamais à jour, il

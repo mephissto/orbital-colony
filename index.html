@@ -1391,7 +1391,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.9.1";
+const VERSION="3.10.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1580,7 +1580,7 @@ fr:{
   au_sw:"Automates actifs",
   au_sw_hint:"Couper un automate ne rembourse rien et ne fait perdre aucun niveau.<br><b>L'Ingénieur et le Contremaître dépensent le même minerai, chacun son tour, chaque seconde :</b> l'Ingénieur passe d'abord et prend l'amélioration la moins chère qu'il peut payer ; le Contremaître achète ensuite sa structure avec ce qui reste. Quand il n'y a plus une seule amélioration à acheter — la fin de chaque cycle — tout le minerai va aux structures. Pour donner la main à l'Ingénieur, coupe le Contremaître.",
   au_gen:"Le Contremaître achète",
-  au_gen_hint:"Il n'achète que cette structure, par lots de la quantité choisie, une fois par seconde et dès qu'il a le minerai — celui que l'Ingénieur lui laisse. Le lot est acheté entier ou pas du tout.",
+  au_gen_hint:"Il n'achète que cette structure, par lots de la quantité choisie, une fois par seconde et dès qu'il a le minerai — celui que l'Ingénieur lui laisse. Le lot est acheté entier ou pas du tout. En <b>MAX</b>, il achète à chaque seconde tout ce que le minerai permet.",
   au_gen_ready:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b>, disponible.",
   au_gen_wait:"Prochain achat : <b style=\"color:var(--gold)\">{0} minerai</b><br>il manque <b>{1}</b>{2}.",
   au_cyc_hint:"Tape le nombre d'antimatière à partir duquel le cycle doit repartir tout seul. Le cycle ne repart jamais pour moins de 10 % de ta réserve, même si tu saisis moins.",
@@ -1589,7 +1589,7 @@ fr:{
   au_cyc_wait:"il manque <b style=\"color:var(--violet)\">{0}</b>{1}.",
   au_unit_am:"antimatière",
   au_off:"coupé",
-  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · ×{1} par seconde, sur le reste",
+  au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · {1} par seconde, sur le reste",
   au_e_ing:"se sert en premier · l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
   au_e_cycle:"relance à +{0} antimatière",
   t_auto:"{0} — niveau {1}", t_auto_on:"{0} : remis en marche", t_auto_off:"{0} : coupé",
@@ -1759,7 +1759,7 @@ en:{
   au_sw:"Active automations",
   au_sw_hint:"Switching one off refunds nothing and loses no level.<br><b>The Engineer and the Foreman spend the same ore, each in turn, every second:</b> the Engineer goes first and takes the cheapest upgrade it can afford; the Foreman then buys its structure with what is left. Once there is not a single upgrade left to buy — the end of every cycle — all the ore goes to structures. To give the Engineer a free hand, switch the Foreman off.",
   au_gen:"The Foreman buys",
-  au_gen_hint:"It only ever buys that one structure, in batches of the chosen size, once a second and as soon as it has the ore — the ore the Engineer leaves it. A batch is bought whole or not at all.",
+  au_gen_hint:"It only ever buys that one structure, in batches of the chosen size, once a second and as soon as it has the ore — the ore the Engineer leaves it. A batch is bought whole or not at all. On <b>MAX</b> it buys everything the ore allows, every second.",
   au_gen_ready:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b>, available.",
   au_gen_wait:"Next purchase: <b style=\"color:var(--gold)\">{0} ore</b><br><b>{1}</b> to go{2}.",
   au_cyc_hint:"Type the amount of antimatter at which the cycle should restart on its own. It never restarts for less than 10 % of your stock, even if you type less.",
@@ -1768,7 +1768,7 @@ en:{
   au_cyc_wait:"<b style=\"color:var(--violet)\">{0}</b> to go{1}.",
   au_unit_am:"antimatter",
   au_off:"off",
-  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · ×{1} per second, on what is left",
+  au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · {1} per second, on what is left",
   au_e_ing:"served first · the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
   au_e_cycle:"restarts at +{0} antimatter",
   t_auto:"{0} — level {1}", t_auto_on:"{0}: switched back on", t_auto_off:"{0}: switched off",
@@ -2147,8 +2147,22 @@ const aOn=id=>alvl(id)>0&&!S.autoOff[id];
 const CONTRE_S=1;                   // délai entre deux achats du Contremaître
 /* Quantité achetée à chaque passage du Contremaître. En fin de partie, une
    structure par seconde ne suit plus la production : à ×25 il rattrape. */
-const CONTRE_QTE=[1,10,25];
+const CONTRE_QTE=[1,10,25,"max"];
 const autoQte=()=>CONTRE_QTE.indexOf(S.autoQte)>=0?S.autoQte:1;
+const qteLib=q=>q==="max"?"MAX":"×"+q;
+/* Lot visé par le Contremaître : { n, c } = nombre d'exemplaires et prix total.
+   En MAX c'est tout ce que le minerai permet ; si rien n'est payable on vise un
+   exemplaire, pour que l'affichage dise ce qui manque. maxAffordable() passe par
+   un logarithme : on redescend d'un cran si l'arrondi a vu un peu trop grand. */
+function autoLot(g){
+  const q=autoQte();
+  let n=q;
+  if(q==="max"){
+    n=Math.max(1,maxAffordable(g));
+    while(n>1&&genCost(g,n)>S.ore)n--;
+  }
+  return {n,c:genCost(g,n)};
+}
 const SONDE_S =2;                   // délai avant ramassage de la Sonde
 /* Structures déjà révélées : c'est la liste que voit le joueur dans Extraction,
    donc la seule qu'on puisse proposer sans rien dévoiler d'avance. */
@@ -3461,7 +3475,7 @@ function getAutoCard(a){
 function autoEtat(a){
   const l=alvl(a.id);
   if(a.id==="clic")  return t("au_e_clic",l,l>1?"s":"");
-  if(a.id==="contre"){const g=autoGen();return t("au_e_contre",g?g.ico+" "+tr(g.nm):"—",autoQte())}
+  if(a.id==="contre"){const g=autoGen();return t("au_e_contre",g?g.ico+" "+tr(g.nm):"—",qteLib(autoQte()))}
   if(a.id==="ing")   return t("au_e_ing");
   if(a.id==="sonde") return t("au_e_sonde",SONDE_S);
   return t("au_e_cycle",fmt(cycSeuil()));
@@ -3643,7 +3657,7 @@ function buildSkeleton(){
   $("#auGenCtl").appendChild(GENSEL);
   QGEN=CONTRE_QTE.map(q=>{
     const b=document.createElement("button");
-    b.type="button"; b.className="qty"; b.textContent="×"+q; b._q=q;
+    b.type="button"; b.className="qty"; b.textContent=qteLib(q); b._q=q;
     bindAction(b,()=>{S.autoQte=q;render()});
     $("#auGenCtl").appendChild(b); return b;
   });
@@ -4039,7 +4053,7 @@ function renderAuto(){
     const cible=autoGenId();
     if(GENSEL.value!==cible)GENSEL.value=cible;
     QGEN.forEach(b=>cls(b,"on",autoQte()===b._q));
-    const g=autoGen(), n=autoQte(), cout=genCost(g,n), manque=cout-S.ore;
+    const g=autoGen(), cout=autoLot(g).c, manque=cout-S.ore;
     if(manque<=0) html($("#auGenNow"),t("au_gen_ready",fmt(cout)));
     else{
       const r=perSec();
@@ -4417,8 +4431,8 @@ function runAutos(dt){
          La quantité suit le réglage : on achète le lot entier ou rien, comme le
          bouton ×N du joueur — pas d'achat partiel qui viderait la réserve sans
          atteindre le lot demandé. */
-      const g=autoGen(), n=autoQte(), c=g?genCost(g,n):Infinity;
-      if(c<=S.ore){ S.ore-=c; S.gens[g.id]=(S.gens[g.id]||0)+n; }
+      const g=autoGen(), lot=g?autoLot(g):null;
+      if(lot&&lot.c<=S.ore){ S.ore-=lot.c; S.gens[g.id]=(S.gens[g.id]||0)+lot.n; }
     }
   }
 

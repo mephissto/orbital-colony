@@ -16,6 +16,21 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.10.0 — The Foreman on MAX
+
+The Foreman's quantity setting (Auto tab) gains a **MAX** option, after ×1, ×10
+and ×25: every second it buys **everything the ore allows** of the chosen
+structure, instead of a fixed batch.
+
+- Like the fixed batches, it buys with the ore the Engineer leaves it: the
+  Engineer → Foreman priority is unchanged.
+- If nothing is affordable, the status line shows the price of one unit and
+  what is missing.
+- No save field added: `autoQte` now accepts `"max"`. An earlier save stays
+  valid; a 3.10 save opened in an older version falls back to ×1.
+
+---
+
 ## 3.9.1 — One box fewer
 
 The **what's-new summary** at the top of the menu is removed: never up to date,
