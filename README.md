@@ -419,7 +419,7 @@ comme les améliorations elles-mêmes : chaque cycle redécouvre sa liste au fil
 l'extraction. Jusqu'à la 2.28.0 il s'appuyait sur le total de la partie, jamais
 remis à zéro : dès le deuxième cycle la liste entière apparaissait d'un coup.
 
-**Paliers de structure** — 8 par structure, soit 80 au total. Chacun exige un
+**Paliers de structure** — 10 par structure, soit 100 au total. Chacun exige un
 nombre d'exemplaires et multiplie la production de cette seule structure :
 
 | Palier | Exemplaires requis | Effet | Prix |
@@ -432,8 +432,10 @@ nombre d'exemplaires et multiplie la production de cette seule structure :
 | 6 | 250 | ×6 | × 11 |
 | 7 | 350 | ×7 | × 11 |
 | 8 | 450 | ×8 | × 11 |
+| 9 | 550 | ×9 | × 11 |
+| 10 | 650 | ×10 | × 11 |
 
-Une structure entièrement améliorée produit **×80 640**.
+Une structure entièrement améliorée produit **×7 257 600**.
 
 **Améliorations de clic** — sur le clic entier : Marteau ionique ×1,45 (250),
 Exosquelette ×1,52 (18 000, dès 50 clics), Condensateur ×1,58 (5e6, dès 250

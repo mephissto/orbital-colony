@@ -16,11 +16,11 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
-## 3.11.0 — An eighth tier, and more to aim for
+## 3.11.0 — Three more tiers, and more to aim for
 
-Every structure gains an eighth tier: **×8 at 450 units**, priced at the
-previous one × 11. A fully upgraded structure produces **×80,640** (80 structure
-tiers in total).
+Every structure gains three tiers: **×8 at 450 units, ×9 at 550 and ×10 at
+650**, each priced at the previous one × 11. A fully upgraded structure produces
+**×7,257,600** (100 structure tiers in total).
 
 **24 more achievements** — 122 in total, so **+122 %** output in full. They
 extend the families that stopped too early for an advanced run:
@@ -28,7 +28,7 @@ extend the families that stopped too early for an advanced run:
 | Family | New tiers |
 |---|---|
 | Structures | 500 of every structure · 5,000 and 7,500 in total |
-| Upgrades | tier 8 of every structure |
+| Upgrades | tier 8 of every structure (tiers 9 and 10 have no achievement) |
 | Ore mined | 1 No · 1 Dc · 1 Ud |
 | Output | from 1 Qi/s to 1 Dc/s, every 10³ |
 | Click power | 1 Sp · 1 Oc · 1 No · 1 Dc |

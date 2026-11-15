@@ -17,11 +17,11 @@ restent valides**.
 
 ---
 
-## 3.11.0 — Un huitième palier, et de quoi viser plus loin
+## 3.11.0 — Trois paliers de plus, et de quoi viser plus loin
 
-Chaque structure gagne un huitième palier : **×8 à 450 exemplaires**, au prix du
-précédent × 11. Une structure entièrement améliorée produit **×80 640** (80
-paliers de structure au total).
+Chaque structure gagne trois paliers : **×8 à 450 exemplaires, ×9 à 550 et ×10
+à 650**, chacun au prix du précédent × 11. Une structure entièrement améliorée
+produit **×7 257 600** (100 paliers de structure au total).
 
 **24 succès de plus** — 122 au total, donc **+122 %** de production au complet.
 Ils prolongent les familles qui s'arrêtaient trop tôt pour une partie avancée :
@@ -29,7 +29,7 @@ Ils prolongent les familles qui s'arrêtaient trop tôt pour une partie avancée
 | Famille | Nouveaux paliers |
 |---|---|
 | Structures | 500 de chaque structure · 5 000 et 7 500 au total |
-| Améliorations | le palier 8 de chaque structure |
+| Améliorations | le palier 8 de chaque structure (les paliers 9 et 10 n'ont pas de succès) |
 | Minerai extrait | 1 No · 1 Dc · 1 Ud |
 | Production | de 1 Qi/s à 1 Dc/s, tous les 10³ |
 | Puissance de clic | 1 Sp · 1 Oc · 1 No · 1 Dc |

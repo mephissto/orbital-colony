@@ -409,7 +409,7 @@ every cycle rediscovers its list as you mine. Up to 2.28.0 it was based on the
 lifetime total, never reset: from the second cycle on, the whole list appeared at
 once.
 
-**Structure tiers** — 8 per structure, 80 in total. Each requires a number of
+**Structure tiers** — 10 per structure, 100 in total. Each requires a number of
 units and multiplies that one structure's output:
 
 | Tier | Units required | Effect | Price |
@@ -422,8 +422,10 @@ units and multiplies that one structure's output:
 | 6 | 250 | ×6 | × 11 |
 | 7 | 350 | ×7 | × 11 |
 | 8 | 450 | ×8 | × 11 |
+| 9 | 550 | ×9 | × 11 |
+| 10 | 650 | ×10 | × 11 |
 
-A fully upgraded structure produces **×80,640**.
+A fully upgraded structure produces **×7,257,600**.
 
 **Click upgrades** — on the whole click: Ion hammer ×1.45 (250), Exoskeleton
 ×1.52 (18,000, from 50 clicks), Capacitor ×1.58 (5e6, from 250 clicks), Magnetic
