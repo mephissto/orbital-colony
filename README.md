@@ -773,7 +773,7 @@ suffit de le rallumer.
 | Automate | Effet | Max | Coût | Coût cumulé |
 |---|---|---|---|---|
 | 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
-| ⬆️ Ingénieur | achète l'amélioration la moins chère payable | 1 | 100 | 100 |
+| ⬆️ Ingénieur | achète les améliorations, la moins chère d'abord, tant qu'il peut payer | 1 | 100 | 100 |
 | 🏗️ Contremaître | achète chaque seconde la structure que tu lui désignes | 1 | 150 | 150 |
 | 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 200 | 200 |
 | ♻️ Cycle automatique | relance un cycle au seuil choisi | 1 | 400 | 400 |
@@ -826,7 +826,8 @@ en MAX il achète chaque seconde **tout ce que le minerai permet** (`autoLot()`)
 
 **Le Contremaître et l'Ingénieur tournent ensemble, par priorité** (3.4.0).
 Ils puisent dans le même minerai, et l'arbitrage tient en une phrase : **chaque
-seconde l'Ingénieur passe d'abord** ; s'il ne reste aucune amélioration
+seconde l'Ingénieur passe d'abord** (et achète en rafale : toutes les améliorations
+disponibles qu'il peut payer, la moins chère d'abord, depuis la 3.12.0) ; s'il ne reste aucune amélioration
 disponible, ou qu'aucune n'est payable, le Contremaître achète une structure
 avec ce qui reste. Ce n'est pas une règle écrite quelque part : c'est **l'ordre
 des deux blocs dans `runAutos()`**. Le premier prélève, le second dépense le

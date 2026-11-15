@@ -16,6 +16,22 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.12.0 — The Engineer buys in bursts
+
+The Engineer only bought **one upgrade per second**, even with enough ore for
+ten. Every second it now buys **the cheapest available upgrade for as long as it
+can pay for it**.
+
+- The rule stays "cheapest first": if it cannot afford the next one it stops,
+  it never skips to a pricier one.
+- It restarts from the list after each purchase: a purchase that unlocks
+  another one (structure tiers) makes it buyable straight away.
+- It still goes **before** the Foreman: the priority is unchanged.
+
+No save field added or changed.
+
+---
+
 ## 3.11.0 — Three more tiers, and more to aim for
 
 Every structure gains three tiers: **×8 at 450 units, ×9 at 550 and ×10 at

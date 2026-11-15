@@ -750,7 +750,7 @@ on.
 | Automation | Effect | Max | Cost | Cumulative cost |
 |---|---|---|---|---|
 | 🛰️ Mining satellites | +1 click/s per level | 10 | 30, ×2 per level | 30,690 |
-| ⬆️ Engineer | buys the cheapest affordable upgrade | 1 | 100 | 100 |
+| ⬆️ Engineer | buys upgrades, cheapest first, as long as it can pay | 1 | 100 | 100 |
 | 🏗️ Foreman | buys the structure you assign it, every second | 1 | 150 | 150 |
 | 📡 Recovery probe | collects the anomaly for you | 1 | 200 | 200 |
 | ♻️ Auto cycle | starts a new cycle at the chosen threshold | 1 | 400 | 400 |
@@ -800,7 +800,8 @@ on MAX it buys **everything the ore allows** every second (`autoLot()`).
 
 **The Foreman and the Engineer run together, by priority** (3.4.0). They draw on
 the same ore, and the arbitration fits in one sentence: **every second the
-Engineer goes first**; if no upgrade is left, or none is affordable, the Foreman
+Engineer goes first** (and buys in bursts: every available upgrade it can pay for,
+cheapest first, since 3.12.0); if no upgrade is left, or none is affordable, the Foreman
 buys a structure with what remains. It is not a rule written down somewhere: it
 is **the order of the two blocks in `runAutos()`**. The first takes its cut, the
 second spends the balance. Swapping them would starve the Engineer.
