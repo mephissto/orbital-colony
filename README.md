@@ -419,7 +419,7 @@ comme les améliorations elles-mêmes : chaque cycle redécouvre sa liste au fil
 l'extraction. Jusqu'à la 2.28.0 il s'appuyait sur le total de la partie, jamais
 remis à zéro : dès le deuxième cycle la liste entière apparaissait d'un coup.
 
-**Paliers de structure** — 7 par structure, soit 70 au total. Chacun exige un
+**Paliers de structure** — 8 par structure, soit 80 au total. Chacun exige un
 nombre d'exemplaires et multiplie la production de cette seule structure :
 
 | Palier | Exemplaires requis | Effet | Prix |
@@ -431,8 +431,9 @@ nombre d'exemplaires et multiplie la production de cette seule structure :
 | 5 | 175 | ×5 | × 11 |
 | 6 | 250 | ×6 | × 11 |
 | 7 | 350 | ×7 | × 11 |
+| 8 | 450 | ×8 | × 11 |
 
-Une structure entièrement améliorée produit **×10 080**.
+Une structure entièrement améliorée produit **×80 640**.
 
 **Améliorations de clic** — sur le clic entier : Marteau ionique ×1,45 (250),
 Exosquelette ×1,52 (18 000, dès 50 clics), Condensateur ×1,58 (5e6, dès 250
@@ -1002,7 +1003,7 @@ Compression et 9 Réacteur, dépense 41 M sur 92,9, et fait passer le cycle de
 
 ## Les succès
 
-**98 succès**, chacun donnant **+1 % de production** — soit **+98 %** au
+**122 succès**, chacun donnant **+1 % de production** — soit **+122 %** au
 complet. Ils ne sont **jamais perdus** au prestige.
 
 L'onglet les range en **dix catégories** (tableau `ACHCATS`, dont l'ordre est
@@ -1012,13 +1013,13 @@ une fois la catégorie complète.
 
 | Catégorie | Nombre | Ce qu'elle mesure |
 |---|---|---|
-| 🖱️ Clics | 12 | nombre de clics jusqu'à 1 000 000, puissance de clic de 1 M à 1 Sx |
-| 🏗️ Structures | 13 | drones, sphères de Dyson, paliers « X de chaque », totaux |
-| ⛏️ Extraction | 8 | minerai extrait, de 1 M à 1 Oc |
-| ⚡ Production | 5 | production par seconde, de 1 K/s à 1 Qa/s |
-| 🔬 Améliorations et recherches | 5 | achats d'améliorations, complétion des deux arbres |
+| 🖱️ Clics | 17 | nombre de clics jusqu'à 10 000 000, puissance de clic de 1 M à 1 Dc |
+| 🏗️ Structures | 16 | drones, sphères de Dyson, paliers « X de chaque », totaux |
+| ⛏️ Extraction | 11 | minerai extrait, de 1 M à 1 Ud |
+| ⚡ Production | 11 | production par seconde, de 1 K/s à 1 Dc/s |
+| 🔬 Améliorations et recherches | 6 | achats d'améliorations, complétion des deux arbres |
 | ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
-| ♻️ Cycles et antimatière | 13 | nombre de cycles jusqu'à 2 500, antimatière possédée |
+| ♻️ Cycles et antimatière | 19 | nombre de cycles jusqu'à 5 000, antimatière possédée jusqu'à 10 B |
 | ⚙️ Automatisation | 12 | achat et usage des automates, jusqu'à 2 500 cycles relancés seuls |
 | 🜛 Percées | 9 | niveaux achetés, lignes entamées, antimatière versée |
 | 🎯 Défis | 7 | un par défi réussi, plus un pour les six |
@@ -1028,7 +1029,9 @@ Les deux échelles de la catégorie Clics sont volontairement séparées : le
 1 000 000 en une trentaine d'heures) et la **puissance** d'un clic. Le plafond
 de puissance est monté jusqu'à 1 Sx parce que 1 Qa se franchit vers « 100 de
 chaque structure + toutes les améliorations + 100 antimatière », donc bien avant
-la fin de partie ; à 250 de chaque et 100 000 antimatière on dépasse 1 Sx.
+la fin de partie ; à 250 de chaque et 100 000 antimatière on dépasse 1 Sx. La
+3.11.0 prolonge l'échelle jusqu'à 1 Dc : une partie à 500 de chaque structure
+produit déjà plus de 10³² par clic.
 
 Deux succès de la catégorie Anomalies ne se comptent pas : **Résonance
 parfaite** demande d'attraper un bonus alors qu'un autre est encore actif (elle

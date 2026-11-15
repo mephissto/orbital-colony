@@ -409,7 +409,7 @@ every cycle rediscovers its list as you mine. Up to 2.28.0 it was based on the
 lifetime total, never reset: from the second cycle on, the whole list appeared at
 once.
 
-**Structure tiers** — 7 per structure, 70 in total. Each requires a number of
+**Structure tiers** — 8 per structure, 80 in total. Each requires a number of
 units and multiplies that one structure's output:
 
 | Tier | Units required | Effect | Price |
@@ -421,8 +421,9 @@ units and multiplies that one structure's output:
 | 5 | 175 | ×5 | × 11 |
 | 6 | 250 | ×6 | × 11 |
 | 7 | 350 | ×7 | × 11 |
+| 8 | 450 | ×8 | × 11 |
 
-A fully upgraded structure produces **×10,080**.
+A fully upgraded structure produces **×80,640**.
 
 **Click upgrades** — on the whole click: Ion hammer ×1.45 (250), Exoskeleton
 ×1.52 (18,000, from 50 clicks), Capacitor ×1.58 (5e6, from 250 clicks), Magnetic
@@ -970,7 +971,7 @@ with no purchase costing more than 7 % of the pocket.
 
 ## Achievements
 
-**98 achievements**, each granting **+1 % output** — so **+98 %** in full. They
+**122 achievements**, each granting **+1 % output** — so **+122 %** in full. They
 are **never lost** on prestige.
 
 The tab sorts them into **ten categories** (the `ACHCATS` array, whose order is
@@ -980,13 +981,13 @@ complete.
 
 | Category | Count | What it measures |
 |---|---|---|
-| 🖱️ Clicking | 12 | number of clicks up to 1,000,000, click power from 1 M to 1 Sx |
-| 🏗️ Structures | 13 | drones, Dyson spheres, "X of each" tiers, totals |
-| ⛏️ Mining | 8 | ore mined, from 1 M to 1 Oc |
-| ⚡ Output | 5 | output per second, from 1 K/s to 1 Qa/s |
-| 🔬 Upgrades and research | 5 | upgrade purchases, completing both trees |
+| 🖱️ Clicking | 17 | number of clicks up to 10,000,000, click power from 1 M to 1 Dc |
+| 🏗️ Structures | 16 | drones, Dyson spheres, "X of each" tiers, totals |
+| ⛏️ Mining | 11 | ore mined, from 1 M to 1 Ud |
+| ⚡ Output | 11 | output per second, from 1 K/s to 1 Dc/s |
+| 🔬 Upgrades and research | 6 | upgrade purchases, completing both trees |
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
-| ♻️ Cycles and antimatter | 13 | number of cycles up to 2,500, antimatter held |
+| ♻️ Cycles and antimatter | 19 | number of cycles up to 5,000, antimatter held up to 10 B |
 | ⚙️ Automation | 12 | buying and using the automations, up to 2,500 cycles restarted alone |
 | 🜛 Breakthroughs | 9 | levels bought, lines started, antimatter poured |
 | 🎯 Challenges | 7 | one per challenge beaten, plus one for all six |
@@ -996,7 +997,9 @@ of clicks (which the Mining satellites push up by 10/s, so 1,000,000 in about
 thirty hours) and the **power** of a click. The power ceiling was raised to 1 Sx
 because 1 Qa is crossed around "100 of each structure + all upgrades + 100
 antimatter", so well before the end of the game; at 250 of each and 100,000
-antimatter you go past 1 Sx.
+antimatter you go past 1 Sx. 3.11.0 extends the
+scale to 1 Dc: a run at 500 of each structure already makes more than 10³² per
+click.
 
 Two achievements in the Anomalies category are not counters: **Perfect
 resonance** asks you to catch a buff while another is still running (it required

@@ -17,6 +17,33 @@ restent valides**.
 
 ---
 
+## 3.11.0 — Un huitième palier, et de quoi viser plus loin
+
+Chaque structure gagne un huitième palier : **×8 à 450 exemplaires**, au prix du
+précédent × 11. Une structure entièrement améliorée produit **×80 640** (80
+paliers de structure au total).
+
+**24 succès de plus** — 122 au total, donc **+122 %** de production au complet.
+Ils prolongent les familles qui s'arrêtaient trop tôt pour une partie avancée :
+
+| Famille | Nouveaux paliers |
+|---|---|
+| Structures | 500 de chaque structure · 5 000 et 7 500 au total |
+| Améliorations | le palier 8 de chaque structure |
+| Minerai extrait | 1 No · 1 Dc · 1 Ud |
+| Production | de 1 Qi/s à 1 Dc/s, tous les 10³ |
+| Puissance de clic | 1 Sp · 1 Oc · 1 No · 1 Dc |
+| Clics | 10 000 000 |
+| Antimatière possédée | 1 M · 10 M · 100 M · 1 B · 10 B |
+| Cycles | 5 000 |
+
+Plusieurs sont déjà atteints par une partie avancée : ils se débloquent dès le
+chargement (les notifications n'en montrent que quatre à la fois).
+
+Aucun champ de sauvegarde ajouté ni modifié.
+
+---
+
 ## 3.10.0 — Le Contremaître en MAX
 
 Le réglage de quantité du Contremaître (onglet Auto) gagne une option **MAX**,
