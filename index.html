@@ -2345,8 +2345,6 @@ const ACHS=[
   nm:{fr:"Marteau-piqueur",en:"Jackhammer"},ds:{fr:"100 000 clics",en:"100,000 clicks"}},
  {id:"a_click1M",c:"clic",v:S=>S.clicks,n:1e6,
   nm:{fr:"Mémoire musculaire",en:"Muscle memory"},ds:{fr:"1 000 000 de clics",en:"1,000,000 clicks"}},
- {id:"a_click10M",c:"clic",v:S=>S.clicks,n:1e7,
-  nm:{fr:"Phalanges d'acier",en:"Steel knuckles"},ds:{fr:"10 000 000 de clics",en:"10,000,000 clicks"}},
  {id:"a_click1m",c:"clic",v:S=>clickVal(),n:1e6,
   nm:{fr:"Doigt de fer",en:"Iron finger"},ds:{fr:"1 M de puissance de clic",en:"1 M click power"}},
  {id:"a_drone10",c:"struct",v:S=>(S.gens.drone||0),n:10,
@@ -2516,6 +2514,10 @@ const ACHS=[
   nm:{fr:"Septième ciel",en:"Seventh heaven"},ds:{fr:"Le palier 7 de chaque structure",en:"Tier 7 of every structure"}},
  {id:"a_tier8",c:"tech",v:S=>GENS.filter(g=>!!S.ups[g.id+"_t7"]).length,n:GENS.length,
   nm:{fr:"Huitième ciel",en:"Eighth heaven"},ds:{fr:"Le palier 8 de chaque structure",en:"Tier 8 of every structure"}},
+ {id:"a_tier9",c:"tech",v:S=>GENS.filter(g=>!!S.ups[g.id+"_t8"]).length,n:GENS.length,
+  nm:{fr:"Neuvième nuage",en:"Cloud nine"},ds:{fr:"Le palier 9 de chaque structure",en:"Tier 9 of every structure"}},
+ {id:"a_tier10",c:"tech",v:S=>GENS.filter(g=>!!S.ups[g.id+"_t9"]).length,n:GENS.length,
+  nm:{fr:"Dixième dimension",en:"Tenth dimension"},ds:{fr:"Le palier 10 de chaque structure",en:"Tier 10 of every structure"}},
 
  /* ---- automatisation ---- */
  {id:"a_auto1",c:"auto",v:S=>Object.keys(S.auto).length,n:1,
@@ -4567,8 +4569,8 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
  {v:"3.11.0", nm:{fr:"Trois paliers de plus, et de quoi viser plus loin",en:"Three more tiers, and more to aim for"},
-  d:{fr:"Chaque structure gagne trois paliers de plus : ×8 à 450 exemplaires, ×9 à 550 et ×10 à 650. Une structure entièrement améliorée produit ×7 257 600. Vingt-quatre succès s'ajoutent (122 au total) pour prolonger les familles qui s'arrêtaient trop tôt : production et puissance de clic jusqu'au décillion, minerai jusqu'à l'undécillion, antimatière possédée jusqu'à 10 milliards, 5 000 et 7 500 structures, 500 de chaque structure, et le palier 8 partout.",
-     en:"Every structure gains three more tiers: ×8 at 450 units, ×9 at 550 and ×10 at 650. A fully upgraded structure now produces ×7,257,600. Twenty-four achievements are added (122 in total) to extend the families that stopped too early: output and click power up to the decillion, ore up to the undecillion, antimatter held up to 10 billion, 5,000 and 7,500 structures, 500 of every structure, and tier 8 everywhere."}},
+  d:{fr:"Chaque structure gagne trois paliers de plus : ×8 à 450 exemplaires, ×9 à 550 et ×10 à 650. Une structure entièrement améliorée produit ×7 257 600. Vingt-cinq succès s'ajoutent (123 au total) pour prolonger les familles qui s'arrêtaient trop tôt : production et puissance de clic jusqu'au décillion, minerai jusqu'à l'undécillion, antimatière possédée jusqu'à 10 milliards, 5 000 et 7 500 structures, 500 de chaque structure, et les paliers 8, 9 et 10 partout.",
+     en:"Every structure gains three more tiers: ×8 at 450 units, ×9 at 550 and ×10 at 650. A fully upgraded structure now produces ×7,257,600. Twenty-five achievements are added (123 in total) to extend the families that stopped too early: output and click power up to the decillion, ore up to the undecillion, antimatter held up to 10 billion, 5,000 and 7,500 structures, 500 of every structure, and tiers 8, 9 and 10 everywhere."}},
  {v:"3.9.0", nm:{fr:"Un septième palier",en:"A seventh tier"},
   d:{fr:"Chaque structure gagne un palier de plus : ×7 à 350 exemplaires, au prix du palier précédent × 11. Une structure entièrement améliorée produit ×10 080 au lieu de ×1 440. Dix améliorations de plus (70 au lieu de 60) : le succès « Collectionneur » exige désormais les 70 ; qui l'avait déjà le garde. Deux succès de plus (98) : « Au-delà du parfait » (350 de chaque structure) et « Septième ciel » (le palier 7 de chaque structure).",
      en:"Every structure gains one more tier: ×7 at 350 units, priced at the previous tier × 11. A fully upgraded structure now produces ×10,080 instead of ×1,440. Ten more upgrades (70 instead of 60): the \"Completionist\" achievement now requires all 70; anyone who already had it keeps it. Two more achievements (98): \"Beyond perfect\" (350 of every structure) and \"Seventh heaven\" (tier 7 of every structure)."}},

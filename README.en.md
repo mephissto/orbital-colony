@@ -973,7 +973,7 @@ with no purchase costing more than 7 % of the pocket.
 
 ## Achievements
 
-**122 achievements**, each granting **+1 % output** — so **+122 %** in full. They
+**123 achievements**, each granting **+1 % output** — so **+123 %** in full. They
 are **never lost** on prestige.
 
 The tab sorts them into **ten categories** (the `ACHCATS` array, whose order is
@@ -983,11 +983,11 @@ complete.
 
 | Category | Count | What it measures |
 |---|---|---|
-| 🖱️ Clicking | 17 | number of clicks up to 10,000,000, click power from 1 M to 1 Dc |
+| 🖱️ Clicking | 16 | number of clicks up to 1,000,000, click power from 1 M to 1 Dc |
 | 🏗️ Structures | 16 | drones, Dyson spheres, "X of each" tiers, totals |
 | ⛏️ Mining | 11 | ore mined, from 1 M to 1 Ud |
 | ⚡ Output | 11 | output per second, from 1 K/s to 1 Dc/s |
-| 🔬 Upgrades and research | 6 | upgrade purchases, completing both trees |
+| 🔬 Upgrades and research | 8 | upgrade purchases, completing both trees |
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
 | ♻️ Cycles and antimatter | 19 | number of cycles up to 5,000, antimatter held up to 10 B |
 | ⚙️ Automation | 12 | buying and using the automations, up to 2,500 cycles restarted alone |
