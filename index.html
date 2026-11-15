@@ -1391,7 +1391,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.10.0";
+const VERSION="3.11.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1912,7 +1912,7 @@ const GROWTH_CHAL=1.35;
 
 /* ---------- données : améliorations ---------- */
 const UPS=[];
-const TIERS=[{need:10,mult:2},{need:25,mult:2},{need:50,mult:3},{need:100,mult:4},{need:175,mult:5},{need:250,mult:6},{need:350,mult:7}];
+const TIERS=[{need:10,mult:2},{need:25,mult:2},{need:50,mult:3},{need:100,mult:4},{need:175,mult:5},{need:250,mult:6},{need:350,mult:7},{need:450,mult:8},{need:550,mult:9},{need:650,mult:10}];
 GENS.forEach(g=>{
   TIERS.forEach((tier,i)=>{
     UPS.push({
@@ -2401,10 +2401,16 @@ const ACHS=[
   nm:{fr:"Machine parfaite",en:"Perfect machine"},ds:{fr:"250 de chaque structure",en:"250 of every structure"}},
  {id:"a_all350",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=350).length,n:GENS.length,
   nm:{fr:"Au-delà du parfait",en:"Beyond perfect"},ds:{fr:"350 de chaque structure",en:"350 of every structure"}},
+ {id:"a_all500",c:"struct",v:S=>GENS.filter(g=>(S.gens[g.id]||0)>=500).length,n:GENS.length,
+  nm:{fr:"Colosse de métal",en:"Metal colossus"},ds:{fr:"500 de chaque structure",en:"500 of every structure"}},
  {id:"a_struct1k",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:1000,
   nm:{fr:"Mille pièces",en:"A thousand parts"},ds:{fr:"1 000 structures au total",en:"1,000 structures in total"}},
  {id:"a_struct2k5",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:2500,
   nm:{fr:"Mégastructure",en:"Megastructure"},ds:{fr:"2 500 structures au total",en:"2,500 structures in total"}},
+ {id:"a_struct5k",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:5000,
+  nm:{fr:"Chaîne de montage cosmique",en:"Cosmic assembly line"},ds:{fr:"5 000 structures au total",en:"5,000 structures in total"}},
+ {id:"a_struct7k5",c:"struct",v:S=>GENS.reduce((a,g)=>a+(S.gens[g.id]||0),0),n:7500,
+  nm:{fr:"Ville-usine",en:"Factory city"},ds:{fr:"7 500 structures au total",en:"7,500 structures in total"}},
  {id:"a_dyson50",c:"struct",v:S=>(S.gens.dyson||0),n:50,
   nm:{fr:"Constellation captive",en:"Captive constellation"},ds:{fr:"50 sphères de Dyson",en:"50 Dyson spheres"}},
  {id:"a_e21",c:"ore",v:S=>S.totalOre,n:1e21,
@@ -2413,10 +2419,28 @@ const ACHS=[
   nm:{fr:"Échelle universelle",en:"Universal scale"},ds:{fr:"1 Sp de minerai extrait",en:"1 Sp ore mined"}},
  {id:"a_e27",c:"ore",v:S=>S.totalOre,n:1e27,
   nm:{fr:"Au-delà des nombres",en:"Beyond numbers"},ds:{fr:"1 Oc de minerai extrait",en:"1 Oc ore mined"}},
+ {id:"a_e30",c:"ore",v:S=>S.totalOre,n:1e30,
+  nm:{fr:"Poussière d'étoiles",en:"Stardust"},ds:{fr:"1 No de minerai extrait",en:"1 No ore mined"}},
+ {id:"a_e33",c:"ore",v:S=>S.totalOre,n:1e33,
+  nm:{fr:"Cœur de galaxie",en:"Galactic core"},ds:{fr:"1 Dc de minerai extrait",en:"1 Dc ore mined"}},
+ {id:"a_e36",c:"ore",v:S=>S.totalOre,n:1e36,
+  nm:{fr:"Univers miné",en:"Mined universe"},ds:{fr:"1 Ud de minerai extrait",en:"1 Ud ore mined"}},
  {id:"a_rate1t",c:"rate",v:S=>perSec(),n:1e12,
   nm:{fr:"Torrent",en:"Torrent"},ds:{fr:"1 T/s de production",en:"1 T/s output"}},
  {id:"a_rate1qa",c:"rate",v:S=>perSec(),n:1e15,
   nm:{fr:"Singularité productive",en:"Productive singularity"},ds:{fr:"1 Qa/s de production",en:"1 Qa/s output"}},
+ {id:"a_rate1e18",c:"rate",v:S=>perSec(),n:1e18,
+  nm:{fr:"Cascade",en:"Cascade"},ds:{fr:"1 Qi/s de production",en:"1 Qi/s output"}},
+ {id:"a_rate1e21",c:"rate",v:S=>perSec(),n:1e21,
+  nm:{fr:"Déluge",en:"Deluge"},ds:{fr:"1 Sx/s de production",en:"1 Sx/s output"}},
+ {id:"a_rate1e24",c:"rate",v:S=>perSec(),n:1e24,
+  nm:{fr:"Tempête stellaire",en:"Star storm"},ds:{fr:"1 Sp/s de production",en:"1 Sp/s output"}},
+ {id:"a_rate1e27",c:"rate",v:S=>perSec(),n:1e27,
+  nm:{fr:"Fleuve de matière",en:"River of matter"},ds:{fr:"1 Oc/s de production",en:"1 Oc/s output"}},
+ {id:"a_rate1e30",c:"rate",v:S=>perSec(),n:1e30,
+  nm:{fr:"Cataclysme productif",en:"Productive cataclysm"},ds:{fr:"1 No/s de production",en:"1 No/s output"}},
+ {id:"a_rate1e33",c:"rate",v:S=>perSec(),n:1e33,
+  nm:{fr:"Big bang industriel",en:"Industrial big bang"},ds:{fr:"1 Dc/s de production",en:"1 Dc/s output"}},
  {id:"a_click1g",c:"clic",v:S=>clickVal(),n:1e9,
   nm:{fr:"Doigt d'or",en:"Golden finger"},ds:{fr:"1 B de puissance de clic",en:"1 B click power"}},
  {id:"a_click1t",c:"clic",v:S=>clickVal(),n:1e12,
@@ -2427,6 +2451,14 @@ const ACHS=[
   nm:{fr:"Doigt d'antimatière",en:"Antimatter finger"},ds:{fr:"1 Qi de puissance de clic",en:"1 Qi click power"}},
  {id:"a_click1sx",c:"clic",v:S=>clickVal(),n:1e21,
   nm:{fr:"Doigt-singularité",en:"Singularity finger"},ds:{fr:"1 Sx de puissance de clic",en:"1 Sx click power"}},
+ {id:"a_click1e24",c:"clic",v:S=>clickVal(),n:1e24,
+  nm:{fr:"Doigt cosmique",en:"Cosmic finger"},ds:{fr:"1 Sp de puissance de clic",en:"1 Sp click power"}},
+ {id:"a_click1e27",c:"clic",v:S=>clickVal(),n:1e27,
+  nm:{fr:"Doigt de dieu",en:"Finger of god"},ds:{fr:"1 Oc de puissance de clic",en:"1 Oc click power"}},
+ {id:"a_click1e30",c:"clic",v:S=>clickVal(),n:1e30,
+  nm:{fr:"Main du créateur",en:"Creator's hand"},ds:{fr:"1 No de puissance de clic",en:"1 No click power"}},
+ {id:"a_click1e33",c:"clic",v:S=>clickVal(),n:1e33,
+  nm:{fr:"Toucher originel",en:"Primal touch"},ds:{fr:"1 Dc de puissance de clic",en:"1 Dc click power"}},
  {id:"a_anom100",c:"anom",v:S=>S.anoms,n:100,
   nm:{fr:"Radar vivant",en:"Living radar"},ds:{fr:"Attraper 100 anomalies",en:"Catch 100 anomalies"}},
  {id:"a_anom250",c:"anom",v:S=>S.anoms,n:250,
@@ -2464,12 +2496,28 @@ const ACHS=[
   nm:{fr:"Réacteur à antimatière",en:"Antimatter reactor"},ds:{fr:"10 000 antimatière possédée",en:"10,000 antimatter held"}},
  {id:"a_am100k",c:"cycle",v:S=>S.am,n:1e5,
   nm:{fr:"Banque d'antimatière",en:"Antimatter bank"},ds:{fr:"100 000 antimatière possédée",en:"100,000 antimatter held"}},
+ {id:"a_am1e6",c:"cycle",v:S=>S.am,n:1e6,
+  nm:{fr:"Réserve stratégique",en:"Strategic reserve"},ds:{fr:"1 M antimatière possédée",en:"1 M antimatter held"}},
+ {id:"a_am1e7",c:"cycle",v:S=>S.am,n:1e7,
+  nm:{fr:"Coffre-fort stellaire",en:"Stellar vault"},ds:{fr:"10 M antimatière possédée",en:"10 M antimatter held"}},
+ {id:"a_am1e8",c:"cycle",v:S=>S.am,n:1e8,
+  nm:{fr:"Trésor du vide",en:"Void treasure"},ds:{fr:"100 M antimatière possédée",en:"100 M antimatter held"}},
+ {id:"a_am1e9",c:"cycle",v:S=>S.am,n:1e9,
+  nm:{fr:"Milliardaire du cosmos",en:"Cosmic billionaire"},ds:{fr:"1 B antimatière possédée",en:"1 B antimatter held"}},
+ {id:"a_am1e10",c:"cycle",v:S=>S.am,n:1e10,
+  nm:{fr:"Banque centrale galactique",en:"Galactic central bank"},ds:{fr:"10 B antimatière possédée",en:"10 B antimatter held"}},
  {id:"a_res_all",c:"tech",v:S=>RES.reduce((x,r)=>x+Math.min(lvl(r.id),r.max),0),n:RES.reduce((x,r)=>x+r.max,0),
   nm:{fr:"Savoir absolu",en:"Absolute knowledge"},ds:{fr:"Toutes les recherches au maximum",en:"Every research maxed out"}},
  {id:"a_ups_all",c:"tech",v:S=>UPS.filter(u=>!!S.ups[u.id]).length,n:UPS.length,
   nm:{fr:"Collectionneur",en:"Completionist"},ds:{fr:"Toutes les améliorations achetées",en:"Every upgrade bought"}},
  {id:"a_tier7",c:"tech",v:S=>GENS.filter(g=>!!S.ups[g.id+"_t6"]).length,n:GENS.length,
   nm:{fr:"Septième ciel",en:"Seventh heaven"},ds:{fr:"Le palier 7 de chaque structure",en:"Tier 7 of every structure"}},
+ {id:"a_tier8",c:"tech",v:S=>GENS.filter(g=>!!S.ups[g.id+"_t7"]).length,n:GENS.length,
+  nm:{fr:"Huitième ciel",en:"Eighth heaven"},ds:{fr:"Le palier 8 de chaque structure",en:"Tier 8 of every structure"}},
+ {id:"a_tier9",c:"tech",v:S=>GENS.filter(g=>!!S.ups[g.id+"_t8"]).length,n:GENS.length,
+  nm:{fr:"Neuvième nuage",en:"Cloud nine"},ds:{fr:"Le palier 9 de chaque structure",en:"Tier 9 of every structure"}},
+ {id:"a_tier10",c:"tech",v:S=>GENS.filter(g=>!!S.ups[g.id+"_t9"]).length,n:GENS.length,
+  nm:{fr:"Dixième dimension",en:"Tenth dimension"},ds:{fr:"Le palier 10 de chaque structure",en:"Tier 10 of every structure"}},
 
  /* ---- automatisation ---- */
  {id:"a_auto1",c:"auto",v:S=>Object.keys(S.auto).length,n:1,
@@ -2528,6 +2576,8 @@ const ACHS=[
   nm:{fr:"Roue des mondes",en:"Wheel of worlds"},ds:{fr:"1 000 cycles",en:"1,000 cycles"}},
  {id:"a_pr2500",c:"cycle",v:S=>S.prestiges,n:2500,
   nm:{fr:"Au bout du temps",en:"At the end of time"},ds:{fr:"2 500 cycles",en:"2,500 cycles"}},
+ {id:"a_pr5000",c:"cycle",v:S=>S.prestiges,n:5000,
+  nm:{fr:"Éternel retour",en:"Eternal return"},ds:{fr:"5 000 cycles",en:"5,000 cycles"}},
  {id:"a_acyc250",c:"auto",v:S=>(S.acyc||0),n:250,
   nm:{fr:"Machine perpétuelle",en:"Perpetual machine"},ds:{fr:"250 cycles relancés tout seuls",en:"250 cycles restarted on their own"}},
  {id:"a_acyc500",c:"auto",v:S=>(S.acyc||0),n:500,
@@ -4518,6 +4568,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.11.0", nm:{fr:"Trois paliers de plus, et de quoi viser plus loin",en:"Three more tiers, and more to aim for"},
+  d:{fr:"Chaque structure gagne trois paliers de plus : ×8 à 450 exemplaires, ×9 à 550 et ×10 à 650. Une structure entièrement améliorée produit ×7 257 600. Vingt-cinq succès s'ajoutent (123 au total) pour prolonger les familles qui s'arrêtaient trop tôt : production et puissance de clic jusqu'au décillion, minerai jusqu'à l'undécillion, antimatière possédée jusqu'à 10 milliards, 5 000 et 7 500 structures, 500 de chaque structure, et les paliers 8, 9 et 10 partout.",
+     en:"Every structure gains three more tiers: ×8 at 450 units, ×9 at 550 and ×10 at 650. A fully upgraded structure now produces ×7,257,600. Twenty-five achievements are added (123 in total) to extend the families that stopped too early: output and click power up to the decillion, ore up to the undecillion, antimatter held up to 10 billion, 5,000 and 7,500 structures, 500 of every structure, and tiers 8, 9 and 10 everywhere."}},
  {v:"3.9.0", nm:{fr:"Un septième palier",en:"A seventh tier"},
   d:{fr:"Chaque structure gagne un palier de plus : ×7 à 350 exemplaires, au prix du palier précédent × 11. Une structure entièrement améliorée produit ×10 080 au lieu de ×1 440. Dix améliorations de plus (70 au lieu de 60) : le succès « Collectionneur » exige désormais les 70 ; qui l'avait déjà le garde. Deux succès de plus (98) : « Au-delà du parfait » (350 de chaque structure) et « Septième ciel » (le palier 7 de chaque structure).",
      en:"Every structure gains one more tier: ×7 at 350 units, priced at the previous tier × 11. A fully upgraded structure now produces ×10,080 instead of ×1,440. Ten more upgrades (70 instead of 60): the \"Completionist\" achievement now requires all 70; anyone who already had it keeps it. Two more achievements (98): \"Beyond perfect\" (350 of every structure) and \"Seventh heaven\" (tier 7 of every structure)."}},

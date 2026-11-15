@@ -16,6 +16,32 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.11.0 — Three more tiers, and more to aim for
+
+Every structure gains three tiers: **×8 at 450 units, ×9 at 550 and ×10 at
+650**, each priced at the previous one × 11. A fully upgraded structure produces
+**×7,257,600** (100 structure tiers in total).
+
+**25 more achievements** — 123 in total, so **+123 %** output in full. They
+extend the families that stopped too early for an advanced run:
+
+| Family | New tiers |
+|---|---|
+| Structures | 500 of every structure · 5,000 and 7,500 in total |
+| Upgrades | tiers 8, 9 and 10 of every structure |
+| Ore mined | 1 No · 1 Dc · 1 Ud |
+| Output | from 1 Qi/s to 1 Dc/s, every 10³ |
+| Click power | 1 Sp · 1 Oc · 1 No · 1 Dc |
+| Antimatter held | 1 M · 10 M · 100 M · 1 B · 10 B |
+| Cycles | 5,000 |
+
+Several are already reached by an advanced run: they unlock on load (the
+notifications only show four at a time).
+
+No save field added or changed.
+
+---
+
 ## 3.10.0 — The Foreman on MAX
 
 The Foreman's quantity setting (Auto tab) gains a **MAX** option, after ×1, ×10
