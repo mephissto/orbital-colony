@@ -17,6 +17,22 @@ restent valides**.
 
 ---
 
+## 3.12.0 — L'Ingénieur achète en rafale
+
+L'Ingénieur n'achetait qu'**une amélioration par seconde**, même avec de quoi en
+payer dix. Il achète maintenant, chaque seconde, **la moins chère des
+améliorations disponibles aussi longtemps qu'il peut la payer**.
+
+- La règle reste « la moins chère d'abord » : s'il ne peut pas payer la
+  prochaine, il s'arrête, il ne saute jamais à une plus chère.
+- Il repart de la liste à chaque achat : un achat qui en débloque une autre
+  (paliers de structure) la rend aussitôt achetable.
+- Il passe toujours **avant** le Contremaître : la priorité ne change pas.
+
+Aucun champ de sauvegarde ajouté ni modifié.
+
+---
+
 ## 3.11.0 — Trois paliers de plus, et de quoi viser plus loin
 
 Chaque structure gagne trois paliers : **×8 à 450 exemplaires, ×9 à 550 et ×10
