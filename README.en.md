@@ -800,7 +800,8 @@ on MAX it buys **everything the ore allows** every second (`autoLot()`).
 
 **The Foreman and the Engineer run together, by priority** (3.4.0). They draw on
 the same ore, and the arbitration fits in one sentence: **every second the
-Engineer goes first**; if no upgrade is left, or none is affordable, the Foreman
+Engineer goes first** (and buys in bursts: every available upgrade it can pay for,
+cheapest first, since 3.12.0); if no upgrade is left, or none is affordable, the Foreman
 buys a structure with what remains. It is not a rule written down somewhere: it
 is **the order of the two blocks in `runAutos()`**. The first takes its cut, the
 second spends the balance. Swapping them would starve the Engineer.
