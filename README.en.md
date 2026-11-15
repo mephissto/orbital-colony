@@ -750,7 +750,7 @@ on.
 | Automation | Effect | Max | Cost | Cumulative cost |
 |---|---|---|---|---|
 | 🛰️ Mining satellites | +1 click/s per level | 10 | 30, ×2 per level | 30,690 |
-| ⬆️ Engineer | buys the cheapest affordable upgrade | 1 | 100 | 100 |
+| ⬆️ Engineer | buys upgrades, cheapest first, as long as it can pay | 1 | 100 | 100 |
 | 🏗️ Foreman | buys the structure you assign it, every second | 1 | 150 | 150 |
 | 📡 Recovery probe | collects the anomaly for you | 1 | 200 | 200 |
 | ♻️ Auto cycle | starts a new cycle at the chosen threshold | 1 | 400 | 400 |

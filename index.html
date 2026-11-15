@@ -1391,7 +1391,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.11.0";
+const VERSION="3.12.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1590,7 +1590,7 @@ fr:{
   au_unit_am:"antimatière",
   au_off:"coupé",
   au_e_clic:"{0} satellite{1} en orbite · {0} clic/s", au_e_contre:"{0} · {1} par seconde, sur le reste",
-  au_e_ing:"se sert en premier · l'amélioration la moins chère payable", au_e_sonde:"ramasse l'anomalie après {0} s",
+  au_e_ing:"se sert en premier · les améliorations les moins chères, tant qu'il peut payer", au_e_sonde:"ramasse l'anomalie après {0} s",
   au_e_cycle:"relance à +{0} antimatière",
   t_auto:"{0} — niveau {1}", t_auto_on:"{0} : remis en marche", t_auto_off:"{0} : coupé",
   ch_hint:"Un défi casse <b>une règle du jeu</b> pour tout un cycle. Entrer encaisse d'abord le cycle en cours et te crédite l'antimatière en attente. L'objectif se calcule sur <b>ton meilleur cycle</b> et se fige au moment où tu entres. Réussi une fois, un défi est validé <b>définitivement</b> et sa récompense reste active en dehors.",
@@ -1769,7 +1769,7 @@ en:{
   au_unit_am:"antimatter",
   au_off:"off",
   au_e_clic:"{0} satellite{1} in orbit · {0} click/s", au_e_contre:"{0} · {1} per second, on what is left",
-  au_e_ing:"served first · the cheapest affordable upgrade", au_e_sonde:"collects the anomaly after {0} s",
+  au_e_ing:"served first · the cheapest upgrades, as long as it can pay", au_e_sonde:"collects the anomaly after {0} s",
   au_e_cycle:"restarts at +{0} antimatter",
   t_auto:"{0} — level {1}", t_auto_on:"{0}: switched back on", t_auto_off:"{0}: switched off",
   ch_hint:"A challenge breaks <b>one rule of the game</b> for a whole cycle. Entering banks the current cycle first and credits the antimatter you had pending. The goal is computed from <b>your best cycle</b> and frozen the moment you enter. Once beaten, a challenge is cleared <b>for good</b> and its reward stays active outside of it.",
@@ -2124,8 +2124,8 @@ const AUTOS=[
     Depuis la 3.4.0 ils tournent ensemble, par priorité — voir plus bas. */
  {id:"ing",   ico:"⬆️", max:1, c0:100, cg:1,
   nm:{fr:"Ingénieur",en:"Engineer"}, nmd:{fr:"l'Ingénieur",en:"the Engineer"},
-  ds:{fr:"Achète l'amélioration la moins chère dès que tu peux la payer. Il se sert avant le Contremaître",
-      en:"Buys the cheapest upgrade the moment you can afford it. It takes its share before the Foreman"}},
+  ds:{fr:"Achète les améliorations, la moins chère d'abord, tant que tu peux les payer — plusieurs d'un coup si besoin. Il se sert avant le Contremaître",
+      en:"Buys upgrades, cheapest first, as long as you can afford them — several at once if needed. It takes its share before the Foreman"}},
  {id:"contre",ico:"🏗️", max:1, c0:150, cg:1,
   nm:{fr:"Contremaître",en:"Foreman"}, nmd:{fr:"le Contremaître",en:"the Foreman"},
   ds:{fr:"Achète une fois par seconde la structure que tu choisis, avec le minerai que l'Ingénieur laisse",
@@ -4466,8 +4466,20 @@ function runAutos(dt){
     autoAcc.ing+=d;
     if(autoAcc.ing>=1){
       autoAcc.ing=0;
-      const cible=prochaineUp();
-      if(cible&&cible.cost<=S.ore)buyUp(cible,true);
+      /* Tant que la moins chère des améliorations disponibles est payable, il
+         l'achète — plusieurs par seconde si le minerai le permet. On repart de
+         prochaineUp() à chaque tour : un achat peut en débloquer une autre
+         (paliers de structure, `req`), et la règle reste « la moins chère
+         d'abord », jamais une plus chère avant. Un seul rendu à la fin, et un
+         plafond de sécurité : il ne peut de toute façon pas y en avoir plus que
+         d'améliorations. */
+      let achete=false;
+      for(let i=0;i<UPS.length;i++){
+        const cible=prochaineUp();
+        if(!cible||cible.cost>S.ore)break;
+        S.ore-=cible.cost; S.ups[cible.id]=1; achete=true;
+      }
+      if(achete)render();
     }
   }
 
@@ -4568,6 +4580,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.12.0", nm:{fr:"L'Ingénieur achète en rafale",en:"The Engineer buys in bursts"},
+  d:{fr:"L'Ingénieur n'achetait qu'une amélioration par seconde, même avec de quoi en payer dix. Il achète maintenant, chaque seconde, la moins chère des améliorations disponibles aussi longtemps qu'il peut la payer — jamais une plus chère avant. Il passe toujours avant le Contremaître.",
+     en:"The Engineer only bought one upgrade per second, even with enough ore for ten. Every second it now buys the cheapest available upgrade for as long as it can pay for it — never a pricier one first. It still goes before the Foreman."}},
  {v:"3.11.0", nm:{fr:"Trois paliers de plus, et de quoi viser plus loin",en:"Three more tiers, and more to aim for"},
   d:{fr:"Chaque structure gagne trois paliers de plus : ×8 à 450 exemplaires, ×9 à 550 et ×10 à 650. Une structure entièrement améliorée produit ×7 257 600. Vingt-cinq succès s'ajoutent (123 au total) pour prolonger les familles qui s'arrêtaient trop tôt : production et puissance de clic jusqu'au décillion, minerai jusqu'à l'undécillion, antimatière possédée jusqu'à 10 milliards, 5 000 et 7 500 structures, 500 de chaque structure, et les paliers 8, 9 et 10 partout.",
      en:"Every structure gains three more tiers: ×8 at 450 units, ×9 at 550 and ×10 at 650. A fully upgraded structure now produces ×7,257,600. Twenty-five achievements are added (123 in total) to extend the families that stopped too early: output and click power up to the decillion, ore up to the undecillion, antimatter held up to 10 billion, 5,000 and 7,500 structures, 500 of every structure, and tiers 8, 9 and 10 everywhere."}},
