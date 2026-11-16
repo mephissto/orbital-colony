@@ -16,6 +16,28 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.13.0 — Constellation: up to 40 satellites
+
+New **"Constellation" Breakthrough**: each level raises the **Mining satellites**
+ceiling by one (10 at the start), up to **40** at level 30.
+
+- **Breakthrough price:** 100 M antimatter for the first level, **×3 per level**.
+  It is the only capped Breakthrough (30 levels).
+- **The satellites themselves** are still bought in the Automation tab at the
+  usual price (30, ×2 per level), and strike at **full value**. The doubling
+  price and the Breakthrough's ×3 slope slow the climb on their own.
+- **Display:** past 20 satellites, a **second ring**, wider and turning the other
+  way, takes the rest (20 + 20).
+- **Six achievements**: 15, 20, 25, 30 and 40 satellites, and a first
+  Constellation level. 129 achievements in total, so **+129 %** output in full.
+- "On every front" now asks for a level in each of the **five** Breakthrough
+  lines. Anyone who already had it keeps it.
+- "Full automation" stays computed on the original ceilings (14 levels).
+
+No save field added: the level is stored in `S.perc.const`.
+
+---
+
 ## 3.12.0 — The Engineer buys in bursts
 
 The Engineer only bought **one upgrade per second**, even with enough ore for

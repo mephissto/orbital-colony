@@ -327,8 +327,12 @@ main{flex:1;display:grid;min-height:0;position:relative;
    le GPU : ni recalcul de mise en page, ni redessin. */
 #orbit{position:absolute;inset:-9px;pointer-events:none;
   animation:spin 8s linear infinite;will-change:transform}
-#orbit i{position:absolute;inset:0;transform:rotate(var(--a,0deg))}
-#orbit i::before{
+/* Second anneau, au-delà de 20 satellites : un peu plus large, et il tourne dans
+   l'autre sens pour qu'on distingue les deux couronnes. */
+#orbit2{position:absolute;inset:-19px;pointer-events:none;
+  animation:spinrev 11s linear infinite;will-change:transform}
+#orbit i,#orbit2 i{position:absolute;inset:0;transform:rotate(var(--a,0deg))}
+#orbit i::before,#orbit2 i::before{
   content:"";position:absolute;top:-3px;left:50%;width:6px;height:6px;margin-left:-3px;
   border-radius:50%;background:var(--cyan);box-shadow:0 0 7px rgba(79,216,255,.85);
   /* pulsation à cadence fixe elle aussi ; le décalage fait courir une onde
@@ -339,7 +343,8 @@ main{flex:1;display:grid;min-height:0;position:relative;
 /* la planète réserve la place de l'orbite : les points ne débordent jamais sur
    les tuiles voisines ni sur la barre d'onglets */
 #rock{margin:13px 0}
-@media (prefers-reduced-motion:reduce){ #orbit,#orbit i::before{animation:none} }
+#rock.r2{margin:23px 0}
+@media (prefers-reduced-motion:reduce){ #orbit,#orbit2,#orbit i::before,#orbit2 i::before{animation:none} }
 #rock::after{
   content:"";position:absolute;inset:-6px;border-radius:50%;
   border:1px dashed rgba(79,216,255,.35);animation:spin 24s linear infinite;
@@ -1044,7 +1049,8 @@ a.hbtn{text-decoration:none}
      d'anomalie et le haut de la barre d'onglets. L'orbite est calibrée pour
      rester dedans, points compris. */
   #orbit{inset:-4px}
-  #orbit i::before{width:4px;height:4px;top:-2px;margin-left:-2px;box-shadow:0 0 5px rgba(79,216,255,.85)}
+  #orbit2{inset:-10px}
+  #orbit i::before,#orbit2 i::before{width:4px;height:4px;top:-2px;margin-left:-2px;box-shadow:0 0 5px rgba(79,216,255,.85)}
   #rock{margin:0}
   .crater{transform:scale(.49);transform-origin:top left}
   #hero .kpis{gap:6px}
@@ -1158,7 +1164,7 @@ a.hbtn{text-decoration:none}
       <div id="anomChip" data-i18n-title="anom_title"><span class="aci"><svg viewBox="0 0 64 64" aria-hidden="true"><path
         d="M32 10 L38 26 L54 32 L38 38 L32 54 L26 38 L10 32 L26 26 Z"/></svg></span><span
         class="acw" data-i18n="anom_word">Anomalie ·</span><span class="acv"></span></div>
-      <div id="rock"><div id="orbit" style="display:none" aria-hidden="true"></div></div>
+      <div id="rock"><div id="orbit" style="display:none" aria-hidden="true"></div><div id="orbit2" style="display:none" aria-hidden="true"></div></div>
     </div>
     <div id="buffs"></div>
     <div id="heroside">
@@ -1391,7 +1397,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.12.0";
+const VERSION="3.13.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -1485,7 +1491,7 @@ fr:{
   log_t:"Changelog", log_full:"Historique complet",
   log_hint:"Les dernières versions, en résumé. L'historique complet est dans le dépôt.",
   perc_t:"Percées — {0} antimatière disponible",
-  perc_hint:"Les huit recherches sont au maximum. Les <b>Percées</b> n'ont pas de plafond : chaque niveau coûte 15 % de plus que le précédent, et se garde d'un cycle à l'autre. Acheter fait baisser ton antimatière en poche, donc ta production — et le seuil de relance avec, puisqu'il en vaut 10 %. Dépenser raccourcit donc tes cycles.",
+  perc_hint:"Les huit recherches sont au maximum. Les <b>Percées</b> n'ont pas de plafond : chaque niveau coûte 15 % de plus que le précédent, et se garde d'un cycle à l'autre. Seule la <b>Constellation</b> est limitée (30 niveaux) et coûte ×3 par niveau. Acheter fait baisser ton antimatière en poche, donc ta production — et le seuil de relance avec, puisqu'il en vaut 10 %. Dépenser raccourcit donc tes cycles.",
   perc_sub:"niveau",
   t_perc:"Percée : {0} niveau {1}",
   st_perc_niv:"Niveaux de Percées", st_perc_am:"Antimatière versée",
@@ -1666,7 +1672,7 @@ en:{
   log_t:"Changelog", log_full:"Full history",
   log_hint:"The latest versions, in short. The full history lives in the repository.",
   perc_t:"Breakthroughs — {0} antimatter available",
-  perc_hint:"All eight researches are maxed. <b>Breakthroughs</b> have no ceiling: each level costs 15 % more than the last, and is kept from one cycle to the next. Buying lowers the antimatter in hand, and therefore your output — and the restart threshold with it, since the threshold is 10 % of it. So spending shortens your cycles.",
+  perc_hint:"All eight researches are maxed. <b>Breakthroughs</b> have no ceiling: each level costs 15 % more than the last, and is kept from one cycle to the next. Only <b>Constellation</b> is capped (30 levels) and costs ×3 per level. Buying lowers the antimatter in hand, and therefore your output — and the restart threshold with it, since the threshold is 10 % of it. So spending shortens your cycles.",
   perc_sub:"level",
   t_perc:"Breakthrough: {0} level {1}",
   st_perc_niv:"Breakthrough levels", st_perc_am:"Antimatter poured",
@@ -2093,6 +2099,15 @@ const PERC=[
  {id:"casc",  ico:"✴️",  c0:5e5, cg:1.15, val:1.05,
   nm:{fr:"Cascade",en:"Cascade"},
   ds:{fr:"+5 % de minerai sur les anomalies par niveau",en:"+5 % ore from anomalies per level"}},
+ /* Ne donne aucun bonus directement : relève d'un cran le plafond des Satellites
+    d'extraction (onglet Automatisation), qu'il faut ensuite acheter un par un au
+    prix habituel. Seule Percée à plafond : 30 niveaux, soit 40 satellites. La
+    pente ×3 est volontaire — chaque satellite vaut un clic pleine valeur par
+    seconde. */
+ {id:"const", ico:"🪐", c0:1e8, cg:3, max:30,
+  nm:{fr:"Constellation",en:"Constellation"},
+  ds:{fr:"+1 satellite d'extraction maximum par niveau (à acheter dans Automatisation)",
+      en:"+1 maximum mining satellite per level (to buy in Automation)"}},
 ];
 const plvl=id=>S.perc[id]||0;
 const percCost=(p,l)=>Math.ceil(p.c0*Math.pow(p.cg,l));
@@ -2111,7 +2126,10 @@ const percOuvert=()=>RES.every(r=>lvl(r.id)>=r.max);
    ne font rien qu'un joueur présent ne puisse faire à la main. Chacune possède un
    interrupteur, pour la couper sans la revendre. */
 const AUTOS=[
- {id:"clic",  ico:"🛰️", max:10, c0:30,  cg:2,
+ /* `base` : le plafond d'origine. `max` monte d'un cran par niveau de la Percée
+    Constellation, jusqu'à 40 — c'est `max` que lisent l'achat et l'affichage, et
+    `base` que lit le succès « Automatisation complète », pour qu'il ne bouge pas. */
+ {id:"clic",  ico:"🛰️", base:10, get max(){return this.base+plvl("const")}, c0:30,  cg:2,
   nm:{fr:"Satellites d'extraction",en:"Mining satellites"},
   ds:{fr:"Un satellite en orbite par niveau, chacun frappe une fois par seconde",
       en:"One orbiting satellite per level, each strikes once a second"}},
@@ -2526,9 +2544,21 @@ const ACHS=[
   nm:{fr:"Escadrille",en:"Squadron"},ds:{fr:"5 satellites en orbite",en:"5 satellites in orbit"}},
  {id:"a_autoclic10",c:"auto",v:S=>alvl("clic"),n:10,
   nm:{fr:"Ceinture orbitale",en:"Orbital belt"},ds:{fr:"10 satellites en orbite",en:"10 satellites in orbit"}},
+ {id:"a_autoclic15",c:"auto",v:S=>alvl("clic"),n:15,
+  nm:{fr:"Flottille",en:"Flotilla"},ds:{fr:"15 satellites en orbite",en:"15 satellites in orbit"}},
+ {id:"a_autoclic20",c:"auto",v:S=>alvl("clic"),n:20,
+  nm:{fr:"Anneau complet",en:"Full ring"},ds:{fr:"20 satellites en orbite : le premier anneau est plein",en:"20 satellites in orbit: the first ring is full"}},
+ {id:"a_autoclic25",c:"auto",v:S=>alvl("clic"),n:25,
+  nm:{fr:"Double anneau",en:"Double ring"},ds:{fr:"25 satellites en orbite",en:"25 satellites in orbit"}},
+ {id:"a_autoclic30",c:"auto",v:S=>alvl("clic"),n:30,
+  nm:{fr:"Essaim orbital",en:"Orbital swarm"},ds:{fr:"30 satellites en orbite",en:"30 satellites in orbit"}},
+ {id:"a_autoclic40",c:"auto",v:S=>alvl("clic"),n:40,
+  nm:{fr:"Constellation complète",en:"Complete constellation"},ds:{fr:"40 satellites en orbite : les deux anneaux sont pleins",en:"40 satellites in orbit: both rings are full"}},
+ {id:"a_const1",c:"perc",v:S=>plvl("const"),n:1,
+  nm:{fr:"Nouvelle orbite",en:"New orbit"},ds:{fr:"1 niveau de Constellation",en:"1 Constellation level"}},
  {id:"a_autofull",c:"auto",v:S=>AUTOS.filter(a=>alvl(a.id)>=1).length,n:AUTOS.length,
   nm:{fr:"Équipe au complet",en:"Full crew"},ds:{fr:"Posséder les cinq automates",en:"Own all five automations"}},
- {id:"a_automax",c:"auto",v:S=>AUTOS.reduce((x,a)=>x+Math.min(alvl(a.id),a.max),0),n:AUTOS.reduce((x,a)=>x+a.max,0),
+ {id:"a_automax",c:"auto",v:S=>AUTOS.reduce((x,a)=>x+Math.min(alvl(a.id),a.base||a.max),0),n:AUTOS.reduce((x,a)=>x+(a.base||a.max),0),
   nm:{fr:"Colonie autonome",en:"Self-running colony"},ds:{fr:"Tous les automates au maximum",en:"Every automation maxed out"}},
  {id:"a_asonde50",c:"auto",v:S=>(S.asonde||0),n:50,
   nm:{fr:"Filet dérivant",en:"Drift net"},ds:{fr:"50 anomalies ramassées par la sonde",en:"50 anomalies collected by the probe"}},
@@ -2543,7 +2573,7 @@ const ACHS=[
  {id:"a_perc50",c:"perc",v:S=>percNiv(),n:50,
   nm:{fr:"Percée majeure",en:"Major breakthrough"},ds:{fr:"50 niveaux de Percées",en:"50 breakthrough levels"}},
  {id:"a_perc_all",c:"perc",v:S=>PERC.filter(p=>plvl(p.id)>0).length,n:PERC.length,
-  nm:{fr:"Sur tous les fronts",en:"On every front"},ds:{fr:"Un niveau dans chacune des quatre lignes",en:"One level in each of the four lines"}},
+  nm:{fr:"Sur tous les fronts",en:"On every front"},ds:{fr:"Un niveau dans chacune des cinq lignes",en:"One level in each of the five lines"}},
  {id:"a_perc_spe",c:"perc",v:S=>PERC.reduce((a,p)=>Math.max(a,plvl(p.id)),0),n:20,
   nm:{fr:"Spécialiste",en:"Specialist"},ds:{fr:"20 niveaux dans une seule ligne",en:"20 levels in a single line"}},
  {id:"a_percam1",c:"perc",v:S=>S.percAm||0,n:1e8,
@@ -2990,7 +3020,7 @@ function toggleAuto(a){
 function buyPerc(p){
   if(S.chal){ toast(t("t_chal_locked")); return }   // même règle que les recherches
   if(!percOuvert())return;
-  const l=plvl(p.id), c=percCost(p,l); if(S.am<c)return;
+  const l=plvl(p.id), c=percCost(p,l); if(S.am<c||(p.max&&l>=p.max))return;
   S.am-=c; S.percAm=(S.percAm||0)+c; S.perc[p.id]=l+1;
   toast(t("t_perc",tr(p.nm),l+1),"violet"); render();
 }
@@ -4022,14 +4052,14 @@ function renderPrestige(){
     html($("#percHint"),t("perc_hint"));
   }
   syncList($("#percList"),!ouv?[]:PERC.map(pc=>{
-    const l=plvl(pc.id), cost=percCost(pc,l);
+    const l=plvl(pc.id), cost=percCost(pc,l), maxed=!!pc.max&&l>=pc.max;
     const c=getCard("perc:"+pc.id,()=>buyPerc(pc));
-    const pi=priceInfo(cost,S.am,0,t("unit_am"));
+    const pi=maxed?{}:priceInfo(cost,S.am,0,t("unit_am"));
     upd(c,{ico:pc.ico,nm:tr(pc.nm),ds:tr(pc.ds),
-      clbl:tm("price_lvl",l+1),
-      cost:t("cost_am",fmt(cost)), am:1,
-      miss:"", done:0, cant:pi.cant, prog:S.am/cost,
-      own:fmt(l), owsub:t("perc_sub")});
+      clbl:maxed?"":tm("price_lvl",l+1),
+      cost:maxed?"MAX":t("cost_am",fmt(cost)), am:1,
+      miss:"", done:maxed?1:0, cant:maxed?0:pi.cant, prog:maxed?null:S.am/cost,
+      own:pc.max?l+"/"+pc.max:fmt(l), owsub:t("perc_sub")});
     return c;
   }));
 
@@ -4220,16 +4250,24 @@ function multParts(){
 /* Un satellite par niveau des Satellites d'extraction, répartis à parts égales sur le
    cercle. Le DOM n'est refait qu'au changement de niveau : en régime établi,
    il n'y a plus une seule ligne de JavaScript par image. */
+const SAT_ANNEAU=20;                 // satellites par anneau : 40 au maximum, sur deux
 function majOrbite(){
   const n=aOn("clic")?alvl("clic"):0;
-  const o=$("#orbit");
+  const o=$("#orbit"), o2=$("#orbit2");
   if(o._n===n)return;
   o._n=n;
-  let h="";
-  for(let i=0;i<n;i++)
-    h+='<i style="--a:'+(i*360/n).toFixed(1)+'deg;--d:'+(-2.4*i/n).toFixed(2)+'s"></i>';
-  o.innerHTML=h;
-  show(o,n>0);
+  /* Le premier anneau se remplit d'abord ; le second ne commence qu'au 21e, et
+     ses points sont décalés d'un demi-pas pour ne pas s'aligner sur ceux du
+     premier. */
+  const remplir=(el,k,dec)=>{
+    let h="";
+    for(let i=0;i<k;i++)
+      h+='<i style="--a:'+(dec+i*360/k).toFixed(1)+'deg;--d:'+(-2.4*i/k).toFixed(2)+'s"></i>';
+    el.innerHTML=h; show(el,k>0);
+  };
+  const n1=Math.min(n,SAT_ANNEAU), n2=Math.max(0,n-SAT_ANNEAU);
+  remplir(o,n1,0); remplir(o2,n2,n2>0?180/n2:0);
+  cls($("#rock"),"r2",n2>0);          // le second anneau réclame un peu de marge
 }
 function renderHeader(){
   majOrbite();
@@ -4580,6 +4618,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.13.0", nm:{fr:"Constellation : jusqu'à 40 satellites",en:"Constellation: up to 40 satellites"},
+  d:{fr:"Nouvelle Percée « Constellation » : chaque niveau relève d'un cran le plafond des Satellites d'extraction, de 10 jusqu'à 40. Elle coûte 100 M d'antimatière au premier niveau, puis ×3 par niveau ; les satellites s'achètent toujours dans Automatisation, au prix habituel, et frappent à pleine valeur. Au-delà de 20, un second anneau, tournant dans l'autre sens, accueille les suivants. Six succès s'ajoutent (129 au total).",
+     en:"New \"Constellation\" Breakthrough: each level raises the Mining satellites ceiling by one, from 10 up to 40. It costs 100 M antimatter at the first level, then ×3 per level; satellites are still bought in Automation, at the usual price, and strike at full value. Past 20, a second ring, turning the other way, takes the rest. Six achievements are added (129 in total)."}},
  {v:"3.12.0", nm:{fr:"L'Ingénieur achète en rafale",en:"The Engineer buys in bursts"},
   d:{fr:"L'Ingénieur n'achetait qu'une amélioration par seconde, même avec de quoi en payer dix. Il achète maintenant, chaque seconde, la moins chère des améliorations disponibles aussi longtemps qu'il peut la payer — jamais une plus chère avant. Il passe toujours avant le Contremaître.",
      en:"The Engineer only bought one upgrade per second, even with enough ore for ten. Every second it now buys the cheapest available upgrade for as long as it can pay for it — never a pricier one first. It still goes before the Foreman."}},
