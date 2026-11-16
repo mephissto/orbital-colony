@@ -716,7 +716,8 @@ power: the Mining satellites do nothing an attentive player could not do by hand
 
 **The mining satellites** — as soon as they run, **one dot per level** goes into
 orbit around the planet, evenly spread around the circle: you read your level by
-counting them. **Both rates are fixed**, one turn in 8 s and a 2.4 s pulse per
+counting them. Past 20, a **second ring**, wider and turning the other way, takes
+the rest (up to 40 in all). **Both rates are fixed**, one turn in 8 s and a 2.4 s pulse per
 dot, whatever the level — it is the number of dots that carries the information,
 speed has nothing to add. The pulses are simply offset from one dot to the next,
 so that a wave travels around the ring exactly once per rotation. Their card in
@@ -749,7 +750,7 @@ on.
 
 | Automation | Effect | Max | Cost | Cumulative cost |
 |---|---|---|---|---|
-| 🛰️ Mining satellites | +1 click/s per level | 10 | 30, ×2 per level | 30,690 |
+| 🛰️ Mining satellites | +1 click/s per level | 10 (up to 40, see the Constellation Breakthrough) | 30, ×2 per level | 30,690 for the first 10 |
 | ⬆️ Engineer | buys upgrades, cheapest first, as long as it can pay | 1 | 100 | 100 |
 | 🏗️ Foreman | buys the structure you assign it, every second | 1 | 150 | 150 |
 | 📡 Recovery probe | collects the anomaly for you | 1 | 200 | 200 |
@@ -893,8 +894,8 @@ offline gains apply.
 
 ## Breakthroughs
 
-A **second research tier**, opened once the eight researches are maxed. Four
-lines, **unlimited levels**, paid in antimatter and kept from one cycle to the
+A **second research tier**, opened once the eight researches are maxed. Five
+lines, four of them with **unlimited levels**, paid in antimatter and kept from one cycle to the
 next. Price: `first level × 1.15^levels`, the same ladder as structures.
 
 | Line | Effect per level | 1st level |
@@ -903,6 +904,13 @@ next. Price: `first level × 1.15^levels`, the same ladder as structures.
 | ⚛️ Reactor | output **+10 %** | 1 M |
 | 🛰️ Extended standby | offline **+2 h** | 0.5 M |
 | ✴️ Cascade | ore from anomalies **+5 %** | 0.5 M |
+| 🪐 Constellation | **+1 maximum mining satellite** (30 levels, i.e. 40 satellites) | 100 M, **×3** per level |
+
+**Constellation** (3.13.0) gives no bonus by itself: it raises the Mining satellites'
+ceiling by one. Each satellite must then be bought in the Automation tab **at the
+usual price** (30, ×2 per level). Since every satellite strikes once a second at full
+value, the ×3 slope is the safeguard: level 10 already costs 2,000 G antimatter. It is
+the only capped Breakthrough.
 
 ### Why they exist
 
@@ -974,7 +982,7 @@ with no purchase costing more than 7 % of the pocket.
 
 ## Achievements
 
-**123 achievements**, each granting **+1 % output** — so **+123 %** in full. They
+**129 achievements**, each granting **+1 % output** — so **+129 %** in full. They
 are **never lost** on prestige.
 
 The tab sorts them into **ten categories** (the `ACHCATS` array, whose order is
@@ -991,8 +999,8 @@ complete.
 | 🔬 Upgrades and research | 8 | upgrade purchases, completing both trees |
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
 | ♻️ Cycles and antimatter | 19 | number of cycles up to 5,000, antimatter held up to 10 B |
-| ⚙️ Automation | 12 | buying and using the automations, up to 2,500 cycles restarted alone |
-| 🜛 Breakthroughs | 9 | levels bought, lines started, antimatter poured |
+| ⚙️ Automation | 17 | buying and using the automations (satellites up to 40), up to 2,500 cycles restarted alone |
+| 🜛 Breakthroughs | 10 | levels bought, lines started, antimatter poured |
 | 🎯 Challenges | 7 | one per challenge beaten, plus one for all six |
 
 The two ladders in the Clicking category are deliberately separate: the **number**

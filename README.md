@@ -736,7 +736,8 @@ présent ne puisse faire à la main.
 
 **Les satellites d'extraction** — dès qu'il tourne, **un point par
 niveau** se met en orbite autour de la planète, réparti à parts égales sur le
-cercle : on lit son niveau en les comptant. **Les deux cadences sont fixes**, un
+cercle : on lit son niveau en les comptant. Au-delà de 20, un **second anneau**,
+plus large et tournant dans l'autre sens, accueille les suivants (jusqu'à 40 en tout). **Les deux cadences sont fixes**, un
 tour en 8 s et une pulsation de 2,4 s par point, quel que soit le niveau — c'est
 le nombre de points qui porte l'information, la vitesse n'a rien à ajouter. Les
 pulsations sont simplement décalées d'un point au suivant, de sorte qu'une onde
@@ -772,7 +773,7 @@ suffit de le rallumer.
 
 | Automate | Effet | Max | Coût | Coût cumulé |
 |---|---|---|---|---|
-| 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 | 30, ×2 par niveau | 30 690 |
+| 🛰️ Satellites d'extraction | +1 clic/s par niveau | 10 (jusqu'à 40, voir Percée Constellation) | 30, ×2 par niveau | 30 690 pour les 10 premiers |
 | ⬆️ Ingénieur | achète les améliorations, la moins chère d'abord, tant qu'il peut payer | 1 | 100 | 100 |
 | 🏗️ Contremaître | achète chaque seconde la structure que tu lui désignes | 1 | 150 | 150 |
 | 📡 Sonde de récupération | ramasse l'anomalie à ta place | 1 | 200 | 200 |
@@ -924,7 +925,7 @@ hors-ligne habituels s'appliquent.
 ## Les Percées
 
 Un **second étage de recherche**, ouvert quand les huit recherches sont au
-maximum. Quatre lignes, **niveaux illimités**, payées en antimatière et
+maximum. Cinq lignes, dont quatre à **niveaux illimités**, payées en antimatière et
 conservées d'un cycle à l'autre. Prix : `1er niveau × 1,15^niveaux`, le même
 barème que les structures.
 
@@ -934,6 +935,13 @@ barème que les structures.
 | ⚛️ Réacteur | production **+10 %** | 1 M |
 | 🛰️ Veille prolongée | hors-ligne **+2 h** | 0,5 M |
 | ✴️ Cascade | minerai des anomalies **+5 %** | 0,5 M |
+| 🪐 Constellation | **+1 satellite d'extraction maximum** (30 niveaux, soit 40 satellites) | 100 M, **×3** par niveau |
+
+**Constellation** (3.13.0) ne donne aucun bonus directement : elle relève d'un cran le
+plafond des Satellites d'extraction. Il faut ensuite acheter chaque satellite dans
+l'onglet Automatisation, **au prix habituel** (30, ×2 par niveau). Chaque
+satellite frappant une fois par seconde à pleine valeur, la pente ×3 est le garde-fou :
+le niveau 10 coûte déjà 2 000 G d'antimatière. C'est la seule Percée à plafond.
 
 ### Pourquoi elles existent
 
@@ -1006,7 +1014,7 @@ Compression et 9 Réacteur, dépense 41 M sur 92,9, et fait passer le cycle de
 
 ## Les succès
 
-**123 succès**, chacun donnant **+1 % de production** — soit **+123 %** au
+**129 succès**, chacun donnant **+1 % de production** — soit **+129 %** au
 complet. Ils ne sont **jamais perdus** au prestige.
 
 L'onglet les range en **dix catégories** (tableau `ACHCATS`, dont l'ordre est
@@ -1023,8 +1031,8 @@ une fois la catégorie complète.
 | 🔬 Améliorations et recherches | 8 | achats d'améliorations, complétion des deux arbres |
 | ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
 | ♻️ Cycles et antimatière | 19 | nombre de cycles jusqu'à 5 000, antimatière possédée jusqu'à 10 B |
-| ⚙️ Automatisation | 12 | achat et usage des automates, jusqu'à 2 500 cycles relancés seuls |
-| 🜛 Percées | 9 | niveaux achetés, lignes entamées, antimatière versée |
+| ⚙️ Automatisation | 17 | achat et usage des automates (satellites jusqu'à 40), jusqu'à 2 500 cycles relancés seuls |
+| 🜛 Percées | 10 | niveaux achetés, lignes entamées, antimatière versée |
 | 🎯 Défis | 7 | un par défi réussi, plus un pour les six |
 
 Les deux échelles de la catégorie Clics sont volontairement séparées : le

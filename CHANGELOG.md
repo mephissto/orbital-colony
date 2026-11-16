@@ -17,6 +17,28 @@ restent valides**.
 
 ---
 
+## 3.13.0 — Constellation : jusqu'à 40 satellites
+
+Nouvelle **Percée « Constellation »** : chaque niveau relève d'un cran le plafond
+des **Satellites d'extraction** (10 au départ), jusqu'à **40** au niveau 30.
+
+- **Prix de la Percée :** 100 M d'antimatière pour le premier niveau, **×3 par
+  niveau**. C'est la seule Percée à plafond (30 niveaux).
+- **Les satellites eux-mêmes** s'achètent toujours dans l'onglet Automatisation,
+  au prix habituel (30, ×2 par niveau), et frappent à **pleine valeur**. Le prix
+  doublé à chaque niveau et la pente ×3 de la Percée freinent la montée d'eux-mêmes.
+- **Affichage :** au-delà de 20 satellites, un **second anneau**, plus large et
+  tournant dans l'autre sens, accueille les suivants (20 + 20).
+- **Six succès** : 15, 20, 25, 30 et 40 satellites, et un premier niveau de
+  Constellation. 129 succès au total, donc **+129 %** de production au complet.
+- « Sur tous les fronts » demande désormais un niveau dans chacune des **cinq**
+  lignes de Percées. Qui l'avait déjà le garde.
+- « Automatisation complète » reste calculé sur les plafonds d'origine (14 niveaux).
+
+Aucun champ de sauvegarde ajouté : le niveau est stocké dans `S.perc.const`.
+
+---
+
 ## 3.12.0 — L'Ingénieur achète en rafale
 
 L'Ingénieur n'achetait qu'**une amélioration par seconde**, même avec de quoi en
