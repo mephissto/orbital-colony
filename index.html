@@ -1052,6 +1052,10 @@ a.hbtn{text-decoration:none}
   #orbit2{inset:-10px}
   #orbit i::before,#orbit2 i::before{width:4px;height:4px;top:-2px;margin-left:-2px;box-shadow:0 0 5px rgba(79,216,255,.85)}
   #rock{margin:0}
+  /* Avec le second anneau (21 satellites et plus) la planète rétrécit de 90 à 78 px
+     et ne réclame aucune marge : l'ensemble, anneaux compris, garde la hauteur
+     qu'il avait avec un seul anneau — sinon l'en-tête gagnait de la hauteur. */
+  #rock.r2{width:78px;height:78px;margin:0}
   .crater{transform:scale(.49);transform-origin:top left}
   #hero .kpis{gap:6px}
   /* moins larges qu'en pleine page (la planète est à côté) : on resserre le
@@ -1126,6 +1130,7 @@ a.hbtn{text-decoration:none}
 /* très petits écrans (iPhone SE) : les 5 onglets doivent tenir sans défilement */
 @media (max-width:365px){
   #rock{width:74px;height:74px}
+  #rock.r2{width:62px;height:62px}
   #anomChip{width:96px;font-size:10.5px}
   .crater{transform:scale(.4)}
   #hero .kpi{padding:6px 8px}
