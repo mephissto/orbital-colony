@@ -1405,7 +1405,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.13.1";
+const VERSION="3.13.2";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2104,7 +2104,7 @@ const PERC=[
  {id:"veille",ico:"🛰️", c0:5e5, cg:1.15, val:2,
   nm:{fr:"Veille prolongée",en:"Extended standby"},
   ds:{fr:"+2 h de gains hors-ligne par niveau",en:"+2 h of offline gains per level"}},
- {id:"casc",  ico:"✴️",  c0:5e5, cg:1.15, val:1.05,
+ {id:"casc",  ico:"✴️",  c0:5e5, cg:1.15, val:1.05, lin:0.05,
   nm:{fr:"Cascade",en:"Cascade"},
   ds:{fr:"+5 % de minerai sur les anomalies par niveau",en:"+5 % ore from anomalies per level"}},
  /* Ne donne aucun bonus directement : relève d'un cran le plafond des Satellites
@@ -2124,7 +2124,13 @@ const percDef=id=>PERC.find(p=>p.id===id);
    celle qui fait consommer le PLUS d'antimatière (52 % du total à long terme,
    contre 37 % à +30 % et 26 % à +50 %). Une pente raide n'allonge pas l'échelle,
    elle atteint plus tôt le seuil de rentabilité des 8 % et on achète moins. */
-const percFact=id=>Math.pow(percDef(id).val,plvl(id));
+/* Cascade est ADDITIVE (+5 % par niveau, ×26 à 500 niveaux), les autres
+   composées. Composée, la Cascade valait ×4e10 à 500 niveaux : un filon
+   rapportait des milliards de secondes de production, la réserve dépassait la
+   production d'un facteur 1e12, et le compteur de minerai ne bougeait plus
+   entre deux anomalies — le jeu paraissait figé. Les gains d'anomalie se
+   comptent en secondes de production ; ils doivent rester de cet ordre. */
+const percFact=id=>{const p=percDef(id);return p.lin?1+p.lin*plvl(id):Math.pow(p.val,plvl(id))};
 const percNiv=()=>PERC.reduce((a,p)=>a+plvl(p.id),0);
 const percOuvert=()=>RES.every(r=>lvl(r.id)>=r.max);
 
@@ -4641,6 +4647,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.13.2", nm:{fr:"Cascade additive",en:"Additive Cascade"},
+  d:{fr:"Avec des centaines de niveaux de Cascade, le compteur de minerai ne bougeait plus : la Cascade se composait (×1,05 par niveau, ×40 milliards à 500 niveaux), si bien qu'une anomalie rapportait des milliers de milliards de secondes de production et que la production elle-même devenait invisible. La Cascade devient additive : +5 % par niveau, soit ×26 à 500 niveaux.",
+     en:"With hundreds of Cascade levels the ore counter stopped moving: Cascade compounded (×1.05 per level, ×40 billion at 500 levels), so one anomaly gave trillions of seconds of production and production itself became invisible. Cascade becomes additive: +5 % per level, i.e. ×26 at 500 levels."}},
  {v:"3.13.1", nm:{fr:"La cache ne fait plus exploser le minerai",en:"The cache no longer blows up ore"},
   d:{fr:"Correction d'un blocage en fin de partie : la cache abandonnée rapporte 15 à 20 % de la réserve, multipliés par la Cascade. Dès le niveau 36 de Cascade, une cache rapportait plus que la réserve entière ; à 365 niveaux (×54 millions), le minerai était multiplié par 7 millions à chaque cache et atteignait l'infini en une trentaine — tout passait à NaN. La cache est maintenant plafonnée à 30 minutes de production (comme le bond), et le minerai ne peut plus dépasser 1e300.",
      en:"Fix for a late-game freeze: the abandoned cache grants 15 to 20 % of your reserve, multiplied by Cascade. From Cascade level 36 on, one cache gave more than the whole reserve; at 365 levels (×54 million) ore was multiplied by 7 million with every cache and hit infinity within about thirty — everything turned to NaN. The cache is now capped at 30 minutes of production (like the leap), and ore can no longer exceed 1e300."}},

@@ -903,7 +903,7 @@ next. Price: `first level × 1.15^levels`, the same ladder as structures.
 | 🜛 Compression | antimatter gain **+4 %** | 1 M |
 | ⚛️ Reactor | output **+10 %** | 1 M |
 | 🛰️ Extended standby | offline **+2 h** | 0.5 M |
-| ✴️ Cascade | ore from anomalies **+5 %** | 0.5 M |
+| ✴️ Cascade | ore from anomalies **+5 %**, additive (×26 at 500 levels) | 0.5 M |
 | 🪐 Constellation | **+1 maximum mining satellite** (30 levels, i.e. 40 satellites) | 100 M, **×3** per level |
 
 **Constellation** (3.13.0) gives no bonus by itself: it raises the Mining satellites'
