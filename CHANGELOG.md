@@ -17,6 +17,29 @@ restent valides**.
 
 ---
 
+## 3.13.2 — Cascade additive
+
+**Le minerai semblait figé** avec des centaines de niveaux de Cascade : le
+compteur ne bougeait plus entre deux anomalies.
+
+La Cascade se **composait** : ×1,05 par niveau, soit **×40 milliards** à 500
+niveaux. Un filon (2 à 5 min de production) rapportait alors des milliers de
+milliards de secondes de production ; la réserve finissait 10¹² fois plus grosse
+que la production par seconde, et celle-ci devenait invisible à l'écran. Le jeu
+tournait, mais rien ne bougeait.
+
+- La Cascade devient **additive** : +5 % par niveau, soit **×26 à 500 niveaux**.
+  Les anomalies restent un gros bonus, mais se comptent de nouveau en minutes ou
+  heures de production, pas en millénaires.
+- Les autres Percées ne changent pas.
+
+Une partie en cours avec une réserve déjà démesurée la garde : le prochain cycle
+repart sur des bases normales.
+
+Aucun champ de sauvegarde ajouté ni modifié.
+
+---
+
 ## 3.13.1 — La cache ne fait plus exploser le minerai
 
 **Correction d'un blocage en fin de partie.** Avec beaucoup de niveaux de

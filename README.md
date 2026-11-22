@@ -934,7 +934,7 @@ barème que les structures.
 | 🜛 Compression | gain d'antimatière **+4 %** | 1 M |
 | ⚛️ Réacteur | production **+10 %** | 1 M |
 | 🛰️ Veille prolongée | hors-ligne **+2 h** | 0,5 M |
-| ✴️ Cascade | minerai des anomalies **+5 %** | 0,5 M |
+| ✴️ Cascade | minerai des anomalies **+5 %**, additif (×26 à 500 niveaux) | 0,5 M |
 | 🪐 Constellation | **+1 satellite d'extraction maximum** (30 niveaux, soit 40 satellites) | 100 M, **×3** par niveau |
 
 **Constellation** (3.13.0) ne donne aucun bonus directement : elle relève d'un cran le

@@ -16,6 +16,28 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.13.2 — Additive Cascade
+
+**Ore looked frozen** with hundreds of Cascade levels: the counter did not move
+between two anomalies.
+
+Cascade **compounded**: ×1.05 per level, i.e. **×40 billion** at 500 levels. A
+vein (2 to 5 min of production) then gave trillions of seconds of production;
+the reserve ended up 10¹² times larger than production per second, which became
+invisible on screen. The game was running, but nothing moved.
+
+- Cascade becomes **additive**: +5 % per level, i.e. **×26 at 500 levels**.
+  Anomalies stay a big bonus, but are counted in minutes or hours of production
+  again, not millennia.
+- The other Breakthroughs are unchanged.
+
+A run in progress with an already oversized reserve keeps it: the next cycle
+starts on normal footing.
+
+No save field added or changed.
+
+---
+
 ## 3.13.1 — The cache no longer blows up ore
 
 **Fix for a late-game freeze.** With many Cascade levels the game froze: ore at
