@@ -17,6 +17,32 @@ restent valides**.
 
 ---
 
+## 3.13.1 — La cache ne fait plus exploser le minerai
+
+**Correction d'un blocage en fin de partie.** Avec beaucoup de niveaux de
+Cascade, le jeu se figeait : minerai à `∞`, structures à `Infinity`, tout à `NaN`.
+
+La cause : l'anomalie **cache abandonnée** rapporte 15 à 20 % de la *réserve*, et
+la Cascade multiplie ce gain (+5 % composé par niveau). Dès que 0,175 × Cascade
+dépasse 1 — le **niveau 36** — une cache rapporte plus que la réserve entière : la
+réserve est multipliée à chaque anomalie. À 365 niveaux (×54 millions), chaque
+cache multipliait le minerai par ~7 millions, et il atteignait l'infini en une
+trentaine de caches.
+
+- La cache est **plafonnée à 30 minutes de production** (comme le « bond »), avant
+  multiplication par la Cascade. La production ne dépend pas de la réserve :
+  plus de boucle. En jeu normal, la réserve est bien en dessous de ce plafond et
+  rien ne change.
+- Garde-fou général : le minerai (cycle, total, réserve) ne peut plus dépasser
+  `1e300`, quelle qu'en soit la source.
+
+Une partie déjà passée à `NaN` ne se répare pas ; une sauvegarde exportée avant
+le blocage se recharge normalement.
+
+Aucun champ de sauvegarde ajouté ni modifié.
+
+---
+
 ## 3.13.0 — Constellation : jusqu'à 40 satellites
 
 Nouvelle **Percée « Constellation »** : chaque niveau relève d'un cran le plafond

@@ -1405,7 +1405,7 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.13.0";
+const VERSION="3.13.1";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
@@ -2993,7 +2993,13 @@ function amGain(){
 const amMinerai=g=>AM_SEUIL*Math.pow(g/amCoef(),1/AM_EXPG)*(1+1e-9);  // marge d'arrondi
 
 /* ---------- actions ---------- */
-function gain(n){S.ore+=n;S.totalOre+=n;S.runOre+=n}
+/* Garde-fou : un nombre JavaScript déborde à 1,8e308 et devient Infinity, puis
+   NaN au premier calcul — la partie est alors perdue sans retour. On plafonne
+   bien en dessous, là où plus rien n'a de sens de toute façon. */
+const ORE_MAX=1e300;
+function gain(n){
+  S.ore=Math.min(S.ore+n,ORE_MAX); S.totalOre=Math.min(S.totalOre+n,ORE_MAX); S.runOre=Math.min(S.runOre+n,ORE_MAX);
+}
 
 function buyGen(g){
   let n = S.buy==="max" ? maxAffordable(g) : S.buy;
@@ -3179,6 +3185,7 @@ function addBuff(k,m,sec,key){
 /* w = poids du tirage (total 200 → 1 point = 0,5 %). Les multiplicateurs sont
    rares : ils se cumulent avec tout le reste et deviennent démesurés en fin de
    partie, alors qu'un filon ou une cache restent proportionnés. */
+const CACHE_MAX_S=1800;                         // plafond de la cache, en secondes de production
 const ANOMS=[
  {k:"surge", w:10, f:()=>{                      // production ×5 à ×10
     const m=Math.round((5+Math.random()*5)*10)/10, d=45*(1+.3*lvl("detec"));
@@ -3200,7 +3207,14 @@ const ANOMS=[
   }},
  {k:"cache", w:89, f:()=>{                                 // 15 à 20 % de la réserve
     const pct=15+Math.random()*5;
-    const v=Math.max(100,S.ore*pct/100)*percFact("casc");
+    /* Plafonnée à 30 min de production, comme le bond : la cache vaut un
+       pourcentage de la RÉSERVE, et la Cascade la multiplie. Sans plafond, dès
+       que 0,175 × Cascade dépasse 1 (niveau 36), chaque cache rapporte plus que
+       la réserve elle-même — la réserve est multipliée à chaque anomalie, et à
+       365 niveaux (×5,4e7) le minerai atteignait l'infini en une trentaine de
+       caches : tout passait à NaN et le jeu était mort. La production, elle, ne
+       dépend pas de la réserve : aucune boucle. */
+    const v=Math.max(100,Math.min(S.ore*pct/100,perSec(true)*CACHE_MAX_S))*percFact("casc");
     gain(v); toast(t("an_cache",fmt(v),pct.toFixed(1)),"gold");
   }},
 ];
@@ -4627,6 +4641,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.13.1", nm:{fr:"La cache ne fait plus exploser le minerai",en:"The cache no longer blows up ore"},
+  d:{fr:"Correction d'un blocage en fin de partie : la cache abandonnée rapporte 15 à 20 % de la réserve, multipliés par la Cascade. Dès le niveau 36 de Cascade, une cache rapportait plus que la réserve entière ; à 365 niveaux (×54 millions), le minerai était multiplié par 7 millions à chaque cache et atteignait l'infini en une trentaine — tout passait à NaN. La cache est maintenant plafonnée à 30 minutes de production (comme le bond), et le minerai ne peut plus dépasser 1e300.",
+     en:"Fix for a late-game freeze: the abandoned cache grants 15 to 20 % of your reserve, multiplied by Cascade. From Cascade level 36 on, one cache gave more than the whole reserve; at 365 levels (×54 million) ore was multiplied by 7 million with every cache and hit infinity within about thirty — everything turned to NaN. The cache is now capped at 30 minutes of production (like the leap), and ore can no longer exceed 1e300."}},
  {v:"3.13.0", nm:{fr:"Constellation : jusqu'à 40 satellites",en:"Constellation: up to 40 satellites"},
   d:{fr:"Nouvelle Percée « Constellation » : chaque niveau relève d'un cran le plafond des Satellites d'extraction, de 10 jusqu'à 40. Elle coûte 100 M d'antimatière au premier niveau, puis ×3 par niveau ; les satellites s'achètent toujours dans Automatisation, au prix habituel, et frappent à pleine valeur. Au-delà de 20, un second anneau, tournant dans l'autre sens, accueille les suivants. Six succès s'ajoutent (129 au total).",
      en:"New \"Constellation\" Breakthrough: each level raises the Mining satellites ceiling by one, from 10 up to 40. It costs 100 M antimatter at the first level, then ×3 per level; satellites are still bought in Automation, at the usual price, and strike at full value. Past 20, a second ring, turning the other way, takes the rest. Six achievements are added (129 in total)."}},

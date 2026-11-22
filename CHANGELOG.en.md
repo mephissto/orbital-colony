@@ -16,6 +16,31 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.13.1 — The cache no longer blows up ore
+
+**Fix for a late-game freeze.** With many Cascade levels the game froze: ore at
+`∞`, structures at `Infinity`, everything `NaN`.
+
+The cause: the **abandoned cache** anomaly grants 15 to 20 % of your *reserve*,
+and Cascade multiplies that gain (+5 % compounding per level). As soon as
+0.175 × Cascade exceeds 1 — **level 36** — one cache gives more than the whole
+reserve: the reserve is multiplied by every anomaly. At 365 levels (×54 million)
+each cache multiplied ore by about 7 million, and it hit infinity within about
+thirty caches.
+
+- The cache is **capped at 30 minutes of production** (like the "leap"), before
+  Cascade multiplies it. Production does not depend on the reserve: no more
+  loop. In normal play the reserve is well under that cap and nothing changes.
+- General safeguard: ore (cycle, total, reserve) can no longer exceed `1e300`,
+  whatever the source.
+
+A game already turned to `NaN` cannot be repaired; a save exported before the
+freeze loads normally.
+
+No save field added or changed.
+
+---
+
 ## 3.13.0 — Constellation: up to 40 satellites
 
 New **"Constellation" Breakthrough**: each level raises the **Mining satellites**
