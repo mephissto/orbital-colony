@@ -1405,33 +1405,17 @@ a.hbtn{text-decoration:none}
 /* Pendant le développement, un suffixe `-dev.N` s'incrémente à chaque livraison
    pour qu'on sache toujours quelle version exacte est en ligne. Il disparaît à
    la sortie : une version publiée n'a jamais de suffixe. */
-const VERSION="3.13.2";
+const VERSION="3.14.0";
 const LICENCE="GPL-3.0-or-later";
 
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-/* L'échelle courte, de mille en mille, du millier au CENTILLION (10^303) —
-   c'est-à-dire jusqu'au bout de ce qu'un nombre JavaScript sait tenir
-   (1,8×10^308). Elle s'arrêtait au tredecillion (10^42) : passé ce cap la
-   boucle de fmt() ne pouvait plus diviser et écrivait la mantisse entière,
-   « 42972149251Td » au lieu de « 43.0Sxd ». Vu en partie au cycle 518.
-
-   Au-delà du décillion les noms sont composés — préfixe latin de l'unité, puis
-   la dizaine : un + vigintillion = unvigintillion, Uvg. On les FABRIQUE plutôt
-   que d'aligner cent abréviations à la main, où une coquille passerait
-   inaperçue jusqu'à ce qu'un joueur l'atteigne, c'est-à-dire des mois plus
-   tard. La dizaine des décillions garde son suffixe court (-d : Ud, Dd, Td…),
-   les autres prennent le leur (-vg, -tg, -qag…). */
-const UNITS=(function(){
-  const u=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No"];        // jusqu'au nonillion
-  const UN=["","U","D","T","Qa","Qi","Sx","Sp","Oc","No"];           // 1 à 9, en préfixe
-  const DIZ=["","Dc","Vg","Tg","Qag","Qig","Sxg","Spg","Ocg","Nog"]; // 10, 20, … 90
-  const SUF=["","d","vg","tg","qag","qig","sxg","spg","ocg","nog"];  // la même, en suffixe
-  for(let d=1;d<=9;d++)for(let n=0;n<=9;n++)u.push(n?UN[n]+SUF[d]:DIZ[d]);
-  u.push("Ce");                                                      // centillion, 10^303
-  return u;
-})();
-const FMT_MAX=Math.pow(1000,UNITS.length);   // 10^306, au-delà de la dernière unité
+/* Unités nommées jusqu'au trillion seulement (K, M, B, T). Au-delà — à partir de
+   10^15 — la notation scientifique courte : « 1.23e15 ». Jusqu'en 3.13 l'échelle
+   allait au centillion (Qa, Qi, Sx… Novg, Sxtg…) : plus personne ne savait lire
+   « 83.7Ttg », alors qu'un exposant se compare d'un coup d'œil. */
+const UNITS=["","K","M","B","T"];
+const FMT_MAX=Math.pow(1000,UNITS.length);   // 10^15 : au-delà du trillion, l'exposant
 function fmt(n){
   if(!isFinite(n))return "∞";
   if(n<0)return "-"+fmt(-n);
@@ -2394,9 +2378,9 @@ const ACHS=[
  {id:"a_e12",c:"ore",v:S=>S.totalOre,n:1e12,
   nm:{fr:"Billion",en:"Trillion"},ds:{fr:"1 T de minerai extrait",en:"1 T ore mined"}},
  {id:"a_e15",c:"ore",v:S=>S.totalOre,n:1e15,
-  nm:{fr:"Échelle planétaire",en:"Planetary scale"},ds:{fr:"1 Qa de minerai extrait",en:"1 Qa ore mined"}},
+  nm:{fr:"Échelle planétaire",en:"Planetary scale"},ds:{fr:"1e15 de minerai extrait",en:"1e15 ore mined"}},
  {id:"a_e18",c:"ore",v:S=>S.totalOre,n:1e18,
-  nm:{fr:"Échelle stellaire",en:"Stellar scale"},ds:{fr:"1 Qi de minerai extrait",en:"1 Qi ore mined"}},
+  nm:{fr:"Échelle stellaire",en:"Stellar scale"},ds:{fr:"1e18 de minerai extrait",en:"1e18 ore mined"}},
  {id:"a_rate1k",c:"rate",v:S=>perSec(),n:1e3,
   nm:{fr:"Cadence",en:"Cadence"},ds:{fr:"1 K/s de production",en:"1 K/s output"}},
  {id:"a_rate1m",c:"rate",v:S=>perSec(),n:1e6,
@@ -2446,51 +2430,51 @@ const ACHS=[
  {id:"a_dyson50",c:"struct",v:S=>(S.gens.dyson||0),n:50,
   nm:{fr:"Constellation captive",en:"Captive constellation"},ds:{fr:"50 sphères de Dyson",en:"50 Dyson spheres"}},
  {id:"a_e21",c:"ore",v:S=>S.totalOre,n:1e21,
-  nm:{fr:"Échelle galactique",en:"Galactic scale"},ds:{fr:"1 Sx de minerai extrait",en:"1 Sx ore mined"}},
+  nm:{fr:"Échelle galactique",en:"Galactic scale"},ds:{fr:"1e21 de minerai extrait",en:"1e21 ore mined"}},
  {id:"a_e24",c:"ore",v:S=>S.totalOre,n:1e24,
-  nm:{fr:"Échelle universelle",en:"Universal scale"},ds:{fr:"1 Sp de minerai extrait",en:"1 Sp ore mined"}},
+  nm:{fr:"Échelle universelle",en:"Universal scale"},ds:{fr:"1e24 de minerai extrait",en:"1e24 ore mined"}},
  {id:"a_e27",c:"ore",v:S=>S.totalOre,n:1e27,
-  nm:{fr:"Au-delà des nombres",en:"Beyond numbers"},ds:{fr:"1 Oc de minerai extrait",en:"1 Oc ore mined"}},
+  nm:{fr:"Au-delà des nombres",en:"Beyond numbers"},ds:{fr:"1e27 de minerai extrait",en:"1e27 ore mined"}},
  {id:"a_e30",c:"ore",v:S=>S.totalOre,n:1e30,
-  nm:{fr:"Poussière d'étoiles",en:"Stardust"},ds:{fr:"1 No de minerai extrait",en:"1 No ore mined"}},
+  nm:{fr:"Poussière d'étoiles",en:"Stardust"},ds:{fr:"1e30 de minerai extrait",en:"1e30 ore mined"}},
  {id:"a_e33",c:"ore",v:S=>S.totalOre,n:1e33,
-  nm:{fr:"Cœur de galaxie",en:"Galactic core"},ds:{fr:"1 Dc de minerai extrait",en:"1 Dc ore mined"}},
+  nm:{fr:"Cœur de galaxie",en:"Galactic core"},ds:{fr:"1e33 de minerai extrait",en:"1e33 ore mined"}},
  {id:"a_e36",c:"ore",v:S=>S.totalOre,n:1e36,
-  nm:{fr:"Univers miné",en:"Mined universe"},ds:{fr:"1 Ud de minerai extrait",en:"1 Ud ore mined"}},
+  nm:{fr:"Univers miné",en:"Mined universe"},ds:{fr:"1e36 de minerai extrait",en:"1e36 ore mined"}},
  {id:"a_rate1t",c:"rate",v:S=>perSec(),n:1e12,
   nm:{fr:"Torrent",en:"Torrent"},ds:{fr:"1 T/s de production",en:"1 T/s output"}},
  {id:"a_rate1qa",c:"rate",v:S=>perSec(),n:1e15,
-  nm:{fr:"Singularité productive",en:"Productive singularity"},ds:{fr:"1 Qa/s de production",en:"1 Qa/s output"}},
+  nm:{fr:"Singularité productive",en:"Productive singularity"},ds:{fr:"1e15/s de production",en:"1e15/s output"}},
  {id:"a_rate1e18",c:"rate",v:S=>perSec(),n:1e18,
-  nm:{fr:"Cascade",en:"Cascade"},ds:{fr:"1 Qi/s de production",en:"1 Qi/s output"}},
+  nm:{fr:"Cascade",en:"Cascade"},ds:{fr:"1e18/s de production",en:"1e18/s output"}},
  {id:"a_rate1e21",c:"rate",v:S=>perSec(),n:1e21,
-  nm:{fr:"Déluge",en:"Deluge"},ds:{fr:"1 Sx/s de production",en:"1 Sx/s output"}},
+  nm:{fr:"Déluge",en:"Deluge"},ds:{fr:"1e21/s de production",en:"1e21/s output"}},
  {id:"a_rate1e24",c:"rate",v:S=>perSec(),n:1e24,
-  nm:{fr:"Tempête stellaire",en:"Star storm"},ds:{fr:"1 Sp/s de production",en:"1 Sp/s output"}},
+  nm:{fr:"Tempête stellaire",en:"Star storm"},ds:{fr:"1e24/s de production",en:"1e24/s output"}},
  {id:"a_rate1e27",c:"rate",v:S=>perSec(),n:1e27,
-  nm:{fr:"Fleuve de matière",en:"River of matter"},ds:{fr:"1 Oc/s de production",en:"1 Oc/s output"}},
+  nm:{fr:"Fleuve de matière",en:"River of matter"},ds:{fr:"1e27/s de production",en:"1e27/s output"}},
  {id:"a_rate1e30",c:"rate",v:S=>perSec(),n:1e30,
-  nm:{fr:"Cataclysme productif",en:"Productive cataclysm"},ds:{fr:"1 No/s de production",en:"1 No/s output"}},
+  nm:{fr:"Cataclysme productif",en:"Productive cataclysm"},ds:{fr:"1e30/s de production",en:"1e30/s output"}},
  {id:"a_rate1e33",c:"rate",v:S=>perSec(),n:1e33,
-  nm:{fr:"Big bang industriel",en:"Industrial big bang"},ds:{fr:"1 Dc/s de production",en:"1 Dc/s output"}},
+  nm:{fr:"Big bang industriel",en:"Industrial big bang"},ds:{fr:"1e33/s de production",en:"1e33/s output"}},
  {id:"a_click1g",c:"clic",v:S=>clickVal(),n:1e9,
   nm:{fr:"Doigt d'or",en:"Golden finger"},ds:{fr:"1 B de puissance de clic",en:"1 B click power"}},
  {id:"a_click1t",c:"clic",v:S=>clickVal(),n:1e12,
   nm:{fr:"Doigt de diamant",en:"Diamond finger"},ds:{fr:"1 T de puissance de clic",en:"1 T click power"}},
  {id:"a_click1qa",c:"clic",v:S=>clickVal(),n:1e15,
-  nm:{fr:"Doigt de neutronium",en:"Neutronium finger"},ds:{fr:"1 Qa de puissance de clic",en:"1 Qa click power"}},
+  nm:{fr:"Doigt de neutronium",en:"Neutronium finger"},ds:{fr:"1e15 de puissance de clic",en:"1e15 click power"}},
  {id:"a_click1qi",c:"clic",v:S=>clickVal(),n:1e18,
-  nm:{fr:"Doigt d'antimatière",en:"Antimatter finger"},ds:{fr:"1 Qi de puissance de clic",en:"1 Qi click power"}},
+  nm:{fr:"Doigt d'antimatière",en:"Antimatter finger"},ds:{fr:"1e18 de puissance de clic",en:"1e18 click power"}},
  {id:"a_click1sx",c:"clic",v:S=>clickVal(),n:1e21,
-  nm:{fr:"Doigt-singularité",en:"Singularity finger"},ds:{fr:"1 Sx de puissance de clic",en:"1 Sx click power"}},
+  nm:{fr:"Doigt-singularité",en:"Singularity finger"},ds:{fr:"1e21 de puissance de clic",en:"1e21 click power"}},
  {id:"a_click1e24",c:"clic",v:S=>clickVal(),n:1e24,
-  nm:{fr:"Doigt cosmique",en:"Cosmic finger"},ds:{fr:"1 Sp de puissance de clic",en:"1 Sp click power"}},
+  nm:{fr:"Doigt cosmique",en:"Cosmic finger"},ds:{fr:"1e24 de puissance de clic",en:"1e24 click power"}},
  {id:"a_click1e27",c:"clic",v:S=>clickVal(),n:1e27,
-  nm:{fr:"Doigt de dieu",en:"Finger of god"},ds:{fr:"1 Oc de puissance de clic",en:"1 Oc click power"}},
+  nm:{fr:"Doigt de dieu",en:"Finger of god"},ds:{fr:"1e27 de puissance de clic",en:"1e27 click power"}},
  {id:"a_click1e30",c:"clic",v:S=>clickVal(),n:1e30,
-  nm:{fr:"Main du créateur",en:"Creator's hand"},ds:{fr:"1 No de puissance de clic",en:"1 No click power"}},
+  nm:{fr:"Main du créateur",en:"Creator's hand"},ds:{fr:"1e30 de puissance de clic",en:"1e30 click power"}},
  {id:"a_click1e33",c:"clic",v:S=>clickVal(),n:1e33,
-  nm:{fr:"Toucher originel",en:"Primal touch"},ds:{fr:"1 Dc de puissance de clic",en:"1 Dc click power"}},
+  nm:{fr:"Toucher originel",en:"Primal touch"},ds:{fr:"1e33 de puissance de clic",en:"1e33 click power"}},
  {id:"a_anom100",c:"anom",v:S=>S.anoms,n:100,
   nm:{fr:"Radar vivant",en:"Living radar"},ds:{fr:"Attraper 100 anomalies",en:"Catch 100 anomalies"}},
  {id:"a_anom250",c:"anom",v:S=>S.anoms,n:250,
@@ -2593,7 +2577,7 @@ const ACHS=[
  {id:"a_percam1",c:"perc",v:S=>S.percAm||0,n:1e8,
   nm:{fr:"Fonderie",en:"Foundry"},ds:{fr:"100 M d'antimatière versée",en:"100 M antimatter poured"}},
  {id:"a_percam2",c:"perc",v:S=>S.percAm||0,n:1e9,
-  nm:{fr:"Haut fourneau",en:"Blast furnace"},ds:{fr:"1 G d'antimatière versée",en:"1 G antimatter poured"}},
+  nm:{fr:"Haut fourneau",en:"Blast furnace"},ds:{fr:"1 B d'antimatière versée",en:"1 B antimatter poured"}},
  {id:"a_percam3",c:"perc",v:S=>S.percAm||0,n:1e12,
   nm:{fr:"Puits sans fond",en:"Bottomless well"},ds:{fr:"1 T d'antimatière versée",en:"1 T antimatter poured"}},
  {id:"a_acyc100",c:"auto",v:S=>(S.acyc||0),n:100,
@@ -4647,6 +4631,9 @@ const LIEN_LOG_EN=LIEN_CODE+"/blob/main/CHANGELOG.en.md";
    résumées en une phrase, et un lien mène au reste. À tenir à jour à chaque
    livraison — c'est la contrepartie assumée de l'affichage hors ligne. */
 const LOG=[
+ {v:"3.14.0", nm:{fr:"L'exposant après le trillion",en:"Exponents past the trillion"},
+  d:{fr:"Les nombres gardent leurs unités jusqu'au trillion (K, M, B, T) ; au-delà, à partir de 10^15, ils s'écrivent en notation scientifique courte : 1.23e15, 4.76e111. Les Qa, Qi, Sx… Novg, Sxtg ne se lisaient plus, un exposant se compare d'un coup d'œil. Les descriptions de succès suivent.",
+     en:"Numbers keep their units up to the trillion (K, M, B, T); beyond that, from 10^15, they are written in short scientific notation: 1.23e15, 4.76e111. Qa, Qi, Sx… Novg, Sxtg could no longer be read; an exponent compares at a glance. Achievement descriptions follow."}},
  {v:"3.13.2", nm:{fr:"Cascade additive",en:"Additive Cascade"},
   d:{fr:"Avec des centaines de niveaux de Cascade, le compteur de minerai ne bougeait plus : la Cascade se composait (×1,05 par niveau, ×40 milliards à 500 niveaux), si bien qu'une anomalie rapportait des milliers de milliards de secondes de production et que la production elle-même devenait invisible. La Cascade devient additive : +5 % par niveau, soit ×26 à 500 niveaux.",
      en:"With hundreds of Cascade levels the ore counter stopped moving: Cascade compounded (×1.05 per level, ×40 billion at 500 levels), so one anomaly gave trillions of seconds of production and production itself became invisible. Cascade becomes additive: +5 % per level, i.e. ×26 at 500 levels."}},

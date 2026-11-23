@@ -612,8 +612,8 @@ gain = ⌊ ( minerai extrait pendant ce cycle ÷ 1e10 ) ^ 0,30 ⌋
 
 Il faut donc **10 milliards** de minerai extrait sur le cycle pour la première
 unité (`AM_SEUIL`), et l'exposant `AM_EXPG` vaut **0,30**. Le rendement décroît
-très vite : 101 milliards pour 2 unités, 21,5 T pour 10, 46,4 Qa pour 100,
-100 Qi pour 1 000.
+très vite : 101 milliards pour 2 unités, 21,5 T pour 10, 4,64e16 pour 100,
+1e20 pour 1 000.
 
 L'exposant est passé de 0,32 à 0,30 en **2.33.0**. Les corrections du clic
 (2.30 → 2.32) avaient, sans qu'on le vise, presque doublé le minerai d'un cycle
@@ -1024,10 +1024,10 @@ une fois la catégorie complète.
 
 | Catégorie | Nombre | Ce qu'elle mesure |
 |---|---|---|
-| 🖱️ Clics | 16 | nombre de clics jusqu'à 1 000 000, puissance de clic de 1 M à 1 Dc |
+| 🖱️ Clics | 16 | nombre de clics jusqu'à 1 000 000, puissance de clic de 1 M à 1e33 |
 | 🏗️ Structures | 16 | drones, sphères de Dyson, paliers « X de chaque », totaux |
-| ⛏️ Extraction | 11 | minerai extrait, de 1 M à 1 Ud |
-| ⚡ Production | 11 | production par seconde, de 1 K/s à 1 Dc/s |
+| ⛏️ Extraction | 11 | minerai extrait, de 1 M à 1e36 |
+| ⚡ Production | 11 | production par seconde, de 1 K/s à 1e33/s |
 | 🔬 Améliorations et recherches | 8 | achats d'améliorations, complétion des deux arbres |
 | ✦ Anomalies | 14 | anomalies attrapées, au total et par type |
 | ♻️ Cycles et antimatière | 19 | nombre de cycles jusqu'à 5 000, antimatière possédée jusqu'à 10 B |
@@ -1038,10 +1038,10 @@ une fois la catégorie complète.
 Les deux échelles de la catégorie Clics sont volontairement séparées : le
 **nombre** de clics (que les Satellites d'extraction font grimper de 10/s, soit
 1 000 000 en une trentaine d'heures) et la **puissance** d'un clic. Le plafond
-de puissance est monté jusqu'à 1 Sx parce que 1 Qa se franchit vers « 100 de
+de puissance est monté jusqu'à 1e21 parce que 1e15 se franchit vers « 100 de
 chaque structure + toutes les améliorations + 100 antimatière », donc bien avant
-la fin de partie ; à 250 de chaque et 100 000 antimatière on dépasse 1 Sx. La
-3.11.0 prolonge l'échelle jusqu'à 1 Dc : une partie à 500 de chaque structure
+la fin de partie ; à 250 de chaque et 100 000 antimatière on dépasse 1e21. La
+3.11.0 prolonge l'échelle jusqu'à 1e33 : une partie à 500 de chaque structure
 produit déjà plus de 10³² par clic.
 
 Deux succès de la catégorie Anomalies ne se comptent pas : **Résonance
@@ -1083,7 +1083,7 @@ Chaque succès reçoit ainsi son palier précédent, `n0`.
 
 Quand **un palier vaut cent fois le précédent** — les seules familles qui montent
 de mille en mille — l'avancement se lit **en logarithme, depuis le palier
-précédent**. Sur « 1 Sx de puissance de clic », une barre linéaire resterait
+précédent**. Sur « 1e21 de puissance de clic », une barre linéaire resterait
 collée à zéro pendant tout le palier puis sauterait à plein.
 
 Partout ailleurs — clics, anomalies, cycles, antimatière, structures, Percées —

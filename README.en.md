@@ -599,7 +599,7 @@ gain = ⌊ ( ore mined during this cycle ÷ 1e10 ) ^ 0.30 ⌋
 
 So it takes **10 billion** ore mined in the cycle for the first unit
 (`AM_SEUIL`), and the exponent `AM_EXPG` is **0.30**. Returns fall off fast:
-101 billion for 2 units, 21.5 T for 10, 46.4 Qa for 100, 100 Qi for 1,000.
+101 billion for 2 units, 21.5 T for 10, 4.64e16 for 100, 1e20 for 1,000.
 
 The exponent went from 0.32 to 0.30 in **2.33.0**. The click fixes (2.30 → 2.32)
 had, without that being the goal, nearly doubled the ore of an advanced cycle —
@@ -992,10 +992,10 @@ complete.
 
 | Category | Count | What it measures |
 |---|---|---|
-| 🖱️ Clicking | 16 | number of clicks up to 1,000,000, click power from 1 M to 1 Dc |
+| 🖱️ Clicking | 16 | number of clicks up to 1,000,000, click power from 1 M to 1e33 |
 | 🏗️ Structures | 16 | drones, Dyson spheres, "X of each" tiers, totals |
-| ⛏️ Mining | 11 | ore mined, from 1 M to 1 Ud |
-| ⚡ Output | 11 | output per second, from 1 K/s to 1 Dc/s |
+| ⛏️ Mining | 11 | ore mined, from 1 M to 1e36 |
+| ⚡ Output | 11 | output per second, from 1 K/s to 1e33/s |
 | 🔬 Upgrades and research | 8 | upgrade purchases, completing both trees |
 | ✦ Anomalies | 14 | anomalies caught, in total and by type |
 | ♻️ Cycles and antimatter | 19 | number of cycles up to 5,000, antimatter held up to 10 B |
@@ -1005,11 +1005,11 @@ complete.
 
 The two ladders in the Clicking category are deliberately separate: the **number**
 of clicks (which the Mining satellites push up by 10/s, so 1,000,000 in about
-thirty hours) and the **power** of a click. The power ceiling was raised to 1 Sx
-because 1 Qa is crossed around "100 of each structure + all upgrades + 100
+thirty hours) and the **power** of a click. The power ceiling was raised to 1e21
+because 1e15 is crossed around "100 of each structure + all upgrades + 100
 antimatter", so well before the end of the game; at 250 of each and 100,000
-antimatter you go past 1 Sx. 3.11.0 extends the
-scale to 1 Dc: a run at 500 of each structure already makes more than 10³² per
+antimatter you go past 1e21. 3.11.0 extends the
+scale to 1e33: a run at 500 of each structure already makes more than 10³² per
 click.
 
 Two achievements in the Anomalies category are not counters: **Perfect
@@ -1049,7 +1049,7 @@ function's source text is stable. Each achievement thus gets its previous tier,
 
 When **a tier is a hundred times the previous one** — the only families that
 climb by factors of a thousand — progress reads **logarithmically, from the
-previous tier**. On "1 Sx of click power", a linear bar would sit at zero for the
+previous tier**. On "1e21 of click power", a linear bar would sit at zero for the
 whole tier then jump to full.
 
 Everywhere else — clicks, anomalies, cycles, antimatter, structures,
