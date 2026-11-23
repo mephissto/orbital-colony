@@ -17,6 +17,27 @@ restent valides**.
 
 ---
 
+## 3.14.0 — L'exposant après le trillion
+
+Les nombres gardent leurs unités **jusqu'au trillion** — K, M, B, T — puis passent
+en **notation scientifique courte** à partir de 10¹⁵ : `1.23e15`, `4.76e111`.
+
+| Avant | Après |
+|---|---|
+| 999T | 999T |
+| 1.00Qa | 1.00e15 |
+| 30.4Dc | 3.04e34 |
+| 83.7Ttg | 8.37e103 |
+
+L'échelle de la 3.7.27 allait jusqu'au centillion (102 unités : Qa, Qi, Sx…
+Novg, Sxtg…). Plus personne ne les lisait, alors qu'un exposant se compare d'un
+coup d'œil. Les descriptions de succès suivent (« 1e15/s de production »,
+« 1e33 de puissance de clic »…), et « 1 G d'antimatière versée » devient « 1 B ».
+
+Aucun champ de sauvegarde ajouté ni modifié.
+
+---
+
 ## 3.13.2 — Cascade additive
 
 **Le minerai semblait figé** avec des centaines de niveaux de Cascade : le

@@ -16,6 +16,27 @@ export/import. No released version has ever renamed or removed a field: **every
 
 ---
 
+## 3.14.0 — Exponents past the trillion
+
+Numbers keep their units **up to the trillion** — K, M, B, T — then switch to
+**short scientific notation** from 10¹⁵: `1.23e15`, `4.76e111`.
+
+| Before | After |
+|---|---|
+| 999T | 999T |
+| 1.00Qa | 1.00e15 |
+| 30.4Dc | 3.04e34 |
+| 83.7Ttg | 8.37e103 |
+
+The 3.7.27 scale went up to the centillion (102 units: Qa, Qi, Sx… Novg,
+Sxtg…). Nobody read them any more, while an exponent compares at a glance.
+Achievement descriptions follow ("1e15/s output", "1e33 click power"…), and
+"1 G antimatter poured" becomes "1 B".
+
+No save field added or changed.
+
+---
+
 ## 3.13.2 — Additive Cascade
 
 **Ore looked frozen** with hundreds of Cascade levels: the counter did not move
